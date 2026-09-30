@@ -222,6 +222,10 @@ pub struct AudioCallbackData {
     dsd_starved_samples: AtomicU64,
     /// Telemetry: callbacks silenced by `sources` lock contention.
     dsd_lock_misses: AtomicU64,
+    /// Latches the first persistent-silence report (zero channels, undersized
+    /// mix buffers) so the RT callback emits a single "output lost" event
+    /// instead of spamming the channel every callback.
+    output_loss_reported: AtomicBool,
 }
 
 impl AudioCallbackData {
@@ -280,6 +284,7 @@ impl AudioCallbackData {
             dop_marker_phase: AtomicBool::new(false),
             dsd_starved_samples: AtomicU64::new(0),
             dsd_lock_misses: AtomicU64::new(0),
+            output_loss_reported: AtomicBool::new(false),
         }
     }
 
@@ -329,6 +334,21 @@ impl AudioCallbackData {
             }
         }
         None
+    }
+
+    /// Report a persistent silence condition on the shared event channel.
+    /// Latches after the first hit: respawning the engine resets the latch,
+    /// and `player_service.dart` reacts to the "audio engine output lost"
+    /// marker with revive / fallback. RT-safe after the first report
+    /// (only an atomic swap; the initial `format!` happens once).
+    #[inline]
+    fn report_output_lost(&self, event_tx: &Sender<AudioEvent>, detail: &str) {
+        if self.output_loss_reported.swap(true, Ordering::Relaxed) {
+            return;
+        }
+        let message = audio_output_lost_message(detail);
+        log::error!("{}", message);
+        let _ = event_tx.try_send(AudioEvent::Error { message });
     }
 
     /// (starved samples, lock misses) telemetry snapshot for the DSD render
@@ -2318,6 +2338,14 @@ pub fn create_audio_engine(
     })
 }
 
+/// Prefix shared by every "the engine silently stopped producing audio"
+/// event. `player_service.dart` matches this exact phrase to revive the
+/// engine and, after repeats, fall back to the Android player; keep the two
+/// in sync. Not cfg-gated so host tests can assert the marker.
+fn audio_output_lost_message(detail: &str) -> String {
+    format!("Audio engine output lost: {}", detail)
+}
+
 #[cfg(target_os = "android")]
 fn report_oboe_callback_failure(
     event_tx: &Sender<AudioEvent>,
@@ -2328,10 +2356,10 @@ fn report_oboe_callback_failure(
         return;
     }
     *reported = true;
-    let message = format!(
+    let message = audio_output_lost_message(&format!(
         "Android managed output callback failure: {} (output silenced)",
         detail
-    );
+    ));
     log::error!("{}", message);
     let _ = event_tx.try_send(AudioEvent::Error { message });
 }
@@ -3313,7 +3341,7 @@ fn volume_to_gain(volume: f32) -> f32 {
 pub(crate) fn audio_callback(
     output: &mut [f32],
     data: &AudioCallbackData,
-    _event_tx: &Sender<AudioEvent>,
+    event_tx: &Sender<AudioEvent>,
 ) {
     if data.is_paused() {
         data.fill_silence(output);
@@ -3375,6 +3403,10 @@ pub(crate) fn audio_callback(
     let channels = data.channels();
 
     if channels == 0 {
+        data.report_output_lost(
+            event_tx,
+            "audio callback configured with zero channels (output silenced)",
+        );
         output.fill(0.0);
         return;
     }
@@ -3443,6 +3475,13 @@ pub(crate) fn audio_callback(
 
         let needed = output.len();
         if buf_a.len() < needed || buf_b.len() < needed {
+            data.report_output_lost(
+                event_tx,
+                &format!(
+                    "crossfade mix buffers too small for a {} sample callback (output silenced)",
+                    needed
+                ),
+            );
             output.fill(0.0);
             return;
         }
@@ -4365,6 +4404,54 @@ mod tests {
         let mut output = vec![123.0; output_len];
         audio_callback(&mut output, data, &event_tx);
         output
+    }
+
+    #[test]
+    fn audio_output_lost_message_carries_dart_recovery_marker() {
+        let message = audio_output_lost_message("managed output callback failure");
+        assert!(message.starts_with("Audio engine output lost:"));
+    }
+
+    #[test]
+    fn report_output_lost_latches_after_first_event() {
+        let data = build_callback_data(48_000, 2);
+        let (event_tx, event_rx) = bounded::<AudioEvent>(8);
+
+        data.report_output_lost(&event_tx, "first failure");
+        data.report_output_lost(&event_tx, "second failure");
+
+        let event = event_rx
+            .try_recv()
+            .expect("first report should emit an event");
+        match event {
+            AudioEvent::Error { message } => {
+                assert!(message.starts_with("Audio engine output lost:"));
+                assert!(message.contains("first failure"));
+            }
+            _ => panic!("expected AudioEvent::Error"),
+        }
+        assert!(
+            event_rx.try_recv().is_err(),
+            "latch should suppress repeated reports"
+        );
+    }
+
+    #[test]
+    fn zero_channel_callback_reports_output_lost() {
+        let data = build_callback_data(48_000, 0);
+        let (event_tx, event_rx) = bounded::<AudioEvent>(8);
+
+        let mut output = vec![1.0; 8];
+        audio_callback(&mut output, &data, &event_tx);
+
+        assert!(output.iter().all(|sample| *sample == 0.0));
+        let event = event_rx
+            .try_recv()
+            .expect("zero channels should report output loss");
+        match event {
+            AudioEvent::Error { message } => assert!(message.contains("zero channels")),
+            _ => panic!("expected AudioEvent::Error"),
+        }
     }
 
     #[test]
