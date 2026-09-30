@@ -1092,6 +1092,8 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
                           artworkCardTextScale: appPrefs.artworkCardTextScale,
                           artworkCardVerticalOffset:
                               appPrefs.artworkCardVerticalOffset,
+                          artworkCardArtworkOffset:
+                              appPrefs.artworkCardArtworkOffset,
                           artworkCardShowTitle: appPrefs.artworkCardShowTitle,
                           artworkCardShowArtist: appPrefs.artworkCardShowArtist,
                           artworkCardShowAlbum: appPrefs.artworkCardShowAlbum,
@@ -1198,6 +1200,8 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
                                         appPrefs.artworkCardTextScale,
                                     artworkCardVerticalOffset:
                                         appPrefs.artworkCardVerticalOffset,
+                                    artworkCardArtworkOffset:
+                                        appPrefs.artworkCardArtworkOffset,
                                     artworkCardShowTitle:
                                         appPrefs.artworkCardShowTitle,
                                     artworkCardShowArtist:
