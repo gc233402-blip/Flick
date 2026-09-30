@@ -114,6 +114,8 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
                       artworkCardTextScale: appPrefs.artworkCardTextScale,
                       artworkCardVerticalOffset:
                           appPrefs.artworkCardVerticalOffset,
+                      artworkCardArtworkOffset:
+                          appPrefs.artworkCardArtworkOffset,
                       artworkCardShowTitle: appPrefs.artworkCardShowTitle,
                       artworkCardShowArtist: appPrefs.artworkCardShowArtist,
                       artworkCardShowAlbum: appPrefs.artworkCardShowAlbum,
@@ -231,6 +233,17 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
                             appPrefs.artworkCardVerticalOffset,
                           ),
                           onChanged: prefsNotifier.setArtworkCardVerticalOffset,
+                        ),
+                        _PlayerCustomizationSlider(
+                          title: 'Artwork placement',
+                          value: appPrefs.artworkCardArtworkOffset,
+                          min: -48,
+                          max: 48,
+                          divisions: 16,
+                          valueLabel: _placementLabel(
+                            appPrefs.artworkCardArtworkOffset,
+                          ),
+                          onChanged: prefsNotifier.setArtworkCardArtworkOffset,
                         ),
                         const SizedBox(height: 6),
                         _PlayerCustomizationToggle(
@@ -471,6 +484,8 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
                           artworkCardTextScale: appPrefs.artworkCardTextScale,
                           artworkCardVerticalOffset:
                               appPrefs.artworkCardVerticalOffset,
+                          artworkCardArtworkOffset:
+                              appPrefs.artworkCardArtworkOffset,
                           artworkCardShowTitle: appPrefs.artworkCardShowTitle,
                           artworkCardShowArtist: appPrefs.artworkCardShowArtist,
                           artworkCardShowAlbum: appPrefs.artworkCardShowAlbum,
@@ -802,6 +817,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
   final double artworkCardArtworkScale;
   final double artworkCardTextScale;
   final double artworkCardVerticalOffset;
+  final double artworkCardArtworkOffset;
   final bool artworkCardShowTitle;
   final bool artworkCardShowArtist;
   final bool artworkCardShowAlbum;
@@ -818,6 +834,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
     required this.artworkCardArtworkScale,
     required this.artworkCardTextScale,
     required this.artworkCardVerticalOffset,
+    required this.artworkCardArtworkOffset,
     this.artworkCardShowTitle = true,
     this.artworkCardShowArtist = true,
     this.artworkCardShowAlbum = true,
@@ -876,44 +893,52 @@ class _PlayerLayoutPreview extends StatelessWidget {
 
   Widget _buildArtworkCardPreview(BuildContext context) {
     final artSize = 70.0 * artworkCardArtworkScale;
-    return Transform.translate(
-      offset: Offset(0, artworkCardVerticalOffset * 0.45),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _PreviewAlbumArt(song: song, size: artSize, radius: 18),
-          const SizedBox(height: 12),
-          if (artworkCardShowTitle)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
-              child: Text(
-                song?.title ?? 'Midnight Signal',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'ProductSans',
-                  fontSize: 17 * artworkCardTextScale,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Transform.translate(
+          offset: Offset(0, artworkCardArtworkOffset * 0.45),
+          child: _PreviewAlbumArt(song: song, size: artSize, radius: 18),
+        ),
+        const SizedBox(height: 12),
+        Transform.translate(
+          offset: Offset(0, artworkCardVerticalOffset * 0.45),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (artworkCardShowTitle)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  child: Text(
+                    song?.title ?? 'Midnight Signal',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'ProductSans',
+                      fontSize: 17 * artworkCardTextScale,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          if (artworkCardShowTitle && artworkCardShowArtist)
-            const SizedBox(height: 4),
-          if (artworkCardShowArtist)
-            Text(
-              song?.artist ?? 'Flick Preview',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'ProductSans',
-                fontSize: 12 * artworkCardTextScale,
-                color: Colors.white.withValues(alpha: 0.72),
-              ),
-            ),
-        ],
-      ),
+              if (artworkCardShowTitle && artworkCardShowArtist)
+                const SizedBox(height: 4),
+              if (artworkCardShowArtist)
+                Text(
+                  song?.artist ?? 'Flick Preview',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'ProductSans',
+                    fontSize: 12 * artworkCardTextScale,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -1053,6 +1078,7 @@ class _FullScreenPreview extends StatelessWidget {
   final double artworkCardArtworkScale;
   final double artworkCardTextScale;
   final double artworkCardVerticalOffset;
+  final double artworkCardArtworkOffset;
   final bool artworkCardShowTitle;
   final bool artworkCardShowArtist;
   final bool artworkCardShowAlbum;
@@ -1071,6 +1097,7 @@ class _FullScreenPreview extends StatelessWidget {
     required this.artworkCardArtworkScale,
     required this.artworkCardTextScale,
     required this.artworkCardVerticalOffset,
+    required this.artworkCardArtworkOffset,
     this.artworkCardShowTitle = true,
     this.artworkCardShowArtist = true,
     this.artworkCardShowAlbum = true,
@@ -1110,69 +1137,77 @@ class _FullScreenPreview extends StatelessWidget {
         final maxWidth = constraints.maxWidth;
         final artSize =
             (maxWidth * 0.68).clamp(180.0, 380.0) * artworkCardArtworkScale;
-        return Transform.translate(
-          offset: Offset(0, artworkCardVerticalOffset * 1.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _PreviewAlbumArt(song: song, size: artSize, radius: 28),
-              const SizedBox(height: 24),
-              if (artworkCardShowTitle)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Text(
-                    song?.title ?? 'Midnight Signal',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'ProductSans',
-                      fontSize: 28 * artworkCardTextScale,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Transform.translate(
+              offset: Offset(0, artworkCardArtworkOffset * 1.0),
+              child: _PreviewAlbumArt(song: song, size: artSize, radius: 28),
+            ),
+            const SizedBox(height: 24),
+            Transform.translate(
+              offset: Offset(0, artworkCardVerticalOffset * 1.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (artworkCardShowTitle)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Text(
+                        song?.title ?? 'Midnight Signal',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'ProductSans',
+                          fontSize: 28 * artworkCardTextScale,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              if (artworkCardShowTitle && artworkCardShowArtist)
-                const SizedBox(height: 8),
-              if (artworkCardShowArtist)
-                Text(
-                  song?.artist ?? 'Flick Preview',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'ProductSans',
-                    fontSize: 17 * artworkCardTextScale,
-                    color: Colors.white.withValues(alpha: 0.72),
-                  ),
-                ),
-              if (artworkCardShowArtist && artworkCardShowAlbum)
-                const SizedBox(height: 6),
-              if (artworkCardShowAlbum)
-                Text(
-                  song?.album ?? 'Mirror Test',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'ProductSans',
-                    fontSize: 14 * artworkCardTextScale,
-                    color: Colors.white.withValues(alpha: 0.56),
-                  ),
-                ),
-              if (artworkCardShowFileInfo)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    'FLAC · 24-bit / 96 kHz',
-                    style: TextStyle(
-                      fontFamily: 'ProductSans',
-                      fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.4),
+                  if (artworkCardShowTitle && artworkCardShowArtist)
+                    const SizedBox(height: 8),
+                  if (artworkCardShowArtist)
+                    Text(
+                      song?.artist ?? 'Flick Preview',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'ProductSans',
+                        fontSize: 17 * artworkCardTextScale,
+                        color: Colors.white.withValues(alpha: 0.72),
+                      ),
                     ),
-                  ),
-                ),
-            ],
-          ),
+                  if (artworkCardShowArtist && artworkCardShowAlbum)
+                    const SizedBox(height: 6),
+                  if (artworkCardShowAlbum)
+                    Text(
+                      song?.album ?? 'Mirror Test',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'ProductSans',
+                        fontSize: 14 * artworkCardTextScale,
+                        color: Colors.white.withValues(alpha: 0.56),
+                      ),
+                    ),
+                  if (artworkCardShowFileInfo)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        'FLAC · 24-bit / 96 kHz',
+                        style: TextStyle(
+                          fontFamily: 'ProductSans',
+                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.4),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
         );
       },
     );

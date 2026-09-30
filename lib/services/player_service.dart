@@ -189,6 +189,38 @@ bool shouldSuppressMotionArt({
       engine == AudioEngineType.dapInternalHighRes;
 }
 
+/// The Rust engine and its direct backends emit these markers when the output
+/// stream is no longer producing usable audio. Keep the list in sync with
+/// `audio_output_lost_message` in `engine.rs` and the direct-backend errors.
+@visibleForTesting
+bool isDeadRustEngineError(String message) {
+  final normalized = message.toLowerCase();
+  return normalized.contains('disconnected channel') ||
+      normalized.contains('audio engine thread crashed') ||
+      normalized.contains('audio engine output lost') ||
+      normalized.contains('managed output callback failure') ||
+      normalized.contains('output silenced');
+}
+
+const Duration deadRustEngineRecoveryWindow = Duration(minutes: 2);
+const int deadRustEngineRecoveryLimit = 2;
+
+/// True when [recoveryTimestamps] (including the current failure) holds
+/// [deadRustEngineRecoveryLimit] failures inside [deadRustEngineRecoveryWindow].
+/// Respawning cannot fix a deterministic HAL failure, so the caller should
+/// fall back to the plain Android engine instead of looping.
+@visibleForTesting
+bool shouldForceRustEngineFallback({
+  required List<DateTime> recoveryTimestamps,
+  required DateTime now,
+}) {
+  final cutoff = now.subtract(deadRustEngineRecoveryWindow);
+  final recent = recoveryTimestamps.where(
+    (timestamp) => timestamp.isAfter(cutoff),
+  );
+  return recent.length >= deadRustEngineRecoveryLimit;
+}
+
 @visibleForTesting
 String canonicalPlaybackFileType({required String fileType, String? filePath}) {
   final pathExtension = extractPlaybackPathExtension(filePath);
@@ -409,6 +441,7 @@ class PlayerService {
   bool _motionArtDuringBitPerfect = false;
   bool _midStreamUsbFallbackActive = false;
   bool _deadRustEngineRecoveryActive = false;
+  final List<DateTime> _deadRustEngineRecoveryTimestamps = <DateTime>[];
   late final AudioSessionManager _sessionManager;
   late final AudioEngineManager _playbackManager;
   RustAudioEngine? _rustEngine;
@@ -2938,9 +2971,7 @@ class PlayerService {
         }());
         return;
       }
-      final normalizedError = message.toLowerCase();
-      if (normalizedError.contains('audio engine thread crashed') ||
-          normalizedError.contains('audio engine output lost')) {
+      if (isDeadRustEngineError(message)) {
         final song = currentSongNotifier.value;
         final position = _lastPlaybackState?.position ?? Duration.zero;
         unawaited(() async {
@@ -5026,10 +5057,7 @@ class PlayerService {
     }
 
     final message = error.toString();
-    final normalized = message.toLowerCase();
-    if (!normalized.contains('disconnected channel') &&
-        !normalized.contains('audio engine thread crashed') &&
-        !normalized.contains('audio engine output lost')) {
+    if (!isDeadRustEngineError(message)) {
       return false;
     }
     if (_deadRustEngineRecoveryActive) {
@@ -5038,15 +5066,33 @@ class PlayerService {
 
     _deadRustEngineRecoveryActive = true;
     try {
+      final now = DateTime.now();
+      _deadRustEngineRecoveryTimestamps.removeWhere(
+        (timestamp) =>
+            now.difference(timestamp) >= deadRustEngineRecoveryWindow,
+      );
+      _deadRustEngineRecoveryTimestamps.add(now);
+      final forceFallback = shouldForceRustEngineFallback(
+        recoveryTimestamps: _deadRustEngineRecoveryTimestamps,
+        now: now,
+      );
+
       _debugLog(
-        '[Engine] Rust engine unreachable ($message); attempting respawn',
+        forceFallback
+            ? '[Engine] Rust engine failed '
+                  '${_deadRustEngineRecoveryTimestamps.length} times within '
+                  '${deadRustEngineRecoveryWindow.inSeconds}s ($message); '
+                  'skipping respawn and falling back to NORMAL_ANDROID'
+            : '[Engine] Rust engine unreachable ($message); attempting respawn',
       );
       var revived = false;
-      try {
-        await _rustAudioService.prepareEngine();
-        revived = true;
-      } catch (e) {
-        _debugLog('[Engine] Rust engine respawn failed: $e');
+      if (!forceFallback) {
+        try {
+          await _rustAudioService.prepareEngine();
+          revived = true;
+        } catch (e) {
+          _debugLog('[Engine] Rust engine respawn failed: $e');
+        }
       }
 
       if (!revived) {
@@ -5054,7 +5100,9 @@ class PlayerService {
         await _sessionManager.recordFallback(
           requestedMode: currentEngineType,
           fallbackMode: AudioEngineType.normalAndroid,
-          reason: 'rust audio engine unrecoverable: $message',
+          reason: forceFallback
+              ? 'rust audio engine failed repeatedly: $message'
+              : 'rust audio engine unrecoverable: $message',
         );
         await _sessionManager.switchMode(
           AudioEngineType.normalAndroid,

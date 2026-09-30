@@ -44,6 +44,20 @@ class ChangelogSubsection {
 /// automatically surface the entry whose `version` equals `kAppVersion`.
 const List<ChangelogEntry> kChangelogEntries = [
   ChangelogEntry(
+    version: '0.22.0-beta.3',
+    date: '2026-09-30',
+    sections: [
+      ChangelogSection(
+        title: 'Audio Reliability',
+        bullets: [
+          '**Silent Rust-engine output is now detected and recovered** — if the engine stops producing audio, the app respawns it and resumes the current track instead of staying silent.',
+          '**Repeated failures fall back to the Android player** — two engine failures within two minutes switch playback to just_audio/ExoPlayer instead of looping on the same broken output.',
+          'Managed output failures now log burst/format details for easier troubleshooting.',
+        ],
+      ),
+    ],
+  ),
+  ChangelogEntry(
     version: '0.22.0-beta.2',
     date: '2026-09-28',
     sections: [

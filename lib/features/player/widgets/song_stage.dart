@@ -53,6 +53,7 @@ class SongStage extends StatelessWidget {
   final double artworkCardArtworkScale;
   final double artworkCardTextScale;
   final double artworkCardVerticalOffset;
+  final double artworkCardArtworkOffset;
   final bool artworkCardShowTitle;
   final bool artworkCardShowArtist;
   final bool artworkCardShowAlbum;
@@ -97,6 +98,7 @@ class SongStage extends StatelessWidget {
     this.artworkCardArtworkScale = 1.0,
     this.artworkCardTextScale = 1.0,
     this.artworkCardVerticalOffset = 0.0,
+    this.artworkCardArtworkOffset = 0.0,
     this.artworkCardShowTitle = true,
     this.artworkCardShowArtist = true,
     this.artworkCardShowAlbum = true,
@@ -627,16 +629,19 @@ class SongStage extends StatelessWidget {
                                         onNavigateToArtistDetail,
                                   ),
                                 )
-                              : Transform.translate(
-                                  offset: Offset(0, artworkCardVerticalOffset),
-                                  child: Column(
-                                    mainAxisAlignment: isVeryShortHeight
-                                        ? MainAxisAlignment.start
-                                        : MainAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        flex: isVeryShortHeight ? 5 : 7,
-                                        child: Center(
+                              : Column(
+                                  mainAxisAlignment: isVeryShortHeight
+                                      ? MainAxisAlignment.start
+                                      : MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      flex: isVeryShortHeight ? 5 : 7,
+                                      child: Center(
+                                        child: Transform.translate(
+                                          offset: Offset(
+                                            0,
+                                            artworkCardArtworkOffset,
+                                          ),
                                           child: OverflowBox(
                                             maxWidth: artworkSize,
                                             maxHeight: artworkSize,
@@ -673,8 +678,14 @@ class SongStage extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      SizedBox(height: artworkSpacing),
-                                      Padding(
+                                    ),
+                                    SizedBox(height: artworkSpacing),
+                                    Transform.translate(
+                                      offset: Offset(
+                                        0,
+                                        artworkCardVerticalOffset,
+                                      ),
+                                      child: Padding(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: isVeryShortHeight
                                               ? 8.0
@@ -686,9 +697,9 @@ class SongStage extends StatelessWidget {
                                           veryCompact: isVeryShortHeight,
                                         ),
                                       ),
-                                      SizedBox(height: identitySpacing),
-                                    ],
-                                  ),
+                                    ),
+                                    SizedBox(height: identitySpacing),
+                                  ],
                                 ),
                         ),
                 ),

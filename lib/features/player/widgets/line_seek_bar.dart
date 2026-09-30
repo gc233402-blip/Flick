@@ -230,9 +230,9 @@ class _LineSeekBarState extends State<LineSeekBar>
                       ? AppColors.glassBackgroundStrong
                       : Colors.transparent,
                 ),
-                padding: EdgeInsets.symmetric(
-                  vertical: _isFineScrubbing ? (_expandedHeight - 10) / 2 : 18,
-                ),
+                padding: _isFineScrubbing
+                    ? EdgeInsets.symmetric(vertical: (_expandedHeight - 10) / 2)
+                    : const EdgeInsets.only(top: 26, bottom: 10),
                 child: RepaintBoundary(
                   child: AnimatedBuilder(
                     animation: _pulseAnimation,
