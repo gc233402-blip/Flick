@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.22.0-beta.3 (2026-09-30)
+
+### Audio Reliability
+- **Silent Rust-engine output is detected and recovered**: callback failures, zero-channel output, and undersized mix buffers now surface as an "output lost" event, and the app respawns the engine and resumes the current track instead of staying silent.
+- **Repeated failures fall back to the Android player**: if the Rust engine dies twice within two minutes, playback switches to the just_audio/ExoPlayer engine rather than looping on the same broken output.
+- Managed output callback failures now carry burst/format details for easier triage.
+
 ## 0.22.0-beta.2 (2026-09-28)
 
 ### Distribution
