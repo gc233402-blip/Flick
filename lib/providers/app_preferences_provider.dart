@@ -247,6 +247,14 @@ class AppPreferencesNotifier extends Notifier<AppPreferences> {
         .setArtworkCardVerticalOffset(value);
   }
 
+  Future<void> setArtworkCardArtworkOffset(double value) async {
+    if (state.artworkCardArtworkOffset == value) return;
+    state = state.copyWith(artworkCardArtworkOffset: value);
+    await ref
+        .read(appPreferencesServiceProvider)
+        .setArtworkCardArtworkOffset(value);
+  }
+
   Future<void> setArtworkCardShowTitle(bool value) async {
     if (state.artworkCardShowTitle == value) return;
     state = state.copyWith(artworkCardShowTitle: value);

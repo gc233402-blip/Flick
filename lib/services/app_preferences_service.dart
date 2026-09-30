@@ -27,6 +27,7 @@ class AppPreferences {
   final double artworkCardArtworkScale;
   final double artworkCardTextScale;
   final double artworkCardVerticalOffset;
+  final double artworkCardArtworkOffset;
   final bool artworkCardShowTitle;
   final bool artworkCardShowArtist;
   final bool artworkCardShowAlbum;
@@ -142,6 +143,7 @@ class AppPreferences {
     this.artworkCardArtworkScale = 1.0,
     this.artworkCardTextScale = 1.0,
     this.artworkCardVerticalOffset = 0.0,
+    this.artworkCardArtworkOffset = 0.0,
     this.artworkCardShowTitle = true,
     this.artworkCardShowArtist = true,
     this.artworkCardShowAlbum = true,
@@ -258,6 +260,7 @@ class AppPreferences {
     double? artworkCardArtworkScale,
     double? artworkCardTextScale,
     double? artworkCardVerticalOffset,
+    double? artworkCardArtworkOffset,
     bool? artworkCardShowTitle,
     bool? artworkCardShowArtist,
     bool? artworkCardShowAlbum,
@@ -383,6 +386,8 @@ class AppPreferences {
       artworkCardTextScale: artworkCardTextScale ?? this.artworkCardTextScale,
       artworkCardVerticalOffset:
           artworkCardVerticalOffset ?? this.artworkCardVerticalOffset,
+      artworkCardArtworkOffset:
+          artworkCardArtworkOffset ?? this.artworkCardArtworkOffset,
       artworkCardShowTitle: artworkCardShowTitle ?? this.artworkCardShowTitle,
       artworkCardShowArtist:
           artworkCardShowArtist ?? this.artworkCardShowArtist,
@@ -542,6 +547,7 @@ class AppPreferencesService {
   static const _artworkCardArtworkScaleKey = 'artwork_card_artwork_scale';
   static const _artworkCardTextScaleKey = 'artwork_card_text_scale';
   static const _artworkCardVerticalOffsetKey = 'artwork_card_vertical_offset';
+  static const _artworkCardArtworkOffsetKey = 'artwork_card_artwork_offset';
   static const _artworkCardShowTitleKey = 'artwork_card_show_title';
   static const _artworkCardShowArtistKey = 'artwork_card_show_artist';
   static const _artworkCardShowAlbumKey = 'artwork_card_show_album';
@@ -681,6 +687,8 @@ class AppPreferencesService {
       artworkCardTextScale: prefs.getDouble(_artworkCardTextScaleKey) ?? 1.0,
       artworkCardVerticalOffset:
           prefs.getDouble(_artworkCardVerticalOffsetKey) ?? 0.0,
+      artworkCardArtworkOffset:
+          prefs.getDouble(_artworkCardArtworkOffsetKey) ?? 0.0,
       artworkCardShowTitle: prefs.getBool(_artworkCardShowTitleKey) ?? true,
       artworkCardShowArtist: prefs.getBool(_artworkCardShowArtistKey) ?? true,
       artworkCardShowAlbum: prefs.getBool(_artworkCardShowAlbumKey) ?? true,
@@ -1115,6 +1123,11 @@ class AppPreferencesService {
   Future<void> setArtworkCardVerticalOffset(double value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_artworkCardVerticalOffsetKey, value);
+  }
+
+  Future<void> setArtworkCardArtworkOffset(double value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_artworkCardArtworkOffsetKey, value);
   }
 
   Future<bool> getArtworkCardShowTitle() async {
