@@ -43,6 +43,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                   artworkCardArtworkScale: appPrefs.artworkCardArtworkScale,
                   artworkCardTextScale: appPrefs.artworkCardTextScale,
                   artworkCardVerticalOffset: appPrefs.artworkCardVerticalOffset,
+                  artworkCardArtworkOffset: appPrefs.artworkCardArtworkOffset,
                   artworkCardShowTitle: appPrefs.artworkCardShowTitle,
                   artworkCardShowArtist: appPrefs.artworkCardShowArtist,
                   artworkCardShowAlbum: appPrefs.artworkCardShowAlbum,
@@ -267,7 +268,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               SliderSetting(
                 icon: LucideIcons.arrowUpDown,
                 title: 'Content Placement',
-                subtitle: 'Shift the card and text up or down',
+                subtitle: 'Shift only the song details up or down',
                 value: appPrefs.artworkCardVerticalOffset,
                 displayValue:
                     _placementLabel(appPrefs.artworkCardVerticalOffset),
@@ -278,6 +279,23 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                   ref
                       .read(appPreferencesProvider.notifier)
                       .setArtworkCardVerticalOffset(value);
+                },
+              ),
+              const SettingsDivider(),
+              SliderSetting(
+                icon: LucideIcons.moveVertical,
+                title: 'Artwork Placement',
+                subtitle: 'Shift only the album art up or down',
+                value: appPrefs.artworkCardArtworkOffset,
+                displayValue:
+                    _placementLabel(appPrefs.artworkCardArtworkOffset),
+                min: -48,
+                max: 48,
+                divisions: 16,
+                onChanged: (value) {
+                  ref
+                      .read(appPreferencesProvider.notifier)
+                      .setArtworkCardArtworkOffset(value);
                 },
               ),
               const SettingsDivider(),
@@ -495,6 +513,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                           artworkCardTextScale: appPrefs.artworkCardTextScale,
                           artworkCardVerticalOffset:
                               appPrefs.artworkCardVerticalOffset,
+                          artworkCardArtworkOffset:
+                              appPrefs.artworkCardArtworkOffset,
                           artworkCardShowTitle: appPrefs.artworkCardShowTitle,
                           artworkCardShowArtist: appPrefs.artworkCardShowArtist,
                           artworkCardShowAlbum: appPrefs.artworkCardShowAlbum,
@@ -590,6 +610,7 @@ class _LayoutPreview extends StatelessWidget {
     required this.artworkCardArtworkScale,
     required this.artworkCardTextScale,
     required this.artworkCardVerticalOffset,
+    required this.artworkCardArtworkOffset,
     required this.artworkCardShowTitle,
     required this.artworkCardShowArtist,
     required this.artworkCardShowAlbum,
@@ -608,6 +629,7 @@ class _LayoutPreview extends StatelessWidget {
   final double artworkCardArtworkScale;
   final double artworkCardTextScale;
   final double artworkCardVerticalOffset;
+  final double artworkCardArtworkOffset;
   final bool artworkCardShowTitle;
   final bool artworkCardShowArtist;
   final bool artworkCardShowAlbum;
@@ -699,72 +721,80 @@ class _LayoutPreview extends StatelessWidget {
 
   Widget _buildArtworkCardPreview(BuildContext context) {
     final artSize = 70.0 * artworkCardArtworkScale;
-    return Transform.translate(
-      offset: Offset(0, artworkCardVerticalOffset * 0.45),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _AlbumArtThumb(song: song, size: artSize, radius: 18),
-          const SizedBox(height: 10),
-          if (artworkCardShowTitle)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
-              child: Text(
-                song?.title ?? 'Unknown',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'ProductSans',
-                  fontSize: 17 * artworkCardTextScale,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Transform.translate(
+          offset: Offset(0, artworkCardArtworkOffset * 0.45),
+          child: _AlbumArtThumb(song: song, size: artSize, radius: 18),
+        ),
+        const SizedBox(height: 10),
+        Transform.translate(
+          offset: Offset(0, artworkCardVerticalOffset * 0.45),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (artworkCardShowTitle)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  child: Text(
+                    song?.title ?? 'Unknown',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'ProductSans',
+                      fontSize: 17 * artworkCardTextScale,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          if (artworkCardShowTitle && artworkCardShowArtist)
-            const SizedBox(height: 4),
-          if (artworkCardShowArtist)
-            Text(
-              song?.artist ?? 'Unknown Artist',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'ProductSans',
-                fontSize: 12 * artworkCardTextScale,
-                color: Colors.white.withValues(alpha: 0.72),
-              ),
-            ),
-          if (artworkCardShowAlbum) ...[
-            if ((artworkCardShowTitle || artworkCardShowArtist))
-              const SizedBox(height: 2),
-            Text(
-              song?.album ?? '',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'ProductSans',
-                fontSize: 11 * artworkCardTextScale,
-                color: Colors.white.withValues(alpha: 0.55),
-              ),
-            ),
-          ],
-          if (artworkCardShowFileInfo && song != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 3),
-              child: Text(
-                _fileInfoLabel(song),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'ProductSans',
-                  fontSize: 10,
-                  color: Colors.white.withValues(alpha: 0.48),
+              if (artworkCardShowTitle && artworkCardShowArtist)
+                const SizedBox(height: 4),
+              if (artworkCardShowArtist)
+                Text(
+                  song?.artist ?? 'Unknown Artist',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'ProductSans',
+                    fontSize: 12 * artworkCardTextScale,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
                 ),
-              ),
-            ),
-        ],
-      ),
+              if (artworkCardShowAlbum) ...[
+                if ((artworkCardShowTitle || artworkCardShowArtist))
+                  const SizedBox(height: 2),
+                Text(
+                  song?.album ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'ProductSans',
+                    fontSize: 11 * artworkCardTextScale,
+                    color: Colors.white.withValues(alpha: 0.55),
+                  ),
+                ),
+              ],
+              if (artworkCardShowFileInfo && song != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 3),
+                  child: Text(
+                    _fileInfoLabel(song),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: 'ProductSans',
+                      fontSize: 10,
+                      color: Colors.white.withValues(alpha: 0.48),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -972,6 +1002,7 @@ class _FullScreenPreview extends StatelessWidget {
     required this.artworkCardArtworkScale,
     required this.artworkCardTextScale,
     required this.artworkCardVerticalOffset,
+    required this.artworkCardArtworkOffset,
     this.artworkCardShowTitle = true,
     this.artworkCardShowArtist = true,
     this.artworkCardShowAlbum = true,
@@ -990,6 +1021,7 @@ class _FullScreenPreview extends StatelessWidget {
   final double artworkCardArtworkScale;
   final double artworkCardTextScale;
   final double artworkCardVerticalOffset;
+  final double artworkCardArtworkOffset;
   final bool artworkCardShowTitle;
   final bool artworkCardShowArtist;
   final bool artworkCardShowAlbum;
@@ -1028,69 +1060,77 @@ class _FullScreenPreview extends StatelessWidget {
         final maxWidth = constraints.maxWidth;
         final artSize =
             (maxWidth * 0.68).clamp(180.0, 380.0) * artworkCardArtworkScale;
-        return Transform.translate(
-          offset: Offset(0, artworkCardVerticalOffset * 1.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _AlbumArtThumb(song: song, size: artSize, radius: 28),
-              const SizedBox(height: 24),
-              if (artworkCardShowTitle)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Text(
-                    song?.title ?? 'Midnight Signal',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'ProductSans',
-                      fontSize: 28 * artworkCardTextScale,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Transform.translate(
+              offset: Offset(0, artworkCardArtworkOffset * 1.0),
+              child: _AlbumArtThumb(song: song, size: artSize, radius: 28),
+            ),
+            const SizedBox(height: 24),
+            Transform.translate(
+              offset: Offset(0, artworkCardVerticalOffset * 1.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (artworkCardShowTitle)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Text(
+                        song?.title ?? 'Midnight Signal',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'ProductSans',
+                          fontSize: 28 * artworkCardTextScale,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              if (artworkCardShowTitle && artworkCardShowArtist)
-                const SizedBox(height: 8),
-              if (artworkCardShowArtist)
-                Text(
-                  song?.artist ?? 'Flick Preview',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'ProductSans',
-                    fontSize: 17 * artworkCardTextScale,
-                    color: Colors.white.withValues(alpha: 0.72),
-                  ),
-                ),
-              if (artworkCardShowArtist && artworkCardShowAlbum)
-                const SizedBox(height: 6),
-              if (artworkCardShowAlbum)
-                Text(
-                  song?.album ?? 'Mirror Test',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'ProductSans',
-                    fontSize: 14 * artworkCardTextScale,
-                    color: Colors.white.withValues(alpha: 0.56),
-                  ),
-                ),
-              if (artworkCardShowFileInfo)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    _fileInfoLabel(song),
-                    style: TextStyle(
-                      fontFamily: 'ProductSans',
-                      fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.4),
+                  if (artworkCardShowTitle && artworkCardShowArtist)
+                    const SizedBox(height: 8),
+                  if (artworkCardShowArtist)
+                    Text(
+                      song?.artist ?? 'Flick Preview',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'ProductSans',
+                        fontSize: 17 * artworkCardTextScale,
+                        color: Colors.white.withValues(alpha: 0.72),
+                      ),
                     ),
-                  ),
-                ),
-            ],
-          ),
+                  if (artworkCardShowArtist && artworkCardShowAlbum)
+                    const SizedBox(height: 6),
+                  if (artworkCardShowAlbum)
+                    Text(
+                      song?.album ?? 'Mirror Test',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: 'ProductSans',
+                        fontSize: 14 * artworkCardTextScale,
+                        color: Colors.white.withValues(alpha: 0.56),
+                      ),
+                    ),
+                  if (artworkCardShowFileInfo)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        _fileInfoLabel(song),
+                        style: TextStyle(
+                          fontFamily: 'ProductSans',
+                          fontSize: 11,
+                          color: Colors.white.withValues(alpha: 0.4),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
         );
       },
     );
