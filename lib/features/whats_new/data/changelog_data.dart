@@ -52,6 +52,8 @@ const List<ChangelogEntry> kChangelogEntries = [
         bullets: [
           '**Silent Rust-engine output is now detected and recovered** — if the engine stops producing audio, the app respawns it and resumes the current track instead of staying silent.',
           '**Repeated failures fall back to the Android player** — two engine failures within two minutes switch playback to just_audio/ExoPlayer instead of looping on the same broken output.',
+          '**SAF/`content://` libraries play again on the standard engine** — local sources no longer get routed through just_audio\'s HTTP proxy, which failed with "Unsupported scheme \'content\'".',
+          '**Rust and USB DAC engines stage `content://` sources correctly** — the native staging bridge misread small size values, which blocked SAF files on the High Quality and bit-perfect engines.',
           'Managed output failures now log burst/format details for easier troubleshooting.',
         ],
       ),
