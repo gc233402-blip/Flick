@@ -190,7 +190,12 @@ class RustAudioEngine implements AudioEngine {
 
     final path = await _resolvePlaybackPath(track);
     if (path == null || path.isEmpty) {
-      throw StateError('Failed to resolve Rust playback path');
+      final sourcePath = track.filePath ?? '';
+      final scheme = Uri.tryParse(sourcePath)?.scheme ?? '';
+      throw StateError(
+        'Failed to resolve Rust playback path for "${track.title}" '
+        '(source scheme: ${scheme.isEmpty ? 'file' : scheme})',
+      );
     }
 
     await _rustAudioService.play(path);
