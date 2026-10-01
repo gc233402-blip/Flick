@@ -1,4 +1,4 @@
-# Flick 0.22.0-beta.3
+# Flick 0.22.1-beta.3
 
 Audio reliability fixes, bit-perfect/USB correctness, and player layout polish.
 

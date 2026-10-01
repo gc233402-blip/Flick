@@ -2,7 +2,7 @@
 
 Date: 2026-10-01
 Device: FiiO BR13 (UAC1.0, VID `0x0a12` / PID `0x4007`) on Samsung Galaxy S24 Ultra (SM-S928B, One UI)
-App: 0.22.0-beta.3 era build
+App: 0.22.1-beta.3 era build
 
 ## Report
 
