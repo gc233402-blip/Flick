@@ -493,6 +493,18 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                   foregroundColor: AppColors.textSecondary,
                 ),
               ),
+              const SizedBox(width: AppConstants.spacingSm),
+              TextButton.icon(
+                onPressed: () => _launchUrl('https://discord.gg/5hgcrdnKY6'),
+                icon: const Icon(LucideIcons.messageCircle, size: 18),
+                label: const Text(
+                  'Discord',
+                  style: TextStyle(fontFamily: 'ProductSans'),
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.textSecondary,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: AppConstants.spacingMd),

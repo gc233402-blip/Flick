@@ -9,6 +9,13 @@
 - **Rust and USB DAC engines stage `content://` sources correctly**: the native staging bridge rejected small byte counts ("Integer cannot be cast to Long"), which blocked SAF files on the High Quality and bit-perfect engines.
 - Managed output callback failures now carry burst/format details for easier triage.
 
+### Bit-Perfect & EQ
+- **Bit-perfect USB takes precedence over the parametric EQ**: PEQ no longer forces the Rust engine ahead of the bit-perfect preference, so turning on Bit-perfect is no longer silently ineffective when PEQ is active. PEQ is bypassed on the direct USB path, with a note in UAC2 preferences, and the audio route re-resolves when the preference changes.
+
+### Player & Layout
+- **Configurable artwork placement**: artwork and text offsets move independently in the player card, so album art can be nudged without shifting the title and artist.
+- Playback-path errors now include the failing track; the floating island defaults to disabled.
+
 ## 0.22.0-beta.2 (2026-09-28)
 
 ### Distribution
