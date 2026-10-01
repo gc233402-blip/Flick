@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.22.0-beta.3 (2026-09-30)
+## 0.22.1-beta.3 (2026-09-30)
 
 ### Audio Reliability
 - **Silent Rust-engine output is detected and recovered**: callback failures, zero-channel output, and undersized mix buffers now surface as an "output lost" event, and the app respawns the engine and resumes the current track instead of staying silent.
