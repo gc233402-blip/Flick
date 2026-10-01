@@ -57,6 +57,20 @@ const List<ChangelogEntry> kChangelogEntries = [
           'Managed output failures now log burst/format details for easier troubleshooting.',
         ],
       ),
+      ChangelogSection(
+        title: 'Bit-Perfect & EQ',
+        bullets: [
+          '**Bit-perfect USB takes precedence over the parametric EQ** — enabling Bit-perfect is no longer silently overridden when PEQ is active; the direct USB path is selected and PEQ is bypassed.',
+          'A note appears in UAC2 preferences when PEQ is bypassed on a bit-perfect route, and the audio route re-resolves the moment the Bit-perfect toggle changes.',
+        ],
+      ),
+      ChangelogSection(
+        title: 'Player & Layout',
+        bullets: [
+          '**Configurable artwork placement** — artwork and text offsets move independently in the player card, so album art can be nudged without shifting the title and artist.',
+          'Playback-path errors now include the failing track; the floating island defaults to disabled.',
+        ],
+      ),
     ],
   ),
   ChangelogEntry(
