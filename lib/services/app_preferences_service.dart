@@ -202,7 +202,7 @@ class AppPreferences {
     this.btSampleRate = 0,
     this.btLdacBitsPerSample = 0,
     this.floatingPlayerEnabled = false,
-    this.floatingIslandEnabled = true,
+    this.floatingIslandEnabled = false,
     this.autoFocusSearch = false,
     this.searchPlaybackMode = 'results',
     this.refreshRateMode = 'high',
@@ -780,7 +780,7 @@ class AppPreferencesService {
       floatingPlayerEnabled:
           prefs.getBool(_floatingPlayerEnabledKey) ?? false,
       floatingIslandEnabled:
-          prefs.getBool(_floatingIslandEnabledKey) ?? true,
+          prefs.getBool(_floatingIslandEnabledKey) ?? false,
       autoFocusSearch: prefs.getBool(_autoFocusSearchKey) ?? false,
       searchPlaybackMode:
           prefs.getString(_searchPlaybackModeKey) ?? 'results',
@@ -1716,7 +1716,7 @@ class AppPreferencesService {
 
   Future<bool> getFloatingIslandEnabled() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_floatingIslandEnabledKey) ?? true;
+    return prefs.getBool(_floatingIslandEnabledKey) ?? false;
   }
 
   Future<void> setFloatingIslandEnabled(bool value) async {
