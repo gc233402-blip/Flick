@@ -221,6 +221,15 @@ bool shouldForceRustEngineFallback({
   return recent.length >= deadRustEngineRecoveryLimit;
 }
 
+/// just_audio routes any non-`file://` URI through its local HTTP proxy as
+/// soon as the headers map is non-null (even when empty), and that proxy can
+/// only speak HTTP — `content://` sources then fail with "Unsupported scheme
+/// 'content'". Passing null keeps ExoPlayer on its native content resolver.
+@visibleForTesting
+Map<String, String>? proxySafeHeaders(Map<String, String> headers) {
+  return headers.isEmpty ? null : headers;
+}
+
 @visibleForTesting
 String canonicalPlaybackFileType({required String fileType, String? filePath}) {
   final pathExtension = extractPlaybackPathExtension(filePath);
@@ -920,6 +929,7 @@ class PlayerService {
       }
     }
 
+    await syncAudioRouteSelection(reason: 'bit-perfect preference changed');
     await reapplyEqualizer();
     await _refreshAudioOutputDiagnostics(
       reason: 'bit-perfect preference changed',
@@ -3368,7 +3378,7 @@ class PlayerService {
 
     final resolved = await _resolvePlaybackUri(song);
     final uri = resolved.uri;
-    final headers = resolved.headers;
+    final headers = proxySafeHeaders(resolved.headers);
 
     if (song.startOffsetMs != null && song.startOffsetMs! > 0) {
       final start = Duration(milliseconds: song.startOffsetMs!);
@@ -3554,6 +3564,7 @@ class PlayerService {
       }
     } catch (e) {
       _debugLog('Failed to stage content URI for playback: $e');
+      AppLog.instance.add('[Playback] Content URI staging failed: $e');
     }
     return null;
   }
@@ -3685,6 +3696,10 @@ class PlayerService {
       if (stagedPath != null && stagedPath.isNotEmpty) {
         return stagedPath;
       }
+      AppLog.instance.add(
+        '[Playback] Rust source unavailable: "${song.title}" content URI '
+        'could not be staged (SAF access missing?)',
+      );
       return null;
     }
 

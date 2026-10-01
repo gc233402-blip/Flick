@@ -384,8 +384,8 @@ class MainActivity: FlutterActivity() {
                 "cacheUriForPlayback" -> {
                     val uri = call.argument<String>("uri")
                     val extensionHint = call.argument<String>("extensionHint")
-                    val maxSizeBytes = call.argument<Long>("maxSizeBytes")
-                    val maxStagingBytes = call.argument<Long>("maxStagingBytes")
+                    val maxSizeBytes = call.argument<Number>("maxSizeBytes")?.toLong()
+                    val maxStagingBytes = call.argument<Number>("maxStagingBytes")?.toLong()
                     if (uri != null) {
                         mainScope.launch {
                             try {
