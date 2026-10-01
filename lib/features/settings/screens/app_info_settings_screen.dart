@@ -495,7 +495,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
               ),
               const SizedBox(width: AppConstants.spacingSm),
               TextButton.icon(
-                onPressed: () => _launchUrl('https://discord.gg/xemdDZ3uGd'),
+                onPressed: () => _launchUrl('https://discord.gg/5hgcrdnKY6'),
                 icon: const Icon(LucideIcons.messageCircle, size: 18),
                 label: const Text(
                   'Discord',
