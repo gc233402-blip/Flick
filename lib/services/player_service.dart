@@ -929,6 +929,7 @@ class PlayerService {
       }
     }
 
+    await syncAudioRouteSelection(reason: 'bit-perfect preference changed');
     await reapplyEqualizer();
     await _refreshAudioOutputDiagnostics(
       reason: 'bit-perfect preference changed',
