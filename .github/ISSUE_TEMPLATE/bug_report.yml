@@ -1,0 +1,75 @@
+name: Bug report
+description: Something is broken in Flick
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. **Never include credentials, tokens, or private
+        file paths you don't want public.** Redact logs before pasting.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and Android version
+      placeholder: e.g. Pixel 7, Android 15
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: Flick version and flavor
+      description: From Settings → About, or the APK/release name. Say whether it is the Play build or the GitHub `full` build.
+    validations:
+      required: false
+  - type: dropdown
+    id: output-path
+    attributes:
+      label: Output path involved
+      options:
+        - Bit-perfect USB DAC (UAC 2.0)
+        - DAP hi-res (Oboe/AAudio exclusive)
+        - Standard Android pipeline (just_audio/ExoPlayer)
+        - Bluetooth / wired headset
+        - Not audio-specific
+        - Unknown
+    validations:
+      required: false
+  - type: input
+    id: dac
+    attributes:
+      label: DAC or output device
+      description: Model and connection (USB, 3.5 mm, Bluetooth) if relevant.
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Redact anything sensitive first.
+      render: text
+    validations:
+      required: false

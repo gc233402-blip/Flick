@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & ideas
+    url: https://github.com/moss-apps/Flick/discussions
+    about: Ask questions, share setups, or discuss ideas in Discussions.
+  - name: Build and release docs
+    url: https://github.com/moss-apps/Flick/blob/main/docs/RELEASING.md
+    about: Build flavors, signing, and release process.
+  - name: Report a security vulnerability
+    url: https://github.com/moss-apps/Flick/security/advisories/new
+    about: Report privately — never in a public issue.
