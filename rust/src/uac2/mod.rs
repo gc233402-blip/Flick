@@ -36,7 +36,7 @@ mod device_info_extractor;
 #[cfg(feature = "uac2")]
 mod endpoint;
 #[cfg(feature = "uac2")]
-mod error;
+pub(crate) mod error;
 #[cfg(feature = "uac2")]
 mod error_recovery;
 #[cfg(feature = "uac2")]
