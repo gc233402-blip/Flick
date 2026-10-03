@@ -1,6 +1,27 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    ".opencode/plugins/graphify.js"
-  ]
+  "instructions": ["AGENTS.md"],
+  "plugin": [".opencode/plugins/graphify.js"],
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "flutter analyze": "allow",
+      "flutter test": "allow",
+      "flutter test *": "allow",
+      "flutter pub *": "allow",
+      "flutter build *": "allow",
+      "dart *": "allow",
+      "cargo test*": "allow",
+      "cargo check*": "allow",
+      "cargo fmt*": "allow",
+      "git status": "allow",
+      "git diff*": "allow",
+      "git log *": "allow",
+      "graphify query *": "allow",
+      "graphify path *": "allow",
+      "graphify explain *": "allow",
+      "graphify update *": "allow",
+      "graphify hook status": "allow"
+    }
+  }
 }

@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,6 +18,7 @@ jobs:
   rust-checks:
     name: Rust (${{ matrix.target }})
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -64,6 +66,7 @@ jobs:
   rust-test:
     name: Rust tests (host)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -90,6 +93,7 @@ jobs:
   dart-checks:
     name: Flutter analyze + test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -106,6 +110,14 @@ jobs:
 
       - name: build_runner
         run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Check generated code is fresh
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::Generated code is stale. Run build_runner and commit the result."
+            git status --short
+            exit 1
+          fi
 
       - name: flutter analyze
         # ponytail: newer runner flutter flags `onReorder` as deprecated (info).
