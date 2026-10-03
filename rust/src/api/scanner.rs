@@ -3,10 +3,10 @@ use dff_meta::DffFile;
 use dsf_meta::DsfFile;
 use id3::TagLike;
 use lofty::config::ParseOptions;
-use lofty::picture::{PictureType, APE_PICTURE_TYPES};
+use lofty::file::FileType;
+use lofty::picture::PictureType;
 use lofty::prelude::*;
 use lofty::probe::Probe;
-use lofty::tag::Tag;
 use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
@@ -282,7 +282,7 @@ fn extract_lofty_artwork(path: &Path) -> Option<Vec<u8>> {
     let parse_options = ParseOptions::new().read_properties(false);
     let tagged_file = Probe::open(path)
         .ok()?
-        .options(parse_options)
+        .options(parse_options.clone())
         .guess_file_type()
         .ok()?
         .read()
@@ -296,37 +296,44 @@ fn extract_lofty_artwork(path: &Path) -> Option<Vec<u8>> {
     {
         return Some(picture.data().to_vec());
     }
-    ape_cover_item(tag)
-}
-
-/// APE-tagged formats (WavPack) store cover art as binary tag items under
-/// keys like "Cover Art (Front)", which never surface through
-/// `Tag::pictures()`. Prefer the front cover, then any picture item.
-fn ape_cover_item(tag: &Tag) -> Option<Vec<u8>> {
-    for front_only in [true, false] {
-        for item in tag.items() {
-            let ItemKey::Unknown(key) = item.key() else {
-                continue;
-            };
-            if !APE_PICTURE_TYPES.contains(&key.as_str()) {
-                continue;
-            }
-            if front_only && key != "Cover Art (Front)" {
-                continue;
-            }
-            // APE cover values are "description\0image bytes".
-            let Some(bytes) = item.value().binary() else {
-                continue;
-            };
-            if let Some(split) = bytes.iter().position(|&b| b == 0) {
-                let start = split + 1;
-                if start < bytes.len() {
-                    return Some(bytes[start..].to_vec());
-                }
-            }
-        }
+    if tagged_file.file_type() == FileType::WavPack {
+        return extract_ape_artwork(path, parse_options);
     }
     None
+}
+
+/// WavPack stores cover art as APEv2 binary items under keys like
+/// "Cover Art (Front)", which lofty does not surface as pictures when a
+/// raw APE tag is converted into a generic `Tag`. Read the APE tag
+/// directly and decode its picture items.
+fn extract_ape_artwork(path: &Path, parse_options: ParseOptions) -> Option<Vec<u8>> {
+    use lofty::ape::APE_PICTURE_TYPES;
+    use lofty::tag::ItemValue;
+    use lofty::wavpack::WavPackFile;
+
+    let mut file = std::fs::File::open(path).ok()?;
+    let wavpack = WavPackFile::read_from(&mut file, parse_options).ok()?;
+    let ape = wavpack.ape()?;
+
+    let mut fallback = None;
+    for key in APE_PICTURE_TYPES {
+        let Some(item) = ape.get(key) else {
+            continue;
+        };
+        let ItemValue::Binary(bytes) = item.value() else {
+            continue;
+        };
+        let Ok(picture) = lofty::picture::Picture::from_ape_bytes(key, bytes.as_slice()) else {
+            continue;
+        };
+        if picture.pic_type() == PictureType::CoverFront {
+            return Some(picture.into_data());
+        }
+        if fallback.is_none() {
+            fallback = Some(picture.into_data());
+        }
+    }
+    fallback
 }
 
 fn extract_dsf_artwork(path: &Path) -> Option<Vec<u8>> {
@@ -586,7 +593,7 @@ fn parse_rg_peak(value: Option<&str>) -> Option<f64> {
 fn lofty_replaygains(
     tag: Option<&lofty::tag::Tag>,
 ) -> (Option<f64>, Option<f64>, Option<f64>, Option<f64>) {
-    let value = |key: ItemKey| tag.and_then(|t| t.get_string(&key));
+    let value = |key: ItemKey| tag.and_then(|t| t.get_string(key));
     (
         parse_rg_db(value(ItemKey::ReplayGainTrackGain)),
         parse_rg_peak(value(ItemKey::ReplayGainTrackPeak)),
@@ -664,7 +671,10 @@ fn extract_lofty_metadata(
         track_number: tag.and_then(|t| t.track()),
         disc_number: tag.and_then(|t| t.disk()),
         genre: tag.and_then(|t| t.genre().map(|s| s.to_string())),
-        year: tag.and_then(|t| t.year()).filter(|y| *y > 0),
+        year: tag
+            .and_then(|t| t.date())
+            .map(|d| d.year as u32)
+            .filter(|y| *y > 0),
         file_size: entry.file_size,
         replaygain_track_gain: rg_track_gain,
         replaygain_track_peak: rg_track_peak,

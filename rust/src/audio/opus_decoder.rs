@@ -1,23 +1,29 @@
 use std::sync::Mutex;
 
-use symphonia::core::audio::{AudioBuffer, AudioBufferRef, Signal, SignalSpec};
-use symphonia::core::codecs::{
-    CodecDescriptor, CodecParameters, Decoder, DecoderOptions, FinalizeResult, CODEC_TYPE_OPUS,
+use symphonia::core::audio::{layouts, AudioBuffer, AudioSpec, GenericAudioBufferRef};
+use symphonia::core::codecs::audio::{
+    well_known, AudioCodecParameters, AudioDecoder, AudioDecoderOptions, FinalizeResult,
 };
+use symphonia::core::codecs::CodecInfo;
 use symphonia::core::errors::{decode_error, unsupported_error, Error, Result};
-use symphonia::core::formats::Packet;
-use symphonia::core::units::TimeBase;
+use symphonia::core::packet::PacketRef;
 
 pub struct OpusDecoder {
     inner: Mutex<opus_sys::Decoder>,
-    params: CodecParameters,
+    params: AudioCodecParameters,
     buf: Vec<f32>,
     decoded: AudioBuffer<f32>,
 }
 
-impl Decoder for OpusDecoder {
-    fn try_new(params: &CodecParameters, _options: &DecoderOptions) -> Result<Self> {
-        let channels = params.channels.map(|c| c.count()).unwrap_or(2);
+static CODEC_INFO: CodecInfo = CodecInfo {
+    short_name: "opus",
+    long_name: "Opus (via libopus)",
+    profiles: &[],
+};
+
+impl OpusDecoder {
+    pub fn try_new(params: &AudioCodecParameters, _options: &AudioDecoderOptions) -> Result<Self> {
+        let channels = params.channels.as_ref().map(|c| c.count()).unwrap_or(2);
         let sample_rate = params.sample_rate.unwrap_or(48_000);
 
         let ch = match channels {
@@ -33,43 +39,50 @@ impl Decoder for OpusDecoder {
             )))
         })?;
 
-        let mut codec_params = CodecParameters::new();
+        let mut codec_params = AudioCodecParameters::new();
         codec_params
-            .for_codec(CODEC_TYPE_OPUS)
+            .for_codec(well_known::CODEC_ID_OPUS)
             .with_sample_rate(sample_rate)
-            .with_time_base(TimeBase::new(1, sample_rate))
-            .with_channels(params.channels.unwrap_or(
-                symphonia::core::audio::Channels::FRONT_LEFT
-                    | symphonia::core::audio::Channels::FRONT_RIGHT,
-            ));
-
-        if let Some(delay) = params.delay {
-            codec_params.with_delay(delay);
-        }
+            .with_channels(
+                params
+                    .channels
+                    .clone()
+                    .unwrap_or(layouts::CHANNEL_LAYOUT_STEREO),
+            );
 
         Ok(OpusDecoder {
             inner: Mutex::new(inner),
             params: codec_params,
             buf: Vec::new(),
-            decoded: AudioBuffer::unused(),
+            decoded: AudioBuffer::default(),
         })
     }
+}
 
-    fn supported_codecs() -> &'static [CodecDescriptor] {
-        static DESCRIPTORS: &[CodecDescriptor] = &[CodecDescriptor {
-            codec: CODEC_TYPE_OPUS,
-            short_name: "opus",
-            long_name: "Opus (via libopus)",
-            inst_func: |params, opts| {
-                OpusDecoder::try_new(params, opts).map(|d| Box::new(d) as Box<dyn Decoder>)
-            },
-        }];
-        DESCRIPTORS
+impl AudioDecoder for OpusDecoder {
+    fn reset(&mut self) {
+        if let Ok(inner) = self.inner.get_mut() {
+            let _ = inner.reset_state();
+        }
     }
 
-    fn decode(&mut self, packet: &Packet) -> Result<AudioBufferRef<'_>> {
-        let channels = self.params.channels.map(|c| c.count()).unwrap_or(2).max(1);
-        let data = &packet.data;
+    fn codec_info(&self) -> &CodecInfo {
+        &CODEC_INFO
+    }
+
+    fn codec_params(&self) -> &AudioCodecParameters {
+        &self.params
+    }
+
+    fn decode_ref(&mut self, packet: &PacketRef<'_>) -> Result<GenericAudioBufferRef<'_>> {
+        let channels = self
+            .params
+            .channels
+            .as_ref()
+            .map(|c| c.count())
+            .unwrap_or(2)
+            .max(1);
+        let data = packet.data;
 
         if data.is_empty() {
             let frames = channels * 960;
@@ -92,44 +105,29 @@ impl Decoder for OpusDecoder {
 
         let n_frames = self.buf.len() / channels;
         let rate = self.params.sample_rate.unwrap_or(48_000);
-        let spec_channels = self.params.channels.unwrap_or(
-            symphonia::core::audio::Channels::FRONT_LEFT
-                | symphonia::core::audio::Channels::FRONT_RIGHT,
-        );
-        let spec = SignalSpec::new(rate, spec_channels);
+        let spec_channels = self
+            .params
+            .channels
+            .clone()
+            .unwrap_or(layouts::CHANNEL_LAYOUT_STEREO);
+        let spec = AudioSpec::new(rate, spec_channels);
 
-        self.decoded = AudioBuffer::<f32>::new(n_frames as u64, spec);
+        self.decoded = AudioBuffer::<f32>::new(spec, n_frames);
+        self.decoded.render_with(Some(n_frames), |frame, planes| {
+            for (ch, plane) in planes.iter_mut().enumerate() {
+                plane[frame] = self.buf[frame * channels + ch];
+            }
+            Ok(())
+        })?;
 
-        self.decoded
-            .render(Some(n_frames), |planes, _frame_count| {
-                for (ch, plane) in planes.planes().iter_mut().enumerate() {
-                    for f in 0..n_frames {
-                        plane[f] = self.buf[f * channels + ch];
-                    }
-                }
-                Ok(())
-            })?;
-
-        Ok(AudioBufferRef::F32(std::borrow::Cow::Borrowed(
-            &self.decoded,
-        )))
-    }
-
-    fn reset(&mut self) {
-        if let Ok(inner) = self.inner.get_mut() {
-            let _ = inner.reset_state();
-        }
-    }
-
-    fn codec_params(&self) -> &CodecParameters {
-        &self.params
+        Ok(GenericAudioBufferRef::F32(&self.decoded))
     }
 
     fn finalize(&mut self) -> FinalizeResult {
         FinalizeResult { verify_ok: None }
     }
 
-    fn last_decoded(&self) -> AudioBufferRef<'_> {
-        AudioBufferRef::F32(std::borrow::Cow::Borrowed(&self.decoded))
+    fn last_decoded(&self) -> GenericAudioBufferRef<'_> {
+        GenericAudioBufferRef::F32(&self.decoded)
     }
 }

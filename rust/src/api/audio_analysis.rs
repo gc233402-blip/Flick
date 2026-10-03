@@ -6,12 +6,12 @@ use std::collections::VecDeque;
 use std::fs::File;
 use std::path::Path;
 
-use symphonia::core::audio::Signal;
-use symphonia::core::codecs::{DecoderOptions, CODEC_TYPE_NULL};
+use symphonia::core::codecs::audio::{AudioDecoderOptions, CODEC_ID_NULL_AUDIO};
+use symphonia::core::codecs::CodecParameters;
+use symphonia::core::formats::probe::Hint;
 use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
-use symphonia::core::probe::Hint;
 
 pub struct AudioAnalysisResult {
     pub peaks: Vec<f32>,
@@ -137,24 +137,40 @@ pub fn analyze_audio_file(path: String, peak_buckets: u32) -> Option<AudioAnalys
     }
 
     let probed = symphonia::default::get_probe()
-        .format(&hint, mss, &FormatOptions::default(), &MetadataOptions::default())
+        .probe(
+            &hint,
+            mss,
+            FormatOptions::default(),
+            MetadataOptions::default(),
+        )
         .ok()?;
 
-    let track = probed
-        .format
-        .tracks()
-        .iter()
-        .find(|t| t.codec_params.codec != CODEC_TYPE_NULL)?;
-
-    let codec_params = track.codec_params.clone();
+    let (codec_params, num_frames) = {
+        let track = probed.tracks().iter().find(|t| {
+            matches!(
+                &t.codec_params,
+                Some(CodecParameters::Audio(p)) if p.codec != CODEC_ID_NULL_AUDIO
+            )
+        })?;
+        let params = match &track.codec_params {
+            Some(CodecParameters::Audio(p)) => p.clone(),
+            _ => return None,
+        };
+        (params, track.num_frames)
+    };
     let sr = codec_params.sample_rate.unwrap_or(44100) as f64;
-    let ch = codec_params.channels.map(|c| c.count()).unwrap_or(1).min(2);
+    let ch = codec_params
+        .channels
+        .as_ref()
+        .map(|c| c.count())
+        .unwrap_or(1)
+        .min(2);
 
     let mut decoder = symphonia::default::get_codecs()
-        .make(&codec_params, &DecoderOptions::default())
+        .make_audio_decoder(&codec_params, &AudioDecoderOptions::default())
         .ok()?;
 
-    let mut format_ctx = probed.format;
+    let mut format_ctx = probed;
 
     // K-filter biquads per channel.
     let mut kfilters: Vec<[Biquad; 2]> = (0..ch)
@@ -185,15 +201,16 @@ pub fn analyze_audio_file(path: String, peak_buckets: u32) -> Option<AudioAnalys
     let n_buckets = peak_buckets.max(1) as usize;
     let mut bucket_max = vec![0.0f32; n_buckets];
     let mut frames_seen: u64 = 0;
-    let total = codec_params
-        .n_frames
+    let total = num_frames
         .map(|n| n as u64)
         .unwrap_or_else(|| (sr * 600.0) as u64);
     let per_bucket = (total / n_buckets as u64).max(1);
 
+    let mut interleaved: Vec<f32> = Vec::new();
     loop {
         let packet = match format_ctx.next_packet() {
-            Ok(p) => p,
+            Ok(Some(p)) => p,
+            Ok(None) => break,
             Err(_) => break,
         };
 
@@ -202,17 +219,21 @@ pub fn analyze_audio_file(path: String, peak_buckets: u32) -> Option<AudioAnalys
             Err(_) => continue,
         };
 
-        let mut buf = decoded.make_equivalent::<f32>();
-        decoded.convert(&mut buf);
-        let nf = buf.frames();
+        let buf_ch = decoded.spec().channels().count().max(1);
+        decoded.copy_to_vec_interleaved::<f32>(&mut interleaved);
+        let nf = decoded.frames();
 
         for f in 0..nf {
-            let s0 = buf.chan(0)[f] as f64;
+            let s0 = interleaved[f * buf_ch] as f64;
             let abs0 = s0.abs();
 
             let mut wss = 0.0;
             for c in 0..ch {
-                let s = if c == 0 { s0 } else { buf.chan(c)[f] as f64 };
+                let s = if c == 0 {
+                    s0
+                } else {
+                    interleaved[f * buf_ch + c] as f64
+                };
                 let a = s.abs();
 
                 // K-filter.

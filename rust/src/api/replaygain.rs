@@ -79,16 +79,16 @@ pub fn read_replaygain_tags(path: String) -> Option<ReplayGainTagFields> {
 
     Some(ReplayGainTagFields {
         track_gain_db: tag
-            .and_then(|t| t.get_string(&ItemKey::ReplayGainTrackGain))
+            .and_then(|t| t.get_string(ItemKey::ReplayGainTrackGain))
             .and_then(parse_db),
         track_peak: tag
-            .and_then(|t| t.get_string(&ItemKey::ReplayGainTrackPeak))
+            .and_then(|t| t.get_string(ItemKey::ReplayGainTrackPeak))
             .and_then(parse_peak),
         album_gain_db: tag
-            .and_then(|t| t.get_string(&ItemKey::ReplayGainAlbumGain))
+            .and_then(|t| t.get_string(ItemKey::ReplayGainAlbumGain))
             .and_then(parse_db),
         album_peak: tag
-            .and_then(|t| t.get_string(&ItemKey::ReplayGainAlbumPeak))
+            .and_then(|t| t.get_string(ItemKey::ReplayGainAlbumPeak))
             .and_then(parse_peak),
     })
 }

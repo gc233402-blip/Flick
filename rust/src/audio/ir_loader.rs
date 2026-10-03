@@ -33,7 +33,8 @@ pub fn load_ir(path: &Path, target_rate: u32) -> Result<Vec<Vec<f32>>, String> {
     let mut buf = Vec::with_capacity(IR_CHUNK * src_channels);
     loop {
         let packet = match format.next_packet() {
-            Ok(p) => p,
+            Ok(Some(p)) => p,
+            Ok(None) => break,
             Err(SymphoniaError::IoError(ref e))
                 if e.kind() == std::io::ErrorKind::UnexpectedEof =>
             {
@@ -45,7 +46,7 @@ pub fn load_ir(path: &Path, target_rate: u32) -> Result<Vec<Vec<f32>>, String> {
             }
             Err(e) => return Err(format!("IR decode failed: {}", e)),
         };
-        if packet.track_id() != track_id {
+        if packet.track_id != track_id {
             continue;
         }
         let decoded_buf = match decoder.decode(&packet) {

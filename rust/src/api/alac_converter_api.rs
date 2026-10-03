@@ -3,7 +3,6 @@
 //! This module exposes the ALAC converter to Flutter via flutter_rust_bridge.
 
 use crate::audio::alac_converter::{AudioMetadata, ConversionSession};
-use anyhow::Result;
 use flutter_rust_bridge::frb;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -66,14 +65,14 @@ impl From<&AudioMetadata> for AlacAudioMetadata {
 
 /// Probe ALAC/M4A file and return metadata without creating a session
 #[frb(sync)]
-pub fn alac_probe_metadata(file_bytes: Vec<u8>) -> Result<AlacAudioMetadata> {
+pub fn alac_probe_metadata(file_bytes: Vec<u8>) -> anyhow::Result<AlacAudioMetadata> {
     let session = ConversionSession::new(file_bytes)?;
     Ok(AlacAudioMetadata::from(session.metadata()))
 }
 
 /// Create a new conversion session and return session ID
 #[frb(sync)]
-pub fn alac_create_session(file_bytes: Vec<u8>) -> Result<u64> {
+pub fn alac_create_session(file_bytes: Vec<u8>) -> anyhow::Result<u64> {
     let session = ConversionSession::new(file_bytes)?;
     let mut manager = SESSION_MANAGER.lock().unwrap();
     Ok(manager.create_session(session))
@@ -84,7 +83,7 @@ pub fn alac_create_session(file_bytes: Vec<u8>) -> Result<u64> {
 /// Preferred over [`alac_create_session`] for playback: the file never crosses
 /// the FFI boundary.
 #[frb(sync)]
-pub fn alac_create_session_from_path(path: String) -> Result<u64> {
+pub fn alac_create_session_from_path(path: String) -> anyhow::Result<u64> {
     let session = ConversionSession::new_from_path(std::path::Path::new(&path))?;
     let mut manager = SESSION_MANAGER.lock().unwrap();
     Ok(manager.create_session(session))
@@ -92,7 +91,7 @@ pub fn alac_create_session_from_path(path: String) -> Result<u64> {
 
 /// Get metadata for an active session
 #[frb(sync)]
-pub fn alac_get_metadata(session_id: u64) -> Result<AlacAudioMetadata> {
+pub fn alac_get_metadata(session_id: u64) -> anyhow::Result<AlacAudioMetadata> {
     let mut manager = SESSION_MANAGER.lock().unwrap();
     let session = manager
         .get_session(session_id)
@@ -102,7 +101,7 @@ pub fn alac_get_metadata(session_id: u64) -> Result<AlacAudioMetadata> {
 
 /// Get WAV header for the session
 #[frb(sync)]
-pub fn alac_get_wav_header(session_id: u64) -> Result<Vec<u8>> {
+pub fn alac_get_wav_header(session_id: u64) -> anyhow::Result<Vec<u8>> {
     let mut manager = SESSION_MANAGER.lock().unwrap();
     let session = manager
         .get_session(session_id)
@@ -114,7 +113,7 @@ pub fn alac_get_wav_header(session_id: u64) -> Result<Vec<u8>> {
 ///
 /// Returns None when end of stream is reached
 #[frb(sync)]
-pub fn alac_decode_next_chunk(session_id: u64) -> Result<Option<Vec<u8>>> {
+pub fn alac_decode_next_chunk(session_id: u64) -> anyhow::Result<Option<Vec<u8>>> {
     let mut manager = SESSION_MANAGER.lock().unwrap();
     let session = manager
         .get_session(session_id)
@@ -124,7 +123,7 @@ pub fn alac_decode_next_chunk(session_id: u64) -> Result<Option<Vec<u8>>> {
 
 /// Seek to a specific time position in seconds
 #[frb(sync)]
-pub fn alac_seek(session_id: u64, time_seconds: f64) -> Result<()> {
+pub fn alac_seek(session_id: u64, time_seconds: f64) -> anyhow::Result<()> {
     let mut manager = SESSION_MANAGER.lock().unwrap();
     let session = manager
         .get_session(session_id)
@@ -134,7 +133,7 @@ pub fn alac_seek(session_id: u64, time_seconds: f64) -> Result<()> {
 
 /// Seek to an exact PCM frame, returning the frame the session landed on.
 #[frb(sync)]
-pub fn alac_seek_frame(session_id: u64, frame: u64) -> Result<u64> {
+pub fn alac_seek_frame(session_id: u64, frame: u64) -> anyhow::Result<u64> {
     let mut manager = SESSION_MANAGER.lock().unwrap();
     let session = manager
         .get_session(session_id)
@@ -146,7 +145,7 @@ pub fn alac_seek_frame(session_id: u64, frame: u64) -> Result<u64> {
 ///
 /// Returns fewer bytes at end of stream.
 #[frb(sync)]
-pub fn alac_read_pcm(session_id: u64, start_frame: u64, frame_count: u64) -> Result<Vec<u8>> {
+pub fn alac_read_pcm(session_id: u64, start_frame: u64, frame_count: u64) -> anyhow::Result<Vec<u8>> {
     let mut manager = SESSION_MANAGER.lock().unwrap();
     let session = manager
         .get_session(session_id)
@@ -156,7 +155,7 @@ pub fn alac_read_pcm(session_id: u64, start_frame: u64, frame_count: u64) -> Res
 
 /// Close and cleanup a conversion session
 #[frb(sync)]
-pub fn alac_close_session(session_id: u64) -> Result<()> {
+pub fn alac_close_session(session_id: u64) -> anyhow::Result<()> {
     let mut manager = SESSION_MANAGER.lock().unwrap();
     manager
         .remove_session(session_id)
@@ -168,7 +167,7 @@ pub fn alac_close_session(session_id: u64) -> Result<()> {
 ///
 /// For large files, prefer streaming with create_session + decode_next_chunk
 #[frb(sync)]
-pub fn alac_convert_to_wav(file_bytes: Vec<u8>) -> Result<Vec<u8>> {
+pub fn alac_convert_to_wav(file_bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let mut session = ConversionSession::new(file_bytes)?;
     session.convert_to_wav()
 }
