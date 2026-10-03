@@ -15,13 +15,13 @@ use std::{ffi::c_void, sync::OnceLock};
 
 #[cfg(target_os = "android")]
 use jni::{
-    objects::{GlobalRef, JObject, JString},
+    objects::{Global, JObject, JString},
     sys::{jboolean, jdouble, jint, jstring},
     JNIEnv, JavaVM,
 };
 
 #[cfg(target_os = "android")]
-static ANDROID_APP_CONTEXT: OnceLock<GlobalRef> = OnceLock::new();
+static ANDROID_APP_CONTEXT: OnceLock<Global<JObject<'static>>> = OnceLock::new();
 
 #[cfg(target_os = "android")]
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -49,7 +49,7 @@ macro_rules! dev_eprintln {
 
 #[cfg(target_os = "android")]
 fn initialize_android_app_context<'local>(
-    env: &mut JNIEnv<'local>,
+    env: &mut jni::Env<'local>,
     context: &JObject<'local>,
 ) -> Result<(), String> {
     if ANDROID_APP_CONTEXT.get().is_some() {
@@ -66,7 +66,7 @@ fn initialize_android_app_context<'local>(
         Ok(()) => {
             unsafe {
                 ndk_context::initialize_android_context(
-                    java_vm.get_java_vm_pointer() as *mut c_void,
+                    java_vm.get_raw() as *mut c_void,
                     context_ptr,
                 );
             }
@@ -90,7 +90,7 @@ pub extern "system" fn JNI_OnLoad(_vm: JavaVM, _reserved: *mut c_void) -> jni::s
             })
             .with_tag("RustUSB"),
     );
-    jni::JNIVersion::V6.into()
+    jni::JNIVersion::V1_6.into()
 }
 
 /// FRB installs its own `android_logger` during `RustLib.init` and clobbers
@@ -113,31 +113,34 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeInitRustAndroi
     _activity: JObject<'_>,
     context: JObject<'local>,
 ) -> jboolean {
-    match initialize_android_app_context(&mut env, &context) {
-        Ok(()) => {
-            match crate::audio::device::detect_android_device_profile(&mut env, &context) {
-                Ok(profile) => {
-                    log::info!(
-                        "[ANDROID] Cached device profile: kind={:?} bit_perfect={} max_rate_hz={} balanced={}",
-                        profile.kind,
-                        profile.confirmed_bit_perfect,
-                        profile.max_sample_rate,
-                        profile.has_balanced_output,
-                    );
-                    crate::audio::device::cache_android_device_profile(profile);
+    env.with_env(|env| -> jni::errors::Result<()> {
+        match initialize_android_app_context(env, &context) {
+            Ok(()) => {
+                match crate::audio::device::detect_android_device_profile(env, &context) {
+                    Ok(profile) => {
+                        log::info!(
+                            "[ANDROID] Cached device profile: kind={:?} bit_perfect={} max_rate_hz={} balanced={}",
+                            profile.kind,
+                            profile.confirmed_bit_perfect,
+                            profile.max_sample_rate,
+                            profile.has_balanced_output,
+                        );
+                        crate::audio::device::cache_android_device_profile(profile);
+                    }
+                    Err(error) => {
+                        log::warn!("[ANDROID] Failed to detect device profile: {}", error);
+                    }
                 }
-                Err(error) => {
-                    log::warn!("[ANDROID] Failed to detect device profile: {}", error);
-                }
+                dev_eprintln!("Rust Android audio context initialized");
             }
-            dev_eprintln!("Rust Android audio context initialized");
-            1
+            Err(error) => {
+                dev_eprintln!("Failed to initialize Android app context: {}", error);
+            }
         }
-        Err(error) => {
-            dev_eprintln!("Failed to initialize Android app context: {}", error);
-            0
-        }
-    }
+        Ok(())
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>();
+    true
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
@@ -153,49 +156,48 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeRegisterRustDi
     serial: JString<'_>,
     device_name: JString<'_>,
 ) -> jboolean {
-    let read_string = |env: &mut JNIEnv<'_>, value: JString<'_>| -> Option<String> {
-        let object: JObject<'_> = value.into();
-        if object.is_null() {
+    let read_string = |env: &mut jni::Env<'_>, value: JString<'_>| -> Option<String> {
+        if jni::refs::Reference::is_null(&value) {
             return None;
         }
-
-        env.get_string(&JString::from(object))
-            .ok()
-            .map(|value| value.to_string_lossy().into_owned())
+        value.try_to_string(env).ok()
     };
 
-    let product_name =
-        read_string(&mut env, product_name).unwrap_or_else(|| "USB Audio Device".to_string());
-    let manufacturer = read_string(&mut env, manufacturer).unwrap_or_default();
-    let serial = read_string(&mut env, serial);
-    let device_name = read_string(&mut env, device_name);
+    env.with_env(|env| -> jni::errors::Result<bool> {
+        let product_name =
+            read_string(env, product_name).unwrap_or_else(|| "USB Audio Device".to_string());
+        let manufacturer = read_string(env, manufacturer).unwrap_or_default();
+        let serial = read_string(env, serial);
+        let device_name = read_string(env, device_name);
 
-    let device = match crate::uac2::AndroidDirectUsbDevice::try_new(
-        fd,
-        vendor_id as u16,
-        product_id as u16,
-        product_name,
-        manufacturer,
-        serial,
-        device_name,
-    ) {
-        Ok(device) => device,
-        Err(error) => {
-            dev_eprintln!(
-                "Failed to prepare Android direct USB DAC registration: {}",
-                error
-            );
-            return 0;
-        }
-    };
+        let device = match crate::uac2::AndroidDirectUsbDevice::try_new(
+            fd,
+            vendor_id as u16,
+            product_id as u16,
+            product_name,
+            manufacturer,
+            serial,
+            device_name,
+        ) {
+            Ok(device) => device,
+            Err(error) => {
+                dev_eprintln!(
+                    "Failed to prepare Android direct USB DAC registration: {}",
+                    error
+                );
+                return Ok(false);
+            }
+        };
 
-    match crate::uac2::register_android_usb_device(device) {
-        Ok(()) => 1,
-        Err(error) => {
-            dev_eprintln!("Failed to register Android direct USB DAC: {}", error);
-            0
+        match crate::uac2::register_android_usb_device(device) {
+            Ok(()) => Ok(true),
+            Err(error) => {
+                dev_eprintln!("Failed to register Android direct USB DAC: {}", error);
+                Ok(false)
+            }
         }
-    }
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
 #[cfg(all(target_os = "android", not(feature = "uac2")))]
@@ -211,7 +213,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeRegisterRustDi
     _serial: JString<'_>,
     _device_name: JString<'_>,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
@@ -225,9 +227,9 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
     is_dop: jboolean,
     is_native_dsd: jboolean,
 ) -> jboolean {
-    let dsd_transport = if is_dop != 0 {
+    let dsd_transport = if is_dop {
         crate::uac2::DsdTransportMode::DoP
-    } else if is_native_dsd != 0 {
+    } else if is_native_dsd {
         crate::uac2::DsdTransportMode::Native
     } else {
         crate::uac2::DsdTransportMode::None
@@ -239,20 +241,20 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
             sample_rate: sample_rate as u32,
             bit_depth: bit_depth as u8,
             channels: channels as u16,
-            is_dop: is_dop != 0,
+            is_dop,
             dsd_transport,
             dsd_bit_rate: 0,
         })
     };
 
     match crate::uac2::set_android_usb_playback_format(playback_format) {
-        Ok(()) => 1,
+        Ok(()) => true,
         Err(error) => {
             dev_eprintln!(
                 "Failed to update Android direct USB playback format: {}",
                 error
             );
-            0
+            false
         }
     }
 }
@@ -268,7 +270,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
     _is_dop: jboolean,
     _is_native_dsd: jboolean,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
@@ -278,11 +280,11 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
     _activity: JObject<'_>,
     enabled: jboolean,
 ) -> jboolean {
-    match crate::uac2::set_android_usb_lock_enabled(enabled != 0) {
-        Ok(()) => 1,
+    match crate::uac2::set_android_usb_lock_enabled(enabled) {
+        Ok(()) => true,
         Err(error) => {
             dev_eprintln!("Failed to update Android direct USB lock state: {}", error);
-            0
+            false
         }
     }
 }
@@ -294,9 +296,9 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeHasRustDirectU
     _activity: JObject<'_>,
 ) -> jboolean {
     if crate::uac2::android_direct_has_hardware_volume_control() {
-        1
+        true
     } else {
-        0
+        false
     }
 }
 
@@ -306,7 +308,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeHasRustDirectU
     _env: JNIEnv<'_>,
     _activity: JObject<'_>,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
@@ -335,13 +337,13 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
     volume: jdouble,
 ) -> jboolean {
     match crate::uac2::android_direct_set_hardware_volume(volume) {
-        Ok(()) => 1,
+        Ok(()) => true,
         Err(error) => {
             dev_eprintln!(
                 "Failed to set Android direct USB hardware volume: {}",
                 error
             );
-            0
+            false
         }
     }
 }
@@ -353,7 +355,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
     _activity: JObject<'_>,
     _volume: jdouble,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
@@ -385,11 +387,11 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
     _activity: JObject<'_>,
     muted: jboolean,
 ) -> jboolean {
-    match crate::uac2::android_direct_set_hardware_mute(muted != 0) {
-        Ok(()) => 1,
+    match crate::uac2::android_direct_set_hardware_mute(muted) {
+        Ok(()) => true,
         Err(error) => {
             dev_eprintln!("Failed to set Android direct USB hardware mute: {}", error);
-            0
+            false
         }
     }
 }
@@ -401,7 +403,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
     _activity: JObject<'_>,
     _muted: jboolean,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
@@ -433,13 +435,13 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
     _activity: JObject<'_>,
     _enabled: jboolean,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
 #[no_mangle]
 pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustAudioDebugStateJson(
-    env: JNIEnv<'_>,
+    mut env: JNIEnv<'_>,
     _activity: JObject<'_>,
 ) -> jstring {
     let engine_state = crate::api::audio_api::audio_get_runtime_debug_json_state();
@@ -450,15 +452,19 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustAudioDe
         "direct_usb": direct_usb_state,
     });
     let json = serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string());
-    env.new_string(json)
-        .map(|value| value.into_raw())
-        .unwrap_or(std::ptr::null_mut())
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        Ok(env
+            .new_string(json)
+            .map(|value| value.into_raw())
+            .unwrap_or(std::ptr::null_mut()))
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
 #[cfg(all(target_os = "android", not(feature = "uac2")))]
 #[no_mangle]
 pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustAudioDebugStateJson(
-    env: JNIEnv<'_>,
+    mut env: JNIEnv<'_>,
     _activity: JObject<'_>,
 ) -> jstring {
     let payload = serde_json::json!({
@@ -471,9 +477,13 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustAudioDe
         },
     });
     let json = serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string());
-    env.new_string(json)
-        .map(|value| value.into_raw())
-        .unwrap_or(std::ptr::null_mut())
+    env.with_env(|env| -> jni::errors::Result<jstring> {
+        Ok(env
+            .new_string(json)
+            .map(|value| value.into_raw())
+            .unwrap_or(std::ptr::null_mut()))
+    })
+    .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
@@ -483,7 +493,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeClearRustDirec
     _activity: JObject<'_>,
 ) -> jboolean {
     crate::uac2::clear_android_usb_device();
-    1
+    true
 }
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
@@ -514,18 +524,16 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeMarkRustDirect
     _activity: JObject<'_>,
     reason: JString<'_>,
 ) -> jboolean {
-    let reason = {
-        let object: JObject<'_> = reason.into();
-        if object.is_null() {
-            None
-        } else {
-            env.get_string(&JString::from(object))
-                .ok()
-                .map(|value| value.to_string_lossy().into_owned())
-        }
+    let reason = if jni::refs::Reference::is_null(&reason) {
+        None
+    } else {
+        env.with_env(|env| -> jni::errors::Result<Option<String>> {
+            Ok(reason.try_to_string(env).ok())
+        })
+        .resolve::<jni::errors::ThrowRuntimeExAndDefault>()
     };
     crate::uac2::mark_android_usb_fallback(reason);
-    1
+    true
 }
 
 #[cfg(all(target_os = "android", not(feature = "uac2")))]
@@ -535,7 +543,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeMarkRustDirect
     _activity: JObject<'_>,
     _reason: JString<'_>,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(all(target_os = "android", not(feature = "uac2")))]
@@ -544,7 +552,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeClearRustDirec
     _env: JNIEnv<'_>,
     _activity: JObject<'_>,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(all(target_os = "android", not(feature = "uac2")))]
@@ -554,7 +562,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeWaitRustDirect
     _activity: JObject<'_>,
     _timeout_ms: jint,
 ) -> jboolean {
-    1
+    true
 }
 
 #[cfg(all(target_os = "android", not(feature = "uac2")))]
@@ -563,7 +571,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeIsRustDirectUs
     _env: JNIEnv<'_>,
     _activity: JObject<'_>,
 ) -> jboolean {
-    0
+    false
 }
 
 #[cfg(target_os = "android")]
@@ -573,10 +581,10 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDevelop
     _activity: JObject<'_>,
     enabled: jboolean,
 ) {
-    DEVELOPER_MODE.store(enabled != 0, Ordering::Relaxed);
+    DEVELOPER_MODE.store(enabled, Ordering::Relaxed);
     // Developer mode off still keeps Info: DSD starvation/SAS diagnostics
     // must survive in release builds.
-    let level = if enabled != 0 {
+    let level = if enabled {
         log::LevelFilter::Debug
     } else {
         log::LevelFilter::Info

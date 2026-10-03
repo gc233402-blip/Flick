@@ -1069,11 +1069,12 @@ pub struct AudioProbeFormat {
 }
 
 pub fn audio_probe_format(path: String) -> Result<AudioProbeFormat, String> {
-    use symphonia::core::codecs::CODEC_TYPE_NULL;
+    use symphonia::core::codecs::audio::CODEC_ID_NULL_AUDIO;
+    use symphonia::core::codecs::CodecParameters;
+    use symphonia::core::formats::probe::Hint;
     use symphonia::core::formats::FormatOptions;
     use symphonia::core::io::MediaSourceStream;
     use symphonia::core::meta::MetadataOptions;
-    use symphonia::core::probe::Hint;
     use std::fs::File;
     use std::path::Path;
 
@@ -1085,18 +1086,35 @@ pub fn audio_probe_format(path: String) -> Result<AudioProbeFormat, String> {
         hint.with_extension(ext);
     }
     let probed = symphonia::default::get_probe()
-        .format(&hint, mss, &FormatOptions::default(), &MetadataOptions::default())
+        .probe(
+            &hint,
+            mss,
+            FormatOptions::default(),
+            MetadataOptions::default(),
+        )
         .map_err(|e| format!("Failed to probe format: {}", e))?;
     let track = probed
-        .format
         .tracks()
         .iter()
-        .find(|t| t.codec_params.codec != CODEC_TYPE_NULL)
+        .find(|t| {
+            matches!(
+                &t.codec_params,
+                Some(CodecParameters::Audio(p)) if p.codec != CODEC_ID_NULL_AUDIO
+            )
+        })
         .ok_or("No audio track found".to_string())?;
-    let cp = &track.codec_params;
+    let cp = track
+        .codec_params
+        .as_ref()
+        .and_then(|p| p.audio())
+        .ok_or("No audio track found".to_string())?;
     Ok(AudioProbeFormat {
         sample_rate: cp.sample_rate.unwrap_or(44100),
-        channels: cp.channels.map(|c| c.count() as u16).unwrap_or(2),
+        channels: cp
+            .channels
+            .as_ref()
+            .map(|c| c.count() as u16)
+            .unwrap_or(2),
         bits_per_sample: cp.bits_per_sample,
     })
 }
@@ -1756,8 +1774,11 @@ mod tests {
     use super::*;
     use crate::audio::crossfader::CrossfadeCurve;
 
+    static CROSSFADE_TEST_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
     #[test]
     fn pending_crossfade_round_trip() {
+        let _guard = CROSSFADE_TEST_LOCK.lock().unwrap();
         let _ = take_pending_crossfade();
 
         set_pending_crossfade(true, 5.0);
@@ -1776,6 +1797,7 @@ mod tests {
 
     #[test]
     fn pending_crossfade_all_curves() {
+        let _guard = CROSSFADE_TEST_LOCK.lock().unwrap();
         for (curve, expect) in [
             (CrossfadeCurve::EqualPower, CrossfadeCurve::EqualPower),
             (CrossfadeCurve::Linear, CrossfadeCurve::Linear),

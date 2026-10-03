@@ -3,14 +3,15 @@
 //! All tracks are resampled to the system output sample rate (typically 48kHz)
 //! to ensure seamless gapless playback between tracks with different rates.
 
-use rubato::{FastFixedIn, PolynomialDegree, Resampler as RubatoResampler};
+use rubato::audioadapter_buffers::direct::SequentialSliceOfVecs;
+use rubato::{Async, FixedAsync, PolynomialDegree, Resampler as RubatoResampler};
 
 /// Default system output sample rate (48kHz is standard for modern audio)
 pub const DEFAULT_OUTPUT_SAMPLE_RATE: u32 = 48000;
 
 /// Wrapper around rubato's resampler for real-time audio conversion.
 pub struct AudioResampler {
-    resampler: FastFixedIn<f32>,
+    resampler: Async<f32>,
     input_rate: u32,
     output_rate: u32,
     channels: usize,
@@ -43,21 +44,24 @@ impl AudioResampler {
     ) -> Result<Self, String> {
         if input_rate == output_rate {
             // No resampling needed - create a passthrough
+            let resampler = Async::<f32>::new_poly(
+                1.0,
+                1.0,
+                PolynomialDegree::Linear,
+                chunk_size,
+                channels,
+                FixedAsync::Input,
+            )
+            .map_err(|e| format!("Failed to create passthrough resampler: {}", e))?;
+            let max_output_frames = resampler.output_frames_max().max(1);
             return Ok(Self {
-                resampler: FastFixedIn::new(
-                    1.0,
-                    1.0,
-                    PolynomialDegree::Linear,
-                    chunk_size,
-                    channels,
-                )
-                .map_err(|e| format!("Failed to create passthrough resampler: {}", e))?,
+                resampler,
                 input_rate,
                 output_rate,
                 channels,
                 chunk_size,
                 input_buffers: vec![vec![0.0; chunk_size]; channels],
-                output_buffers: vec![vec![0.0; chunk_size]; channels],
+                output_buffers: vec![vec![0.0; max_output_frames]; channels],
                 input_queue: Vec::new(),
                 output_queue: Vec::new(),
                 is_flushed: false,
@@ -66,17 +70,18 @@ impl AudioResampler {
 
         let resample_ratio = output_rate as f64 / input_rate as f64;
 
-        // Calculate output size based on ratio
-        let max_output_frames = (chunk_size as f64 * resample_ratio * 1.1) as usize + 10;
-
-        let resampler = FastFixedIn::new(
+        let resampler = Async::<f32>::new_poly(
             resample_ratio,
             1.0,                      // No additional ratio adjustment
             PolynomialDegree::Septic, // High quality interpolation
             chunk_size,
             channels,
+            FixedAsync::Input,
         )
         .map_err(|e| format!("Failed to create resampler: {}", e))?;
+
+        // Output size is bounded by the resampler's own worst-case estimate.
+        let max_output_frames = resampler.output_frames_max().max(1);
 
         Ok(Self {
             resampler,
@@ -168,10 +173,22 @@ impl AudioResampler {
             self.input_queue.drain(0..samples_per_chunk);
 
             // Perform resampling
-            let input_refs: Vec<&[f32]> = self.input_buffers.iter().map(|b| b.as_slice()).collect();
+            let input_adapter = SequentialSliceOfVecs::new(
+                self.input_buffers.as_slice(),
+                self.channels,
+                frames_per_chunk,
+            )
+            .map_err(|e| format!("Invalid input buffers: {}", e))?;
+            let out_capacity = self.output_buffers.first().map_or(0, Vec::len);
+            let mut output_adapter = SequentialSliceOfVecs::new_mut(
+                self.output_buffers.as_mut_slice(),
+                self.channels,
+                out_capacity,
+            )
+            .map_err(|e| format!("Invalid output buffers: {}", e))?;
             let (_, output_frames) = self
                 .resampler
-                .process_into_buffer(&input_refs, &mut self.output_buffers, None)
+                .process_into_buffer(&input_adapter, &mut output_adapter, None)
                 .map_err(|e| format!("Resampling error: {}", e))?;
 
             // Interleave output into queue
@@ -226,10 +243,22 @@ impl AudioResampler {
             }
             self.input_queue.clear();
 
-            let input_refs: Vec<&[f32]> = self.input_buffers.iter().map(|b| b.as_slice()).collect();
+            let input_adapter = SequentialSliceOfVecs::new(
+                self.input_buffers.as_slice(),
+                self.channels,
+                self.chunk_size,
+            )
+            .map_err(|e| format!("Invalid input buffers: {}", e))?;
+            let out_capacity = self.output_buffers.first().map_or(0, Vec::len);
+            let mut output_adapter = SequentialSliceOfVecs::new_mut(
+                self.output_buffers.as_mut_slice(),
+                self.channels,
+                out_capacity,
+            )
+            .map_err(|e| format!("Invalid output buffers: {}", e))?;
             let (_, output_frames) = self
                 .resampler
-                .process_into_buffer(&input_refs, &mut self.output_buffers, None)
+                .process_into_buffer(&input_adapter, &mut output_adapter, None)
                 .map_err(|e| format!("Resampling flush error: {}", e))?;
 
             for frame_idx in 0..output_frames {

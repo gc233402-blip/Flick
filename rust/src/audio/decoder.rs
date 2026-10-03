@@ -16,15 +16,18 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::thread::{self, JoinHandle};
 
-use symphonia::core::audio::{AudioBufferRef, Signal};
-use symphonia::core::codecs::{Decoder, DecoderOptions, CODEC_TYPE_NULL, CODEC_TYPE_OPUS};
-use symphonia::core::conv::IntoSample;
+use symphonia::core::audio::conv::IntoSample;
+use symphonia::core::audio::{Audio, GenericAudioBufferRef};
+use symphonia::core::codecs::audio::{
+    well_known, AudioDecoder, AudioDecoderOptions, CODEC_ID_NULL_AUDIO,
+};
+use symphonia::core::codecs::CodecParameters;
 use symphonia::core::errors::Error as SymphoniaError;
+use symphonia::core::formats::probe::Hint;
 use symphonia::core::formats::{FormatOptions, FormatReader, SeekMode, SeekTo};
 use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
-use symphonia::core::probe::Hint;
-use symphonia::core::units::Time;
+use symphonia::core::units::{Time, Timestamp};
 
 /// Default chunk size for decoding (in frames)
 const DECODE_CHUNK_SIZE: usize = 4096;
@@ -63,7 +66,7 @@ impl From<std::io::Error> for DecoderError {
 pub struct ProbeResult {
     pub source_info: SourceInfo,
     pub format: Box<dyn FormatReader>,
-    pub decoder: Box<dyn Decoder>,
+    pub decoder: Box<dyn AudioDecoder>,
     pub track_id: u32,
 }
 
@@ -81,10 +84,7 @@ pub fn probe_file(path: &Path) -> Result<ProbeResult, DecoderError> {
     let lower_ext = raw_ext.to_ascii_lowercase();
     let hint_ext = normalize_ogg_hint(&lower_ext);
 
-    let format_opts = FormatOptions {
-        enable_gapless: true,
-        ..Default::default()
-    };
+    let format_opts = FormatOptions::default();
     let metadata_opts = MetadataOptions::default();
 
     let mut hint = Hint::new();
@@ -95,19 +95,23 @@ pub fn probe_file(path: &Path) -> Result<ProbeResult, DecoderError> {
     let file1 = File::open(path)?;
     let mss1 = MediaSourceStream::new(Box::new(file1), Default::default());
 
-    let probed =
-        match symphonia::default::get_probe().format(&hint, mss1, &format_opts, &metadata_opts) {
-            Ok(probed) => probed,
-            Err(first_err) => {
-                // Content-based fallback: reopen and retry with no extension hint.
-                let file2 = File::open(path)?;
-                let mss2 = MediaSourceStream::new(Box::new(file2), Default::default());
-                let no_hint = Hint::new();
-                symphonia::default::get_probe()
-                    .format(&no_hint, mss2, &format_opts, &metadata_opts)
-                    .map_err(|_| DecoderError::UnsupportedFormat(first_err.to_string()))?
-            }
-        };
+    let probed = match symphonia::default::get_probe().probe(
+        &hint,
+        mss1,
+        format_opts.clone(),
+        metadata_opts,
+    ) {
+        Ok(probed) => probed,
+        Err(first_err) => {
+            // Content-based fallback: reopen and retry with no extension hint.
+            let file2 = File::open(path)?;
+            let mss2 = MediaSourceStream::new(Box::new(file2), Default::default());
+            let no_hint = Hint::new();
+            symphonia::default::get_probe()
+                .probe(&no_hint, mss2, format_opts, metadata_opts)
+                .map_err(|_| DecoderError::UnsupportedFormat(first_err.to_string()))?
+        }
+    };
 
     build_probe_result(probed, path.to_path_buf())
 }
@@ -118,10 +122,7 @@ pub fn probe_file(path: &Path) -> Result<ProbeResult, DecoderError> {
 /// extensions.
 pub fn probe_http(url: &str, headers: HashMap<String, String>) -> Result<ProbeResult, DecoderError> {
     let hint_ext = url_hint_ext(url);
-    let format_opts = FormatOptions {
-        enable_gapless: true,
-        ..Default::default()
-    };
+    let format_opts = FormatOptions::default();
     let metadata_opts = MetadataOptions::default();
 
     let mut hint = Hint::new();
@@ -133,7 +134,7 @@ pub fn probe_http(url: &str, headers: HashMap<String, String>) -> Result<ProbeRe
     let mss = MediaSourceStream::new(Box::new(src), Default::default());
 
     let probed = symphonia::default::get_probe()
-        .format(&hint, mss, &format_opts, &metadata_opts)
+        .probe(&hint, mss, format_opts, metadata_opts)
         .map_err(|e| DecoderError::UnsupportedFormat(format!("HTTP probe failed: {}", e)))?;
 
     let mut result = build_probe_result(probed, PathBuf::from(url_label(url)))?;
@@ -144,34 +145,45 @@ pub fn probe_http(url: &str, headers: HashMap<String, String>) -> Result<ProbeRe
 /// Build a [`ProbeResult`] from a probed format reader: locate the audio track,
 /// construct the decoder, and derive [`SourceInfo`]. Shared by file + HTTP paths.
 fn build_probe_result(
-    probed: symphonia::core::probe::ProbeResult,
+    mut format: Box<dyn FormatReader>,
     name_path: PathBuf,
 ) -> Result<ProbeResult, DecoderError> {
-    let mut format = probed.format;
-
     // Find the first audio track
-    let (track_id, codec_params) = {
+    let (track_id, codec_params, num_frames, time_base) = {
         let track = format
             .tracks()
             .iter()
-            .find(|t| t.codec_params.codec != CODEC_TYPE_NULL)
+            .find(|t| {
+                matches!(
+                    &t.codec_params,
+                    Some(CodecParameters::Audio(p)) if p.codec != CODEC_ID_NULL_AUDIO
+                )
+            })
             .ok_or(DecoderError::NoAudioTrack)?;
-        (track.id, track.codec_params.clone())
+        let params = match &track.codec_params {
+            Some(CodecParameters::Audio(p)) => p.clone(),
+            _ => return Err(DecoderError::NoAudioTrack),
+        };
+        (track.id, params, track.num_frames, track.time_base)
     };
 
     let declared_sample_rate = codec_params.sample_rate.unwrap_or(44100);
-    let declared_channels = codec_params.channels.map(|c| c.count()).unwrap_or(2);
+    let declared_channels = codec_params
+        .channels
+        .as_ref()
+        .map(|c| c.count())
+        .unwrap_or(2);
 
-    let decoder_opts = DecoderOptions::default();
-    let is_opus = codec_params.codec == CODEC_TYPE_OPUS;
-    let mut decoder: Box<dyn Decoder> = if is_opus {
+    let decoder_opts = AudioDecoderOptions::default();
+    let is_opus = codec_params.codec == well_known::CODEC_ID_OPUS;
+    let mut decoder: Box<dyn AudioDecoder> = if is_opus {
         Box::new(
             opus_decoder::OpusDecoder::try_new(&codec_params, &decoder_opts)
                 .map_err(|e| DecoderError::UnsupportedFormat(e.to_string()))?,
         )
     } else {
         symphonia::default::get_codecs()
-            .make(&codec_params, &decoder_opts)
+            .make_audio_decoder(&codec_params, &decoder_opts)
             .map_err(|e| DecoderError::UnsupportedFormat(e.to_string()))?
     };
 
@@ -207,15 +219,14 @@ fn build_probe_result(
 
     // Calculate duration. A lying header also carries a lying time_base
     // (derived from the fake rate), so only use it for plausible headers.
-    let duration_secs = if let Some(n_frames) = codec_params.n_frames {
-        if header_lies || codec_params.time_base.is_none() {
+    let duration_secs = if let Some(n_frames) = num_frames {
+        if header_lies || time_base.is_none() {
             n_frames as f64 / sample_rate as f64
         } else {
-            codec_params
-                .time_base
-                .unwrap()
-                .calc_time(n_frames)
-                .seconds as f64
+            time_base
+                .and_then(|tb| tb.calc_time(Timestamp::new(n_frames as i64)))
+                .map(|t| t.as_secs_f64())
+                .unwrap_or(0.0)
         }
     } else {
         0.0
@@ -275,20 +286,20 @@ pub(crate) fn plausible_sample_rate(rate: u32) -> bool {
 /// Returns `None` (with a best-effort rewind) when the peek cannot be trusted.
 fn peek_decoded_layout(
     format: &mut Box<dyn FormatReader>,
-    decoder: &mut dyn Decoder,
+    decoder: &mut dyn AudioDecoder,
     track_id: u32,
 ) -> Option<(u32, usize)> {
     let peeked = (|| -> Option<(u32, usize)> {
-        let packet = format.next_packet().ok()?;
-        if packet.track_id() != track_id {
+        let packet = format.next_packet().ok()??;
+        if packet.track_id != track_id {
             return None;
         }
         let decoded = decoder.decode(&packet).ok()?;
         let spec = decoded.spec();
-        if spec.rate == 0 || spec.channels.count() == 0 {
+        if spec.rate() == 0 || spec.channels().count() == 0 {
             return None;
         }
-        Some((spec.rate, spec.channels.count()))
+        Some((spec.rate(), spec.channels().count()))
     })();
 
     decoder.reset();
@@ -296,7 +307,7 @@ fn peek_decoded_layout(
         .seek(
             SeekMode::Accurate,
             SeekTo::Time {
-                time: Time::new(0, 0.0),
+                time: Time::ZERO,
                 track_id: Some(track_id),
             },
         )
@@ -485,7 +496,7 @@ fn decode_thread(
         let target_secs = position_secs.max(0.0);
         if target_secs > 0.0 {
             let seek_to = SeekTo::Time {
-                time: Time::new(target_secs as u64, target_secs.fract()),
+                time: Time::try_from_secs_f64(target_secs).unwrap_or(Time::ZERO),
                 track_id: Some(track_id),
             };
 
@@ -554,7 +565,11 @@ fn decode_thread(
 
         // Get the next packet
         let packet = match format.next_packet() {
-            Ok(packet) => packet,
+            Ok(Some(packet)) => packet,
+            Ok(None) => {
+                // End of stream
+                break;
+            }
             Err(SymphoniaError::IoError(ref e))
                 if e.kind() == std::io::ErrorKind::UnexpectedEof =>
             {
@@ -572,7 +587,7 @@ fn decode_thread(
         };
 
         // Skip packets from other tracks
-        if packet.track_id() != track_id {
+        if packet.track_id != track_id {
             continue;
         }
 
@@ -746,79 +761,80 @@ fn remix_interleaved_channels(
 }
 
 /// Convert an AudioBufferRef to interleaved f32 samples.
-pub(crate) fn convert_to_interleaved_f32(buffer: &AudioBufferRef, output: &mut Vec<f32>) {
+pub(crate) fn convert_to_interleaved_f32(buffer: &GenericAudioBufferRef, output: &mut Vec<f32>) {
     use std::sync::atomic::{AtomicBool, Ordering as AtomicOrdering};
     static LOGGED_VARIANT: AtomicBool = AtomicBool::new(false);
     if !LOGGED_VARIANT.swap(true, AtomicOrdering::Relaxed) {
         let variant = match buffer {
-            AudioBufferRef::F32(_) => "F32",
-            AudioBufferRef::S16(_) => "S16",
-            AudioBufferRef::S24(_) => "S24",
-            AudioBufferRef::S32(_) => "S32",
-            AudioBufferRef::U8(_) => "U8",
+            GenericAudioBufferRef::F32(_) => "F32",
+            GenericAudioBufferRef::S16(_) => "S16",
+            GenericAudioBufferRef::S24(_) => "S24",
+            GenericAudioBufferRef::S32(_) => "S32",
+            GenericAudioBufferRef::U8(_) => "U8",
             _ => "Unknown",
         };
         log::info!("[DECODER] AudioBufferRef variant: {}", variant);
     }
     match buffer {
-        AudioBufferRef::F32(buf) => {
-            let channels = buf.spec().channels.count();
+        GenericAudioBufferRef::F32(buf) => {
+            let channels = buf.spec().channels().count();
             let frames = buf.frames();
             output.reserve(frames * channels);
 
             for frame in 0..frames {
                 for ch in 0..channels {
-                    output.push(buf.chan(ch)[frame]);
+                    output.push(buf.plane(ch).expect("audio plane")[frame]);
                 }
             }
         }
-        AudioBufferRef::S16(buf) => {
-            let channels = buf.spec().channels.count();
+        GenericAudioBufferRef::S16(buf) => {
+            let channels = buf.spec().channels().count();
             let frames = buf.frames();
             output.reserve(frames * channels);
 
             for frame in 0..frames {
                 for ch in 0..channels {
                     // Convert i16 to f32 (-1.0 to 1.0)
-                    output.push(buf.chan(ch)[frame] as f32 / 32768.0);
+                    output.push(buf.plane(ch).expect("audio plane")[frame] as f32 / 32768.0);
                 }
             }
         }
-        AudioBufferRef::S24(buf) => {
-            let channels = buf.spec().channels.count();
+        GenericAudioBufferRef::S24(buf) => {
+            let channels = buf.spec().channels().count();
             let frames = buf.frames();
             output.reserve(frames * channels);
 
             for frame in 0..frames {
                 for ch in 0..channels {
                     // Convert i24 to f32
-                    let sample = buf.chan(ch)[frame].inner();
+                    let sample = buf.plane(ch).expect("audio plane")[frame].inner();
                     output.push(sample as f32 / 8388608.0);
                 }
             }
         }
-        AudioBufferRef::S32(buf) => {
-            let channels = buf.spec().channels.count();
+        GenericAudioBufferRef::S32(buf) => {
+            let channels = buf.spec().channels().count();
             let frames = buf.frames();
             output.reserve(frames * channels);
 
             for frame in 0..frames {
                 for ch in 0..channels {
-                    // Must match symphonia_core::conv: (i32 as f64 / 2^31) as f32 — casting i32 to
-                    // f32 before dividing quantizes large PCM values and causes audible distortion.
-                    output.push(buf.chan(ch)[frame].into_sample());
+                    // Must match symphonia_core::audio::conv: (i32 as f64 / 2^31) as f32 — casting
+                    // i32 to f32 before dividing quantizes large PCM values and causes audible
+                    // distortion.
+                    output.push(buf.plane(ch).expect("audio plane")[frame].into_sample());
                 }
             }
         }
-        AudioBufferRef::U8(buf) => {
-            let channels = buf.spec().channels.count();
+        GenericAudioBufferRef::U8(buf) => {
+            let channels = buf.spec().channels().count();
             let frames = buf.frames();
             output.reserve(frames * channels);
 
             for frame in 0..frames {
                 for ch in 0..channels {
                     // Convert u8 to f32 (-1.0 to 1.0)
-                    output.push((buf.chan(ch)[frame] as f32 - 128.0) / 128.0);
+                    output.push((buf.plane(ch).expect("audio plane")[frame] as f32 - 128.0) / 128.0);
                 }
             }
         }
@@ -832,7 +848,7 @@ pub(crate) fn convert_to_interleaved_f32(buffer: &AudioBufferRef, output: &mut V
 /// Seek context for handling seek requests.
 pub struct SeekContext {
     pub format: Box<dyn FormatReader>,
-    pub decoder: Box<dyn Decoder>,
+    pub decoder: Box<dyn AudioDecoder>,
     pub track_id: u32,
 }
 
@@ -840,7 +856,7 @@ impl SeekContext {
     /// Seek to a position in seconds.
     pub fn seek(&mut self, position_secs: f64) -> Result<(), DecoderError> {
         let seek_to = SeekTo::Time {
-            time: Time::new(position_secs as u64, position_secs.fract()),
+            time: Time::try_from_secs_f64(position_secs).unwrap_or(Time::ZERO),
             track_id: Some(self.track_id),
         };
 

@@ -4,10 +4,13 @@ use serde::Serialize;
 use std::sync::OnceLock;
 
 #[cfg(target_os = "android")]
-use jni::{
-    objects::{JIntArray, JObject, JObjectArray, JString, JValue},
-    JNIEnv,
-};
+use jni::objects::{JIntArray, JObject, JObjectArray, JString, JValue};
+
+#[cfg(target_os = "android")]
+use jni::strings::JNIString;
+
+#[cfg(target_os = "android")]
+use jni::{jni_sig, jni_str};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct DeviceProfile {
@@ -278,7 +281,7 @@ pub fn current_device_profile() -> Option<DeviceProfile> {
 
 #[cfg(target_os = "android")]
 pub fn detect_android_device_profile<'local>(
-    env: &mut JNIEnv<'local>,
+    env: &mut jni::Env<'local>,
     context: &JObject<'local>,
 ) -> Result<DeviceProfile, String> {
     let manufacturer = get_build_field(env, "MANUFACTURER")?;
@@ -337,8 +340,12 @@ pub fn detect_android_device_profile<'local>(
 }
 
 #[cfg(target_os = "android")]
-fn get_build_field(env: &mut JNIEnv<'_>, field: &str) -> Result<String, String> {
-    let value = match env.get_static_field("android/os/Build", field, "Ljava/lang/String;") {
+fn get_build_field(env: &mut jni::Env<'_>, field: &str) -> Result<String, String> {
+    let value = match env.get_static_field(
+        jni_str!("android/os/Build"),
+        JNIString::new(field),
+        jni_sig!("Ljava/lang/String;"),
+    ) {
         Ok(value) => value,
         Err(error) => {
             clear_pending_exception(env);
@@ -357,7 +364,7 @@ fn get_build_field(env: &mut JNIEnv<'_>, field: &str) -> Result<String, String> 
 
 #[cfg(target_os = "android")]
 fn probe_audio_capabilities<'local>(
-    env: &mut JNIEnv<'local>,
+    env: &mut jni::Env<'local>,
     context: &JObject<'local>,
 ) -> Result<AudioCapabilities, String> {
     if get_sdk_int(env).unwrap_or_default() < 23 {
@@ -370,15 +377,19 @@ fn probe_audio_capabilities<'local>(
     }
 
     let get_devices_outputs = env
-        .get_static_field("android/media/AudioManager", "GET_DEVICES_OUTPUTS", "I")
+        .get_static_field(
+            jni_str!("android/media/AudioManager"),
+            jni_str!("GET_DEVICES_OUTPUTS"),
+            jni_sig!("I"),
+        )
         .map_err(|error| format!("Failed to read AudioManager.GET_DEVICES_OUTPUTS: {}", error))?
         .i()
         .map_err(|error| format!("Invalid AudioManager.GET_DEVICES_OUTPUTS: {}", error))?;
     let devices = env
         .call_method(
             &audio_manager,
-            "getDevices",
-            "(I)[Landroid/media/AudioDeviceInfo;",
+            jni_str!("getDevices"),
+            jni_sig!("(I)[Landroid/media/AudioDeviceInfo;"),
             &[JValue::Int(get_devices_outputs)],
         )
         .map_err(|error| format!("AudioManager.getDevices failed: {}", error))?
@@ -399,7 +410,8 @@ fn probe_audio_capabilities<'local>(
     let encoding_pcm_32 = audio_format_encoding(env, "ENCODING_PCM_32BIT");
     let encoding_float = audio_format_encoding(env, "ENCODING_PCM_FLOAT");
     let encoding_dsd = audio_format_encoding(env, "ENCODING_DSD");
-    let device_array = JObjectArray::from(devices);
+    let device_array = JObjectArray::<JObject<'_>>::cast_local(env, devices)
+        .map_err(|error| format!("Invalid AudioDeviceInfo array: {}", error))?;
     let device_count = env
         .get_array_length(&device_array)
         .map_err(|error| format!("Failed to read AudioDeviceInfo array length: {}", error))?;
@@ -411,10 +423,10 @@ fn probe_audio_capabilities<'local>(
 
     for index in 0..device_count {
         let device = env
-            .get_object_array_element(&device_array, index)
+            .get_object_array_element(&device_array, index as usize)
             .map_err(|error| format!("Failed to read AudioDeviceInfo[{}]: {}", index, error))?;
         let device_type = env
-            .call_method(&device, "getType", "()I", &[])
+            .call_method(&device, jni_str!("getType"), jni_sig!("()I"), &[])
             .map_err(|error| format!("AudioDeviceInfo.getType failed: {}", error))?
             .i()
             .map_err(|error| format!("AudioDeviceInfo.getType returned invalid data: {}", error))?;
@@ -480,7 +492,7 @@ fn probe_audio_capabilities<'local>(
 
 #[cfg(target_os = "android")]
 fn get_phone_type<'local>(
-    env: &mut JNIEnv<'local>,
+    env: &mut jni::Env<'local>,
     context: &JObject<'local>,
 ) -> Result<Option<i32>, String> {
     let telephony_manager = get_system_service(env, context, "TELEPHONY_SERVICE")?;
@@ -488,13 +500,18 @@ fn get_phone_type<'local>(
         return Ok(None);
     }
 
-    env.call_method(&telephony_manager, "getPhoneType", "()I", &[])
+    env.call_method(
+        &telephony_manager,
+        jni_str!("getPhoneType"),
+        jni_sig!("()I"),
+        &[],
+    )
         .map(|value| value.i().ok())
         .map_err(|error| format!("TelephonyManager.getPhoneType failed: {}", error))
 }
 
 #[cfg(target_os = "android")]
-fn detect_ibasso_mango_mode(env: &mut JNIEnv<'_>) -> bool {
+fn detect_ibasso_mango_mode(env: &mut jni::Env<'_>) -> bool {
     [
         "ro.ibasso.mango_mode",
         "persist.ibasso.mango_mode",
@@ -509,7 +526,7 @@ fn detect_ibasso_mango_mode(env: &mut JNIEnv<'_>) -> bool {
 }
 
 #[cfg(target_os = "android")]
-fn get_system_property(env: &mut JNIEnv<'_>, key: &str) -> Option<String> {
+fn get_system_property(env: &mut jni::Env<'_>, key: &str) -> Option<String> {
     let key = match env.new_string(key) {
         Ok(key) => key,
         Err(_) => {
@@ -518,9 +535,9 @@ fn get_system_property(env: &mut JNIEnv<'_>, key: &str) -> Option<String> {
         }
     };
     let value = match env.call_static_method(
-        "android/os/SystemProperties",
-        "get",
-        "(Ljava/lang/String;)Ljava/lang/String;",
+        jni_str!("android/os/SystemProperties"),
+        jni_str!("get"),
+        jni_sig!("(Ljava/lang/String;)Ljava/lang/String;"),
         &[JValue::Object(&JObject::from(key))],
     ) {
         Ok(value) => value,
@@ -546,8 +563,12 @@ fn get_system_property(env: &mut JNIEnv<'_>, key: &str) -> Option<String> {
 }
 
 #[cfg(target_os = "android")]
-fn get_sdk_int(env: &mut JNIEnv<'_>) -> Result<i32, String> {
-    let value = match env.get_static_field("android/os/Build$VERSION", "SDK_INT", "I") {
+fn get_sdk_int(env: &mut jni::Env<'_>) -> Result<i32, String> {
+    let value = match env.get_static_field(
+        jni_str!("android/os/Build$VERSION"),
+        jni_str!("SDK_INT"),
+        jni_sig!("I"),
+    ) {
         Ok(value) => value,
         Err(error) => {
             clear_pending_exception(env);
@@ -565,18 +586,21 @@ fn get_sdk_int(env: &mut JNIEnv<'_>) -> Result<i32, String> {
 
 #[cfg(target_os = "android")]
 fn get_system_service<'local>(
-    env: &mut JNIEnv<'local>,
+    env: &mut jni::Env<'local>,
     context: &JObject<'local>,
     field_name: &str,
 ) -> Result<JObject<'local>, String> {
-    let service_name =
-        match env.get_static_field("android/content/Context", field_name, "Ljava/lang/String;") {
-            Ok(value) => value,
-            Err(error) => {
-                clear_pending_exception(env);
-                return Err(format!("Failed to read Context.{}: {}", field_name, error));
-            }
-        };
+    let service_name = match env.get_static_field(
+        jni_str!("android/content/Context"),
+        JNIString::new(field_name),
+        jni_sig!("Ljava/lang/String;"),
+    ) {
+        Ok(value) => value,
+        Err(error) => {
+            clear_pending_exception(env);
+            return Err(format!("Failed to read Context.{}: {}", field_name, error));
+        }
+    };
     let service_name = match service_name.l() {
         Ok(value) => value,
         Err(error) => {
@@ -586,8 +610,8 @@ fn get_system_service<'local>(
     };
     let service = match env.call_method(
         context,
-        "getSystemService",
-        "(Ljava/lang/String;)Ljava/lang/Object;",
+        jni_str!("getSystemService"),
+        jni_sig!("(Ljava/lang/String;)Ljava/lang/Object;"),
         &[JValue::Object(&service_name)],
     ) {
         Ok(value) => value,
@@ -612,8 +636,12 @@ fn get_system_service<'local>(
 }
 
 #[cfg(target_os = "android")]
-fn audio_device_type(env: &mut JNIEnv<'_>, field: &str) -> Option<i32> {
-    let value = match env.get_static_field("android/media/AudioDeviceInfo", field, "I") {
+fn audio_device_type(env: &mut jni::Env<'_>, field: &str) -> Option<i32> {
+    let value = match env.get_static_field(
+        jni_str!("android/media/AudioDeviceInfo"),
+        JNIString::new(field),
+        jni_sig!("I"),
+    ) {
         Ok(value) => value,
         Err(_) => {
             clear_pending_exception(env);
@@ -630,8 +658,12 @@ fn audio_device_type(env: &mut JNIEnv<'_>, field: &str) -> Option<i32> {
 }
 
 #[cfg(target_os = "android")]
-fn audio_format_encoding(env: &mut JNIEnv<'_>, field: &str) -> Option<i32> {
-    let value = match env.get_static_field("android/media/AudioFormat", field, "I") {
+fn audio_format_encoding(env: &mut jni::Env<'_>, field: &str) -> Option<i32> {
+    let value = match env.get_static_field(
+        jni_str!("android/media/AudioFormat"),
+        JNIString::new(field),
+        jni_sig!("I"),
+    ) {
         Ok(value) => value,
         Err(_) => {
             clear_pending_exception(env);
@@ -649,11 +681,11 @@ fn audio_format_encoding(env: &mut JNIEnv<'_>, field: &str) -> Option<i32> {
 
 #[cfg(target_os = "android")]
 fn int_array_values(
-    env: &mut JNIEnv<'_>,
+    env: &mut jni::Env<'_>,
     object: &JObject<'_>,
     method: &str,
 ) -> Result<Vec<i32>, String> {
-    let values = match env.call_method(object, method, "()[I", &[]) {
+    let values = match env.call_method(object, JNIString::new(method), jni_sig!("()[I"), &[]) {
         Ok(value) => value,
         Err(_) => {
             clear_pending_exception(env);
@@ -671,7 +703,13 @@ fn int_array_values(
         return Ok(Vec::new());
     }
 
-    let values = JIntArray::from(values);
+    let values = match JIntArray::cast_local(env, values) {
+        Ok(values) => values,
+        Err(_) => {
+            clear_pending_exception(env);
+            return Ok(Vec::new());
+        }
+    };
     let len = match env.get_array_length(&values) {
         Ok(len) => len,
         Err(_) => {
@@ -689,17 +727,17 @@ fn int_array_values(
 
 #[cfg(target_os = "android")]
 fn audio_device_label(
-    env: &mut JNIEnv<'_>,
+    env: &mut jni::Env<'_>,
     object: &JObject<'_>,
     method: &str,
 ) -> Result<String, String> {
     let signature = if method == "getAddress" {
-        "()Ljava/lang/String;"
+        jni_sig!("()Ljava/lang/String;")
     } else {
-        "()Ljava/lang/CharSequence;"
+        jni_sig!("()Ljava/lang/CharSequence;")
     };
     let value = env
-        .call_method(object, method, signature, &[])
+        .call_method(object, JNIString::new(method), signature, &[])
         .map_err(|error| format!("AudioDeviceInfo.{} failed: {}", method, error));
     let Ok(value) = value else {
         clear_pending_exception(env);
@@ -727,7 +765,7 @@ fn audio_device_label(
     }
 
     let rendered = env
-        .call_method(&value, "toString", "()Ljava/lang/String;", &[])
+        .call_method(&value, jni_str!("toString"), jni_sig!("()Ljava/lang/String;"), &[])
         .map_err(|error| format!("CharSequence.toString failed: {}", error));
     let Ok(rendered) = rendered else {
         clear_pending_exception(env);
@@ -750,13 +788,20 @@ fn audio_device_label(
 }
 
 #[cfg(target_os = "android")]
-fn java_string(env: &mut JNIEnv<'_>, object: JObject<'_>) -> Result<String, String> {
+fn java_string(env: &mut jni::Env<'_>, object: JObject<'_>) -> Result<String, String> {
     if object.is_null() {
         return Ok(String::new());
     }
 
-    match env.get_string(&JString::from(object)) {
-        Ok(value) => Ok(value.to_string_lossy().into_owned()),
+    let string = match JString::cast_local(env, object) {
+        Ok(value) => value,
+        Err(error) => {
+            clear_pending_exception(env);
+            return Err(format!("Failed to read Java string: {}", error));
+        }
+    };
+    match string.try_to_string(env) {
+        Ok(value) => Ok(value),
         Err(error) => {
             clear_pending_exception(env);
             Err(format!("Failed to read Java string: {}", error))
@@ -765,8 +810,8 @@ fn java_string(env: &mut JNIEnv<'_>, object: JObject<'_>) -> Result<String, Stri
 }
 
 #[cfg(target_os = "android")]
-fn clear_pending_exception(env: &mut JNIEnv<'_>) {
-    if env.exception_check().unwrap_or(false) {
+fn clear_pending_exception(env: &mut jni::Env<'_>) {
+    if env.exception_check() {
         let _ = env.exception_clear();
     }
 }

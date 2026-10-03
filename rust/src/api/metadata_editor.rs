@@ -3,6 +3,7 @@ use lofty::config::{ParseOptions, WriteOptions};
 use lofty::file::AudioFile;
 use lofty::prelude::*;
 use lofty::probe::Probe;
+use lofty::tag::items::Timestamp;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -65,16 +66,16 @@ pub fn read_tags(path: String) -> Result<TagReadResult, String> {
             title: t.title().map(|s| s.to_string()),
             artist: t.artist().map(|s| s.to_string()),
             album: t.album().map(|s| s.to_string()),
-            album_artist: t.get_string(&ItemKey::AlbumArtist).map(|s| s.to_string()),
+            album_artist: t.get_string(ItemKey::AlbumArtist).map(|s| s.to_string()),
             genre: t.genre().map(|s| s.to_string()),
-            year: t.year(),
+            year: t.date().map(|d| d.year as u32),
             track_number: t.track(),
             disc_number: t.disk(),
-            date: t.get_string(&ItemKey::RecordingDate).map(|s| s.to_string()),
+            date: t.get_string(ItemKey::RecordingDate).map(|s| s.to_string()),
             copyright: t
-                .get_string(&ItemKey::CopyrightMessage)
+                .get_string(ItemKey::CopyrightMessage)
                 .map(|s| s.to_string()),
-            label: t.get_string(&ItemKey::Label).map(|s| s.to_string()),
+            label: t.get_string(ItemKey::Label).map(|s| s.to_string()),
         }),
         None => Ok(TagReadResult {
             title: None,
@@ -257,7 +258,10 @@ fn apply_tag_fields(
                 t.set_genre(v.clone());
             }
             if let Some(v) = fields.year {
-                t.set_year(v);
+                t.set_date(Timestamp {
+                    year: v as u16,
+                    ..Default::default()
+                });
             }
             if let Some(v) = fields.track_number {
                 t.set_track(v);
