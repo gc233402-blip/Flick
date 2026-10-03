@@ -1,3 +1,36 @@
+# AGENTS.md
+
+Flick is an Android music player with a Rust audio engine: bit-perfect PCM and native DSD to USB DACs (UAC 2.0), DAP hi-res via Oboe/AAudio exclusive mode, and a full DSP chain (31-band PEQ, dynamics, convolution reverb, crossfade, gapless). Flutter/Riverpod + Isar frontend; Rust backend (Symphonia, rusb, cpal/Oboe, lofty) bridged with `flutter_rust_bridge`. Android-only, minSdk 26.
+
+## Docs
+
+| Doc | Contents |
+|---|---|
+| `docs/RELEASING.md` | Build flavors, signing, release process |
+| `docs/UAC2_IMPLEMENTATION_CHECKLIST.md` | USB audio work and constraints |
+| `docs/DSD_ARCHITECTURE.md` | DSD paths (DSF/DFF/WavPack, DoP) |
+| `docs/LIBRARY_SCAN_ARCHITECTURE.md` | MediaStore/SAF scanner design |
+| `CONTRIBUTING.md` | Scope, invariants, PR rules |
+
+## Commands
+
+```
+flutter analyze
+flutter test
+cargo test --lib --manifest-path rust/Cargo.toml
+flutter run --flavor full
+```
+
+## Invariants (do not violate)
+
+- **Bit-perfect / native format output is the goal.** Never silently resample or truncate; do not route everything through one container for convenience.
+- **Android only, minSdk 26.** No desktop or iOS paths.
+- **No ads, tracking, or premium tier.** Nothing phones home or gates features.
+- **No new dependencies without a reason** — stdlib or an existing dep first.
+- Match the style of files you touch; no unrelated reformatting in the same diff.
+- Test audio-path changes on real hardware when possible; say so if not.
+- Never commit signing material, secrets, or machine-local files (`key.properties`, keystores, `graphify-out/`).
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.

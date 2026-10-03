@@ -41,3 +41,11 @@ If you're working on DAC output, note that some DACs only do `S24_3LE`, not `S24
 ## Branch policy
 
 Work off `main`. Fork, push to your fork, open a PR against `main`. Rebase before you open if `main` has moved.
+
+## Reporting bugs and requesting features
+
+Use the issue templates. For security issues, do **not** open a public issue — follow [SECURITY.md](./SECURITY.md). Questions and ideas go to [Discussions](https://github.com/moss-apps/Flick/discussions).
+
+## Code of conduct
+
+Participation is governed by [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
