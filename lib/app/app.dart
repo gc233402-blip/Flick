@@ -53,6 +53,7 @@ import 'package:flick/features/milestone/widgets/milestone_card.dart';
 import 'package:flick/features/milestone/widgets/streak_popup.dart';
 import 'package:flick/features/whats_new/widgets/whats_new_bottom_sheet.dart';
 import 'package:flick/core/utils/dev_log.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Main application widget for Flick Player.
 class FlickPlayerApp extends StatelessWidget {
@@ -70,20 +71,32 @@ class FlickPlayerApp extends StatelessWidget {
       ),
     );
 
-    return MaterialApp(
-      title: 'Flick Player',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      navigatorKey: rootNavigatorKey,
-      home: const _RootRouter(),
-      // Global connectivity notice. It sits below the app content so it is
-      // never covered by routes and never covers any interface itself.
-      builder: (context, child) {
-        return Column(
-          children: [
-            Expanded(child: child ?? const SizedBox.shrink()),
-            const OfflineNotice(),
-          ],
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: LocaleController.instance,
+      builder: (context, selectedLocale, _) {
+        return MaterialApp(
+          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.darkTheme,
+          navigatorKey: rootNavigatorKey,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: kSupportedLocales,
+          // null means "follow the device locale".
+          locale: selectedLocale,
+          home: const _RootRouter(),
+          // Global connectivity notice. It sits below the app content so it is
+          // never covered by routes and never covers any interface itself.
+          builder: (context, child) {
+            // Keep the global `l10n` accessor pointed at the active locale, so
+            // service-layer strings resolve consistently with the widget layer.
+            LocaleController.instance.bind(AppLocalizations.of(context));
+            return Column(
+              children: [
+                Expanded(child: child ?? const SizedBox.shrink()),
+                const OfflineNotice(),
+              ],
+            );
+          },
         );
       },
     );
