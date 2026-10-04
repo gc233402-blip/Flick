@@ -1,0 +1,11 @@
+{
+  "@@locale": "zh",
+
+  "appTitle": "Flick 音乐播放器",
+
+  "language": "语言",
+  "languageSystemDefault": "跟随系统",
+  "languageSectionDescription": "选择应用界面使用的语言。",
+
+  "castingTo": "正在投放到 {deviceName}"
+}

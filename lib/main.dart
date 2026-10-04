@@ -17,6 +17,7 @@ import 'package:flick/services/uac2_preferences_service.dart';
 import 'package:flick/services/uac2_service.dart';
 import 'package:flick/core/utils/app_log.dart';
 import 'package:flick/core/utils/dev_log.dart';
+import 'package:flick/l10n/l10n.dart';
 import 'package:flick/core/utils/frame_timings_monitor.dart';
 import 'package:flick/src/rust/api/logging.dart';
 
@@ -30,6 +31,12 @@ Future<void> main() async {
   await AppLog.instance.initializePersistence();
   await Uac2PreferencesService().initializeDeveloperModeCache();
   FrameTimingsMonitor.instance.start();
+
+  // Resolve the UI language before anything can produce a user-visible string.
+  // The global `l10n` accessor is a plain global (see lib/l10n/l10n.dart), so
+  // service-layer strings need it pointed at the right locale from the start.
+  await LocaleController.instance.load();
+  LocaleController.instance.bindLocale(LocaleController.instance.effectiveLocale);
 
   FlutterError.onError = (details) {
     AppLog.instance.add(
