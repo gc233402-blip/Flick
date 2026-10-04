@@ -7,6 +7,7 @@ import 'package:flick/providers/player_provider.dart';
 import 'package:flick/providers/uac2_provider.dart';
 import 'package:flick/services/uac2_preferences_service.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Pure gate: auto-engage only for an external USB route in a live state when
 /// the user hasn't opted out, the device isn't declined, and bits aren't
@@ -251,8 +252,8 @@ class _UsbBitPerfectPromptState extends ConsumerState<UsbBitPerfectPrompt> {
         SnackBar(
           content: Text(
             recovered
-                ? 'Exclusive USB bit-perfect re-engaged.'
-                : 'Exclusive USB is still unavailable. Check the USB diagnostics.',
+                ? l10n.exclusiveUsbBitPerfectReEngaged
+                : l10n.exclusiveUsbIsStillUnavailableCheck,
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -270,12 +271,12 @@ class _UsbBitPerfectPromptState extends ConsumerState<UsbBitPerfectPrompt> {
         SnackBar(
           content: Text(
             applied
-                ? 'Bit-perfect (USB DAC) enabled for ${status.device.productName}.'
-                : 'Bit-perfect (USB DAC) could not be enabled for ${status.device.productName}. Check the USB diagnostics.',
+                ? l10n.bitPerfectUsbDacEnabledFor(status.device.productName)
+                : l10n.bitPerfectUsbDacCouldNot2(status.device.productName),
           ),
           behavior: SnackBarBehavior.floating,
           action: SnackBarAction(
-            label: 'Undo',
+            label: l10n.undo,
             onPressed: () => unawaited(_declineAutoEngage(promptKey)),
           ),
         ),
@@ -287,13 +288,13 @@ class _UsbBitPerfectPromptState extends ConsumerState<UsbBitPerfectPrompt> {
       ..removeCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: const Text(
-            'Exclusive USB dropped to the Android mixer. Bit-perfect is paused.',
+          content: Text(
+            l10n.exclusiveUsbDroppedToTheAndroid,
           ),
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 8),
           action: SnackBarAction(
-            label: 'Retry',
+            label: l10n.retry,
             onPressed: () => unawaited(_retryDirectUsb()),
           ),
         ),

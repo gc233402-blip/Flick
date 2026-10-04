@@ -7,15 +7,6 @@ enum PlaybackSource {
   network,
   unknown;
 
-  String get label => switch (this) {
-    PlaybackSource.album => 'Album',
-    PlaybackSource.artist => 'Artist',
-    PlaybackSource.folder => 'Folder',
-    PlaybackSource.playlist => 'Playlist',
-    PlaybackSource.allSongs => 'All Songs',
-    PlaybackSource.network => 'Network',
-    PlaybackSource.unknown => 'Unknown',
-  };
 }
 
 class PlaybackContext {

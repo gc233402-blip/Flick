@@ -20,6 +20,7 @@ import '../services/apple_music/auto_metadata_enricher.dart';
 import '../services/artwork_backfill_tracker.dart';
 import '../src/rust/api/scanner.dart'; // Rust bridge
 import 'package:flick/core/utils/dev_log.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// How thoroughly a scan re-reads the library.
 enum ScanMode {
@@ -737,7 +738,7 @@ class LibraryScannerService {
 
       final artist = (file.artist?.trim().isNotEmpty ?? false)
           ? file.artist!.trim()
-          : 'Unknown Artist';
+          : l10n.unknownArtist;
       final song = SongEntity()
         ..filePath = file.filePath ?? file.uri
         ..mediaStoreUri = file.uri
@@ -747,7 +748,7 @@ class LibraryScannerService {
         ..artist = artist
         ..album = (file.album?.trim().isNotEmpty ?? false)
             ? file.album!.trim()
-            : 'Unknown Album'
+            : l10n.unknownAlbum
         ..albumArtist = (file.albumArtist?.trim().isNotEmpty ?? false)
             ? file.albumArtist!.trim()
             : artist
@@ -1177,9 +1178,9 @@ class LibraryScannerService {
               ? basic.uri
               : null
           ..title = _extractTitleFromFilename(basic.name)
-          ..artist = 'Unknown Artist'
-          ..album = 'Unknown Album'
-          ..albumArtist = 'Unknown Artist'
+          ..artist = l10n.unknownArtist
+          ..album = l10n.unknownAlbum
+          ..albumArtist = l10n.unknownArtist
           ..trackNumber = 0
           ..discNumber = 1
           ..durationMs = 0
@@ -1667,7 +1668,7 @@ class LibraryScannerService {
 
         final artist = (meta?.artist?.trim().isNotEmpty ?? false)
             ? meta!.artist!.trim()
-            : 'Unknown Artist';
+            : l10n.unknownArtist;
         final song = SongEntity()
           ..filePath = basic.uri
           ..mediaStoreUri = basic.uri.startsWith('content://')
@@ -1679,7 +1680,7 @@ class LibraryScannerService {
           ..artist = artist
           ..album = (meta?.album?.trim().isNotEmpty ?? false)
               ? meta!.album!.trim()
-              : 'Unknown Album'
+              : l10n.unknownAlbum
           ..albumArtist = (meta?.albumArtist?.trim().isNotEmpty ?? false)
               ? meta!.albumArtist!.trim()
               : artist
@@ -1945,7 +1946,7 @@ class LibraryScannerService {
           final existing = existingMap[metadata.path];
           final artist = (metadata.artist?.trim().isNotEmpty ?? false)
               ? metadata.artist!.trim()
-              : 'Unknown Artist';
+              : l10n.unknownArtist;
           final song = SongEntity()
             ..filePath = metadata.path
             ..title = (metadata.title?.trim().isNotEmpty ?? false)
@@ -1954,7 +1955,7 @@ class LibraryScannerService {
             ..artist = artist
             ..album = (metadata.album?.trim().isNotEmpty ?? false)
                 ? metadata.album!.trim()
-                : 'Unknown Album'
+                : l10n.unknownAlbum
             ..albumArtist = existing?.albumArtist ?? artist
             ..trackNumber = metadata.trackNumber ?? existing?.trackNumber ?? 0
             ..discNumber = metadata.discNumber ?? existing?.discNumber ?? 1
@@ -3223,7 +3224,7 @@ class LibraryScannerService {
           ? cueSheet.performer!.trim()
           : (meta?.artist?.trim().isNotEmpty ?? false)
           ? meta!.artist!.trim()
-          : 'Unknown Artist';
+          : l10n.unknownArtist;
       final existing = existingMap['$audioUri#${track.startOffsetMs}'];
       final trackLog = ripLog?.tracks.firstWhere(
         (t) => t.trackNumber == track.trackNumber,
@@ -3246,7 +3247,7 @@ class LibraryScannerService {
             ? cueSheet.title!.trim()
             : (meta?.album?.trim().isNotEmpty ?? false)
             ? meta!.album!.trim()
-            : 'Unknown Album'
+            : l10n.unknownAlbum
         ..albumArtist = cueSheet.performer?.trim().isNotEmpty ?? false
             ? cueSheet.performer!.trim()
             : artist

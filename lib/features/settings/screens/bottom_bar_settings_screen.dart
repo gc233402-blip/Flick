@@ -9,6 +9,7 @@ import 'package:flick/models/nav_bar_config.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/widgets/navigation/flick_nav_bar.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class BottomBarSettingsScreen extends ConsumerWidget {
   const BottomBarSettingsScreen({super.key});
@@ -24,17 +25,17 @@ class BottomBarSettingsScreen extends ConsumerWidget {
     final hiddenButtons = NavBarButton.values.where((b) => hidden.contains(b)).toList();
 
     return SettingsScaffold(
-      title: 'Bottom Bar',
+      title: l10n.bottomBar,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Mini Player'),
+          SettingsSectionHeader(l10n.miniPlayer),
           SettingsCard(
             children: [
               SelectionSetting(
                 icon: LucideIcons.audioLines,
-                title: 'Visualizer',
-                subtitle: 'Swipe to show or hide the visualizer',
+                title: l10n.visualizer,
+                subtitle: l10n.swipeToShowOrHideThe,
                 selected: appPreferences.miniPlayerSwipeAction == 'visualizer',
                 onTap: () {
                   ref
@@ -45,8 +46,8 @@ class BottomBarSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.skipForward,
-                title: 'Switch Songs',
-                subtitle: 'Swipe left/right to skip tracks',
+                title: l10n.switchSongs,
+                subtitle: l10n.swipeLeftRightToSkipTracks,
                 selected: appPreferences.miniPlayerSwipeAction == 'switchSongs',
                 onTap: () {
                   ref
@@ -57,8 +58,8 @@ class BottomBarSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.split,
-                title: 'Separate from Nav Bar',
-                subtitle: 'Show the mini player as its own bar above the buttons',
+                title: l10n.separateFromNavBar,
+                subtitle: l10n.showTheMiniPlayerAsIts,
                 value: appPreferences.separateMiniPlayerFromNavBar,
                 onChanged: (value) {
                   ref
@@ -69,14 +70,14 @@ class BottomBarSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Auto Collapse'),
+          SettingsSectionHeader(l10n.autoCollapse),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.timer,
-                title: 'Auto Collapse',
+                title: l10n.autoCollapse,
                 subtitle:
-                    'Hide navigation buttons after being idle',
+                    l10n.hideNavigationButtonsAfterBeingIdle,
                 value: appPreferences.bottomBarAutoCollapseEnabled,
                 onChanged: (value) {
                   ref
@@ -88,9 +89,9 @@ class BottomBarSettingsScreen extends ConsumerWidget {
                 const SettingsDivider(),
                 SliderSetting(
                   icon: LucideIcons.clock,
-                  title: 'Collapse After',
+                  title: l10n.collapseAfter,
                   subtitle:
-                      'Seconds of inactivity before collapsing',
+                      l10n.secondsOfInactivityBeforeCollapsing,
                   value: appPreferences.bottomBarAutoCollapseSeconds.toDouble(),
                   displayValue:
                       '${appPreferences.bottomBarAutoCollapseSeconds}s',
@@ -107,7 +108,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Buttons'),
+          SettingsSectionHeader(l10n.buttons),
           Container(
             clipBehavior: Clip.none,
             decoration: BoxDecoration(
@@ -162,7 +163,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
                           child: ToggleSetting(
                             icon: button.icon,
                             title: button.label,
-                            subtitle: 'Show the ${button.label} tab in the bottom bar',
+                            subtitle: l10n.showTheTabInTheBottom(button.label),
                             value: true,
                             onChanged: isOnly
                                 ? (_) {}
@@ -182,7 +183,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
           ),
           if (disabledVisible.isNotEmpty) ...[
             const SizedBox(height: AppConstants.spacingLg),
-            const SettingsSectionHeader('Disabled'),
+            SettingsSectionHeader(l10n.disabled),
             SettingsCard(
               children: [
                 for (int i = 0; i < disabledVisible.length; i++) ...[
@@ -199,7 +200,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
           ],
           if (hiddenButtons.isNotEmpty) ...[
             const SizedBox(height: AppConstants.spacingLg),
-            const SettingsSectionHeader('Hidden'),
+            SettingsSectionHeader(l10n.hidden),
             SettingsCard(
               children: [
                 for (int i = 0; i < hiddenButtons.length; i++) ...[
@@ -238,7 +239,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
                   const SizedBox(width: AppConstants.spacingSm),
                   Expanded(
                     child: Text(
-                      'Having more than 4 buttons may cause text labels to compress. Consider reducing the button spacing below.',
+                      l10n.havingMoreThan4ButtonsMay,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextSecondary,
                         height: 1.35,
@@ -250,13 +251,13 @@ class BottomBarSettingsScreen extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Appearance'),
+          SettingsSectionHeader(l10n.appearance),
           SettingsCard(
             children: [
               SliderSetting(
                 icon: LucideIcons.ruler,
-                title: 'Bar Height',
-                subtitle: 'Adjust the size of the bottom bar',
+                title: l10n.barHeight,
+                subtitle: l10n.adjustTheSizeOfTheBottom,
                 value: config.barSizeFactor,
                 displayValue: '${config.barSizeFactor.toStringAsFixed(1)}x',
                 min: 0.6,
@@ -271,8 +272,8 @@ class BottomBarSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.space,
-                title: 'Button Spacing',
-                subtitle: 'Adjust spacing between buttons',
+                title: l10n.buttonSpacing,
+                subtitle: l10n.adjustSpacingBetweenButtons,
                 value: config.buttonSpacingFactor,
                 displayValue: '${config.buttonSpacingFactor.toStringAsFixed(1)}x',
                 min: 0.5,
@@ -287,8 +288,8 @@ class BottomBarSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.maximize,
-                title: 'Icon Size',
-                subtitle: 'Adjust the size of the icons',
+                title: l10n.iconSize,
+                subtitle: l10n.adjustTheSizeOfTheIcons,
                 value: config.iconSizeFactor,
                 displayValue: '${config.iconSizeFactor.toStringAsFixed(1)}x',
                 min: 0.5,
@@ -303,8 +304,8 @@ class BottomBarSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.type,
-                title: 'Show Labels',
-                subtitle: 'Display text labels below icons',
+                title: l10n.showLabels,
+                subtitle: l10n.displayTextLabelsBelowIcons,
                 value: config.showLabels,
                 onChanged: (value) {
                   ref
@@ -315,7 +316,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Preview'),
+          SettingsSectionHeader(l10n.preview),
           ClipRRect(
             borderRadius: BorderRadius.circular(AppConstants.radiusLg),
             child: Container(
@@ -390,8 +391,8 @@ class _DisabledNavItem extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       isHidden
-                          ? 'Completely hidden from the bottom bar'
-                          : 'Appears in the overflow menu',
+                          ? l10n.completelyHiddenFromTheBottomBar
+                          : l10n.appearsInTheOverflowMenu,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.adaptiveTextTertiary,
                       ),

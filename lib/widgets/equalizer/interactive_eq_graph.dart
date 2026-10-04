@@ -10,6 +10,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/providers/equalizer_provider.dart';
 import 'package:flick/widgets/equalizer/eq_graph_utils.dart' as equtils;
+import 'package:flick/l10n/l10n.dart';
 
 class InteractiveEqGraphScreen extends ConsumerStatefulWidget {
   final EqMode mode;
@@ -118,7 +119,7 @@ class _InteractiveEqGraphScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Interactive EQ',
+                  l10n.interactiveEq,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
                     fontWeight: FontWeight.w700,
@@ -126,8 +127,8 @@ class _InteractiveEqGraphScreenState
                 ),
                 Text(
                   widget.mode == EqMode.graphic
-                      ? 'Drag bands up or down'
-                      : 'Drag to move • Pinch to widen/narrow',
+                      ? l10n.dragBandsUpOrDown
+                      : l10n.dragToMovePinchToWiden,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),
@@ -155,10 +156,10 @@ class _InteractiveEqGraphScreenState
         ),
         child: Text(
           isQ
-              ? 'Pinch apart = narrower (higher Q)\nPinch together = wider (lower Q)'
+              ? l10n.pinchApartNarrowerHigherQNpinch
               : widget.mode == EqMode.graphic
-              ? 'Drag vertically to change gain'
-              : 'Drag to change frequency & gain',
+              ? l10n.dragVerticallyToChangeGain
+              : l10n.dragToChangeFrequencyGain,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: context.adaptiveTextPrimary.withValues(alpha: 0.85),
@@ -204,15 +205,15 @@ class _InteractiveEqGraphScreenState
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _DetailItem(
-                  label: 'Frequency',
+                  label: l10n.frequency,
                   value: equtils.hzLabel(freq),
                 ),
                 _DetailItem(
-                  label: 'Band',
+                  label: l10n.band,
                   value: bandFamily,
                 ),
                 _DetailItem(
-                  label: 'Gain',
+                  label: l10n.gain,
                   value:
                       '${gain >= 0 ? '+' : ''}${gain.toStringAsFixed(1)} dB',
                 ),
@@ -251,12 +252,12 @@ class _InteractiveEqGraphScreenState
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _DetailItem(
-                  label: 'Frequency',
+                  label: l10n.frequency,
                   value: equtils.hzLabel(band.frequencyHz),
                 ),
                 if (band.type.supportsGain)
                   _DetailItem(
-                    label: 'Gain',
+                    label: l10n.gain,
                     value:
                         '${band.gainDb >= 0 ? '+' : ''}${band.gainDb.toStringAsFixed(1)} dB',
                   ),
@@ -273,11 +274,11 @@ class _InteractiveEqGraphScreenState
   }
 
   String _getBandFamily(double freqHz) {
-    if (freqHz < 60) return 'Sub';
-    if (freqHz < 250) return 'Bass';
-    if (freqHz < 2000) return 'Mid';
-    if (freqHz < 6000) return 'Presence';
-    return 'Air';
+    if (freqHz < 60) return l10n.sub;
+    if (freqHz < 250) return l10n.bass;
+    if (freqHz < 2000) return l10n.mid;
+    if (freqHz < 6000) return l10n.presence;
+    return l10n.air;
   }
 
   Widget _buildStatusBar() {
@@ -288,10 +289,10 @@ class _InteractiveEqGraphScreenState
     String summaryText;
     if (widget.mode == EqMode.graphic) {
       final adjustedCount = state.graphicGainsDb.where((g) => g.abs() > 0.05).length;
-      summaryText = adjustedCount == 0 ? 'Flat' : '$adjustedCount/${state.graphicGainsDb.length} bands adjusted';
+      summaryText = adjustedCount == 0 ? l10n.flat : l10n.bandsAdjusted2(adjustedCount, state.graphicGainsDb.length);
     } else {
       final activeCount = state.parametricBands.where((b) => b.enabled).length;
-      summaryText = '$activeCount/${state.parametricBands.length} bands active';
+      summaryText = l10n.bandsActive(activeCount, state.parametricBands.length);
     }
 
     return Container(
@@ -319,7 +320,7 @@ class _InteractiveEqGraphScreenState
               borderRadius: BorderRadius.circular(AppConstants.radiusRound),
             ),
             child: Text(
-              widget.mode == EqMode.graphic ? 'Graphic' : 'Parametric',
+              widget.mode == EqMode.graphic ? l10n.graphic : l10n.parametric,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: context.adaptiveTextPrimary,
                 fontWeight: FontWeight.w600,

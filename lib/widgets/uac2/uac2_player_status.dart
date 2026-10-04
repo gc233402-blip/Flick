@@ -5,6 +5,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/models/audio_output_diagnostics.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2PlayerStatus extends ConsumerWidget {
   final bool compact;
@@ -74,7 +75,7 @@ class Uac2PlayerStatus extends ConsumerWidget {
             Text(
               status.currentFormat!.isDsdStream
                   ? status.currentFormat!.compactRateLabel
-                  : '${_effectiveSampleRate(status, diagnostics) ~/ 1000}kHz/${status.currentFormat!.bitDepth}bit',
+                  : l10n.khzBit(_effectiveSampleRate(status, diagnostics) ~/ 1000, status.currentFormat!.bitDepth),
               style: TextStyle(
                 fontSize: 10,
                 color: _getStatusColor(status.state),
@@ -183,7 +184,7 @@ class Uac2PlayerStatus extends ConsumerWidget {
                 _buildFormatBadge(
                   status.currentFormat!.isDsdStream
                       ? status.currentFormat!.compactRateLabel
-                      : '${_effectiveSampleRate(status, diagnostics) ~/ 1000}kHz',
+                      : l10n.khz(_effectiveSampleRate(status, diagnostics) ~/ 1000),
                   context,
                 ),
                 const SizedBox(width: 4),
@@ -194,9 +195,9 @@ class Uac2PlayerStatus extends ConsumerWidget {
                 const SizedBox(width: 4),
                 _buildFormatBadge(
                   status.currentFormat!.channels == 1
-                      ? 'Mono'
+                      ? l10n.mono
                       : status.currentFormat!.channels == 2
-                      ? 'Stereo'
+                      ? l10n.stereo
                       : '${status.currentFormat!.channels}ch',
                   context,
                 ),
@@ -221,7 +222,7 @@ class Uac2PlayerStatus extends ConsumerWidget {
                         ),
                         const SizedBox(width: 2),
                         Text(
-                          'Direct USB',
+                          l10n.directUsb,
                           style: TextStyle(
                             fontSize: 9,
                             color: Colors.green.shade400,
@@ -324,17 +325,17 @@ class Uac2PlayerStatus extends ConsumerWidget {
   String _getStatusLabel(Uac2State state) {
     switch (state) {
       case Uac2State.idle:
-        return 'Idle';
+        return l10n.idle;
       case Uac2State.connecting:
-        return 'Connecting';
+        return l10n.connecting;
       case Uac2State.connected:
-        return 'Connected';
+        return l10n.connected;
       case Uac2State.prewarming:
-        return 'Prewarming';
+        return l10n.prewarming;
       case Uac2State.streaming:
-        return 'Streaming';
+        return l10n.streaming;
       case Uac2State.error:
-        return 'Error';
+        return l10n.error3;
     }
   }
 }

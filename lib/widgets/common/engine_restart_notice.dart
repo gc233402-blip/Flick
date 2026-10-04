@@ -5,6 +5,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/utils/navigation_helper.dart';
 import 'package:flick/features/menu/screens/restarting_screen.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Inline "restart required" prompt shown after the audio engine is changed.
 ///
@@ -43,7 +44,7 @@ class EngineRestartNotice extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Restart required',
+                  l10n.restartRequired,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: context.adaptiveTextPrimary,
                     fontWeight: FontWeight.w700,
@@ -51,7 +52,7 @@ class EngineRestartNotice extends StatelessWidget {
                 ),
                 const SizedBox(height: AppConstants.spacingXxs),
                 Text(
-                  'Your new audio engine is ready. Restart Flick to apply it.',
+                  l10n.yourNewAudioEngineIsReady,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.adaptiveTextSecondary,
                     height: 1.35,
@@ -85,7 +86,7 @@ class EngineRestartNotice extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('Restart'),
+            child: Text(l10n.restart),
           ),
         ],
       ),

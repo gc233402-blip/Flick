@@ -46,35 +46,6 @@ extension PlayerActionButtonX on PlayerActionButton {
     }
   }
 
-  String get label {
-    switch (this) {
-      case PlayerActionButton.none:
-        return 'None';
-      case PlayerActionButton.lyrics:
-        return 'Lyrics';
-      case PlayerActionButton.favorites:
-        return 'Favorites';
-      case PlayerActionButton.visualizer:
-        return 'Visualizer';
-      case PlayerActionButton.ratings:
-        return 'Rating';
-      case PlayerActionButton.queue:
-        return 'Queue';
-      case PlayerActionButton.sleepTimer:
-        return 'Sleep Timer';
-      case PlayerActionButton.share:
-        return 'Share';
-      case PlayerActionButton.usbVolume:
-        return 'USB Volume';
-      case PlayerActionButton.equalizer:
-        return 'Equalizer';
-      case PlayerActionButton.volume:
-        return 'Volume';
-      case PlayerActionButton.cast:
-        return 'Cast';
-    }
-  }
-
   IconData get icon {
     switch (this) {
       case PlayerActionButton.none:

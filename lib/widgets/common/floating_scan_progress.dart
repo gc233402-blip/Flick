@@ -10,6 +10,7 @@ import 'package:flick/models/floating_scan_indicator_side.dart';
 import 'package:flick/services/audio_preload_service.dart';
 import 'package:flick/services/floating_scan_indicator_preference_service.dart';
 import 'package:flick/services/scan_session_controller.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Pinned bubble (plus anchored details card) that keeps scan/preload progress
 /// visible after the full-screen overlay is minimized.
@@ -376,7 +377,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
             ? _autoPreloadProgress.value
             : null;
 
-        final title = session?.title ?? 'Preloading audio';
+        final title = session?.title ?? l10n.preloadingAudio3;
         final fraction = session != null
             ? (scanProgress?.progressFraction ?? 0.0)
             : (preloadProgress?.fraction ?? 0.0);
@@ -400,7 +401,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
         };
         final foldersTotal = scanProgress?.foldersTotal ?? 0;
         final folderStatus = foldersTotal > 1
-            ? 'Folder ${scanProgress?.foldersCompleted ?? 0} of $foldersTotal'
+            ? l10n.folderOf2(scanProgress?.foldersCompleted ?? 0, foldersTotal)
             : null;
         final loadingArtwork =
             session != null && scanProgress?.phase == 'Loading artwork';
@@ -486,7 +487,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
           curve: Curves.easeOutCubic,
           child: Semantics(
             button: true,
-            label: 'Scan progress',
+            label: l10n.scanProgress,
             child: Container(
               width: _bubbleSize,
               height: _bubbleSize,
@@ -713,8 +714,8 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
               total > 0
                   ? '$processed / $total ${loadingArtwork ? 'covers' : 'files'}${finishingUp ? ' · Finishing up…' : ''}${folderStatus != null ? ' · $folderStatus' : ''}${failed > 0 ? ' · $failed failed' : ''}'
                   : loadingArtwork
-                  ? 'Loading artwork…'
-                  : 'Counting files…',
+                  ? l10n.loadingArtwork2
+                  : l10n.countingFiles,
               style: const TextStyle(
                 fontFamily: 'ProductSans',
                 fontSize: 12,
@@ -748,7 +749,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
                     ),
                   ),
                   child: Text(
-                    loadingArtwork ? 'Skip' : 'Stop',
+                    loadingArtwork ? l10n.skip : l10n.stop,
                     style: const TextStyle(
                       fontFamily: 'ProductSans',
                       fontWeight: FontWeight.w500,

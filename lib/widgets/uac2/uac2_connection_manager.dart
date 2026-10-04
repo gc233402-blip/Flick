@@ -8,6 +8,7 @@ import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
 import 'package:flick/src/rust/api/uac2_api.dart' as rust_uac2;
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2ConnectionManager extends ConsumerStatefulWidget {
   const Uac2ConnectionManager({super.key});
@@ -69,7 +70,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            success ? 'Reconnection successful' : 'Reconnection failed',
+            success ? l10n.reconnectionSuccessful : l10n.reconnectionFailed,
           ),
           backgroundColor: success ? Colors.green : Colors.red,
         ),
@@ -85,7 +86,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
     final isStreaming = next.state == Uac2State.streaming;
     final format = next.currentFormat;
     final formatSuffix = format != null
-        ? ' at ${(format.sampleRate ~/ 1000)}kHz/${format.bitDepth}bit'
+        ? l10n.atKhzBit((format.sampleRate ~/ 1000), format.bitDepth)
         : '';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -137,7 +138,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
               ),
               const SizedBox(width: AppConstants.spacingSm),
               Text(
-                'Connection Management',
+                l10n.connectionManagement,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   color: context.adaptiveTextPrimary,
                   fontWeight: FontWeight.w600,
@@ -149,7 +150,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
           if (_connectionState != null) ...[
             _buildInfoRow(
               context,
-              'State',
+              l10n.state,
               _connectionState!.state,
               LucideIcons.activity,
               valueColor: _getStateColor(_connectionState!.state),
@@ -157,7 +158,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
             const Divider(height: 1, color: AppColors.glassBorder),
             _buildInfoRow(
               context,
-              'Reconnect Attempts',
+              l10n.reconnectAttempts,
               _connectionState!.reconnectAttempts.toString(),
               LucideIcons.rotateCw,
               valueColor: _connectionState!.reconnectAttempts > 0
@@ -180,7 +181,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
                 const SizedBox(width: AppConstants.spacingMd),
                 Expanded(
                   child: Text(
-                    'Auto-Reconnect',
+                    l10n.autoReconnect,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.adaptiveTextSecondary,
                     ),
@@ -202,7 +203,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
               child: ElevatedButton.icon(
                 onPressed: _attemptReconnect,
                 icon: const Icon(LucideIcons.refreshCw, size: 18),
-                label: const Text('Reconnect Now'),
+                label: Text(l10n.reconnectNow),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
                   foregroundColor: Colors.black,
