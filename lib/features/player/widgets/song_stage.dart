@@ -75,6 +75,10 @@ class SongStage extends StatelessWidget {
   /// page keeps video running).
   final bool motionArtEnabled;
 
+  /// True only for the carousel page of the currently playing song. Peek
+  /// stages render lyrics statically instead of following playback.
+  final bool active;
+
   const SongStage({
     super.key,
     required this.song,
@@ -116,6 +120,7 @@ class SongStage extends StatelessWidget {
     required this.onToggleLyrics,
     this.showWaveform = true,
     this.motionArtEnabled = true,
+    this.active = true,
   });
 
   @override
@@ -198,6 +203,8 @@ class SongStage extends StatelessWidget {
                       playerService: playerService,
                       lyricsService: lyricsService,
                       albumColor: albumColor,
+                      positionNotifier: positionNotifier,
+                      active: active,
                     ),
                   ),
                 ),
@@ -617,6 +624,8 @@ class SongStage extends StatelessWidget {
                             playerService: playerService,
                             lyricsService: lyricsService,
                             albumColor: albumColor,
+                            positionNotifier: positionNotifier,
+                            active: active,
                           ),
                         )
                       : KeyedSubtree(
