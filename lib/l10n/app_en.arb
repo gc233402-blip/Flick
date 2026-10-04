@@ -1,0 +1,31 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Flick Player",
+  "@appTitle": {
+    "description": "Application name. Used by MaterialApp.onGenerateTitle and shown in the Android task switcher."
+  },
+
+  "language": "Language",
+  "@language": {
+    "description": "Settings entry label and the title of the language picker."
+  },
+  "languageSystemDefault": "System default",
+  "@languageSystemDefault": {
+    "description": "Language option that follows the device locale."
+  },
+  "languageSectionDescription": "Choose the language used across the app.",
+  "@languageSectionDescription": {
+    "description": "Helper text under the language setting."
+  },
+
+  "castingTo": "Casting to {deviceName}",
+  "@castingTo": {
+    "description": "Snack bar shown after starting a cast session.",
+    "placeholders": {
+      "deviceName": {
+        "type": "Object"
+      }
+    }
+  }
+}

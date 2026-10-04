@@ -587,6 +587,8 @@ class AppPreferencesService {
   static const _animatedAlbumArtKey = 'album_animated_art';
   static const _folderGridPageSizeKey = 'folder_grid_page_size';
   static const _lastSeenChangelogVersionKey = 'last_seen_changelog_version';
+  /// UI language. A locale tag such as 'zh_CN', or 'system' to follow the device.
+  static const _appLocaleKey = 'app_locale';
   static const _bottomBarAutoCollapseEnabledKey =
       'bottom_bar_auto_collapse_enabled';
   static const _bottomBarAutoCollapseSecondsKey =
@@ -1752,6 +1754,17 @@ class AppPreferencesService {
   Future<void> setRefreshRateMode(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_refreshRateModeKey, value);
+  }
+
+  /// Returns the persisted UI language tag, or 'system' when unset.
+  Future<String> getAppLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_appLocaleKey) ?? 'system';
+  }
+
+  Future<void> setAppLocale(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_appLocaleKey, value);
   }
 
   Future<bool> getVisualizerEnabled() async {

@@ -9,6 +9,7 @@ import 'package:flick/services/milestone_service.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/features/settings/screens/bottom_bar_settings_screen.dart';
 import 'package:flick/features/settings/screens/visualizer_settings_screen.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class InterfaceSettingsScreen extends ConsumerWidget {
   const InterfaceSettingsScreen({super.key});
@@ -36,6 +37,48 @@ class InterfaceSettingsScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SettingsSectionHeader(context.l10n.language),
+          SettingsCard(
+            children: [
+              ValueListenableBuilder<Locale?>(
+                valueListenable: LocaleController.instance,
+                builder: (context, selectedLocale, _) {
+                  return Column(
+                    children: [
+                      SelectionSetting(
+                        icon: LucideIcons.smartphone,
+                        title: context.l10n.languageSystemDefault,
+                        subtitle: context.l10n.languageSectionDescription,
+                        selected: selectedLocale == null,
+                        onTap: () => LocaleController.instance.select(null),
+                      ),
+                      const SettingsDivider(),
+                      SelectionSetting(
+                        icon: LucideIcons.languages,
+                        title: '简体中文',
+                        subtitle: 'Simplified Chinese',
+                        selected: selectedLocale?.languageCode == 'zh',
+                        onTap: () => LocaleController.instance.select(
+                          const Locale('zh', 'CN'),
+                        ),
+                      ),
+                      const SettingsDivider(),
+                      SelectionSetting(
+                        icon: LucideIcons.globe,
+                        title: 'English',
+                        subtitle: 'English',
+                        selected: selectedLocale?.languageCode == 'en',
+                        onTap: () => LocaleController.instance.select(
+                          const Locale('en'),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: AppConstants.spacingLg),
           const SettingsSectionHeader('Interface'),
           SettingsCard(
             children: [
