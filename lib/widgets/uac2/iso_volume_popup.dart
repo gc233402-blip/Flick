@@ -6,6 +6,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 String _volumeToDb(double volume) {
   if (volume <= 0.0) return '-∞';
@@ -257,7 +258,7 @@ class _IsoVolumePopupOverlayState extends ConsumerState<_IsoVolumePopupOverlay>
                                   ? Colors.red.shade400
                                   : context.adaptiveTextPrimary,
                               padding: EdgeInsets.zero,
-                              tooltip: effectiveMuted ? 'Unmute' : 'Mute',
+                              tooltip: effectiveMuted ? l10n.unmute : l10n.mute,
                             ),
                           ),
                           const SizedBox(height: AppConstants.spacingXs),
@@ -272,7 +273,7 @@ class _IsoVolumePopupOverlayState extends ConsumerState<_IsoVolumePopupOverlay>
                                 max: 1.0,
                                 divisions: 100,
                                 label: showDb
-                                    ? '${(effectiveVolume * 100).round()}%  ${_volumeToDb(effectiveVolume)} dB'
+                                    ? l10n.db15((effectiveVolume * 100).round(), _volumeToDb(effectiveVolume))
                                     : '${(effectiveVolume * 100).round()}%',
                                 onChanged: volumeControlWritable
                                     ? _onSliderChanged
@@ -289,7 +290,7 @@ class _IsoVolumePopupOverlayState extends ConsumerState<_IsoVolumePopupOverlay>
                           const SizedBox(height: AppConstants.spacingXs),
                           Text(
                             showDb
-                                ? '${(effectiveVolume * 100).round()}%\n${_volumeToDb(effectiveVolume)} dB'
+                                ? l10n.nDb((effectiveVolume * 100).round(), _volumeToDb(effectiveVolume))
                                 : '${(effectiveVolume * 100).round()}%',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodySmall

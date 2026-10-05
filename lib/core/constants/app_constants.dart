@@ -1,9 +1,11 @@
+import 'package:flick/l10n/l10n.dart';
+
 /// Current marketing version of the app (matches the `version` field in
 /// `pubspec.yaml`). Bump in lockstep with each release.
 const String kAppVersion = '0.22.1-beta.3';
 const String kAppBuild = '29';
 /// Human-friendly version label, e.g. `0.22.1-beta.3 (build 29)`.
-const String kAppVersionLabel = '$kAppVersion (build $kAppBuild)';
+String kAppVersionLabel = l10n.build(kAppVersion, kAppBuild);
 
 /// App-wide constants for Flick Player.
 class AppConstants {

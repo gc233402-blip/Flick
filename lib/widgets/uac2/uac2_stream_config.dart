@@ -6,6 +6,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2StreamConfig extends ConsumerStatefulWidget {
   final Uac2DeviceInfo device;
@@ -54,7 +55,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
         border: Border.all(color: AppColors.glassBorder),
       ),
       child: Text(
-        'Stream configuration not available',
+        l10n.streamConfigurationNotAvailable,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -84,7 +85,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
         border: Border.all(color: AppColors.glassBorder),
       ),
       child: Text(
-        'Error: $error',
+        l10n.error(error),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.red.shade400,
             ),
@@ -124,7 +125,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
         children: [
           _buildConfigRow(
             context,
-            'Sample Rate',
+            l10n.sampleRate2,
             LucideIcons.activity,
             DropdownButton<int>(
               value: _selectedSampleRate,
@@ -133,7 +134,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
               items: sampleRates.map((rate) {
                 return DropdownMenuItem(
                   value: rate,
-                  child: Text('${rate ~/ 1000}kHz'),
+                  child: Text(l10n.khz(rate ~/ 1000)),
                 );
               }).toList(),
               onChanged: isStreaming
@@ -148,7 +149,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
           const Divider(height: 1, color: AppColors.glassBorder),
           _buildConfigRow(
             context,
-            'Bit Depth',
+            l10n.bitDepth2,
             LucideIcons.layers,
             DropdownButton<int>(
               value: _selectedBitDepth,
@@ -157,7 +158,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
               items: bitDepths.map((depth) {
                 return DropdownMenuItem(
                   value: depth,
-                  child: Text('${depth}bit'),
+                  child: Text(l10n.bit(depth)),
                 );
               }).toList(),
               onChanged: isStreaming
@@ -172,7 +173,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
           const Divider(height: 1, color: AppColors.glassBorder),
           _buildConfigRow(
             context,
-            'Channels',
+            l10n.channels,
             LucideIcons.radio,
             DropdownButton<int>(
               value: _selectedChannels,
@@ -182,7 +183,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
                 return DropdownMenuItem(
                   value: ch,
                   child: Text(
-                    ch == 1 ? 'Mono' : ch == 2 ? 'Stereo' : '$ch channels',
+                    ch == 1 ? l10n.mono : ch == 2 ? l10n.stereo : l10n.channels3(ch),
                   ),
                 );
               }).toList(),
@@ -204,7 +205,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
                 isStreaming ? LucideIcons.square : LucideIcons.play,
                 size: 18,
               ),
-              label: Text(isStreaming ? 'Stop Streaming' : 'Start Streaming'),
+              label: Text(isStreaming ? l10n.stopStreaming : l10n.startStreaming),
               style: ElevatedButton.styleFrom(
                 backgroundColor: isStreaming
                     ? Colors.red.shade400
@@ -266,8 +267,8 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
     final success = await deviceStatusNotifier.startStreaming(format);
     if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to start streaming'),
+        SnackBar(
+          content: Text(l10n.failedToStartStreaming),
           backgroundColor: Colors.red,
         ),
       );
@@ -279,8 +280,8 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
     final success = await deviceStatusNotifier.stopStreaming();
     if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to stop streaming'),
+        SnackBar(
+          content: Text(l10n.failedToStopStreaming),
           backgroundColor: Colors.red,
         ),
       );

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2ErrorNotification extends ConsumerStatefulWidget {
   const Uac2ErrorNotification({super.key});
@@ -52,7 +53,7 @@ class _Uac2ErrorNotificationState
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'USB Audio Error',
+                  l10n.usbAudioError,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.red.shade400,

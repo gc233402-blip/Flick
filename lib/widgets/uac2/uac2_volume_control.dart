@@ -6,6 +6,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Convert a linear volume (0.0–1.0) to decibels using the same
 /// exponential curve as the Rust audio engine (≈ -60 dB to 0 dB).
@@ -159,9 +160,9 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
                     Text(
                       hardwareAuthority
                           ? (deviceStatus.isExternalRoute
-                                ? 'USB Route Volume'
-                                : 'Device DAC Volume')
-                          : 'Volume',
+                                ? l10n.usbRouteVolume
+                                : l10n.deviceDacVolume)
+                          : l10n.volume,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         color: labelColor,
@@ -186,7 +187,7 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
                 ),
                 onPressed: volumeControlWritable ? _toggleMute : null,
                 color: effectiveMuted ? Colors.red.shade400 : subLabelColor,
-                tooltip: effectiveMuted ? 'Unmute' : 'Mute',
+                tooltip: effectiveMuted ? l10n.unmute : l10n.mute,
               ),
             ],
           ),
@@ -201,7 +202,7 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
                   max: 1.0,
                   divisions: 100,
                   label: showDb
-                      ? '${(effectiveVolume * 100).round()}%  ${_volumeToDb(effectiveVolume)} dB'
+                      ? l10n.db15((effectiveVolume * 100).round(), _volumeToDb(effectiveVolume))
                       : '${(effectiveVolume * 100).round()}%',
                   onChanged: volumeControlWritable ? _onSliderChanged : null,
                   onChangeEnd: volumeControlWritable
@@ -219,7 +220,7 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
                 width: showDb ? 82 : 40,
                 child: Text(
                   showDb
-                      ? '${(effectiveVolume * 100).round()}%  ${_volumeToDb(effectiveVolume)} dB'
+                      ? l10n.db15((effectiveVolume * 100).round(), _volumeToDb(effectiveVolume))
                       : '${(effectiveVolume * 100).round()}%',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: subLabelColor,
@@ -233,9 +234,7 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
           if (!isAvailable) ...[
             const SizedBox(height: AppConstants.spacingXs),
             Text(
-              'Volume is fixed while bit-perfect passthrough is active: '
-              'the stream is sent untouched and this DAC has no hardware '
-              'volume control.',
+              l10n.volumeIsFixedWhileBitPerfect2,
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: tertiaryColor),
@@ -243,7 +242,7 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
           ] else if (!deviceStatus.volumeControlWritable) ...[
             const SizedBox(height: AppConstants.spacingXs),
             Text(
-              'Hardware volume is detected, but writes stay blocked while live direct USB playback is active.',
+              l10n.hardwareVolumeIsDetectedButWrites,
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: tertiaryColor),

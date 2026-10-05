@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2DeviceSelector extends ConsumerWidget {
   const Uac2DeviceSelector({super.key});
@@ -14,10 +15,10 @@ class Uac2DeviceSelector extends ConsumerWidget {
     final deviceStatus = ref.watch(uac2DeviceStatusProvider);
 
     if (!isAvailable) {
-      return const Card(
+      return Card(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: Text('UAC2 not available on this platform'),
+          child: Text(l10n.uac2NotAvailableOnThisPlatform),
         ),
       );
     }
@@ -32,8 +33,8 @@ class Uac2DeviceSelector extends ConsumerWidget {
               children: [
                 const Icon(Icons.usb),
                 const SizedBox(width: 8),
-                const Text(
-                  'USB Audio Device',
+                Text(
+                  l10n.usbAudioDevice,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -48,14 +49,14 @@ class Uac2DeviceSelector extends ConsumerWidget {
             devicesAsync.when(
               data: (devices) {
                 if (devices.isEmpty) {
-                  return const Text('No USB audio devices found');
+                  return Text(l10n.noUsbAudioDevicesFound);
                 }
                 return Column(
                   children: [
                     DropdownButtonFormField<Uac2DeviceInfo>(
                       initialValue: selectedDevice,
-                      decoration: const InputDecoration(
-                        labelText: 'Select Device',
+                      decoration: InputDecoration(
+                        labelText: l10n.selectDevice,
                         border: OutlineInputBorder(),
                       ),
                       items: devices.map((device) {
@@ -82,12 +83,12 @@ class Uac2DeviceSelector extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Text('Error: $error'),
+              error: (error, stack) => Text(l10n.error(error)),
             ),
             if (deviceStatus?.errorMessage != null) ...[
               const SizedBox(height: 8),
               Text(
-                'Error: ${deviceStatus!.errorMessage}',
+                l10n.error2(deviceStatus!.errorMessage!),
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ],
@@ -104,27 +105,27 @@ class Uac2DeviceSelector extends ConsumerWidget {
     switch (state) {
       case Uac2State.idle:
         color = Colors.grey;
-        label = 'Idle';
+        label = l10n.idle;
         break;
       case Uac2State.connecting:
         color = Colors.orange;
-        label = 'Connecting';
+        label = l10n.connecting;
         break;
       case Uac2State.connected:
         color = Colors.blue;
-        label = 'Connected';
+        label = l10n.connected;
         break;
       case Uac2State.prewarming:
         color = Colors.amber;
-        label = 'Prewarming';
+        label = l10n.prewarming;
         break;
       case Uac2State.streaming:
         color = Colors.green;
-        label = 'Streaming';
+        label = l10n.streaming;
         break;
       case Uac2State.error:
         color = Colors.red;
-        label = 'Error';
+        label = l10n.error3;
         break;
     }
 
@@ -167,7 +168,7 @@ class Uac2DeviceSelector extends ConsumerWidget {
                     await ref.read(uac2DeviceStatusProvider.notifier).selectDevice(device);
                   },
             icon: Icon(isConnected ? Icons.link_off : Icons.link),
-            label: Text(isConnected ? 'Disconnect' : 'Connect'),
+            label: Text(isConnected ? l10n.disconnect : l10n.connect),
           ),
         ),
         const SizedBox(width: 8),
@@ -176,7 +177,7 @@ class Uac2DeviceSelector extends ConsumerWidget {
           onPressed: () {
             ref.invalidate(uac2DevicesProvider);
           },
-          tooltip: 'Refresh devices',
+          tooltip: l10n.refreshDevices2,
         ),
       ],
     );

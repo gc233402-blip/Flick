@@ -6,6 +6,7 @@ import 'package:flick/core/utils/responsive.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/models/nav_bar_config.dart';
 import 'package:flick/widgets/navigation/bottom_bar_geometry.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class FlickNavBar extends StatefulWidget {
   final int currentIndex;
@@ -245,7 +246,7 @@ class _OverflowNavItem extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    'More',
+                    l10n.more,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -467,7 +468,7 @@ class _OverflowMenuPopupState extends State<_OverflowMenuPopup>
                                 const SizedBox(width: 12),
                                 Flexible(
                                   child: Text(
-                                    'Customize Bottom Bar',
+                                    l10n.customizeBottomBar,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(

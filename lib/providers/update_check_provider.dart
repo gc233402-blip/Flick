@@ -8,6 +8,7 @@ import 'package:in_app_update/in_app_update.dart';
 
 import '../core/constants/app_constants.dart';
 import 'connectivity_provider.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class UpdateCheckState {
   const UpdateCheckState({
@@ -174,7 +175,7 @@ class UpdateCheckNotifier extends Notifier<UpdateCheckState> {
       state = state.copyWith(
         isChecking: false,
         hasChecked: true,
-        errorMessage: 'Unable to check for updates right now.',
+        errorMessage: l10n.unableToCheckForUpdatesRight,
         lastCheckedAt: DateTime.now(),
       );
     }
@@ -184,9 +185,9 @@ class UpdateCheckNotifier extends Notifier<UpdateCheckState> {
     try {
       final response = await http.get(
         _githubReleasesApiUri,
-        headers: const {
+        headers: {
           'Accept': 'application/vnd.github+json',
-          'User-Agent': 'FlickPlayer',
+          'User-Agent': l10n.flickplayer,
           'X-GitHub-Api-Version': '2022-11-28',
         },
       );
@@ -220,7 +221,7 @@ class UpdateCheckNotifier extends Notifier<UpdateCheckState> {
         hasChecked: true,
         isPlayStoreBuild: false,
         updateAvailable: false,
-        errorMessage: 'Unable to check for updates right now.',
+        errorMessage: l10n.unableToCheckForUpdatesRight,
         lastCheckedAt: DateTime.now(),
       );
     }

@@ -7,6 +7,7 @@ import 'package:flick/providers/tutorial_provider.dart';
 import 'package:flick/providers/navigation_provider.dart';
 import 'package:flick/features/onboarding/tutorial_targets.dart';
 import 'package:flick/features/manual/screens/manual_screen.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class TutorialOverlay extends ConsumerStatefulWidget {
   const TutorialOverlay({super.key});
@@ -295,8 +296,8 @@ class _TooltipCard extends StatelessWidget {
               const Spacer(),
               GestureDetector(
                 onTap: onSkip,
-                child: const Text(
-                  'Skip',
+                child: Text(
+                  l10n.skip,
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 13,
@@ -309,7 +310,7 @@ class _TooltipCard extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingMd),
           Text(
-            step.title,
+            step.title(context.l10n),
             style: const TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 20,
@@ -319,7 +320,7 @@ class _TooltipCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            step.description,
+            step.description(context.l10n),
             style: const TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 14,
@@ -335,20 +336,20 @@ class _TooltipCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: AppConstants.spacingSm),
                   child: _SecondaryButton(
-                    label: 'Back',
+                    label: l10n.back,
                     icon: LucideIcons.chevronLeft,
                     onTap: onBack!,
                   ),
                 ),
               if (showManualButton)
                 _PrimaryButton(
-                  label: 'Open Manual',
+                  label: l10n.openManual,
                   icon: LucideIcons.bookOpen,
                   onTap: onOpenManual,
                 )
               else
                 _PrimaryButton(
-                  label: isLastStep ? 'Get Started' : 'Next',
+                  label: isLastStep ? l10n.getStarted : l10n.next,
                   icon: isLastStep ? null : LucideIcons.chevronRight,
                   onTap: onNext,
                 ),

@@ -11,6 +11,7 @@ import 'package:flick/features/player/widgets/album_color_helpers.dart';
 import 'package:flick/features/player/widgets/shuffle_mode_sheet.dart';
 import 'package:flick/features/player/widgets/loop_mode_sheet.dart';
 
+import 'package:flick/l10n/l10n.dart';
 class PlayerControls extends StatelessWidget {
   final PlayerService playerService;
   final String Function(Duration) formatDuration;

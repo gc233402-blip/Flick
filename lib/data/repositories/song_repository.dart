@@ -4,6 +4,7 @@ import '../../core/utils/audio_metadata_utils.dart';
 import '../../core/utils/string_sort_utils.dart';
 import '../database.dart';
 import '../../models/song.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class AlbumGroup {
   final String key;
@@ -415,7 +416,7 @@ class SongRepository {
     final songs = await getAllSongs();
     final albumMap = <String, List<Song>>{};
     for (final song in songs) {
-      final album = song.album ?? 'Unknown Album';
+      final album = song.album ?? l10n.unknownAlbum;
       albumMap.putIfAbsent(album, () => []).add(song);
     }
     for (final albumSongs in albumMap.values) {
@@ -445,7 +446,7 @@ class SongRepository {
         ..sort(SongRepository._compareAlbumSongs);
       return AlbumGroup(
         key: entry.key,
-        albumName: albumNames[entry.key] ?? 'Unknown Album',
+        albumName: albumNames[entry.key] ?? l10n.unknownAlbum,
         albumArtist: resolveGroupArtist(
           albumArtistsByKey[entry.key] ?? const {},
         ),
@@ -561,7 +562,7 @@ class SongRepository {
 
   static String _albumNameFor(Song song) {
     final album = song.album?.trim() ?? '';
-    return album.isEmpty ? 'Unknown Album' : album;
+    return album.isEmpty ? l10n.unknownAlbum : album;
   }
 
   static int _compareAlbumSongs(Song a, Song b) {
@@ -598,7 +599,7 @@ class SongRepository {
   String _albumNameForSong(Song song) {
     final albumName = song.album?.trim();
     if (albumName == null || albumName.isEmpty) {
-      return 'Unknown Album';
+      return l10n.unknownAlbum;
     }
     return albumName;
   }
@@ -620,7 +621,7 @@ class SongRepository {
 
     final artist = song.artist.trim();
     if (artist.isNotEmpty) return artist;
-    return 'Unknown Artist';
+    return l10n.unknownArtist;
   }
 
   // ponytail: >1 distinct albumArtist ⇒ untagged compilation (scanner bakes
@@ -634,11 +635,11 @@ class SongRepository {
         .where((a) => a.isNotEmpty)
         .toSet();
     if (distinct.length > 1) {
-      if (distinct.contains('Various Artists')) return 'Various Artists';
+      if (distinct.contains('Various Artists')) return l10n.variousArtists2;
       return (distinct.toList()..sort()).join(', ');
     }
     if (distinct.length == 1) return distinct.first;
-    return 'Unknown Artist';
+    return l10n.unknownArtist;
   }
 
   String _albumGroupKey(String albumName) {

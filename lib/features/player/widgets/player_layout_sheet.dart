@@ -14,6 +14,7 @@ import 'package:flick/providers/providers.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 
+import 'package:flick/l10n/l10n.dart';
 class PlayerLayoutSheet extends ConsumerStatefulWidget {
   final PlayerService playerService;
   final PlayerScreenMode initialMode;

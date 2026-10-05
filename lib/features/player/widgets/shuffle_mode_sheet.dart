@@ -6,6 +6,7 @@ import 'package:flick/models/shuffle_mode.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 
+import 'package:flick/l10n/l10n.dart';
 class ShuffleModeSheet extends StatelessWidget {
   final PlayerService playerService;
 

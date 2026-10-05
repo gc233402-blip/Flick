@@ -3,6 +3,7 @@ import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Read-only collapsible text fetched from an online source, such as an
 /// artist biography or album notes. Coexists with the user-authored
@@ -38,7 +39,7 @@ class FetchedDescription extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingMd),
           Text(
-            'From $sourceLabel',
+            l10n.from(sourceLabel),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -83,11 +84,11 @@ class FetchedDescription extends StatelessWidget {
                   minimumSize: const Size(0, 28),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text('Show more'),
+                child: Text(l10n.showMore),
               ),
               const Spacer(),
               Text(
-                'From $sourceLabel',
+                l10n.from(sourceLabel),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.adaptiveTextTertiary,
                 ),

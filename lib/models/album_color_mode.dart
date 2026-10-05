@@ -14,32 +14,6 @@ extension AlbumColorModeX on AlbumColorMode {
     }
   }
 
-  String get label {
-    switch (this) {
-      case AlbumColorMode.off:
-        return 'Off';
-      case AlbumColorMode.subtle:
-        return 'Subtle';
-      case AlbumColorMode.moderate:
-        return 'Moderate';
-      case AlbumColorMode.vibrant:
-        return 'Vibrant';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case AlbumColorMode.off:
-        return 'Use the default monochrome theme.';
-      case AlbumColorMode.subtle:
-        return 'Faint hue shift from album art.';
-      case AlbumColorMode.moderate:
-        return 'Noticeable tinting from album art.';
-      case AlbumColorMode.vibrant:
-        return 'Bold, saturated colors from album art.';
-    }
-  }
-
   /// Blend factor with Color(0xFF121212) for button/container surfaces.
   double get surfaceBlend {
     switch (this) {

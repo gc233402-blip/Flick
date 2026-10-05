@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2HotplugMonitor extends ConsumerStatefulWidget {
   const Uac2HotplugMonitor({super.key});
@@ -45,8 +46,8 @@ class _Uac2HotplugMonitorState extends ConsumerState<Uac2HotplugMonitor> {
         final isConnected = devices.length > _lastDeviceCount;
         setState(() {
           _lastEventMessage = isConnected
-              ? 'Device connected'
-              : 'Device disconnected';
+              ? l10n.deviceConnected
+              : l10n.deviceDisconnected;
           _lastEventTime = DateTime.now();
           _lastDeviceCount = devices.length;
         });
@@ -100,7 +101,7 @@ class _Uac2HotplugMonitorState extends ConsumerState<Uac2HotplugMonitor> {
             ),
           ),
           Text(
-            '${timeSinceEvent.inSeconds}s ago',
+            l10n.sAgo(timeSinceEvent.inSeconds),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.adaptiveTextTertiary,
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/providers/alac_converter_provider.dart';
 import 'package:flick/src/rust/api/alac_converter_api.dart' as alac_api;
+import 'package:flick/l10n/l10n.dart';
 
 /// Widget that shows ALAC conversion status
 class AlacConversionIndicator extends ConsumerWidget {
@@ -29,14 +30,14 @@ class AlacConversionIndicator extends ConsumerWidget {
         Positioned.fill(
           child: Container(
             color: Colors.black54,
-            child: const Center(
+            child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
                   Text(
-                    'Converting audio...',
+                    l10n.convertingAudio,
                     style: TextStyle(color: Colors.white),
                   ),
                 ],
@@ -76,7 +77,7 @@ class AlacFormatBadge extends ConsumerWidget {
               const Icon(Icons.high_quality, size: 16, color: Colors.purple),
               const SizedBox(width: 4),
               Text(
-                'ALAC ${meta.bitDepth}-bit',
+                l10n.alacBit(meta.bitDepth),
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.purple,
@@ -106,10 +107,10 @@ class AlacMetadataCard extends ConsumerWidget {
     return metadata.when(
       data: (alac_api.AlacAudioMetadata? meta) {
         if (meta == null) {
-          return const Card(
+          return Card(
             child: Padding(
               padding: EdgeInsets.all(16),
-              child: Text('Not an ALAC file'),
+              child: Text(l10n.notAnAlacFile),
             ),
           );
         }
@@ -120,12 +121,12 @@ class AlacMetadataCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(Icons.audiotrack, color: Colors.purple),
                     SizedBox(width: 8),
                     Text(
-                      'ALAC Audio',
+                      l10n.alacAudio,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -134,14 +135,14 @@ class AlacMetadataCard extends ConsumerWidget {
                   ],
                 ),
                 const Divider(),
-                _buildMetadataRow('Sample Rate', '${meta.sampleRate} Hz'),
-                _buildMetadataRow('Bit Depth', '${meta.bitDepth}-bit'),
-                _buildMetadataRow('Channels', '${meta.channels}'),
+                _buildMetadataRow(l10n.sampleRate2, l10n.hz6(meta.sampleRate)),
+                _buildMetadataRow(l10n.bitDepth2, '${meta.bitDepth}-bit'),
+                _buildMetadataRow(l10n.channels, '${meta.channels}'),
                 _buildMetadataRow(
-                  'Duration',
+                  l10n.duration,
                   '${meta.durationSeconds.toStringAsFixed(2)}s',
                 ),
-                _buildMetadataRow('Samples', meta.durationSamples.toString()),
+                _buildMetadataRow(l10n.samples, meta.durationSamples.toString()),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -149,13 +150,13 @@ class AlacMetadataCard extends ConsumerWidget {
                     color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
                       Icon(Icons.check_circle, color: Colors.green, size: 16),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Lossless quality preserved during conversion',
+                          l10n.losslessQualityPreservedDuringConversion,
                           style: TextStyle(fontSize: 12),
                         ),
                       ),
@@ -176,7 +177,7 @@ class AlacMetadataCard extends ConsumerWidget {
       error: (error, _) => Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('Error: $error'),
+          child: Text(l10n.error(error)),
         ),
       ),
     );
@@ -215,7 +216,7 @@ class AlacConversionNotifications {
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
             const SizedBox(width: 16),
-            Expanded(child: Text('Converting $fileName to WAV...')),
+            Expanded(child: Text(l10n.convertingToWav(fileName))),
           ],
         ),
         duration: const Duration(seconds: 2),
@@ -230,7 +231,7 @@ class AlacConversionNotifications {
           children: [
             const Icon(Icons.check_circle, color: Colors.green),
             const SizedBox(width: 16),
-            Expanded(child: Text('$fileName converted successfully')),
+            Expanded(child: Text(l10n.convertedSuccessfully(fileName))),
           ],
         ),
         backgroundColor: Colors.green.shade700,
@@ -246,7 +247,7 @@ class AlacConversionNotifications {
           children: [
             const Icon(Icons.error, color: Colors.white),
             const SizedBox(width: 16),
-            Expanded(child: Text('Conversion failed: $error')),
+            Expanded(child: Text(l10n.conversionFailed(error))),
           ],
         ),
         backgroundColor: Colors.red.shade700,

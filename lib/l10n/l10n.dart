@@ -20,6 +20,13 @@ import 'package:flick/services/app_preferences_service.dart';
 
 export 'package:flick/l10n/generated/app_localizations.dart';
 
+// 模型层的展示扩展（label / description / menuLabel …）。
+//
+// 它们放在 lib/l10n/ 而不是 lib/models/，是为了让模型保持与语言无关 —— 上游
+// review 明确要求 models 不得依赖 l10n（会破坏分层与可测试性）。这里 re-export，
+// 调用方只要 import 本文件就能拿到，无需额外 import。
+export 'package:flick/l10n/model_labels.dart';
+
 /// Locales the app ships translations for.
 ///
 /// English is listed first so that a device locale we do not translate falls

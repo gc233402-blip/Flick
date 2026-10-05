@@ -11,15 +11,6 @@ extension SongViewModeX on SongViewMode {
     }
   }
 
-  String get menuLabel {
-    switch (this) {
-      case SongViewMode.orbit:
-        return 'Orbital';
-      case SongViewMode.list:
-        return 'List';
-    }
-  }
-
   static SongViewMode fromStorageValue(String? value) {
     switch (value) {
       case 'list':

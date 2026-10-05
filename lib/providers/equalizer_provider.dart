@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flick/services/eq_response_service.dart';
 import 'package:flick/services/equalizer_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum EqMode { graphic, parametric }
 
@@ -24,21 +25,21 @@ extension ParametricBandTypeX on ParametricBandType {
   String get displayName {
     switch (this) {
       case ParametricBandType.peaking:
-        return 'Peaking';
+        return l10n.peaking;
       case ParametricBandType.lowShelf:
-        return 'Low Shelf';
+        return l10n.lowShelf;
       case ParametricBandType.highShelf:
-        return 'High Shelf';
+        return l10n.highShelf;
       case ParametricBandType.lowPass:
-        return 'Low Pass';
+        return l10n.lowPass;
       case ParametricBandType.highPass:
-        return 'High Pass';
+        return l10n.highPass;
       case ParametricBandType.bandPass:
-        return 'Band Pass';
+        return l10n.bandPass;
       case ParametricBandType.notch:
-        return 'Notch';
+        return l10n.notch;
       case ParametricBandType.allPass:
-        return 'All Pass';
+        return l10n.allPass;
     }
   }
 
@@ -61,13 +62,13 @@ extension ParametricBandTypeX on ParametricBandType {
     switch (this) {
       case ParametricBandType.lowShelf:
       case ParametricBandType.highShelf:
-        return 'Slope';
+        return l10n.slope;
       case ParametricBandType.lowPass:
       case ParametricBandType.highPass:
       case ParametricBandType.bandPass:
       case ParametricBandType.notch:
       case ParametricBandType.allPass:
-        return 'Resonance';
+        return l10n.resonance;
       case ParametricBandType.peaking:
         return 'Q';
     }

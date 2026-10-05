@@ -8,6 +8,7 @@ import 'package:flick/models/song_tile_thumbnail_mode.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 
+import 'package:flick/l10n/l10n.dart';
 class UiCustomizationSettingsScreen extends ConsumerWidget {
   const UiCustomizationSettingsScreen({super.key});
 

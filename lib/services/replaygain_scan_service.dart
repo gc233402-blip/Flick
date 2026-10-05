@@ -5,6 +5,7 @@ import 'package:flick/data/entities/song_entity.dart';
 import 'package:flick/data/repositories/song_repository.dart';
 import 'package:flick/src/rust/api/audio_analysis.dart' as rust_analysis;
 import 'package:flick/src/rust/api/replaygain.dart' as rust_replaygain;
+import 'package:flick/l10n/l10n.dart';
 
 class ReplayGainScanProgress {
   final int completed;
@@ -180,10 +181,10 @@ class ReplayGainScanService {
           final album =
               (song.album?.trim().isNotEmpty ?? false)
               ? song.album!.trim()
-              : 'Unknown Album';
+              : l10n.unknownAlbum;
           final albumArtist = (song.albumArtist?.trim().isNotEmpty ?? false)
               ? song.albumArtist!.trim()
-              : (song.artist.trim().isNotEmpty ? song.artist.trim() : 'Unknown Artist');
+              : (song.artist.trim().isNotEmpty ? song.artist.trim() : l10n.unknownArtist);
           measures.add(
             _TrackMeasure(
               path: song.filePath,
