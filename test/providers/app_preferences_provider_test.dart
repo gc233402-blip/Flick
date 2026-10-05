@@ -10,6 +10,50 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   test(
+    'visualizer colors default to album art on existing installations',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      expect(
+        container.read(appPreferencesProvider).visualizerColorMode,
+        'album_art',
+      );
+      await pumpEventQueue();
+      expect(
+        container.read(appPreferencesProvider).visualizerColorMode,
+        'album_art',
+      );
+    },
+  );
+
+  test(
+    'visualizer colors persist independently of shape and movement',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.read(appPreferencesProvider);
+      await pumpEventQueue();
+      final notifier = container.read(appPreferencesProvider.notifier);
+      await notifier.setVisualizerAnimationStyle('blocks');
+      await notifier.setVisualizerFrequencyMode('bass');
+      await notifier.setVisualizerMovementMode('smooth');
+
+      for (final mode in ['rainbow', 'monochrome', 'album_art']) {
+        await notifier.setVisualizerColorMode(mode);
+        final restored = ProviderContainer();
+        restored.read(appPreferencesProvider);
+        await pumpEventQueue();
+        final preferences = restored.read(appPreferencesProvider);
+        expect(preferences.visualizerColorMode, mode);
+        expect(preferences.visualizerAnimationStyle, 'blocks');
+        expect(preferences.visualizerFrequencyMode, 'bass');
+        expect(preferences.visualizerMovementMode, 'smooth');
+        restored.dispose();
+      }
+    },
+  );
+
+  test(
     'connection notices default to enabled for existing installations',
     () async {
       final container = ProviderContainer();

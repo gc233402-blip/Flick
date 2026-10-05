@@ -231,6 +231,12 @@ class AppPreferencesNotifier extends Notifier<AppPreferences> {
         .setVisualizerMovementMode(value);
   }
 
+  Future<void> setVisualizerColorMode(String value) async {
+    if (state.visualizerColorMode == value) return;
+    state = state.copyWith(visualizerColorMode: value);
+    await ref.read(appPreferencesServiceProvider).setVisualizerColorMode(value);
+  }
+
   Future<void> setArtworkCardArtworkScale(double value) async {
     if (state.artworkCardArtworkScale == value) return;
     state = state.copyWith(artworkCardArtworkScale: value);

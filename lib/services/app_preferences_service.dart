@@ -25,6 +25,7 @@ class AppPreferences {
   final String visualizerAnimationStyle;
   final String visualizerFrequencyMode;
   final String visualizerMovementMode;
+  final String visualizerColorMode;
   final double artworkCardArtworkScale;
   final double artworkCardTextScale;
   final double artworkCardVerticalOffset;
@@ -142,6 +143,7 @@ class AppPreferences {
     this.visualizerAnimationStyle = 'bars',
     this.visualizerFrequencyMode = 'full',
     this.visualizerMovementMode = 'bouncy',
+    this.visualizerColorMode = 'album_art',
     this.artworkCardArtworkScale = 1.0,
     this.artworkCardTextScale = 1.0,
     this.artworkCardVerticalOffset = 0.0,
@@ -260,6 +262,7 @@ class AppPreferences {
     String? visualizerAnimationStyle,
     String? visualizerFrequencyMode,
     String? visualizerMovementMode,
+    String? visualizerColorMode,
     double? artworkCardArtworkScale,
     double? artworkCardTextScale,
     double? artworkCardVerticalOffset,
@@ -386,6 +389,7 @@ class AppPreferences {
           visualizerFrequencyMode ?? this.visualizerFrequencyMode,
       visualizerMovementMode:
           visualizerMovementMode ?? this.visualizerMovementMode,
+      visualizerColorMode: visualizerColorMode ?? this.visualizerColorMode,
       artworkCardArtworkScale:
           artworkCardArtworkScale ?? this.artworkCardArtworkScale,
       artworkCardTextScale: artworkCardTextScale ?? this.artworkCardTextScale,
@@ -550,6 +554,7 @@ class AppPreferencesService {
   static const _visualizerAnimationStyleKey = 'visualizer_animation_style';
   static const _visualizerFrequencyModeKey = 'visualizer_frequency_mode';
   static const _visualizerMovementModeKey = 'visualizer_movement_mode';
+  static const _visualizerColorModeKey = 'visualizer_color_mode';
   static const _artworkCardArtworkScaleKey = 'artwork_card_artwork_scale';
   static const _artworkCardTextScaleKey = 'artwork_card_text_scale';
   static const _artworkCardVerticalOffsetKey = 'artwork_card_vertical_offset';
@@ -691,6 +696,8 @@ class AppPreferencesService {
           prefs.getString(_visualizerFrequencyModeKey) ?? 'full',
       visualizerMovementMode:
           prefs.getString(_visualizerMovementModeKey) ?? 'bouncy',
+      visualizerColorMode:
+          prefs.getString(_visualizerColorModeKey) ?? 'album_art',
       artworkCardArtworkScale:
           prefs.getDouble(_artworkCardArtworkScaleKey) ?? 1.0,
       artworkCardTextScale: prefs.getDouble(_artworkCardTextScaleKey) ?? 1.0,
@@ -1122,6 +1129,16 @@ class AppPreferencesService {
   Future<void> setVisualizerMovementMode(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_visualizerMovementModeKey, value);
+  }
+
+  Future<String> getVisualizerColorMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_visualizerColorModeKey) ?? 'album_art';
+  }
+
+  Future<void> setVisualizerColorMode(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_visualizerColorModeKey, value);
   }
 
   Future<void> setArtworkCardArtworkScale(double value) async {
