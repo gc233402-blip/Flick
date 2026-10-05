@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/app_preferences_provider.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class VisualizerSettingsScreen extends ConsumerWidget {
   const VisualizerSettingsScreen({super.key});
@@ -12,22 +13,51 @@ class VisualizerSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(appPreferencesProvider);
     final notifier = ref.read(appPreferencesProvider.notifier);
+    final l10n = context.l10n;
 
     return SettingsScaffold(
-      title: 'Visualizer',
+      title: l10n.visualizer,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Visualizer'),
+          SettingsSectionHeader(l10n.visualizer),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.activity,
-                title: 'Visualizer',
+                title: l10n.visualizer,
                 subtitle: 'Show the audio visualizer (off saves battery)',
                 value: prefs.visualizerEnabled,
-                onChanged: (value) =>
-                    notifier.setVisualizerEnabled(value),
+                onChanged: (value) => notifier.setVisualizerEnabled(value),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppConstants.spacingLg),
+          SettingsSectionHeader(l10n.visualizerColors),
+          SettingsCard(
+            children: [
+              SelectionSetting(
+                icon: LucideIcons.image,
+                title: l10n.albumArt,
+                subtitle: l10n.visualizerAlbumColorsDescription,
+                selected: prefs.visualizerColorMode == 'album_art',
+                onTap: () => notifier.setVisualizerColorMode('album_art'),
+              ),
+              const SettingsDivider(),
+              SelectionSetting(
+                icon: LucideIcons.rainbow,
+                title: l10n.visualizerRainbow,
+                subtitle: l10n.visualizerRainbowDescription,
+                selected: prefs.visualizerColorMode == 'rainbow',
+                onTap: () => notifier.setVisualizerColorMode('rainbow'),
+              ),
+              const SettingsDivider(),
+              SelectionSetting(
+                icon: LucideIcons.contrast,
+                title: l10n.visualizerMonochrome,
+                subtitle: l10n.visualizerMonochromeDescription,
+                selected: prefs.visualizerColorMode == 'monochrome',
+                onTap: () => notifier.setVisualizerColorMode('monochrome'),
               ),
             ],
           ),
@@ -44,6 +74,14 @@ class VisualizerSettingsScreen extends ConsumerWidget {
               ),
               const SettingsDivider(),
               SelectionSetting(
+                icon: LucideIcons.chartBarBig,
+                title: l10n.visualizerBlocks,
+                subtitle: l10n.visualizerBlocksDescription,
+                selected: prefs.visualizerAnimationStyle == 'blocks',
+                onTap: () => notifier.setVisualizerAnimationStyle('blocks'),
+              ),
+              const SettingsDivider(),
+              SelectionSetting(
                 icon: LucideIcons.waves,
                 title: 'Wave',
                 subtitle: 'A smooth continuous wave across frequencies',
@@ -56,7 +94,8 @@ class VisualizerSettingsScreen extends ConsumerWidget {
                 title: 'Curved Wave',
                 subtitle: 'Silky smooth Bézier curves — fluid and organic',
                 selected: prefs.visualizerAnimationStyle == 'curved_wave',
-                onTap: () => notifier.setVisualizerAnimationStyle('curved_wave'),
+                onTap: () =>
+                    notifier.setVisualizerAnimationStyle('curved_wave'),
               ),
               const SettingsDivider(),
               SelectionSetting(
