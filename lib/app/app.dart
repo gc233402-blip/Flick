@@ -37,7 +37,7 @@ import 'package:flick/widgets/navigation/bottom_bar_geometry.dart';
 import 'package:flick/providers/mini_player_config_provider.dart';
 import 'package:flick/widgets/common/floating_mini_player.dart';
 import 'package:flick/widgets/common/floating_scan_progress.dart';
-import 'package:flick/widgets/common/offline_notice.dart';
+import 'package:flick/widgets/common/connection_notice_host.dart';
 import 'package:flick/widgets/uac2/usb_bit_perfect_prompt.dart';
 import 'package:flick/models/song.dart';
 import 'package:flick/services/library_scanner_service.dart';
@@ -88,11 +88,15 @@ class FlickPlayerApp extends StatelessWidget {
             // Keep the global `l10n` accessor pointed at the active locale, so
             // service-layer strings resolve consistently with the widget layer.
             LocaleController.instance.bind(AppLocalizations.of(context));
-            return Column(
-              children: [
-                Expanded(child: child ?? const SizedBox.shrink()),
-                const OfflineNotice(),
-              ],
+            return Consumer(
+              builder: (context, ref, _) => ConnectionNoticeHost(
+                showNotice: ref.watch(
+                  appPreferencesProvider.select(
+                    (preferences) => preferences.connectionNoticesEnabled,
+                  ),
+                ),
+                child: child ?? const SizedBox.shrink(),
+              ),
             );
           },
         );
