@@ -213,7 +213,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Navigation Appearance'),
+          SettingsSectionHeader(l10n.navigationAppearance),
           SettingsCard(
             children: [
               SliderSetting(
@@ -280,7 +280,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
           const SizedBox(height: AppConstants.spacingSm),
           TextButton.icon(
             icon: const Icon(LucideIcons.rotateCcw, size: 18),
-            label: const Text('Reset Navigation to Defaults'),
+            label: Text(l10n.resetNavigationToDefaults),
             onPressed: () async {
               const defaults = AppPreferences();
               final preferences = ref.read(appPreferencesProvider.notifier);
@@ -295,7 +295,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
               ]);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Navigation defaults restored')),
+                  SnackBar(content: Text(l10n.navigationDefaultsRestored)),
                 );
               }
             },

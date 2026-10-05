@@ -816,9 +816,17 @@
   "@natureAmbient": {
     "description": "lib/models/song.dart:317"
   },
+  "navigationAppearance": "Navigation Appearance",
+  "@navigationAppearance": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:216"
+  },
   "navigationBar": "Navigation Bar",
   "@navigationBar": {
     "description": "lib/providers/tutorial_provider.dart:11"
+  },
+  "navigationDefaultsRestored": "Navigation defaults restored",
+  "@navigationDefaultsRestored": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:298"
   },
   "neonNights": "Neon Nights",
   "@neonNights": {
@@ -831,6 +839,10 @@
   "next": "Next",
   "@next": {
     "description": "lib/features/onboarding/screens/onboarding_screen.dart:269"
+  },
+  "nextSong": "Next song",
+  "@nextSong": {
+    "description": "lib/widgets/common/mini_player_bar.dart:266"
   },
   "noUsbAudioDevicesFound": "No USB audio devices found",
   "@noUsbAudioDevicesFound": {
@@ -880,6 +892,10 @@
   "@parametric": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:4169"
   },
+  "pause": "Pause",
+  "@pause": {
+    "description": "lib/widgets/common/mini_player_bar.dart:262"
+  },
   "peaking": "Peaking",
   "@peaking": {
     "description": "lib/providers/equalizer_provider.dart:27"
@@ -924,6 +940,10 @@
   "@preview": {
     "description": "lib/features/settings/screens/audio_settings_screen.dart:686"
   },
+  "previousSong": "Previous song",
+  "@previousSong": {
+    "description": "lib/widgets/common/mini_player_bar.dart:258"
+  },
   "prewarming": "Prewarming",
   "@prewarming": {
     "description": "lib/features/settings/screens/uac2_settings_screen.dart:905"
@@ -967,6 +987,10 @@
   "reorderFilterAndShuffleFromThis": "Reorder, filter, and shuffle from this header.",
   "@reorderFilterAndShuffleFromThis": {
     "description": "lib/providers/tutorial_provider.dart:28"
+  },
+  "resetNavigationToDefaults": "Reset Navigation to Defaults",
+  "@resetNavigationToDefaults": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:283"
   },
   "resonance": "Resonance",
   "@resonance": {

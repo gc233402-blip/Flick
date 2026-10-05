@@ -1094,11 +1094,23 @@ abstract class AppLocalizations {
   /// **'Nature Ambient'**
   String get natureAmbient;
 
+  /// lib/features/settings/screens/bottom_bar_settings_screen.dart:216
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation Appearance'**
+  String get navigationAppearance;
+
   /// lib/providers/tutorial_provider.dart:11
   ///
   /// In en, this message translates to:
   /// **'Navigation Bar'**
   String get navigationBar;
+
+  /// lib/features/settings/screens/bottom_bar_settings_screen.dart:298
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation defaults restored'**
+  String get navigationDefaultsRestored;
 
   /// lib/models/song.dart:357
   ///
@@ -1117,6 +1129,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next'**
   String get next;
+
+  /// lib/widgets/common/mini_player_bar.dart:266
+  ///
+  /// In en, this message translates to:
+  /// **'Next song'**
+  String get nextSong;
 
   /// lib/features/settings/screens/uac2_settings_screen.dart:289
   ///
@@ -1190,6 +1208,12 @@ abstract class AppLocalizations {
   /// **'Parametric'**
   String get parametric;
 
+  /// lib/widgets/common/mini_player_bar.dart:262
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get pause;
+
   /// lib/providers/equalizer_provider.dart:27
   ///
   /// In en, this message translates to:
@@ -1256,6 +1280,12 @@ abstract class AppLocalizations {
   /// **'Preview'**
   String get preview;
 
+  /// lib/widgets/common/mini_player_bar.dart:258
+  ///
+  /// In en, this message translates to:
+  /// **'Previous song'**
+  String get previousSong;
+
   /// lib/features/settings/screens/uac2_settings_screen.dart:905
   ///
   /// In en, this message translates to:
@@ -1321,6 +1351,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reorder, filter, and shuffle from this header.'**
   String get reorderFilterAndShuffleFromThis;
+
+  /// lib/features/settings/screens/bottom_bar_settings_screen.dart:283
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Navigation to Defaults'**
+  String get resetNavigationToDefaults;
 
   /// lib/providers/equalizer_provider.dart:70
   ///
