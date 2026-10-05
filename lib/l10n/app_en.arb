@@ -1,4 +1,12 @@
 {
+  "connectionNotices": "Connection notices",
+  "@connectionNotices": {
+    "description": "Connection notice visibility setting in Interface settings"
+  },
+  "connectionNoticesDescription": "Show offline and back-online notices",
+  "@connectionNoticesDescription": {
+    "description": "Description of the connection notice visibility setting"
+  },
   "activateFallback": "Activate Fallback",
   "@activateFallback": {
     "description": "lib/widgets/uac2/uac2_fallback_manager.dart:179"

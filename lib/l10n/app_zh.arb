@@ -1,4 +1,6 @@
 {
+  "connectionNotices": "网络连接提示",
+  "connectionNoticesDescription": "显示离线和恢复连接提示",
   "activateFallback": "启用回退",
   "active": "已启用",
   "adjustSpacingBetweenButtons": "调整按钮之间的间距",

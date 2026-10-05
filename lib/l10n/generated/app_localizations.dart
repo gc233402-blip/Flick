@@ -98,6 +98,18 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// Connection notice visibility setting in Interface settings
+  ///
+  /// In en, this message translates to:
+  /// **'Connection notices'**
+  String get connectionNotices;
+
+  /// Description of the connection notice visibility setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show offline and back-online notices'**
+  String get connectionNoticesDescription;
+
   /// lib/widgets/uac2/uac2_fallback_manager.dart:179
   ///
   /// In en, this message translates to:

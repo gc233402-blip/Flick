@@ -9,6 +9,13 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get connectionNotices => 'Connection notices';
+
+  @override
+  String get connectionNoticesDescription =>
+      'Show offline and back-online notices';
+
+  @override
   String get activateFallback => 'Activate Fallback';
 
   @override

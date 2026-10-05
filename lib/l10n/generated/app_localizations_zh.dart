@@ -9,6 +9,12 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get connectionNotices => '网络连接提示';
+
+  @override
+  String get connectionNoticesDescription => '显示离线和恢复连接提示';
+
+  @override
   String get activateFallback => '启用回退';
 
   @override
