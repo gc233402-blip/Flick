@@ -583,7 +583,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get natureAmbient => 'Nature Ambient';
 
   @override
+  String get navigationAppearance => 'Navigation Appearance';
+
+  @override
   String get navigationBar => 'Navigation Bar';
+
+  @override
+  String get navigationDefaultsRestored => 'Navigation defaults restored';
 
   @override
   String get neonNights => 'Neon Nights';
@@ -593,6 +599,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get next => 'Next';
+
+  @override
+  String get nextSong => 'Next song';
 
   @override
   String get noUsbAudioDevicesFound => 'No USB audio devices found';
@@ -632,6 +641,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parametric => 'Parametric';
 
   @override
+  String get pause => 'Pause';
+
+  @override
   String get peaking => 'Peaking';
 
   @override
@@ -668,6 +680,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preview => 'Preview';
 
   @override
+  String get previousSong => 'Previous song';
+
+  @override
   String get prewarming => 'Prewarming';
 
   @override
@@ -700,6 +715,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reorderFilterAndShuffleFromThis =>
       'Reorder, filter, and shuffle from this header.';
+
+  @override
+  String get resetNavigationToDefaults => 'Reset Navigation to Defaults';
 
   @override
   String get resonance => 'Resonance';
