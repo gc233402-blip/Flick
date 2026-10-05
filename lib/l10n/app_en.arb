@@ -1,4 +1,12 @@
 {
+  "connectionNotices": "Connection notices",
+  "@connectionNotices": {
+    "description": "Connection notice visibility setting in Interface settings"
+  },
+  "connectionNoticesDescription": "Show offline and back-online notices",
+  "@connectionNoticesDescription": {
+    "description": "Description of the connection notice visibility setting"
+  },
   "activateFallback": "Activate Fallback",
   "@activateFallback": {
     "description": "lib/widgets/uac2/uac2_fallback_manager.dart:179"
@@ -1339,6 +1347,14 @@
     "description": "lib/models/album_color_mode.dart:26"
   },
   "visualizer": "Visualizer",
+  "visualizerColors": "Colors",
+  "visualizerAlbumColorsDescription": "Follow the album cover colors; monochrome when unavailable",
+  "visualizerRainbow": "Rainbow",
+  "visualizerRainbowDescription": "A spectrum of colors across the visualizer",
+  "visualizerMonochrome": "Monochrome",
+  "visualizerMonochromeDescription": "White and gray, independent of the album cover",
+  "visualizerBlocks": "Fading Blocks",
+  "visualizerBlocksDescription": "Segmented bars with softly fading trails",
   "@visualizer": {
     "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:36"
   },

@@ -98,6 +98,18 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// Connection notice visibility setting in Interface settings
+  ///
+  /// In en, this message translates to:
+  /// **'Connection notices'**
+  String get connectionNotices;
+
+  /// Description of the connection notice visibility setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show offline and back-online notices'**
+  String get connectionNoticesDescription;
+
   /// lib/widgets/uac2/uac2_fallback_manager.dart:179
   ///
   /// In en, this message translates to:
@@ -1867,6 +1879,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Visualizer'**
   String get visualizer;
+
+  /// No description provided for @visualizerColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Colors'**
+  String get visualizerColors;
+
+  /// No description provided for @visualizerAlbumColorsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the album cover colors; monochrome when unavailable'**
+  String get visualizerAlbumColorsDescription;
+
+  /// No description provided for @visualizerRainbow.
+  ///
+  /// In en, this message translates to:
+  /// **'Rainbow'**
+  String get visualizerRainbow;
+
+  /// No description provided for @visualizerRainbowDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A spectrum of colors across the visualizer'**
+  String get visualizerRainbowDescription;
+
+  /// No description provided for @visualizerMonochrome.
+  ///
+  /// In en, this message translates to:
+  /// **'Monochrome'**
+  String get visualizerMonochrome;
+
+  /// No description provided for @visualizerMonochromeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'White and gray, independent of the album cover'**
+  String get visualizerMonochromeDescription;
+
+  /// No description provided for @visualizerBlocks.
+  ///
+  /// In en, this message translates to:
+  /// **'Fading Blocks'**
+  String get visualizerBlocks;
+
+  /// No description provided for @visualizerBlocksDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Segmented bars with softly fading trails'**
+  String get visualizerBlocksDescription;
 
   /// lib/features/player/widgets/bit_perfect_indicator.dart:646
   ///

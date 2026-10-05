@@ -9,6 +9,13 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get connectionNotices => 'Connection notices';
+
+  @override
+  String get connectionNoticesDescription =>
+      'Show offline and back-online notices';
+
+  @override
   String get activateFallback => 'Activate Fallback';
 
   @override
@@ -988,6 +995,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get visualizer => 'Visualizer';
+
+  @override
+  String get visualizerColors => 'Colors';
+
+  @override
+  String get visualizerAlbumColorsDescription =>
+      'Follow the album cover colors; monochrome when unavailable';
+
+  @override
+  String get visualizerRainbow => 'Rainbow';
+
+  @override
+  String get visualizerRainbowDescription =>
+      'A spectrum of colors across the visualizer';
+
+  @override
+  String get visualizerMonochrome => 'Monochrome';
+
+  @override
+  String get visualizerMonochromeDescription =>
+      'White and gray, independent of the album cover';
+
+  @override
+  String get visualizerBlocks => 'Fading Blocks';
+
+  @override
+  String get visualizerBlocksDescription =>
+      'Segmented bars with softly fading trails';
 
   @override
   String get volume => 'Volume';

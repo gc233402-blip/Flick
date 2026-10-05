@@ -1,14 +1,18 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flick/providers/album_color_provider.dart';
+import 'package:flick/providers/app_preferences_provider.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/services/visualizer_service.dart';
 
-class AudioVisualizer extends StatefulWidget {
+class AudioVisualizer extends ConsumerStatefulWidget {
   final PlayerService playerService;
   final String animationStyle;
   final String frequencyMode;
   final String movementMode;
+  final String? colorMode;
   final Color? albumColor;
   final bool enabled;
 
@@ -18,20 +22,22 @@ class AudioVisualizer extends StatefulWidget {
     this.animationStyle = 'bars',
     this.frequencyMode = 'full',
     this.movementMode = 'bouncy',
+    this.colorMode,
     this.albumColor,
     this.enabled = true,
   });
 
   @override
-  State<AudioVisualizer> createState() => _AudioVisualizerState();
+  ConsumerState<AudioVisualizer> createState() => _AudioVisualizerState();
 }
 
-class _AudioVisualizerState extends State<AudioVisualizer>
+class _AudioVisualizerState extends ConsumerState<AudioVisualizer>
     with TickerProviderStateMixin {
   static const int _barCount = 48;
   static const double _minHeight = 0.04;
   static const double _spring = 0.28;
   static const double _damping = 0.72;
+  static const int _blockRows = 20;
 
   late AnimationController _controller;
   late VisualizerService _visualizerService;
@@ -40,6 +46,8 @@ class _AudioVisualizerState extends State<AudioVisualizer>
   final List<double> _currentHeights = List.filled(_barCount, _minHeight);
   final List<double> _targetHeights = List.filled(_barCount, _minHeight);
   final List<double> _velocities = List.filled(_barCount, 0.0);
+  final List<double> _blockOpacities = List.filled(_barCount * _blockRows, 0.0);
+  Duration? _lastFrameElapsed;
 
   bool _isPlaying = false;
   bool _useRealData = false;
@@ -61,11 +69,6 @@ class _AudioVisualizerState extends State<AudioVisualizer>
       duration: const Duration(seconds: 1),
     );
     _controller.addListener(_onFrame);
-    // Deferred so MediaQuery (system reduced motion) is available before
-    // deciding whether to run the loop.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _updateControllerState();
-    });
 
     widget.playerService.isPlayingNotifier.addListener(_onPlayingChanged);
     widget.playerService.positionNotifier.addListener(_onPositionChanged);
@@ -78,10 +81,20 @@ class _AudioVisualizerState extends State<AudioVisualizer>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateControllerState();
+  }
+
+  @override
   void didUpdateWidget(AudioVisualizer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.enabled != widget.enabled) {
       _updateControllerState();
+    }
+    if (oldWidget.animationStyle != widget.animationStyle ||
+        oldWidget.frequencyMode != widget.frequencyMode) {
+      _blockOpacities.fillRange(0, _blockOpacities.length, 0.0);
     }
     if (oldWidget.playerService != widget.playerService) {
       oldWidget.playerService.isPlayingNotifier.removeListener(
@@ -103,8 +116,10 @@ class _AudioVisualizerState extends State<AudioVisualizer>
         _onBackendChanged,
       );
       _isPlaying = widget.playerService.isPlayingNotifier.value;
+      _resetAnimation();
       _updateSongSeed();
       _syncVisualizerAttachment();
+      _updateControllerState();
     }
   }
 
@@ -127,7 +142,20 @@ class _AudioVisualizerState extends State<AudioVisualizer>
   }
 
   void _onSongChanged() {
-    _updateSongSeed();
+    setState(() {
+      _resetAnimation();
+      _updateSongSeed();
+      if (_isPlaying) _onPositionChanged();
+    });
+  }
+
+  void _resetAnimation() {
+    _currentHeights.fillRange(0, _barCount, _minHeight);
+    _targetHeights.fillRange(0, _barCount, _minHeight);
+    _velocities.fillRange(0, _barCount, 0.0);
+    _blockOpacities.fillRange(0, _blockOpacities.length, 0.0);
+    _lastFrameElapsed = null;
+    _frameCount = 0;
   }
 
   void _updateSongSeed() {
@@ -285,7 +313,7 @@ class _AudioVisualizerState extends State<AudioVisualizer>
     _syncVisualizerAttachment();
     if (!_isPlaying && !_useRealData) {
       for (int i = 0; i < _barCount; i++) {
-        _targetHeights[i] = _minHeight + _frand(i * 97) * 0.06;
+        _targetHeights[i] = _minHeight;
       }
     }
     _updateControllerState();
@@ -293,12 +321,17 @@ class _AudioVisualizerState extends State<AudioVisualizer>
 
   void _updateControllerState() {
     if (!mounted) return;
-    final reducedMotion = MediaQuery.of(context).disableAnimations;
-    if (!widget.enabled || reducedMotion) {
+    final reducedMotion = MediaQuery.disableAnimationsOf(context);
+    if (!widget.enabled ||
+        reducedMotion ||
+        !TickerMode.valuesOf(context).enabled) {
       if (_controller.isAnimating) _controller.stop();
+      _lastFrameElapsed = null;
+      _blockOpacities.fillRange(0, _blockOpacities.length, 0.0);
       return;
     }
     if (_isPlaying && !_controller.isAnimating) {
+      _lastFrameElapsed = null;
       _controller.repeat();
     }
   }
@@ -306,6 +339,11 @@ class _AudioVisualizerState extends State<AudioVisualizer>
   void _onFrame() {
     if (!mounted) return;
     _frameCount++;
+    final elapsed = _controller.lastElapsedDuration ?? Duration.zero;
+    final deltaSeconds = _lastFrameElapsed == null
+        ? 0.0
+        : math.max(0.0, (elapsed - _lastFrameElapsed!).inMicroseconds / 1e6);
+    _lastFrameElapsed = elapsed;
 
     if (_useRealData) {
       return;
@@ -345,6 +383,20 @@ class _AudioVisualizerState extends State<AudioVisualizer>
       _computeSimulatedTargets(ms);
     }
 
+    if (widget.animationStyle == 'blocks') {
+      final heights = _displayHeights;
+      final decay = math.exp(-deltaSeconds * 6.0);
+      for (var i = 0; i < _barCount; i++) {
+        final litRows = (heights[i] * _blockRows).ceil();
+        for (var row = 0; row < _blockRows; row++) {
+          final index = i * _blockRows + row;
+          _blockOpacities[index] = row < litRows
+              ? 1.0
+              : _blockOpacities[index] * decay;
+        }
+      }
+    }
+
     if (!_isPlaying && !_useRealData && _controller.isAnimating) {
       bool settled = true;
       for (int i = 0; i < _barCount; i++) {
@@ -353,7 +405,9 @@ class _AudioVisualizerState extends State<AudioVisualizer>
           break;
         }
       }
-      if (settled) {
+      final trailsSettled = widget.animationStyle != 'blocks' ||
+          _blockOpacities.every((opacity) => opacity < 0.01 || opacity == 1.0);
+      if (settled && trailsSettled) {
         _controller.stop();
       }
     }
@@ -436,6 +490,13 @@ class _AudioVisualizerState extends State<AudioVisualizer>
     if (!widget.enabled) {
       return const SizedBox.shrink();
     }
+    final String colorMode = widget.colorMode ??
+        ref.watch<String>(
+          appPreferencesProvider.select((prefs) => prefs.visualizerColorMode),
+        );
+    final albumColor = colorMode == 'album_art'
+        ? widget.albumColor ?? ref.watch(albumDominantColorSyncProvider)
+        : null;
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _controller,
@@ -444,7 +505,11 @@ class _AudioVisualizerState extends State<AudioVisualizer>
             painter: _VisualizerBarPainter(
               barHeights: _displayHeights,
               animationStyle: widget.animationStyle,
-              albumColor: widget.albumColor,
+              colorMode: colorMode,
+              albumColor: albumColor,
+              blockOpacities: widget.animationStyle == 'blocks'
+                  ? List.of(_blockOpacities)
+                  : const [],
               repaint: _controller,
             ),
           );
@@ -457,23 +522,32 @@ class _AudioVisualizerState extends State<AudioVisualizer>
 class _VisualizerBarPainter extends CustomPainter {
   final List<double> barHeights;
   final String animationStyle;
+  final String colorMode;
   final Color? albumColor;
+  final List<double> blockOpacities;
 
   _VisualizerBarPainter({
     required this.barHeights,
     required this.animationStyle,
+    required this.colorMode,
+    required this.blockOpacities,
     this.albumColor,
     required Listenable repaint,
   }) : super(repaint: repaint);
 
   Color _barColor(double t) {
-    if (albumColor == null) {
+    if (colorMode == 'rainbow') {
+      return HSLColor.fromAHSL(1.0, t * 300.0, 0.80, 0.65).toColor();
+    }
+    if (colorMode == 'monochrome' || albumColor == null) {
       final b = 1.0 - t * 0.40;
       return Color.fromRGBO((255 * b).round(), (255 * b).round(), (255 * b).round(), 1.0);
     }
     final hsl = HSLColor.fromColor(albumColor!);
-    final l = (0.45 + t * 0.45).clamp(0.15, 0.92);
-    final s = (hsl.saturation * (0.7 + t * 0.4)).clamp(0.15, 1.0);
+    final l = 0.56 + t * 0.10;
+    final s = hsl.saturation < 0.05
+        ? 0.0
+        : (hsl.saturation * 1.35 + 0.20).clamp(0.72, 1.0);
     return hsl.withLightness(l).withSaturation(s).toColor();
   }
 
@@ -489,6 +563,8 @@ class _VisualizerBarPainter extends CustomPainter {
         _paintMirrored(canvas, size);
       case 'dots':
         _paintDots(canvas, size);
+      case 'blocks':
+        _paintBlocks(canvas, size);
       default:
         _paintBars(canvas, size);
     }
@@ -496,7 +572,7 @@ class _VisualizerBarPainter extends CustomPainter {
 
   void _paintBars(Canvas canvas, Size size) {
     final barCount = barHeights.length;
-    const spacing = 2.5;
+    final spacing = math.min(2.5, size.width / (barCount * 2));
     final totalSpacing = (barCount - 1) * spacing;
     final barWidth = (size.width - totalSpacing) / barCount;
     final maxBarHeight = size.height * 0.88;
@@ -521,6 +597,51 @@ class _VisualizerBarPainter extends CustomPainter {
       canvas.drawRRect(rect, barPaint);
     }
   }
+
+  void _paintBlocks(Canvas canvas, Size size) {
+    const sourceRows = _AudioVisualizerState._blockRows;
+    const cellSize = 6.0;
+    final availableHeight = size.height * 0.88;
+    final pitch = math.min(cellSize, math.min(size.width, availableHeight));
+    final columns = math.max(1, (size.width / pitch).floor());
+    final rows = math.max(1, (availableHeight / pitch).floor());
+    final gap = math.min(2.0, pitch * 0.25);
+    final blockSize = pitch - gap;
+    final left = (size.width - columns * pitch) / 2;
+    final paint = Paint();
+
+    for (var column = 0; column < columns; column++) {
+      final source = (column * barHeights.length / columns).floor();
+      final t = columns > 1 ? column / (columns - 1) : 0.5;
+      final color = _barColor(t);
+      for (var row = 0; row < rows; row++) {
+        final sourceRow = (row * sourceRows / rows).floor();
+        final lit = row < (barHeights[source] * rows).ceil();
+        final trail = blockOpacities[source * sourceRows + sourceRow];
+        final intensity = lit ? 1.0 : trail;
+        if (intensity < 0.01) continue;
+        paint.color = color.withValues(
+          alpha: intensity * (0.88 - row / rows * 0.30),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(
+            left + column * pitch + gap / 2,
+            size.height - (row + 1) * pitch + gap / 2,
+            blockSize,
+            blockSize,
+          ),
+          paint,
+        );
+      }
+    }
+  }
+
+  Shader _rainbowShader(Size size, double alpha) => LinearGradient(
+    colors: List.generate(
+      7,
+      (i) => _barColor(i / 6).withValues(alpha: alpha),
+    ),
+  ).createShader(Offset.zero & size);
 
   void _paintWave(Canvas canvas, Size size) {
     final barCount = barHeights.length;
@@ -549,6 +670,9 @@ class _VisualizerBarPainter extends CustomPainter {
           rightColor.withValues(alpha: 0.15),
         ],
       ).createShader(Rect.fromLTWH(0, baseline - maxHeight, size.width, maxHeight));
+    if (colorMode == 'rainbow') {
+      fillPaint.shader = _rainbowShader(size, 0.40);
+    }
     canvas.drawPath(topPath, fillPaint);
 
     final linePath = Path();
@@ -565,6 +689,7 @@ class _VisualizerBarPainter extends CustomPainter {
       ..color = _barColor(0.5).withValues(alpha: 0.95)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.8;
+    if (colorMode == 'rainbow') linePaint.shader = _rainbowShader(size, 0.95);
     canvas.drawPath(linePath, linePaint);
 
     for (int i = 0; i < barCount; i += 2) {
@@ -635,6 +760,7 @@ class _VisualizerBarPainter extends CustomPainter {
         ],
       ).createShader(
           Rect.fromLTWH(0, baseline - maxHeight, size.width, maxHeight));
+    if (colorMode == 'rainbow') fillPaint.shader = _rainbowShader(size, 0.35);
     canvas.drawPath(fillPath, fillPaint);
 
     // --- Glow stroke ---
@@ -643,6 +769,7 @@ class _VisualizerBarPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5.0
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    if (colorMode == 'rainbow') glowPaint.shader = _rainbowShader(size, 0.30);
     canvas.drawPath(curvePath, glowPaint);
 
     // --- Main stroke ---
@@ -651,13 +778,14 @@ class _VisualizerBarPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.2
       ..strokeCap = StrokeCap.round;
+    if (colorMode == 'rainbow') strokePaint.shader = _rainbowShader(size, 0.95);
     canvas.drawPath(curvePath, strokePaint);
   }
 
   void _paintMirrored(Canvas canvas, Size size) {
     final barCount = barHeights.length;
     final half = barCount ~/ 2;
-    const spacing = 2.0;
+    final spacing = math.min(2.0, size.width * 0.48 / (half * 2));
     final totalSpacing = (half - 1) * spacing;
     final barWidth = (size.width * 0.48 - totalSpacing) / half;
     final maxHeight = size.height * 0.42;

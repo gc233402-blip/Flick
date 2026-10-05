@@ -39,6 +39,14 @@ class AppPreferencesNotifier extends Notifier<AppPreferences> {
     await ref.read(appPreferencesServiceProvider).setHapticsEnabled(value);
   }
 
+  Future<void> setConnectionNoticesEnabled(bool value) async {
+    if (state.connectionNoticesEnabled == value) return;
+    state = state.copyWith(connectionNoticesEnabled: value);
+    await ref
+        .read(appPreferencesServiceProvider)
+        .setConnectionNoticesEnabled(value);
+  }
+
   Future<void> setShowSmartMixes(bool value) async {
     if (state.showSmartMixes == value) return;
     state = state.copyWith(showSmartMixes: value);
@@ -221,6 +229,12 @@ class AppPreferencesNotifier extends Notifier<AppPreferences> {
     await ref
         .read(appPreferencesServiceProvider)
         .setVisualizerMovementMode(value);
+  }
+
+  Future<void> setVisualizerColorMode(String value) async {
+    if (state.visualizerColorMode == value) return;
+    state = state.copyWith(visualizerColorMode: value);
+    await ref.read(appPreferencesServiceProvider).setVisualizerColorMode(value);
   }
 
   Future<void> setArtworkCardArtworkScale(double value) async {

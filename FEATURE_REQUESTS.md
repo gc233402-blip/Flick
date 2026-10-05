@@ -63,8 +63,16 @@ name, track count, artist, and (newly added) **Year**.
 - [X] **Audio Quality Badges** — show badges under the time bar (e.g. Lossless, AAC, Hi-Res)
 - [X] **Apple Music Animated Album Art** — animated album art on player screen
 - [X] **Immersive Animated Album Player Art** — full-bleed animated player background
+- [X] **Visualizer color modes & fading blocks** — follow album-cover colors, rainbow spectrum, or monochrome; new Fading Blocks style with softly decaying trails.
+- [ ] **Offline animated album covers** ([#282](https://github.com/moss-apps/Flick/issues/282)) — manually select a local animated cover and apply it across an album; discover named motion files beside music (for example `motion.mp4` or `cover.mp4`). Resolve manual overrides before folder artwork, online motion art, and static fallback. Preserve imported animations, use durable app storage, and support granted SAF/removable-storage folders. Keep video muted and respect reduced-motion and exclusive-output suppression. The reported inconsistent online artwork across album tracks still needs an affected album's tags/logs to reproduce.
 - [ ] **Library screen grid 3×X** — configurable grid column count
 - [ ] **Landscape mode** — proper landscape layouts for library and player screens (e.g. side-by-side player with artwork/queue, wider list/grid columns)
+
+---
+
+## Source-quality estimation — deferred
+
+- [ ] **Lossless-origin check** ([#282](https://github.com/moss-apps/Flick/issues/282)) — request to identify MP3-to-FLAC conversions, upsampling, or padded bit depth. Recorded for future scope review; overlaps the declined audio-analysis features above. Audio alone cannot prove a recording's origin. Any future implementation should be an opt-in, offline estimate with supporting evidence and an inconclusive/unsupported result, rather than a binary “true/fake lossless” badge. Validate false positives on genuine bandwidth-limited recordings before shipping; keep analysis separate from playback, preload, and ReplayGain.
 
 ---
 

@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppPreferences {
   final bool animationsEnabled;
   final bool hapticsEnabled;
+  final bool connectionNoticesEnabled;
   final bool showSmartMixes;
   final bool showRecentArtists;
   final bool showRecentTracks;
@@ -24,6 +25,7 @@ class AppPreferences {
   final String visualizerAnimationStyle;
   final String visualizerFrequencyMode;
   final String visualizerMovementMode;
+  final String visualizerColorMode;
   final double artworkCardArtworkScale;
   final double artworkCardTextScale;
   final double artworkCardVerticalOffset;
@@ -119,6 +121,7 @@ class AppPreferences {
   const AppPreferences({
     this.animationsEnabled = true,
     this.hapticsEnabled = true,
+    this.connectionNoticesEnabled = true,
     this.showSmartMixes = true,
     this.showRecentArtists = true,
     this.showRecentTracks = true,
@@ -140,6 +143,7 @@ class AppPreferences {
     this.visualizerAnimationStyle = 'bars',
     this.visualizerFrequencyMode = 'full',
     this.visualizerMovementMode = 'bouncy',
+    this.visualizerColorMode = 'album_art',
     this.artworkCardArtworkScale = 1.0,
     this.artworkCardTextScale = 1.0,
     this.artworkCardVerticalOffset = 0.0,
@@ -236,6 +240,7 @@ class AppPreferences {
   AppPreferences copyWith({
     bool? animationsEnabled,
     bool? hapticsEnabled,
+    bool? connectionNoticesEnabled,
     bool? showSmartMixes,
     bool? showRecentArtists,
     bool? showRecentTracks,
@@ -257,6 +262,7 @@ class AppPreferences {
     String? visualizerAnimationStyle,
     String? visualizerFrequencyMode,
     String? visualizerMovementMode,
+    String? visualizerColorMode,
     double? artworkCardArtworkScale,
     double? artworkCardTextScale,
     double? artworkCardVerticalOffset,
@@ -352,6 +358,8 @@ class AppPreferences {
     return AppPreferences(
       animationsEnabled: animationsEnabled ?? this.animationsEnabled,
       hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
+      connectionNoticesEnabled:
+          connectionNoticesEnabled ?? this.connectionNoticesEnabled,
       showSmartMixes: showSmartMixes ?? this.showSmartMixes,
       showRecentArtists: showRecentArtists ?? this.showRecentArtists,
       showRecentTracks: showRecentTracks ?? this.showRecentTracks,
@@ -381,6 +389,7 @@ class AppPreferences {
           visualizerFrequencyMode ?? this.visualizerFrequencyMode,
       visualizerMovementMode:
           visualizerMovementMode ?? this.visualizerMovementMode,
+      visualizerColorMode: visualizerColorMode ?? this.visualizerColorMode,
       artworkCardArtworkScale:
           artworkCardArtworkScale ?? this.artworkCardArtworkScale,
       artworkCardTextScale: artworkCardTextScale ?? this.artworkCardTextScale,
@@ -523,6 +532,7 @@ class AppPreferences {
 class AppPreferencesService {
   static const _animationsKey = 'app_animations_enabled';
   static const _hapticsKey = 'app_haptics_enabled';
+  static const _connectionNoticesKey = 'app_connection_notices_enabled';
   static const _showSmartMixesKey = 'menu_show_smart_mixes';
   static const _showRecentArtistsKey = 'menu_show_recent_artists';
   static const _showRecentTracksKey = 'menu_show_recent_tracks';
@@ -544,6 +554,7 @@ class AppPreferencesService {
   static const _visualizerAnimationStyleKey = 'visualizer_animation_style';
   static const _visualizerFrequencyModeKey = 'visualizer_frequency_mode';
   static const _visualizerMovementModeKey = 'visualizer_movement_mode';
+  static const _visualizerColorModeKey = 'visualizer_color_mode';
   static const _artworkCardArtworkScaleKey = 'artwork_card_artwork_scale';
   static const _artworkCardTextScaleKey = 'artwork_card_text_scale';
   static const _artworkCardVerticalOffsetKey = 'artwork_card_vertical_offset';
@@ -657,6 +668,7 @@ class AppPreferencesService {
     return AppPreferences(
       animationsEnabled: prefs.getBool(_animationsKey) ?? true,
       hapticsEnabled: prefs.getBool(_hapticsKey) ?? true,
+      connectionNoticesEnabled: prefs.getBool(_connectionNoticesKey) ?? true,
       showSmartMixes: prefs.getBool(_showSmartMixesKey) ?? true,
       showRecentArtists: prefs.getBool(_showRecentArtistsKey) ?? true,
       showRecentTracks: prefs.getBool(_showRecentTracksKey) ?? true,
@@ -684,6 +696,8 @@ class AppPreferencesService {
           prefs.getString(_visualizerFrequencyModeKey) ?? 'full',
       visualizerMovementMode:
           prefs.getString(_visualizerMovementModeKey) ?? 'bouncy',
+      visualizerColorMode:
+          prefs.getString(_visualizerColorModeKey) ?? 'album_art',
       artworkCardArtworkScale:
           prefs.getDouble(_artworkCardArtworkScaleKey) ?? 1.0,
       artworkCardTextScale: prefs.getDouble(_artworkCardTextScaleKey) ?? 1.0,
@@ -840,6 +854,11 @@ class AppPreferencesService {
   Future<void> setHapticsEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_hapticsKey, value);
+  }
+
+  Future<void> setConnectionNoticesEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_connectionNoticesKey, value);
   }
 
   Future<bool> getShowSmartMixes() async {
@@ -1110,6 +1129,16 @@ class AppPreferencesService {
   Future<void> setVisualizerMovementMode(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_visualizerMovementModeKey, value);
+  }
+
+  Future<String> getVisualizerColorMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_visualizerColorModeKey) ?? 'album_art';
+  }
+
+  Future<void> setVisualizerColorMode(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_visualizerColorModeKey, value);
   }
 
   Future<void> setArtworkCardArtworkScale(double value) async {

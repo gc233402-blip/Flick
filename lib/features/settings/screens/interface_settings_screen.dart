@@ -109,6 +109,18 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               ),
               const SettingsDivider(),
               ToggleSetting(
+                icon: LucideIcons.wifiOff,
+                title: context.l10n.connectionNotices,
+                subtitle: context.l10n.connectionNoticesDescription,
+                value: appPreferences.connectionNoticesEnabled,
+                onChanged: (value) {
+                  ref
+                      .read(appPreferencesProvider.notifier)
+                      .setConnectionNoticesEnabled(value);
+                },
+              ),
+              const SettingsDivider(),
+              ToggleSetting(
                 icon: LucideIcons.arrowLeftRight,
                 title: 'Swipe Actions',
                 subtitle: 'Swipe songs left to queue or right to favorite',
