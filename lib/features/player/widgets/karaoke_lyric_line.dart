@@ -21,6 +21,13 @@ class KaraokeLyricLine extends StatefulWidget {
   final Color sungColor;
   final Color unsungColor;
 
+  /// Position source to sweep against. Defaults to the player's own position;
+  /// carousel peek stages pass a static source so their sweep stays put.
+  final ValueNotifier<Duration>? positionNotifier;
+
+  /// False for peek stages: no ticker, no sweep.
+  final bool active;
+
   const KaraokeLyricLine({
     super.key,
     required this.playerService,
@@ -31,6 +38,8 @@ class KaraokeLyricLine extends StatefulWidget {
     required this.style,
     required this.sungColor,
     required this.unsungColor,
+    this.positionNotifier,
+    this.active = true,
   });
 
   @override
@@ -51,12 +60,15 @@ class _KaraokeLyricLineState extends State<KaraokeLyricLine>
   int _builtForLineIndex = -1;
   LyricsData? _builtForLyrics;
 
+  ValueNotifier<Duration> get _positionNotifier =>
+      widget.positionNotifier ?? widget.playerService.positionNotifier;
+
   @override
   void initState() {
     super.initState();
-    _basePosition = widget.playerService.positionNotifier.value;
+    _basePosition = _positionNotifier.value;
     _isPlaying = widget.playerService.isPlayingNotifier.value;
-    widget.playerService.positionNotifier.addListener(_onPositionTick);
+    _positionNotifier.addListener(_onPositionTick);
     widget.playerService.isPlayingNotifier.addListener(_onPlayingChanged);
     _resolveWords();
     _updateTicker();
@@ -65,9 +77,21 @@ class _KaraokeLyricLineState extends State<KaraokeLyricLine>
   @override
   void didUpdateWidget(covariant KaraokeLyricLine oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final oldNotifier =
+        oldWidget.positionNotifier ?? oldWidget.playerService.positionNotifier;
+    if (!identical(oldNotifier, _positionNotifier)) {
+      oldNotifier.removeListener(_onPositionTick);
+      _basePosition = _positionNotifier.value;
+      _baseTickerElapsed = _tickerElapsed;
+      _positionNotifier.addListener(_onPositionTick);
+    }
     if (!identical(oldWidget.lyrics, widget.lyrics) ||
         oldWidget.lineIndex != widget.lineIndex) {
       _resolveWords();
+      _onPositionTick();
+      return;
+    }
+    if (oldWidget.active != widget.active) {
       _onPositionTick();
       return;
     }
@@ -86,7 +110,7 @@ class _KaraokeLyricLineState extends State<KaraokeLyricLine>
   }
 
   void _onPositionTick() {
-    _basePosition = widget.playerService.positionNotifier.value;
+    _basePosition = _positionNotifier.value;
     _baseTickerElapsed = _tickerElapsed;
     _updateTicker();
   }
@@ -101,7 +125,8 @@ class _KaraokeLyricLineState extends State<KaraokeLyricLine>
   }
 
   void _updateTicker() {
-    final shouldRun = _isPlaying && _segments.isNotEmpty && mounted;
+    final shouldRun =
+        widget.active && _isPlaying && _segments.isNotEmpty && mounted;
     if (shouldRun && _ticker == null) {
       _tickerElapsed = Duration.zero;
       _baseTickerElapsed = Duration.zero;
@@ -184,7 +209,7 @@ class _KaraokeLyricLineState extends State<KaraokeLyricLine>
   @override
   void dispose() {
     _ticker?.dispose();
-    widget.playerService.positionNotifier.removeListener(_onPositionTick);
+    _positionNotifier.removeListener(_onPositionTick);
     widget.playerService.isPlayingNotifier.removeListener(_onPlayingChanged);
     super.dispose();
   }

@@ -1116,6 +1116,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
                           onToggleLyrics: () => _setLyricsMode(!_isLyricsMode),
                           showWaveform: false,
                           motionArtEnabled: isCurrent,
+                          active: isCurrent,
                         );
                       },
                     );
@@ -1182,7 +1183,9 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
                                     albumColor: albumColor,
                                     playerService: _playerService,
                                     lyricsService: _lyricsService,
-                                    positionNotifier: _zeroPosition,
+                                    positionNotifier: isCurrent
+                                        ? _throttledPositionNotifier
+                                        : _zeroPosition,
                                     formatDuration: formatDuration,
                                     onNavigateToArtistDetail: (s) => _navigation
                                         .openArtistFromSong(context, s),
@@ -1232,6 +1235,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
                                     onToggleLyrics: () =>
                                         _setLyricsMode(!_isLyricsMode),
                                     showWaveform: false,
+                                    active: isCurrent,
                                   );
                                 },
                               );

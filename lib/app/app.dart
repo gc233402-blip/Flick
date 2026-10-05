@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/app_theme.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
@@ -25,18 +24,17 @@ import 'package:flick/core/navigation/root_navigator.dart';
 import 'package:flick/core/utils/navigation_helper.dart';
 import 'package:flick/core/utils/app_haptics.dart';
 import 'package:flick/core/utils/app_log.dart';
-import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
-import 'package:flick/features/player/widgets/audio_visualizer.dart';
 import 'package:flick/widgets/navigation/flick_nav_bar.dart';
 import 'package:flick/providers/equalizer_provider.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/features/onboarding/screens/onboarding_screen.dart';
 import 'package:flick/features/onboarding/tutorial_targets.dart';
 import 'package:flick/features/onboarding/widgets/tutorial_overlay.dart';
-import 'package:flick/widgets/common/cached_image_widget.dart';
-import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
+import 'package:flick/widgets/common/embedded_mini_player.dart';
+import 'package:flick/widgets/navigation/bottom_bar_geometry.dart';
+import 'package:flick/providers/mini_player_config_provider.dart';
 import 'package:flick/widgets/common/floating_mini_player.dart';
 import 'package:flick/widgets/common/floating_scan_progress.dart';
 import 'package:flick/widgets/common/offline_notice.dart';
@@ -729,6 +727,15 @@ class _MainShellState extends ConsumerState<MainShell>
   @override
   Widget build(BuildContext context) {
     final backgroundColor = ref.watch(backgroundColorProvider);
+    final miniConfig = ref.watch(miniPlayerConfigProvider);
+    final separated = ref.watch(
+      appPreferencesProvider.select(
+        (prefs) => prefs.separateMiniPlayerFromNavBar,
+      ),
+    );
+    final extraClearance = BottomBarGeometry.extraClearance(
+      context, miniConfig, separated,
+    );
 
     return PopScope(
       canPop: false,
@@ -770,11 +777,11 @@ class _MainShellState extends ConsumerState<MainShell>
                       final mq = MediaQuery.of(nestedContext);
                       final inflated = mq.copyWith(
                         padding: mq.padding.copyWith(
-                          bottom: mq.padding.bottom + _kNestedBarClearance,
+                          bottom: mq.padding.bottom + _kNestedBarClearance + extraClearance,
                         ),
                         viewPadding: mq.viewPadding.copyWith(
                           bottom:
-                              mq.viewPadding.bottom + _kNestedBarClearance,
+                              mq.viewPadding.bottom + _kNestedBarClearance + extraClearance,
                         ),
                       );
                       return MediaQuery(
@@ -798,7 +805,9 @@ class _MainShellState extends ConsumerState<MainShell>
                                       final cfg =
                                           ref.watch(navBarConfigProvider);
                                       final order = _getPageOrder(cfg);
-                                      return PageView(
+                                      return Padding(
+                                        padding: EdgeInsets.only(bottom: extraClearance),
+                                        child: PageView(
                                         controller: _pageController,
                                         physics:
                                             const ClampingScrollPhysics(),
@@ -875,6 +884,7 @@ class _MainShellState extends ConsumerState<MainShell>
                                             child: _buildScreen(button),
                                           );
                                         }).toList(),
+                                        ),
                                       );
                                     },
                                   ),
@@ -1011,337 +1021,9 @@ class _MainShellState extends ConsumerState<MainShell>
         separateMiniPlayer: separated,
         miniPlayerWidget: TutorialTargetAnchor(
           target: TutorialTarget.miniPlayer,
-          child: _EmbeddedMiniPlayer(
+          child: EmbeddedMiniPlayer(
             collapsed: collapsed,
-            matchNavBarWidth: separated && !collapsed,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Embedded mini player widget that uses Riverpod for state.
-class _EmbeddedMiniPlayer extends ConsumerStatefulWidget {
-  final bool collapsed;
-  final bool matchNavBarWidth;
-
-  const _EmbeddedMiniPlayer({
-    this.collapsed = false,
-    this.matchNavBarWidth = false,
-  });
-
-  @override
-  ConsumerState<_EmbeddedMiniPlayer> createState() =>
-      _EmbeddedMiniPlayerState();
-}
-
-class _EmbeddedMiniPlayerState extends ConsumerState<_EmbeddedMiniPlayer> {
-  bool _showVisualizer = false;
-  int _songChangeDirection = 0; // 1=next, -1=previous, 0=none
-  String? _currentSongId;
-
-  void _onHorizontalDragEnd(DragEndDetails details) {
-    final velocity = details.primaryVelocity ?? 0;
-    if (velocity.abs() <= 300) return;
-
-    final swipeAction = ref.read(appPreferencesProvider).miniPlayerSwipeAction;
-    if (swipeAction == 'switchSongs') {
-      if (velocity < 0) {
-        _songChangeDirection = -1;
-        ref.read(playerProvider.notifier).next();
-      } else {
-        _songChangeDirection = 1;
-        ref.read(playerProvider.notifier).previous(allowRestart: false);
-      }
-    } else {
-      setState(() {
-        _showVisualizer = !_showVisualizer;
-      });
-    }
-  }
-
-  Widget _buildSongInfo(Song currentSong) {
-    final previousSongId = _currentSongId;
-    final newSongId = currentSong.id;
-    _currentSongId = newSongId;
-
-    final songDirection = _songChangeDirection;
-    _songChangeDirection = 0;
-
-    return AnimatedSwitcher(
-      key: const ValueKey('mini_player_song_info'),
-      duration: const Duration(milliseconds: 350),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (child, animation) {
-        final key = (child.key as ValueKey).value as String;
-        final isNewSong = key == 'mini_player_song_$newSongId';
-        final isOldSong =
-            previousSongId != null && key == 'mini_player_song_$previousSongId';
-
-        if (!isNewSong && !isOldSong) {
-          return FadeTransition(opacity: animation, child: child);
-        }
-
-        final isNext = songDirection == 1;
-        final isPrevious = songDirection == -1;
-
-        final slideBegin = Offset(
-          isNext
-              ? (isNewSong ? 0.5 : -0.5)
-              : isPrevious
-                  ? (isNewSong ? -0.5 : 0.5)
-                  : 0,
-          0,
-        );
-
-        return SlideTransition(
-          position: Tween<Offset>(begin: slideBegin, end: Offset.zero)
-              .animate(animation),
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.95, end: 1.0).animate(animation),
-            child: FadeTransition(
-              opacity: Tween<double>(begin: 0.0, end: 1.0).animate(animation),
-              child: child,
-            ),
-          ),
-        );
-      },
-      child: Row(
-        key: ValueKey('mini_player_song_$newSongId'),
-        mainAxisSize: MainAxisSize.max,
-        children: [
-            // Album Art
-            Hero(
-              tag: 'mini_player_art',
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
-                  child: currentSong.albumArt != null
-                      ? CachedImageWidget(
-                          imagePath: currentSong.albumArt!,
-                          audioSourcePath: currentSong.filePath,
-                          fit: BoxFit.cover,
-                          useThumbnail: true,
-                          thumbnailWidth: 128,
-                          thumbnailHeight: 128,
-                          placeholder: const ColoredBox(
-                            color: AppColors.surface,
-                            child: FlickArtworkPlaceholder(size: 26, opacity: 0.9),
-                          ),
-                          errorWidget: const ColoredBox(
-                            color: AppColors.surface,
-                            child: FlickArtworkPlaceholder(size: 26, opacity: 0.9),
-                          ),
-                        )
-                      : const ColoredBox(
-                          color: AppColors.surface,
-                          child: FlickArtworkPlaceholder(size: 26, opacity: 0.9),
-                        ),
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            // Song Info
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    currentSong.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: 'ProductSans',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: context.adaptiveTextPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    currentSong.artist,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: 'ProductSans',
-                      fontSize: 12,
-                      color: context.adaptiveTextSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Play/Pause Button
-            Consumer(
-              builder: (context, ref, _) {
-                final isPlaying = ref.watch(isPlayingProvider);
-                return IconButton(
-                  onPressed: () =>
-                      ref.read(playerProvider.notifier).togglePlayPause(),
-                  icon: Icon(
-                    isPlaying ? LucideIcons.pause : LucideIcons.play,
-                    color: context.adaptiveTextPrimary,
-                    size: 20,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(width: 4),
-          ],
-        ),
-      );
-  }
-
-  Widget _buildVisualizer() {
-    final appPrefs = ref.watch(appPreferencesProvider);
-    final albumColor = ref.watch(albumDominantColorSyncProvider);
-    final playerService = ref.read(playerServiceProvider);
-    final reducedMotion = MediaQuery.of(context).disableAnimations;
-
-    return SizedBox.expand(
-      key: const ValueKey('mini_player_visualizer'),
-      child: AudioVisualizer(
-        playerService: playerService,
-        animationStyle: appPrefs.visualizerAnimationStyle,
-        frequencyMode: appPrefs.visualizerFrequencyMode,
-        movementMode: appPrefs.visualizerMovementMode,
-        albumColor: albumColor,
-        enabled: appPrefs.visualizerEnabled && !reducedMotion,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final currentSong = ref.watch(currentSongProvider);
-
-    if (currentSong == null) {
-      return const SizedBox.shrink();
-    }
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () async {
-        FocusScope.of(context).unfocus();
-        final result = await NavigationHelper.navigateToFullPlayer(
-          context,
-          heroTag: 'mini_player_art',
-        );
-        if (result != null && context.mounted) {
-          ref.read(navigationIndexProvider.notifier).setIndex(result);
-        }
-      },
-      onHorizontalDragStart: (_) {},
-      onHorizontalDragUpdate: (_) {},
-      onHorizontalDragEnd: _onHorizontalDragEnd,
-      child: AnimatedContainer(
-        duration: AppConstants.animationNormal,
-        margin: EdgeInsets.fromLTRB(
-          widget.matchNavBarWidth
-              ? context.scaleSize(AppConstants.spacingLg)
-              : 12,
-          12,
-          widget.matchNavBarWidth
-              ? context.scaleSize(AppConstants.spacingLg)
-              : 12,
-          widget.collapsed ? 12 : 8,
-        ),
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.surfaceLight.withValues(alpha: 0.86),
-              AppColors.surface.withValues(alpha: 0.94),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: const Color.fromARGB(
-              108,
-              255,
-              255,
-              255,
-            ).withValues(alpha: 0.45),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.22),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Stack(
-            children: [
-              // Progress Bar at bottom
-              Consumer(
-                builder: (context, ref, _) {
-                  final progress = ref.watch(progressProvider);
-                  if (progress == 0) return const SizedBox.shrink();
-
-                  return Align(
-                    alignment: Alignment.bottomLeft,
-                    child: FractionallySizedBox(
-                      widthFactor: progress,
-                      child: Container(height: 2, color: AppColors.accent),
-                    ),
-                  );
-                },
-              ),
-
-              // Song info or visualizer
-              AnimatedSwitcher(
-                duration: AppConstants.animationNormal,
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeOutCubic,
-                transitionBuilder: (child, animation) {
-                  final isEntering = child.key == const ValueKey('mini_player_visualizer');
-                  final offset = isEntering
-                      ? const Offset(0.3, 0)
-                      : const Offset(-0.3, 0);
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: offset,
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                    )),
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    ),
-                  );
-                },
-                child: _showVisualizer
-                    ? _buildVisualizer()
-                    : _buildSongInfo(currentSong),
-              ),
-
-            ],
+            separated: separated,
           ),
         ),
       ),

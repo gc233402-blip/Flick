@@ -7,8 +7,9 @@ import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/utils/app_haptics.dart';
 import 'package:flick/models/nav_bar_config.dart';
 import 'package:flick/providers/providers.dart';
+import 'package:flick/services/app_preferences_service.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
-import 'package:flick/widgets/navigation/flick_nav_bar.dart';
+import 'package:flick/features/settings/widgets/mini_player_customization.dart';
 import 'package:flick/l10n/l10n.dart';
 
 class BottomBarSettingsScreen extends ConsumerWidget {
@@ -29,46 +30,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SettingsSectionHeader(l10n.miniPlayer),
-          SettingsCard(
-            children: [
-              SelectionSetting(
-                icon: LucideIcons.audioLines,
-                title: l10n.visualizer,
-                subtitle: l10n.swipeToShowOrHideThe,
-                selected: appPreferences.miniPlayerSwipeAction == 'visualizer',
-                onTap: () {
-                  ref
-                      .read(appPreferencesProvider.notifier)
-                      .setMiniPlayerSwipeAction('visualizer');
-                },
-              ),
-              const SettingsDivider(),
-              SelectionSetting(
-                icon: LucideIcons.skipForward,
-                title: l10n.switchSongs,
-                subtitle: l10n.swipeLeftRightToSkipTracks,
-                selected: appPreferences.miniPlayerSwipeAction == 'switchSongs',
-                onTap: () {
-                  ref
-                      .read(appPreferencesProvider.notifier)
-                      .setMiniPlayerSwipeAction('switchSongs');
-                },
-              ),
-              const SettingsDivider(),
-              ToggleSetting(
-                icon: LucideIcons.split,
-                title: l10n.separateFromNavBar,
-                subtitle: l10n.showTheMiniPlayerAsIts,
-                value: appPreferences.separateMiniPlayerFromNavBar,
-                onChanged: (value) {
-                  ref
-                      .read(appPreferencesProvider.notifier)
-                      .setSeparateMiniPlayerFromNavBar(value);
-                },
-              ),
-            ],
-          ),
+          const MiniPlayerCustomization(),
           const SizedBox(height: AppConstants.spacingLg),
           SettingsSectionHeader(l10n.autoCollapse),
           SettingsCard(
@@ -251,7 +213,7 @@ class BottomBarSettingsScreen extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: AppConstants.spacingLg),
-          SettingsSectionHeader(l10n.appearance),
+          const SettingsSectionHeader('Navigation Appearance'),
           SettingsCard(
             children: [
               SliderSetting(
@@ -315,21 +277,28 @@ class BottomBarSettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppConstants.spacingLg),
-          SettingsSectionHeader(l10n.preview),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppConstants.radiusLg),
-            child: Container(
-              color: AppColors.surface.withValues(alpha: 0.4),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: AbsorbPointer(
-                child: FlickNavBar(
-                  currentIndex: config.orderedButtons.first.pageIndex,
-                  config: config,
-                  onTap: (_) {},
+          const SizedBox(height: AppConstants.spacingSm),
+          TextButton.icon(
+            icon: const Icon(LucideIcons.rotateCcw, size: 18),
+            label: const Text('Reset Navigation to Defaults'),
+            onPressed: () async {
+              const defaults = AppPreferences();
+              final preferences = ref.read(appPreferencesProvider.notifier);
+              await Future.wait([
+                ref.read(navBarConfigProvider.notifier).reset(),
+                preferences.setBottomBarAutoCollapseEnabled(
+                  defaults.bottomBarAutoCollapseEnabled,
                 ),
-              ),
-            ),
+                preferences.setBottomBarAutoCollapseSeconds(
+                  defaults.bottomBarAutoCollapseSeconds,
+                ),
+              ]);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Navigation defaults restored')),
+                );
+              }
+            },
           ),
           const SizedBox(height: AppConstants.navBarHeight + 40),
         ],
