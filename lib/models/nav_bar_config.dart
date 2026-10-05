@@ -2,20 +2,19 @@ import 'package:flutter/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum NavBarButton {
-  menu(0, 'Menu', LucideIcons.layoutGrid),
-  songs(1, 'Songs', LucideIcons.music),
-  settings(2, 'Settings', LucideIcons.settings),
-  albums(3, 'Albums', LucideIcons.disc),
-  artists(4, 'Artists', LucideIcons.users),
-  folders(5, 'Folders', LucideIcons.folder),
-  playlists(6, 'Playlists', LucideIcons.listMusic),
-  favorites(7, 'Favorites', LucideIcons.heart),
-  search(8, 'Search', LucideIcons.search);
+  menu(0, LucideIcons.layoutGrid),
+  songs(1, LucideIcons.music),
+  settings(2, LucideIcons.settings),
+  albums(3, LucideIcons.disc),
+  artists(4, LucideIcons.users),
+  folders(5, LucideIcons.folder),
+  playlists(6, LucideIcons.listMusic),
+  favorites(7, LucideIcons.heart),
+  search(8, LucideIcons.search);
 
-  const NavBarButton(this.pageIndex, this.label, this.icon);
+  const NavBarButton(this.pageIndex, this.icon);
 
   final int pageIndex;
-  final String label;
   final IconData icon;
 }
 

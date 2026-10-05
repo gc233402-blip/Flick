@@ -185,9 +185,9 @@ class UpdateCheckNotifier extends Notifier<UpdateCheckState> {
     try {
       final response = await http.get(
         _githubReleasesApiUri,
-        headers: {
+        headers: const {
           'Accept': 'application/vnd.github+json',
-          'User-Agent': l10n.flickplayer,
+          'User-Agent': 'FlickPlayer',
           'X-GitHub-Api-Version': '2022-11-28',
         },
       );
