@@ -39,6 +39,14 @@ class AppPreferencesNotifier extends Notifier<AppPreferences> {
     await ref.read(appPreferencesServiceProvider).setHapticsEnabled(value);
   }
 
+  Future<void> setConnectionNoticesEnabled(bool value) async {
+    if (state.connectionNoticesEnabled == value) return;
+    state = state.copyWith(connectionNoticesEnabled: value);
+    await ref
+        .read(appPreferencesServiceProvider)
+        .setConnectionNoticesEnabled(value);
+  }
+
   Future<void> setShowSmartMixes(bool value) async {
     if (state.showSmartMixes == value) return;
     state = state.copyWith(showSmartMixes: value);
