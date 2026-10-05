@@ -25,12 +25,14 @@ class SettingsSectionHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(
-            title.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: context.adaptiveTextTertiary,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              title.toUpperCase(),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: context.adaptiveTextTertiary,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           if (tag != null) ...[
@@ -681,11 +683,13 @@ class _SettingsBackHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppConstants.spacingSm),
-            Text(
-            title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: context.adaptiveTextPrimary,
+          Expanded(
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: context.adaptiveTextPrimary,
+              ),
             ),
           ),
         ],

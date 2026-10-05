@@ -26,12 +26,22 @@ class SyncedLyricsView extends ConsumerStatefulWidget {
   final LyricsData lyrics;
   final Color? albumColor;
 
+  /// Playback clock to follow. Defaults to the player's own position, but
+  /// carousel peek stages pass a static source so only the playing song's
+  /// lyrics run.
+  final ValueNotifier<Duration>? positionNotifier;
+
+  /// False for peek stages: renders statically without following playback.
+  final bool active;
+
   const SyncedLyricsView({
     super.key,
     required this.playerService,
     required this.lyricsService,
     required this.lyrics,
     this.albumColor,
+    this.positionNotifier,
+    this.active = true,
   });
 
   @override
@@ -61,21 +71,29 @@ class _SyncedLyricsViewState extends ConsumerState<SyncedLyricsView> {
   Timer? _followResumeTimer;
   bool _needsInitialJump = true;
 
+  ValueNotifier<Duration> get _positionNotifier =>
+      widget.positionNotifier ?? widget.playerService.positionNotifier;
+
   @override
   void initState() {
     super.initState();
-    widget.playerService.positionNotifier.addListener(_onPositionChanged);
+    _positionNotifier.addListener(_onPositionChanged);
   }
 
   @override
   void didUpdateWidget(covariant SyncedLyricsView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.playerService != widget.playerService) {
-      oldWidget.playerService.positionNotifier.removeListener(_onPositionChanged);
-      widget.playerService.positionNotifier.addListener(_onPositionChanged);
+    final oldNotifier =
+        oldWidget.positionNotifier ?? oldWidget.playerService.positionNotifier;
+    if (!identical(oldNotifier, _positionNotifier)) {
+      oldNotifier.removeListener(_onPositionChanged);
+      _positionNotifier.addListener(_onPositionChanged);
     }
     if (!identical(oldWidget.lyrics, widget.lyrics)) {
       _estimatesForWidth = null;
+      _needsInitialJump = true;
+    }
+    if (oldWidget.active != widget.active && widget.active) {
       _needsInitialJump = true;
     }
   }
@@ -83,13 +101,14 @@ class _SyncedLyricsViewState extends ConsumerState<SyncedLyricsView> {
   @override
   void dispose() {
     _followResumeTimer?.cancel();
-    widget.playerService.positionNotifier.removeListener(_onPositionChanged);
+    _positionNotifier.removeListener(_onPositionChanged);
     _scrollController.dispose();
     super.dispose();
   }
 
   void _onPositionChanged() {
-    final position = widget.playerService.positionNotifier.value;
+    if (!widget.active) return;
+    final position = _positionNotifier.value;
     final deltaMs = position.inMilliseconds - _lastTickPosition.inMilliseconds;
     _lastTickPosition = position;
     final isSeekBack = deltaMs <= -_seekBackThresholdMs;
@@ -115,7 +134,7 @@ class _SyncedLyricsViewState extends ConsumerState<SyncedLyricsView> {
   }
 
   void _syncToPosition() {
-    final position = widget.playerService.positionNotifier.value;
+    final position = _positionNotifier.value;
     _lastTickPosition = position;
     final newIndex = widget.lyricsService.findCurrentLineIndex(
       widget.lyrics,
@@ -373,6 +392,8 @@ class _SyncedLyricsViewState extends ConsumerState<SyncedLyricsView> {
               style: _textStyle(true, 1),
               sungColor: _sungColor,
               unsungColor: Colors.white.withValues(alpha: 0.30),
+              positionNotifier: _positionNotifier,
+              active: widget.active,
             ),
           )
         : Padding(

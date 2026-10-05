@@ -19,12 +19,16 @@ class InlineLyricsPanel extends ConsumerStatefulWidget {
   final LyricsService lyricsService;
   final Song song;
   final Color? albumColor;
+  final ValueNotifier<Duration>? positionNotifier;
+  final bool active;
 
   const InlineLyricsPanel({super.key,
     required this.playerService,
     required this.lyricsService,
     required this.song,
     this.albumColor,
+    this.positionNotifier,
+    this.active = true,
   });
 
   @override
@@ -362,6 +366,8 @@ class _InlineLyricsPanelState extends ConsumerState<InlineLyricsPanel> {
         lyricsService: widget.lyricsService,
         lyrics: lyrics,
         albumColor: widget.albumColor,
+        positionNotifier: widget.positionNotifier,
+        active: widget.active,
       ),
     );
   }
