@@ -566,7 +566,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get natureAmbient => '自然氛围';
 
   @override
+  String get navigationAppearance => '导航栏外观';
+
+  @override
   String get navigationBar => '导航栏';
+
+  @override
+  String get navigationDefaultsRestored => '导航栏默认设置已恢复';
 
   @override
   String get neonNights => '霓虹之夜';
@@ -576,6 +582,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get next => '下一步';
+
+  @override
+  String get nextSong => '下一首';
 
   @override
   String get noUsbAudioDevicesFound => '未找到 USB 音频设备';
@@ -614,6 +623,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get parametric => '参数';
 
   @override
+  String get pause => '暂停';
+
+  @override
   String get peaking => '峰值';
 
   @override
@@ -648,6 +660,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preview => '预览';
 
   @override
+  String get previousSong => '上一首';
+
+  @override
   String get prewarming => '预热中';
 
   @override
@@ -679,6 +694,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reorderFilterAndShuffleFromThis => '在此标题栏可重新排序、筛选和随机播放。';
+
+  @override
+  String get resetNavigationToDefaults => '恢复导航栏默认设置';
 
   @override
   String get resonance => '谐振';

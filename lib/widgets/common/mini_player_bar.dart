@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
+import 'package:flick/l10n/l10n.dart';
 import 'package:flick/models/mini_player_config.dart';
 import 'package:flick/widgets/navigation/bottom_bar_geometry.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
@@ -254,15 +255,15 @@ class MiniPlayerBar extends StatelessWidget {
           ),
         ),
         if (config.showPrevious)
-          _control(context, LucideIcons.skipBack, 'Previous song', onPrevious),
+          _control(context, LucideIcons.skipBack, l10n.previousSong, onPrevious),
         _control(
           context,
           isPlaying ? LucideIcons.pause : LucideIcons.play,
-          isPlaying ? 'Pause' : 'Play',
+          isPlaying ? l10n.pause : l10n.play,
           onPlayPause,
         ),
         if (config.showNext)
-          _control(context, LucideIcons.skipForward, 'Next song', onNext),
+          _control(context, LucideIcons.skipForward, l10n.nextSong, onNext),
         const SizedBox(width: 4),
       ],
     );
