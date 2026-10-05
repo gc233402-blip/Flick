@@ -6,6 +6,7 @@ import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/adaptive_colors.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Shared detail-screen header: full-bleed art fading into the page
 /// background at the bottom, with the title block overlaid on the gradient.
@@ -154,7 +155,7 @@ class DetailHeader extends StatelessWidget {
                               color: context.adaptiveTextSecondary,
                             ),
                           ),
-                          const TextSpan(text: ' Lossless'),
+                          TextSpan(text: l10n.lossless),
                         ],
                       ],
                     ),
@@ -254,7 +255,7 @@ class DetailActionCapsule extends StatelessWidget {
           child: Row(
             children: [
               segment(
-                tooltip: isFavorite ? 'Remove from favorites' : 'Favorite all',
+                tooltip: isFavorite ? l10n.removeFromFavorites2 : l10n.favoriteAll,
                 child: Icon(
                   isFavorite ? Icons.favorite_rounded : Icons.favorite_border,
                   color: fg,
@@ -264,25 +265,25 @@ class DetailActionCapsule extends StatelessWidget {
               ),
               slice(),
               segment(
-                tooltip: 'Shuffle',
+                tooltip: l10n.shuffle,
                 child: Icon(LucideIcons.shuffle, color: fg, size: 21),
                 onTap: onShuffle,
               ),
               slice(),
               segment(
-                tooltip: 'Play',
+                tooltip: l10n.play,
                 child: Icon(LucideIcons.play, color: fg, size: 24),
                 onTap: onPlay,
               ),
               slice(),
               segment(
-                tooltip: 'Queue',
+                tooltip: l10n.queue,
                 child: Icon(LucideIcons.listMusic, color: fg, size: 21),
                 onTap: onQueue,
               ),
               slice(),
               segment(
-                tooltip: 'More',
+                tooltip: l10n.more,
                 child: Icon(
                   LucideIcons.ellipsisVertical,
                   color: fg,
@@ -344,7 +345,7 @@ class DetailMoreSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(
-              'More',
+              l10n.more,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: context.adaptiveTextPrimary,
                 fontWeight: FontWeight.w700,

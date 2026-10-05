@@ -12,6 +12,7 @@ import '../../data/repositories/song_repository.dart';
 import '../library_scanner_service.dart' show ScanProgress;
 import '../network_cache_service.dart';
 import 'network_source_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// UPnP / DLNA MediaServer client (ContentDirectory:1 over SOAP).
 ///
@@ -236,8 +237,8 @@ class UpnpService implements NetworkSourceService {
 
     // BFS over containers. Start at root "0"; some servers use different root
     // ids but "0" is the UPnP convention.
-    final queue = <_UpnpContainer>[_UpnpContainer(id: '0', title: 'Root')];
-    final allContainers = <_UpnpContainer>[_UpnpContainer(id: '0', title: 'Root')];
+    final queue = <_UpnpContainer>[_UpnpContainer(id: '0', title: l10n.root)];
+    final allContainers = <_UpnpContainer>[_UpnpContainer(id: '0', title: l10n.root)];
     var filesProcessed = 0;
 
     while (queue.isNotEmpty) {

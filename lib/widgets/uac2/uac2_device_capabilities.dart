@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2DeviceCapabilities extends ConsumerWidget {
   final Uac2DeviceInfo device;
@@ -20,10 +21,10 @@ class Uac2DeviceCapabilities extends ConsumerWidget {
     return capabilitiesAsync.when(
       data: (capabilities) {
         if (capabilities == null) {
-          return const Card(
+          return Card(
             child: Padding(
               padding: EdgeInsets.all(16.0),
-              child: Text('Capabilities not available'),
+              child: Text(l10n.capabilitiesNotAvailable),
             ),
           );
         }
@@ -35,20 +36,20 @@ class Uac2DeviceCapabilities extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Device Capabilities',
+                  l10n.deviceCapabilities,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 16),
                 _buildCapabilityRow(
                   context,
-                  'Device Type',
+                  l10n.deviceType,
                   capabilities.deviceType,
                   Icons.category,
                 ),
                 const Divider(),
                 _buildCapabilityRow(
                   context,
-                  'Sample Rates',
+                  l10n.sampleRates,
                   capabilities.supportedSampleRates
                       .map((r) => '${r ~/ 1000}kHz')
                       .join(', '),
@@ -57,7 +58,7 @@ class Uac2DeviceCapabilities extends ConsumerWidget {
                 const Divider(),
                 _buildCapabilityRow(
                   context,
-                  'Bit Depths',
+                  l10n.bitDepths,
                   capabilities.supportedBitDepths
                       .map((d) => '${d}bit')
                       .join(', '),
@@ -66,9 +67,9 @@ class Uac2DeviceCapabilities extends ConsumerWidget {
                 const Divider(),
                 _buildCapabilityRow(
                   context,
-                  'Channels',
+                  l10n.channels,
                   capabilities.supportedChannels
-                      .map((c) => c == 1 ? 'Mono' : c == 2 ? 'Stereo' : '$c ch')
+                      .map((c) => c == 1 ? l10n.mono : c == 2 ? l10n.stereo : '$c ch')
                       .join(', '),
                   Icons.surround_sound,
                 ),
@@ -86,7 +87,7 @@ class Uac2DeviceCapabilities extends ConsumerWidget {
       error: (error, stack) => Card(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Text('Error loading capabilities: $error'),
+          child: Text(l10n.errorLoadingCapabilities(error)),
         ),
       ),
     );

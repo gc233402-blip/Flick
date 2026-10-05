@@ -8,6 +8,7 @@ import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/providers/connectivity_provider.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Full-width notice bar that sits below the app content while the device is
 /// offline and briefly confirms when the connection comes back.
@@ -133,8 +134,8 @@ class _NoticeBar extends StatelessWidget {
       container: true,
       liveRegion: true,
       label: isOffline
-          ? "You're offline. Some online features may not work."
-          : 'Back online',
+          ? l10n.youReOfflineSomeOnlineFeatures
+          : l10n.backOnline,
       child: AnimatedContainer(
         key: const ValueKey('offline_notice_bar'),
         duration: duration,
@@ -177,12 +178,12 @@ class _NoticeBar extends StatelessWidget {
             Flexible(
               child: Text.rich(
                 TextSpan(
-                  text: isOffline ? "You're offline" : 'Back online',
+                  text: isOffline ? l10n.youReOffline : l10n.backOnline,
                   style: titleStyle,
                   children: isOffline
                       ? [
                           TextSpan(
-                            text: '  ·  Some online features may not work',
+                            text: l10n.someOnlineFeaturesMayNotWork,
                             style: detailStyle,
                           ),
                         ]

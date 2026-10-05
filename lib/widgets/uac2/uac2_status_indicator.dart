@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/models/audio_output_diagnostics.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2StatusIndicator extends ConsumerWidget {
   const Uac2StatusIndicator({super.key});
@@ -48,7 +49,7 @@ class Uac2StatusIndicator extends ConsumerWidget {
             Text(
               deviceStatus.currentFormat!.isDsdStream
                   ? deviceStatus.currentFormat!.compactRateLabel
-                  : '${_effectiveSampleRate(deviceStatus, diagnostics) ~/ 1000}kHz/${deviceStatus.currentFormat!.bitDepth}bit',
+                  : l10n.khzBit2(_effectiveSampleRate(deviceStatus, diagnostics) ~/ 1000, deviceStatus.currentFormat!.bitDepth),
               style: TextStyle(
                 fontSize: 10,
                 color: _getStatusColor(

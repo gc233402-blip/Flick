@@ -1,24 +1,260 @@
 {
-  "@@locale": "en",
-
+  "activateFallback": "Activate Fallback",
+  "@activateFallback": {
+    "description": "lib/widgets/uac2/uac2_fallback_manager.dart:179"
+  },
+  "active": "Active",
+  "@active": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:670"
+  },
+  "adjustSpacingBetweenButtons": "Adjust spacing between buttons",
+  "@adjustSpacingBetweenButtons": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:275"
+  },
+  "adjustTheSizeOfTheBottom": "Adjust the size of the bottom bar",
+  "@adjustTheSizeOfTheBottom": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:259"
+  },
+  "adjustTheSizeOfTheIcons": "Adjust the size of the icons",
+  "@adjustTheSizeOfTheIcons": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:291"
+  },
+  "advanceToARandomCategory": "Advance to a random category",
+  "@advanceToARandomCategory": {
+    "description": "lib/models/advance_list_order.dart:15"
+  },
+  "advanceToTheNextCategoryAlphabetically": "Advance to the next category alphabetically",
+  "@advanceToTheNextCategoryAlphabetically": {
+    "description": "lib/models/advance_list_order.dart:13"
+  },
+  "advanceToTheNextMostRecently": "Advance to the next most recently added category",
+  "@advanceToTheNextMostRecently": {
+    "description": "lib/models/advance_list_order.dart:14"
+  },
+  "air": "Air",
+  "@air": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:1891"
+  },
+  "alacAudio": "ALAC Audio",
+  "@alacAudio": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:128"
+  },
+  "alacBit": "ALAC {arg1}-bit",
+  "@alacBit": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:79",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "album": "Album",
+  "@album": {
+    "description": "lib/features/albums/widgets/identify_album_sheet.dart:263"
+  },
+  "albumArt": "Album Art",
+  "@albumArt": {
+    "description": "lib/features/settings/screens/widget_settings_screen.dart:200"
+  },
+  "albums": "Albums",
+  "@albums": {
+    "description": "lib/features/albums/screens/albums_screen.dart:252"
+  },
+  "allFormats": "All Formats",
+  "@allFormats": {
+    "description": "lib/providers/songs_provider.dart:116"
+  },
+  "allPass": "All Pass",
+  "@allPass": {
+    "description": "lib/providers/equalizer_provider.dart:41"
+  },
+  "allSongs": "All Songs",
+  "@allSongs": {
+    "description": "lib/models/playback_context.dart:15"
+  },
+  "alphabetical": "Alphabetical",
+  "@alphabetical": {
+    "description": "lib/models/advance_list_order.dart:7"
+  },
+  "androidBlockedWritingToThisFile": "Android blocked writing to this file. Remove and re-add the folder in Settings to grant edit access, then try again.",
+  "@androidBlockedWritingToThisFile": {
+    "description": "lib/services/metadata_editor_service.dart:184"
+  },
   "appTitle": "Flick Player",
   "@appTitle": {
     "description": "Application name. Used by MaterialApp.onGenerateTitle and shown in the Android task switcher."
   },
-
-  "language": "Language",
-  "@language": {
-    "description": "Settings entry label and the title of the language picker."
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:253"
   },
-  "languageSystemDefault": "System default",
-  "@languageSystemDefault": {
-    "description": "Language option that follows the device locale."
+  "appearsInTheOverflowMenu": "Appears in the overflow menu",
+  "@appearsInTheOverflowMenu": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:394"
   },
-  "languageSectionDescription": "Choose the language used across the app.",
-  "@languageSectionDescription": {
-    "description": "Helper text under the language setting."
+  "artist": "Artist",
+  "@artist": {
+    "description": "lib/features/albums/widgets/identify_album_sheet.dart:254"
   },
-
+  "artists": "Artists",
+  "@artists": {
+    "description": "lib/features/artists/screens/artists_screen.dart:253"
+  },
+  "artworkCard": "Artwork Card",
+  "@artworkCard": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:203"
+  },
+  "asmrDreams": "ASMR Dreams",
+  "@asmrDreams": {
+    "description": "lib/models/song.dart:367"
+  },
+  "atKhzBit": " at {arg1}kHz/{arg2}bit",
+  "@atKhzBit": {
+    "description": "lib/widgets/uac2/uac2_connection_manager.dart:88",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "autoCollapse": "Auto Collapse",
+  "@autoCollapse": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:77"
+  },
+  "autoReconnect": "Auto-Reconnect",
+  "@autoReconnect": {
+    "description": "lib/widgets/uac2/uac2_connection_manager.dart:183"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "lib/features/onboarding/widgets/tutorial_overlay.dart:338"
+  },
+  "backOnline": "Back online",
+  "@backOnline": {
+    "description": "lib/widgets/common/offline_notice.dart:137"
+  },
+  "band": "Band",
+  "@band": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:211"
+  },
+  "bandPass": "Band Pass",
+  "@bandPass": {
+    "description": "lib/providers/equalizer_provider.dart:37"
+  },
+  "bandsActive": "{activeCount}/{arg1} bands active",
+  "@bandsActive": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:294",
+    "placeholders": {
+      "activeCount": {
+        "type": "Object"
+      },
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "bandsAdjusted2": "{adjustedCount}/{arg1} bands adjusted",
+  "@bandsAdjusted2": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:291",
+    "placeholders": {
+      "adjustedCount": {
+        "type": "Object"
+      },
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "barHeight": "Bar Height",
+  "@barHeight": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:258"
+  },
+  "bass": "Bass",
+  "@bass": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:1665"
+  },
+  "bit": "{depth}bit",
+  "@bit": {
+    "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1361",
+    "placeholders": {
+      "depth": {
+        "type": "Object"
+      }
+    }
+  },
+  "bitDepth2": "Bit Depth",
+  "@bitDepth2": {
+    "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1350"
+  },
+  "bitDepths": "Bit Depths",
+  "@bitDepths": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:569"
+  },
+  "bitPerfectUsbDac": "Bit-perfect (USB DAC)",
+  "@bitPerfectUsbDac": {
+    "description": "lib/features/menu/screens/menu_screen.dart:512"
+  },
+  "bitPerfectUsbDacCouldNot2": "Bit-perfect (USB DAC) could not be enabled for {arg1}. Check the USB diagnostics.",
+  "@bitPerfectUsbDacCouldNot2": {
+    "description": "lib/widgets/uac2/usb_bit_perfect_prompt.dart:274",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "bitPerfectUsbDacEnabledFor": "Bit-perfect (USB DAC) enabled for {arg1}.",
+  "@bitPerfectUsbDacEnabledFor": {
+    "description": "lib/widgets/uac2/usb_bit_perfect_prompt.dart:273",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "boldSaturatedColorsFromAlbumArt": "Bold, saturated colors from album art.",
+  "@boldSaturatedColorsFromAlbumArt": {
+    "description": "lib/models/album_color_mode.dart:39"
+  },
+  "bottomBar": "Bottom Bar",
+  "@bottomBar": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:27"
+  },
+  "build": "{kAppVersion} (build {kAppBuild})",
+  "@build": {
+    "description": "lib/core/constants/app_constants.dart:6",
+    "placeholders": {
+      "kAppVersion": {
+        "type": "Object"
+      },
+      "kAppBuild": {
+        "type": "Object"
+      }
+    }
+  },
+  "buttonSpacing": "Button Spacing",
+  "@buttonSpacing": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:274"
+  },
+  "buttons": "Buttons",
+  "@buttons": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:110"
+  },
+  "calmFrequencies": "Calm Frequencies",
+  "@calmFrequencies": {
+    "description": "lib/models/song.dart:313"
+  },
+  "capabilitiesNotAvailable": "Capabilities not available",
+  "@capabilitiesNotAvailable": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:529"
+  },
+  "cast": "Cast",
+  "@cast": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:843"
+  },
   "castingTo": "Casting to {deviceName}",
   "@castingTo": {
     "description": "Snack bar shown after starting a cast session.",
@@ -27,5 +263,1151 @@
         "type": "Object"
       }
     }
+  },
+  "categories": "Categories",
+  "@categories": {
+    "description": "lib/models/shuffle_mode.dart:14"
+  },
+  "channels": "Channels",
+  "@channels": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:620"
+  },
+  "channels3": "{ch} channels",
+  "@channels3": {
+    "description": "lib/widgets/uac2/uac2_stream_config.dart:185",
+    "placeholders": {
+      "ch": {
+        "type": "Object"
+      }
+    }
+  },
+  "cityBeats": "City Beats",
+  "@cityBeats": {
+    "description": "lib/models/song.dart:331"
+  },
+  "cleanStraightLineWithPrecisionScrubbing": "Clean straight line with precision scrubbing.",
+  "@cleanStraightLineWithPrecisionScrubbing": {
+    "description": "lib/models/progress_bar_style.dart:27"
+  },
+  "collapseAfter": "Collapse After",
+  "@collapseAfter": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:91"
+  },
+  "completelyHiddenFromTheBottomBar": "Completely hidden from the bottom bar",
+  "@completelyHiddenFromTheBottomBar": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:393"
+  },
+  "connect": "Connect",
+  "@connect": {
+    "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:785"
+  },
+  "connected": "Connected",
+  "@connected": {
+    "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:110"
+  },
+  "connecting": "Connecting",
+  "@connecting": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:901"
+  },
+  "connectionManagement": "Connection Management",
+  "@connectionManagement": {
+    "description": "lib/widgets/uac2/uac2_connection_manager.dart:140"
+  },
+  "conversionFailed": "Conversion failed: {error}",
+  "@conversionFailed": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:249",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "convertedSuccessfully": "{fileName} converted successfully",
+  "@convertedSuccessfully": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:233",
+    "placeholders": {
+      "fileName": {
+        "type": "Object"
+      }
+    }
+  },
+  "convertingAudio": "Converting audio...",
+  "@convertingAudio": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:39"
+  },
+  "convertingToWav": "Converting {fileName} to WAV...",
+  "@convertingToWav": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:218",
+    "placeholders": {
+      "fileName": {
+        "type": "Object"
+      }
+    }
+  },
+  "cosmicOrchestra": "Cosmic Orchestra",
+  "@cosmicOrchestra": {
+    "description": "lib/models/song.dart:322"
+  },
+  "countingFiles": "Counting files…",
+  "@countingFiles": {
+    "description": "lib/features/settings/screens/library_settings_screen.dart:985"
+  },
+  "crystalCaverns": "Crystal Caverns",
+  "@crystalCaverns": {
+    "description": "lib/models/song.dart:348"
+  },
+  "cueSheetTracksCannotBeEdited": "CUE sheet tracks cannot be edited.",
+  "@cueSheetTracksCannotBeEdited": {
+    "description": "lib/services/metadata_editor_service.dart:67"
+  },
+  "customizeAudioDisplayNavigationAnd": "Customize audio, display, navigation, and integrations.",
+  "@customizeAudioDisplayNavigationAnd": {
+    "description": "lib/providers/tutorial_provider.dart:44"
+  },
+  "customizeBottomBar": "Customize Bottom Bar",
+  "@customizeBottomBar": {
+    "description": "lib/widgets/navigation/flick_nav_bar.dart:463"
+  },
+  "daily": "Daily",
+  "@daily": {
+    "description": "lib/data/repositories/recently_played_repository.dart:14"
+  },
+  "dateAdded": "Date Added",
+  "@dateAdded": {
+    "description": "lib/features/folders/screens/folders_screen.dart:2596"
+  },
+  "db15": "{arg1}%  {arg2} dB",
+  "@db15": {
+    "description": "lib/widgets/uac2/iso_volume_popup.dart:275",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "deactivateFallback": "Deactivate Fallback",
+  "@deactivateFallback": {
+    "description": "lib/widgets/uac2/uac2_fallback_manager.dart:178"
+  },
+  "deepEarth": "Deep Earth",
+  "@deepEarth": {
+    "description": "lib/models/song.dart:353"
+  },
+  "deviceCapabilities": "Device Capabilities",
+  "@deviceCapabilities": {
+    "description": "lib/widgets/uac2/uac2_device_capabilities.dart:38"
+  },
+  "deviceConnected": "Device connected",
+  "@deviceConnected": {
+    "description": "lib/widgets/uac2/uac2_hotplug_monitor.dart:48"
+  },
+  "deviceDacVolume": "Device DAC Volume",
+  "@deviceDacVolume": {
+    "description": "lib/widgets/uac2/uac2_volume_control.dart:163"
+  },
+  "deviceDisconnected": "Device disconnected",
+  "@deviceDisconnected": {
+    "description": "lib/widgets/uac2/uac2_hotplug_monitor.dart:49"
+  },
+  "deviceType": "Device Type",
+  "@deviceType": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:553"
+  },
+  "directUsb": "Direct USB",
+  "@directUsb": {
+    "description": "lib/widgets/uac2/uac2_player_status.dart:224"
+  },
+  "disabled": "Disabled",
+  "@disabled": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:185"
+  },
+  "disconnect": "Disconnect",
+  "@disconnect": {
+    "description": "lib/features/settings/widgets/lastfm_settings_tile.dart:253"
+  },
+  "displayTextLabelsBelowIcons": "Display text labels below icons",
+  "@displayTextLabelsBelowIcons": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:307"
+  },
+  "dragBandsUpOrDown": "Drag bands up or down",
+  "@dragBandsUpOrDown": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:129"
+  },
+  "dragToChangeFrequencyGain": "Drag to change frequency & gain",
+  "@dragToChangeFrequencyGain": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:161"
+  },
+  "dragToMovePinchToWiden": "Drag to move • Pinch to widen/narrow",
+  "@dragToMovePinchToWiden": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:130"
+  },
+  "dragVerticallyToChangeGain": "Drag vertically to change gain",
+  "@dragVerticallyToChangeGain": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:160"
+  },
+  "duration": "Duration",
+  "@duration": {
+    "description": "lib/features/settings/screens/audio_settings_screen.dart:330"
+  },
+  "equalizer": "Equalizer",
+  "@equalizer": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:756"
+  },
+  "error": "Error: {error}",
+  "@error": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:226",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "error2": "Error: {arg1}",
+  "@error2": {
+    "description": "lib/widgets/uac2/uac2_device_selector.dart:90",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "error3": "Error",
+  "@error3": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:909"
+  },
+  "errorLoadingCapabilities": "Error loading capabilities: {error}",
+  "@errorLoadingCapabilities": {
+    "description": "lib/widgets/uac2/uac2_device_capabilities.dart:89",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "etherealTones": "Ethereal Tones",
+  "@etherealTones": {
+    "description": "lib/models/song.dart:349"
+  },
+  "exclusiveUsbBitPerfectReEngaged": "Exclusive USB bit-perfect re-engaged.",
+  "@exclusiveUsbBitPerfectReEngaged": {
+    "description": "lib/widgets/uac2/usb_bit_perfect_prompt.dart:254"
+  },
+  "exclusiveUsbDroppedToTheAndroid": "Exclusive USB dropped to the Android mixer. Bit-perfect is paused.",
+  "@exclusiveUsbDroppedToTheAndroid": {
+    "description": "lib/widgets/uac2/usb_bit_perfect_prompt.dart:291"
+  },
+  "exclusiveUsbIsStillUnavailableCheck": "Exclusive USB is still unavailable. Check the USB diagnostics.",
+  "@exclusiveUsbIsStillUnavailableCheck": {
+    "description": "lib/widgets/uac2/usb_bit_perfect_prompt.dart:255"
+  },
+  "externalSongsCannotBeEdited": "External songs cannot be edited.",
+  "@externalSongsCannotBeEdited": {
+    "description": "lib/services/metadata_editor_service.dart:73"
+  },
+  "failedToActivateFallback": "Failed to activate fallback",
+  "@failedToActivateFallback": {
+    "description": "lib/widgets/uac2/uac2_fallback_manager.dart:61"
+  },
+  "failedToDeactivateFallback": "Failed to deactivate fallback",
+  "@failedToDeactivateFallback": {
+    "description": "lib/widgets/uac2/uac2_fallback_manager.dart:81"
+  },
+  "failedToSaveMetadata": "Failed to save metadata: {e}",
+  "@failedToSaveMetadata": {
+    "description": "lib/services/metadata_editor_service.dart:100",
+    "placeholders": {
+      "e": {
+        "type": "Object"
+      }
+    }
+  },
+  "failedToStartStreaming": "Failed to start streaming",
+  "@failedToStartStreaming": {
+    "description": "lib/widgets/uac2/uac2_stream_config.dart:270"
+  },
+  "failedToStopStreaming": "Failed to stop streaming",
+  "@failedToStopStreaming": {
+    "description": "lib/widgets/uac2/uac2_stream_config.dart:283"
+  },
+  "faintHueShiftFromAlbumArt": "Faint hue shift from album art.",
+  "@faintHueShiftFromAlbumArt": {
+    "description": "lib/models/album_color_mode.dart:35"
+  },
+  "fallbackAudio": "Fallback Audio",
+  "@fallbackAudio": {
+    "description": "lib/widgets/uac2/uac2_fallback_manager.dart:136"
+  },
+  "fallbackAudioActivated": "Fallback audio activated",
+  "@fallbackAudioActivated": {
+    "description": "lib/widgets/uac2/uac2_fallback_manager.dart:60"
+  },
+  "fallbackAudioDeactivated": "Fallback audio deactivated",
+  "@fallbackAudioDeactivated": {
+    "description": "lib/widgets/uac2/uac2_fallback_manager.dart:80"
+  },
+  "fallbackAudioWillBeUsedIf": "Fallback audio will be used if UAC2 device fails",
+  "@fallbackAudioWillBeUsedIf": {
+    "description": "lib/widgets/uac2/uac2_fallback_manager.dart:197"
+  },
+  "favoriteAll": "Favorite all",
+  "@favoriteAll": {
+    "description": "lib/widgets/common/detail_header.dart:257"
+  },
+  "favorites": "Favorites",
+  "@favorites": {
+    "description": "lib/features/favorites/screens/favorites_screen.dart:301"
+  },
+  "flat": "Flat",
+  "@flat": {
+    "description": "lib/services/eq_preset_service.dart:280"
+  },
+  "flickplayer": "FlickPlayer",
+  "@flickplayer": {
+    "description": "lib/features/settings/screens/app_info_settings_screen.dart:230"
+  },
+  "folder": "Folder",
+  "@folder": {
+    "description": "lib/models/playback_context.dart:13"
+  },
+  "folderOf2": "Folder {current} of {total}",
+  "@folderOf2": {
+    "description": "lib/widgets/common/floating_scan_progress.dart:403",
+    "placeholders": {
+      "current": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "folders": "Folders",
+  "@folders": {
+    "description": "lib/features/folders/screens/folders_screen.dart:320"
+  },
+  "frequency": "Frequency",
+  "@frequency": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:2611"
+  },
+  "from": "From {sourceLabel}",
+  "@from": {
+    "description": "lib/widgets/common/fetched_description.dart:41",
+    "placeholders": {
+      "sourceLabel": {
+        "type": "Object"
+      }
+    }
+  },
+  "fullBleedAlbumArtWithThe": "Full-bleed album art with the current cinematic look.",
+  "@fullBleedAlbumArtWithThe": {
+    "description": "lib/models/player_screen_mode.dart:26"
+  },
+  "fullPlayer": "Full Player",
+  "@fullPlayer": {
+    "description": "lib/providers/tutorial_provider.dart:48"
+  },
+  "gain": "Gain",
+  "@gain": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:2666"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "lib/features/onboarding/screens/onboarding_screen.dart:269"
+  },
+  "graphic": "Graphic",
+  "@graphic": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:4162"
+  },
+  "hardwareVolumeIsDetectedButWrites": "Hardware volume is detected, but writes stay blocked while live direct USB playback is active.",
+  "@hardwareVolumeIsDetectedButWrites": {
+    "description": "lib/widgets/uac2/uac2_volume_control.dart:246"
+  },
+  "havingMoreThan4ButtonsMay": "Having more than 4 buttons may cause text labels to compress. Consider reducing the button spacing below.",
+  "@havingMoreThan4ButtonsMay": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:241"
+  },
+  "hidden": "Hidden",
+  "@hidden": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:202"
+  },
+  "hideNavigationButtonsAfterBeingIdle": "Hide navigation buttons after being idle",
+  "@hideNavigationButtonsAfterBeingIdle": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:79"
+  },
+  "highPass": "High Pass",
+  "@highPass": {
+    "description": "lib/providers/equalizer_provider.dart:35"
+  },
+  "highShelf": "High Shelf",
+  "@highShelf": {
+    "description": "lib/providers/equalizer_provider.dart:31"
+  },
+  "hz6": "{arg1} Hz",
+  "@hz6": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:137",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "iconSize": "Icon Size",
+  "@iconSize": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:290"
+  },
+  "idle": "Idle",
+  "@idle": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:899"
+  },
+  "immersive": "Immersive",
+  "@immersive": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:278"
+  },
+  "inactive": "Inactive",
+  "@inactive": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:670"
+  },
+  "interactiveEq": "Interactive EQ",
+  "@interactiveEq": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:121"
+  },
+  "justAudioExoplayer": "just_audio / ExoPlayer",
+  "@justAudioExoplayer": {
+    "description": "lib/features/settings/screens/uac2_preferences_screen.dart:758"
+  },
+  "khz": "{arg1}kHz",
+  "@khz": {
+    "description": "lib/widgets/uac2/uac2_player_status.dart:186",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "khzBit": "{arg1}kHz/{arg2}bit",
+  "@khzBit": {
+    "description": "lib/widgets/uac2/uac2_player_status.dart:77",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "khzBit2": "{arg1}kHz/{arg2}bit",
+  "@khzBit2": {
+    "description": "lib/widgets/uac2/uac2_status_indicator.dart:51",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Settings entry label and the title of the language picker."
+  },
+  "languageSectionDescription": "Choose the language used across the app.",
+  "@languageSectionDescription": {
+    "description": "Helper text under the language setting."
+  },
+  "languageSystemDefault": "System default",
+  "@languageSystemDefault": {
+    "description": "Language option that follows the device locale."
+  },
+  "lateNightSessions": "Late Night Sessions",
+  "@lateNightSessions": {
+    "description": "lib/models/song.dart:344"
+  },
+  "letSTakeAQuickTour": "Let's take a quick tour of your new music player.",
+  "@letSTakeAQuickTour": {
+    "description": "lib/providers/tutorial_provider.dart:8"
+  },
+  "line": "Line",
+  "@line": {
+    "description": "lib/models/progress_bar_style.dart:18"
+  },
+  "list": "List",
+  "@list": {
+    "description": "lib/models/song_view_mode.dart:19"
+  },
+  "loadingArtwork2": "Loading artwork…",
+  "@loadingArtwork2": {
+    "description": "lib/features/settings/screens/library_settings_screen.dart:961"
+  },
+  "@@locale": "en",
+  "lossless": " Lossless",
+  "@lossless": {
+    "description": "lib/widgets/common/detail_header.dart:157"
+  },
+  "losslessQualityPreservedDuringConversion": "Lossless quality preserved during conversion",
+  "@losslessQualityPreservedDuringConversion": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:158"
+  },
+  "lowPass": "Low Pass",
+  "@lowPass": {
+    "description": "lib/providers/equalizer_provider.dart:33"
+  },
+  "lowShelf": "Low Shelf",
+  "@lowShelf": {
+    "description": "lib/providers/equalizer_provider.dart:29"
+  },
+  "lyrics": "Lyrics",
+  "@lyrics": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:295"
+  },
+  "menu": "Menu",
+  "@menu": {
+    "description": "lib/models/nav_bar_config.dart:5"
+  },
+  "metropolitan": "Metropolitan",
+  "@metropolitan": {
+    "description": "lib/models/song.dart:335"
+  },
+  "mid": "Mid",
+  "@mid": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:1680"
+  },
+  "miniPlayer": "Mini Player",
+  "@miniPlayer": {
+    "description": "lib/providers/tutorial_provider.dart:38"
+  },
+  "moderate": "Moderate",
+  "@moderate": {
+    "description": "lib/models/album_color_mode.dart:24"
+  },
+  "mono": "Mono",
+  "@mono": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:621"
+  },
+  "monthly": "Monthly",
+  "@monthly": {
+    "description": "lib/data/repositories/recently_played_repository.dart:16"
+  },
+  "more": "More",
+  "@more": {
+    "description": "lib/features/settings/screens/logs_screen.dart:322"
+  },
+  "mute": "Mute",
+  "@mute": {
+    "description": "lib/widgets/uac2/iso_volume_popup.dart:260"
+  },
+  "nDb": "{arg1}%\n{arg2} dB",
+  "@nDb": {
+    "description": "lib/widgets/uac2/iso_volume_popup.dart:292",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "natureAmbient": "Nature Ambient",
+  "@natureAmbient": {
+    "description": "lib/models/song.dart:317"
+  },
+  "navigationBar": "Navigation Bar",
+  "@navigationBar": {
+    "description": "lib/providers/tutorial_provider.dart:11"
+  },
+  "neonNights": "Neon Nights",
+  "@neonNights": {
+    "description": "lib/models/song.dart:357"
+  },
+  "network": "Network",
+  "@network": {
+    "description": "lib/models/playback_context.dart:16"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "lib/features/onboarding/screens/onboarding_screen.dart:269"
+  },
+  "noUsbAudioDevicesFound": "No USB audio devices found",
+  "@noUsbAudioDevicesFound": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:289"
+  },
+  "none": "None",
+  "@none": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:3769"
+  },
+  "notAnAlacFile": "Not an ALAC file",
+  "@notAnAlacFile": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:112"
+  },
+  "notch": "Notch",
+  "@notch": {
+    "description": "lib/providers/equalizer_provider.dart:39"
+  },
+  "noticeableTintingFromAlbumArt": "Noticeable tinting from album art.",
+  "@noticeableTintingFromAlbumArt": {
+    "description": "lib/models/album_color_mode.dart:37"
+  },
+  "numberOnArt": "Number on Art",
+  "@numberOnArt": {
+    "description": "lib/models/song_tile_thumbnail_mode.dart:22"
+  },
+  "oceanWaves": "Ocean Waves",
+  "@oceanWaves": {
+    "description": "lib/models/song.dart:312"
+  },
+  "off": "Off",
+  "@off": {
+    "description": "lib/features/settings/screens/audio_settings_screen.dart:189"
+  },
+  "openManual": "Open Manual",
+  "@openManual": {
+    "description": "lib/features/onboarding/widgets/tutorial_overlay.dart:345"
+  },
+  "orbital": "Orbital",
+  "@orbital": {
+    "description": "lib/models/song_view_mode.dart:17"
+  },
+  "output": "Output",
+  "@output": {
+    "description": "lib/features/settings/screens/casting_settings_screen.dart:281"
+  },
+  "parametric": "Parametric",
+  "@parametric": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:4169"
+  },
+  "peaking": "Peaking",
+  "@peaking": {
+    "description": "lib/providers/equalizer_provider.dart:27"
+  },
+  "pinchApartNarrowerHigherQNpinch": "Pinch apart = narrower (higher Q)\nPinch together = wider (lower Q)",
+  "@pinchApartNarrowerHigherQNpinch": {
+    "description": "lib/widgets/equalizer/interactive_eq_graph.dart:158"
+  },
+  "play": "Play",
+  "@play": {
+    "description": "lib/widgets/common/detail_header.dart:273"
+  },
+  "playAFewTracksTodayTo": "Play a few tracks today to build your daily recap.",
+  "@playAFewTracksTodayTo": {
+    "description": "lib/data/repositories/recently_played_repository.dart:33"
+  },
+  "playCategoriesInRandomOrderTracks": "Play categories in random order, tracks in sequence",
+  "@playCategoriesInRandomOrderTracks": {
+    "description": "lib/models/shuffle_mode.dart:22"
+  },
+  "playInOrder": "Play in order",
+  "@playInOrder": {
+    "description": "lib/models/shuffle_mode.dart:19"
+  },
+  "playlist2": "Playlist",
+  "@playlist2": {
+    "description": "lib/models/playback_context.dart:14"
+  },
+  "playlists": "Playlists",
+  "@playlists": {
+    "description": "lib/features/menu/screens/menu_screen.dart:1446"
+  },
+  "preloadingAudio3": "Preloading audio",
+  "@preloadingAudio3": {
+    "description": "lib/widgets/common/floating_scan_progress.dart:379"
+  },
+  "presence": "Presence",
+  "@presence": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:1890"
+  },
+  "preview": "Preview",
+  "@preview": {
+    "description": "lib/features/settings/screens/audio_settings_screen.dart:686"
+  },
+  "prewarming": "Prewarming",
+  "@prewarming": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:905"
+  },
+  "queue": "Queue",
+  "@queue": {
+    "description": "lib/features/menu/screens/menu_screen.dart:1081"
+  },
+  "random": "Random",
+  "@random": {
+    "description": "lib/models/advance_list_order.dart:9"
+  },
+  "rating": "Rating",
+  "@rating": {
+    "description": "lib/features/manual/data/manual_data.dart:236"
+  },
+  "reconnectAttempts": "Reconnect Attempts",
+  "@reconnectAttempts": {
+    "description": "lib/widgets/uac2/uac2_connection_manager.dart:160"
+  },
+  "reconnectNow": "Reconnect Now",
+  "@reconnectNow": {
+    "description": "lib/widgets/uac2/uac2_connection_manager.dart:205"
+  },
+  "reconnectionFailed": "Reconnection failed",
+  "@reconnectionFailed": {
+    "description": "lib/widgets/uac2/uac2_connection_manager.dart:72"
+  },
+  "reconnectionSuccessful": "Reconnection successful",
+  "@reconnectionSuccessful": {
+    "description": "lib/widgets/uac2/uac2_connection_manager.dart:72"
+  },
+  "refreshDevices2": "Refresh devices",
+  "@refreshDevices2": {
+    "description": "lib/widgets/uac2/uac2_device_selector.dart:179"
+  },
+  "removeFromFavorites2": "Remove from favorites",
+  "@removeFromFavorites2": {
+    "description": "lib/widgets/common/detail_header.dart:257"
+  },
+  "reorderFilterAndShuffleFromThis": "Reorder, filter, and shuffle from this header.",
+  "@reorderFilterAndShuffleFromThis": {
+    "description": "lib/providers/tutorial_provider.dart:28"
+  },
+  "resonance": "Resonance",
+  "@resonance": {
+    "description": "lib/providers/equalizer_provider.dart:70"
+  },
+  "restart": "Restart",
+  "@restart": {
+    "description": "lib/widgets/common/engine_restart_notice.dart:88"
+  },
+  "restartRequired": "Restart required",
+  "@restartRequired": {
+    "description": "lib/widgets/common/engine_restart_notice.dart:46"
+  },
+  "retroFuture": "Retro Future",
+  "@retroFuture": {
+    "description": "lib/models/song.dart:358"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "lib/features/songs/screens/songs_screen.dart:1838"
+  },
+  "root": "Root",
+  "@root": {
+    "description": "lib/services/sources/upnp_service.dart:239"
+  },
+  "roundedAlbumArtCardWithA": "Rounded album art card with a blurred album-art background.",
+  "@roundedAlbumArtCardWithA": {
+    "description": "lib/models/player_screen_mode.dart:28"
+  },
+  "rustViaOboe": "Rust via Oboe",
+  "@rustViaOboe": {
+    "description": "lib/features/settings/screens/uac2_preferences_screen.dart:794"
+  },
+  "rustViaOboeHighRes": "Rust via Oboe (high-res)",
+  "@rustViaOboeHighRes": {
+    "description": "lib/models/audio_engine_type.dart:39"
+  },
+  "sAgo": "{arg1}s ago",
+  "@sAgo": {
+    "description": "lib/widgets/uac2/uac2_hotplug_monitor.dart:103",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "sampleRate2": "Sample Rate",
+  "@sampleRate2": {
+    "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1319"
+  },
+  "sampleRates": "Sample Rates",
+  "@sampleRates": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:560"
+  },
+  "samples": "Samples",
+  "@samples": {
+    "description": "lib/widgets/alac_conversion_indicator.dart:144"
+  },
+  "scanProgress": "Scan progress",
+  "@scanProgress": {
+    "description": "lib/widgets/common/floating_scan_progress.dart:489"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "lib/providers/tutorial_provider.dart:21"
+  },
+  "searchAcrossSongsArtistsAndAlbums": "Search across songs, artists, and albums instantly.",
+  "@searchAcrossSongsArtistsAndAlbums": {
+    "description": "lib/providers/tutorial_provider.dart:22"
+  },
+  "secondsOfInactivityBeforeCollapsing": "Seconds of inactivity before collapsing",
+  "@secondsOfInactivityBeforeCollapsing": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:93"
+  },
+  "selectDevice": "Select Device",
+  "@selectDevice": {
+    "description": "lib/widgets/uac2/uac2_device_selector.dart:58"
+  },
+  "separateFromNavBar": "Separate from Nav Bar",
+  "@separateFromNavBar": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:60"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:166"
+  },
+  "shadowJazz": "Shadow Jazz",
+  "@shadowJazz": {
+    "description": "lib/models/song.dart:340"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:676"
+  },
+  "showAlbumArtwork": "Show album artwork.",
+  "@showAlbumArtwork": {
+    "description": "lib/models/song_tile_thumbnail_mode.dart:29"
+  },
+  "showLabels": "Show Labels",
+  "@showLabels": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:306"
+  },
+  "showMore": "Show more",
+  "@showMore": {
+    "description": "lib/features/songs/screens/songs_screen.dart:3180"
+  },
+  "showTheMiniPlayerAsIts": "Show the mini player as its own bar above the buttons",
+  "@showTheMiniPlayerAsIts": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:61"
+  },
+  "showTheNumberOverBlurredArt": "Show the number over blurred art.",
+  "@showTheNumberOverBlurredArt": {
+    "description": "lib/models/song_tile_thumbnail_mode.dart:33"
+  },
+  "showTheTabInTheBottom": "Show the {arg1} tab in the bottom bar",
+  "@showTheTabInTheBottom": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:165",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "showTheTrackNumber": "Show the track number.",
+  "@showTheTrackNumber": {
+    "description": "lib/models/song_tile_thumbnail_mode.dart:31"
+  },
+  "showsWhatSPlayingTapTo": "Shows what's playing. Tap to open the full player.",
+  "@showsWhatSPlayingTapTo": {
+    "description": "lib/providers/tutorial_provider.dart:39"
+  },
+  "shuffle": "Shuffle",
+  "@shuffle": {
+    "description": "lib/widgets/common/detail_header.dart:267"
+  },
+  "shuffleSongsAndJumpBetweenCategories": "Shuffle songs and jump between categories",
+  "@shuffleSongsAndJumpBetweenCategories": {
+    "description": "lib/models/shuffle_mode.dart:21"
+  },
+  "shuffleSongsInCurrentList": "Shuffle songs in current list",
+  "@shuffleSongsInCurrentList": {
+    "description": "lib/models/shuffle_mode.dart:20"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "lib/features/onboarding/screens/onboarding_screen.dart:167"
+  },
+  "sleepTimer2": "Sleep Timer",
+  "@sleepTimer2": {
+    "description": "lib/features/player/widgets/sleep_timer_bottom_sheet.dart:55"
+  },
+  "slope": "Slope",
+  "@slope": {
+    "description": "lib/providers/equalizer_provider.dart:64"
+  },
+  "someOnlineFeaturesMayNotWork": "  ·  Some online features may not work",
+  "@someOnlineFeaturesMayNotWork": {
+    "description": "lib/widgets/common/offline_notice.dart:185"
+  },
+  "songGestures": "Song Gestures",
+  "@songGestures": {
+    "description": "lib/providers/tutorial_provider.dart:33"
+  },
+  "songs14": "Songs",
+  "@songs14": {
+    "description": "lib/features/manual/data/manual_data.dart:29"
+  },
+  "songsCategories": "Songs & Categories",
+  "@songsCategories": {
+    "description": "lib/models/shuffle_mode.dart:13"
+  },
+  "songsTab": "Songs Tab",
+  "@songsTab": {
+    "description": "lib/providers/tutorial_provider.dart:16"
+  },
+  "sortFilter": "Sort & Filter",
+  "@sortFilter": {
+    "description": "lib/providers/tutorial_provider.dart:27"
+  },
+  "spaceOdyssey": "Space Odyssey",
+  "@spaceOdyssey": {
+    "description": "lib/models/song.dart:326"
+  },
+  "starlightSerenade": "Starlight Serenade",
+  "@starlightSerenade": {
+    "description": "lib/models/song.dart:321"
+  },
+  "startStreaming": "Start Streaming",
+  "@startStreaming": {
+    "description": "lib/widgets/uac2/uac2_stream_config.dart:207"
+  },
+  "state": "State",
+  "@state": {
+    "description": "lib/widgets/uac2/uac2_connection_manager.dart:152"
+  },
+  "status": "Status",
+  "@status": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:87"
+  },
+  "stereo": "Stereo",
+  "@stereo": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:621"
+  },
+  "stop": "Stop",
+  "@stop": {
+    "description": "lib/features/settings/screens/library_settings_screen.dart:1399"
+  },
+  "stopStreaming": "Stop Streaming",
+  "@stopStreaming": {
+    "description": "lib/widgets/uac2/uac2_stream_config.dart:207"
+  },
+  "stormChasers": "Storm Chasers",
+  "@stormChasers": {
+    "description": "lib/models/song.dart:376"
+  },
+  "streamConfigurationNotAvailable": "Stream configuration not available",
+  "@streamConfigurationNotAvailable": {
+    "description": "lib/widgets/uac2/uac2_stream_config.dart:57"
+  },
+  "streaming": "Streaming",
+  "@streaming": {
+    "description": "lib/features/settings/screens/uac2_settings_screen.dart:907"
+  },
+  "sub": "Sub",
+  "@sub": {
+    "description": "lib/features/settings/screens/equalizer_screen.dart:1887"
+  },
+  "subtle": "Subtle",
+  "@subtle": {
+    "description": "lib/models/album_color_mode.dart:22"
+  },
+  "swipeLeftRightToSkipTracks": "Swipe left/right to skip tracks",
+  "@swipeLeftRightToSkipTracks": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:49"
+  },
+  "swipeToShowOrHideThe": "Swipe to show or hide the visualizer",
+  "@swipeToShowOrHideThe": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:37"
+  },
+  "switchSongs": "Switch Songs",
+  "@switchSongs": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:48"
+  },
+  "synthwaveCity": "Synthwave City",
+  "@synthwaveCity": {
+    "description": "lib/models/song.dart:308"
+  },
+  "tagsWereWrittenButCouldNot": "Tags were written but could not be confirmed by re-reading the file. A library rescan will reconcile any difference.",
+  "@tagsWereWrittenButCouldNot": {
+    "description": "lib/services/metadata_editor_service.dart:131"
+  },
+  "tapIconsToSwitchTabsLong": "Tap icons to switch tabs. Long-press to customize the bar.",
+  "@tapIconsToSwitchTabsLong": {
+    "description": "lib/providers/tutorial_provider.dart:12"
+  },
+  "tapTheMiniPlayerForWaveform": "Tap the mini player for waveform seekbar, EQ, lyrics, and visualizer.",
+  "@tapTheMiniPlayerForWaveform": {
+    "description": "lib/providers/tutorial_provider.dart:50"
+  },
+  "tapToPlayLongPressFor": "Tap to play, long-press for options (queue, play next, info).",
+  "@tapToPlayLongPressFor": {
+    "description": "lib/providers/tutorial_provider.dart:34"
+  },
+  "thatSTheTour": "That's the tour!",
+  "@thatSTheTour": {
+    "description": "lib/providers/tutorial_provider.dart:53"
+  },
+  "thisMonthSRecap": "This Month's Recap",
+  "@thisMonthSRecap": {
+    "description": "lib/data/repositories/recently_played_repository.dart:25"
+  },
+  "thisSongHasNoFilePath": "This song has no file path and cannot be edited.",
+  "@thisSongHasNoFilePath": {
+    "description": "lib/services/metadata_editor_service.dart:61"
+  },
+  "thisWeekSRecap": "This Week's Recap",
+  "@thisWeekSRecap": {
+    "description": "lib/data/repositories/recently_played_repository.dart:24"
+  },
+  "thisYearSRecap": "This Year's Recap",
+  "@thisYearSRecap": {
+    "description": "lib/data/repositories/recently_played_repository.dart:26"
+  },
+  "thunderRoad": "Thunder Road",
+  "@thunderRoad": {
+    "description": "lib/models/song.dart:375"
+  },
+  "todaySRecap": "Today's Recap",
+  "@todaySRecap": {
+    "description": "lib/data/repositories/recently_played_repository.dart:23"
+  },
+  "trackNumber": "Track Number",
+  "@trackNumber": {
+    "description": "lib/models/song_tile_thumbnail_mode.dart:20"
+  },
+  "trueRandomMayRepeatBeforeList": "True random (may repeat before list ends)",
+  "@trueRandomMayRepeatBeforeList": {
+    "description": "lib/models/shuffle_mode.dart:23"
+  },
+  "uac2NotAvailableOnThisPlatform": "UAC2 not available on this platform",
+  "@uac2NotAvailableOnThisPlatform": {
+    "description": "lib/widgets/uac2/uac2_device_selector.dart:20"
+  },
+  "unableToCheckForUpdatesRight": "Unable to check for updates right now.",
+  "@unableToCheckForUpdatesRight": {
+    "description": "lib/providers/update_check_provider.dart:177"
+  },
+  "undo": "Undo",
+  "@undo": {
+    "description": "lib/features/favorites/screens/favorites_screen.dart:63"
+  },
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "lib/features/albums/screens/album_detail_screen.dart:950"
+  },
+  "unknownAlbum": "Unknown Album",
+  "@unknownAlbum": {
+    "description": "lib/data/repositories/recently_played_repository.dart:588"
+  },
+  "unknownArtist": "Unknown Artist",
+  "@unknownArtist": {
+    "description": "lib/data/repositories/recently_played_repository.dart:578"
+  },
+  "unknownTitle": "Unknown Title",
+  "@unknownTitle": {
+    "description": "lib/services/playlist_service.dart:688"
+  },
+  "unmute": "Unmute",
+  "@unmute": {
+    "description": "lib/widgets/uac2/iso_volume_popup.dart:260"
+  },
+  "urbanEchoes": "Urban Echoes",
+  "@urbanEchoes": {
+    "description": "lib/models/song.dart:330"
+  },
+  "usbAudioDevice": "USB Audio Device",
+  "@usbAudioDevice": {
+    "description": "lib/widgets/uac2/uac2_device_selector.dart:36"
+  },
+  "usbAudioError": "USB Audio Error",
+  "@usbAudioError": {
+    "description": "lib/widgets/uac2/uac2_error_notification.dart:55"
+  },
+  "usbRouteVolume": "USB Route Volume",
+  "@usbRouteVolume": {
+    "description": "lib/widgets/uac2/uac2_volume_control.dart:162"
+  },
+  "usbVolume": "USB Volume",
+  "@usbVolume": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:726"
+  },
+  "useTheDefaultMonochromeTheme": "Use the default monochrome theme.",
+  "@useTheDefaultMonochromeTheme": {
+    "description": "lib/models/album_color_mode.dart:33"
+  },
+  "variousArtists2": "Various Artists",
+  "@variousArtists2": {
+    "description": "lib/data/repositories/song_repository.dart:637"
+  },
+  "velvetNoir": "Velvet Noir",
+  "@velvetNoir": {
+    "description": "lib/models/song.dart:339"
+  },
+  "verticalBarsThatAnimateAcrossThe": "Vertical bars that animate across the screen.",
+  "@verticalBarsThatAnimateAcrossThe": {
+    "description": "lib/models/progress_bar_style.dart:25"
+  },
+  "vibrant": "Vibrant",
+  "@vibrant": {
+    "description": "lib/models/album_color_mode.dart:26"
+  },
+  "visualizer": "Visualizer",
+  "@visualizer": {
+    "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:36"
+  },
+  "volume": "Volume",
+  "@volume": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:646"
+  },
+  "volumeIsFixedWhileBitPerfect2": "Volume is fixed while bit-perfect passthrough is active: the stream is sent untouched and this DAC has no hardware volume control.",
+  "@volumeIsFixedWhileBitPerfect2": {
+    "description": "lib/widgets/uac2/uac2_volume_control.dart:236"
+  },
+  "wantEveryControlDocumentedOpenThe": "Want every control documented? Open the in-app Manual anytime from Settings → Help & Manual.",
+  "@wantEveryControlDocumentedOpenThe": {
+    "description": "lib/providers/tutorial_provider.dart:55"
+  },
+  "waveform": "Waveform",
+  "@waveform": {
+    "description": "lib/models/progress_bar_style.dart:16"
+  },
+  "weekly": "Weekly",
+  "@weekly": {
+    "description": "lib/data/repositories/recently_played_repository.dart:15"
+  },
+  "welcomeToFlick2": "Welcome to Flick",
+  "@welcomeToFlick2": {
+    "description": "lib/providers/tutorial_provider.dart:7"
+  },
+  "whisperWorld": "Whisper World",
+  "@whisperWorld": {
+    "description": "lib/models/song.dart:371"
+  },
+  "whisperedSecrets": "Whispered Secrets",
+  "@whisperedSecrets": {
+    "description": "lib/models/song.dart:366"
+  },
+  "wildWeather": "Wild Weather",
+  "@wildWeather": {
+    "description": "lib/models/song.dart:380"
+  },
+  "yearly": "Yearly",
+  "@yearly": {
+    "description": "lib/data/repositories/recently_played_repository.dart:17"
+  },
+  "youReOffline": "You're offline",
+  "@youReOffline": {
+    "description": "lib/widgets/common/offline_notice.dart:180"
+  },
+  "youReOfflineSomeOnlineFeatures": "You're offline. Some online features may not work.",
+  "@youReOfflineSomeOnlineFeatures": {
+    "description": "lib/widgets/common/offline_notice.dart:136"
+  },
+  "yourMonthlyRecapNeedsABit": "Your monthly recap needs a bit more listening time this month.",
+  "@yourMonthlyRecapNeedsABit": {
+    "description": "lib/data/repositories/recently_played_repository.dart:37"
+  },
+  "yourNewAudioEngineIsReady": "Your new audio engine is ready. Restart Flick to apply it.",
+  "@yourNewAudioEngineIsReady": {
+    "description": "lib/widgets/common/engine_restart_notice.dart:54"
+  },
+  "yourWeeklyRecapAppearsOnceYou": "Your weekly recap appears once you start listening this week.",
+  "@yourWeeklyRecapAppearsOnceYou": {
+    "description": "lib/data/repositories/recently_played_repository.dart:35"
+  },
+  "yourWholeLibraryLivesHereTap": "Your whole library lives here. Tap any song to play it.",
+  "@yourWholeLibraryLivesHereTap": {
+    "description": "lib/providers/tutorial_provider.dart:17"
+  },
+  "yourYearlyRecapFillsInAs": "Your yearly recap fills in as you keep listening throughout the year.",
+  "@yourYearlyRecapFillsInAs": {
+    "description": "lib/data/repositories/recently_played_repository.dart:39"
   }
 }

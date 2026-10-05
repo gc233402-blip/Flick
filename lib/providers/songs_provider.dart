@@ -7,6 +7,7 @@ import '../core/utils/string_sort_utils.dart';
 import '../core/utils/uri_display_utils.dart';
 import '../models/song.dart';
 import '../data/repositories/song_repository.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Provider for the SongRepository.
 final songRepositoryProvider = Provider<SongRepository>((ref) {
@@ -113,7 +114,7 @@ extension SongFileTypeFilterExtension on SongFileTypeFilter {
   String get displayName {
     switch (this) {
       case SongFileTypeFilter.all:
-        return 'All Formats';
+        return l10n.allFormats;
       case SongFileTypeFilter.flac:
         return 'FLAC';
       case SongFileTypeFilter.mp3:
@@ -285,10 +286,10 @@ class SongsState {
         result.sort((a, b) {
           final albumA = a.album?.trim().isNotEmpty == true
               ? a.album!.trim()
-              : 'Unknown Album';
+              : l10n.unknownAlbum;
           final albumB = b.album?.trim().isNotEmpty == true
               ? b.album!.trim()
-              : 'Unknown Album';
+              : l10n.unknownAlbum;
           final albumCompare = compareCaseInsensitive(albumA, albumB);
           if (albumCompare != 0) return albumCompare;
 
@@ -373,7 +374,7 @@ class SongsState {
     for (final song in result) {
       final albumName = song.album?.trim().isNotEmpty == true
           ? song.album!.trim()
-          : 'Unknown Album';
+          : l10n.unknownAlbum;
       final albumArtist = SongRepository.albumArtistForSong(song);
       final key = albumName;
 
@@ -417,7 +418,7 @@ class SongsState {
 
       return AlbumGroup(
         key: entry.key,
-        albumName: albumNames[entry.key] ?? 'Unknown Album',
+        albumName: albumNames[entry.key] ?? l10n.unknownAlbum,
         albumArtist: SongRepository.resolveGroupArtist(
           albumArtistsByKey[entry.key] ?? const {},
         ),

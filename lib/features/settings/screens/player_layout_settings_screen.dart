@@ -12,6 +12,7 @@ import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 
+import 'package:flick/l10n/l10n.dart';
 String _placementLabel(double value) {
   if (value == 0) return 'Center';
   return value < 0 ? '${value.abs().round()} up' : '${value.round()} down';

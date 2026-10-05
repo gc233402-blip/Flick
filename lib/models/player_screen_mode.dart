@@ -11,24 +11,6 @@ extension PlayerScreenModeX on PlayerScreenMode {
     }
   }
 
-  String get label {
-    switch (this) {
-      case PlayerScreenMode.immersive:
-        return 'Immersive';
-      case PlayerScreenMode.artworkCard:
-        return 'Artwork Card';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case PlayerScreenMode.immersive:
-        return 'Full-bleed album art with the current cinematic look.';
-      case PlayerScreenMode.artworkCard:
-        return 'Rounded album art card with a blurred album-art background.';
-    }
-  }
-
   static PlayerScreenMode fromStorageValue(String? value) {
     switch (value) {
       case 'artwork_card':

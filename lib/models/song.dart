@@ -1,3 +1,5 @@
+import 'package:flick/l10n/l10n.dart';
+
 /// Song data model for Flick Player.
 class Song {
   /// Unique identifier for the song
@@ -298,86 +300,86 @@ class Song {
       resolution: '24-bit/96kHz',
       album: 'Nocturnal',
     ),
-    const Song(
+    Song(
       id: '2',
       title: 'Electric Sunset',
       artist: 'Neon Pulse',
       duration: Duration(minutes: 3, seconds: 45),
       fileType: 'MP3',
       resolution: '320kbps',
-      album: 'Synthwave City',
+      album: l10n.synthwaveCity,
     ),
-    const Song(
+    Song(
       id: '3',
-      title: 'Ocean Waves',
-      artist: 'Calm Frequencies',
+      title: l10n.oceanWaves,
+      artist: l10n.calmFrequencies,
       duration: Duration(minutes: 5, seconds: 18),
       fileType: 'FLAC',
       resolution: '16-bit/44.1kHz',
-      album: 'Nature Ambient',
+      album: l10n.natureAmbient,
     ),
-    const Song(
+    Song(
       id: '4',
-      title: 'Starlight Serenade',
-      artist: 'Cosmic Orchestra',
+      title: l10n.starlightSerenade,
+      artist: l10n.cosmicOrchestra,
       duration: Duration(minutes: 6, seconds: 02),
       fileType: 'WAV',
       resolution: '32-bit/192kHz',
-      album: 'Space Odyssey',
+      album: l10n.spaceOdyssey,
     ),
-    const Song(
+    Song(
       id: '5',
-      title: 'Urban Echoes',
-      artist: 'City Beats',
+      title: l10n.urbanEchoes,
+      artist: l10n.cityBeats,
       duration: Duration(minutes: 3, seconds: 21),
       fileType: 'AAC',
       resolution: '256kbps',
-      album: 'Metropolitan',
+      album: l10n.metropolitan,
     ),
-    const Song(
+    Song(
       id: '6',
-      title: 'Velvet Noir',
-      artist: 'Shadow Jazz',
+      title: l10n.velvetNoir,
+      artist: l10n.shadowJazz,
       duration: Duration(minutes: 4, seconds: 55),
       fileType: 'FLAC',
       resolution: '24-bit/48kHz',
-      album: 'Late Night Sessions',
+      album: l10n.lateNightSessions,
     ),
-    const Song(
+    Song(
       id: '7',
-      title: 'Crystal Caverns',
-      artist: 'Ethereal Tones',
+      title: l10n.crystalCaverns,
+      artist: l10n.etherealTones,
       duration: Duration(minutes: 7, seconds: 12),
       fileType: 'FLAC',
       resolution: '24-bit/96kHz',
-      album: 'Deep Earth',
+      album: l10n.deepEarth,
     ),
-    const Song(
+    Song(
       id: '8',
-      title: 'Neon Nights',
-      artist: 'Retro Future',
+      title: l10n.neonNights,
+      artist: l10n.retroFuture,
       duration: Duration(minutes: 4, seconds: 08),
       fileType: 'MP3',
       resolution: '320kbps',
       album: '1984',
     ),
-    const Song(
+    Song(
       id: '9',
-      title: 'Whispered Secrets',
-      artist: 'ASMR Dreams',
+      title: l10n.whisperedSecrets,
+      artist: l10n.asmrDreams,
       duration: Duration(minutes: 8, seconds: 45),
       fileType: 'WAV',
       resolution: '24-bit/48kHz',
-      album: 'Whisper World',
+      album: l10n.whisperWorld,
     ),
-    const Song(
+    Song(
       id: '10',
-      title: 'Thunder Road',
-      artist: 'Storm Chasers',
+      title: l10n.thunderRoad,
+      artist: l10n.stormChasers,
       duration: Duration(minutes: 5, seconds: 33),
       fileType: 'FLAC',
       resolution: '16-bit/44.1kHz',
-      album: 'Wild Weather',
+      album: l10n.wildWeather,
     ),
   ];
 }

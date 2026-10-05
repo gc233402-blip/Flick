@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flick/data/repositories/song_repository.dart';
 import 'package:flick/models/song.dart';
 import 'package:flick/src/rust/api/metadata_editor.dart' as rust_metadata;
+import 'package:flick/l10n/l10n.dart';
 
 /// Outcome of a metadata write attempt.
 enum MetadataWriteOutcome {
@@ -56,21 +57,21 @@ class MetadataEditorService {
     rust_metadata.TagEditFields fields,
   ) async {
     if (song.filePath == null) {
-      return const MetadataWriteResult(
+      return MetadataWriteResult(
         MetadataWriteOutcome.failed,
-        message: 'This song has no file path and cannot be edited.',
+        message: l10n.thisSongHasNoFilePath,
       );
     }
     if (song.startOffsetMs != null) {
-      return const MetadataWriteResult(
+      return MetadataWriteResult(
         MetadataWriteOutcome.failed,
-        message: 'CUE sheet tracks cannot be edited.',
+        message: l10n.cueSheetTracksCannotBeEdited,
       );
     }
     if (song.isExternal) {
-      return const MetadataWriteResult(
+      return MetadataWriteResult(
         MetadataWriteOutcome.failed,
-        message: 'External songs cannot be edited.',
+        message: l10n.externalSongsCannotBeEdited,
       );
     }
 
@@ -97,7 +98,7 @@ class MetadataEditorService {
     } catch (e) {
       return MetadataWriteResult(
         MetadataWriteOutcome.failed,
-        message: 'Failed to save metadata: $e',
+        message: l10n.failedToSaveMetadata(e),
       );
     }
   }
@@ -126,11 +127,9 @@ class MetadataEditorService {
 
     return verified
         ? const MetadataWriteResult(MetadataWriteOutcome.verified)
-        : const MetadataWriteResult(
+        : MetadataWriteResult(
             MetadataWriteOutcome.unverified,
-            message: 'Tags were written but could not be confirmed by '
-                're-reading the file. A library rescan will reconcile '
-                'any difference.',
+            message: l10n.tagsWereWrittenButCouldNot,
           );
   }
 
@@ -179,10 +178,9 @@ class MetadataEditorService {
     } catch (_) {}
 
     if (!copied) {
-      return const MetadataWriteResult(
+      return MetadataWriteResult(
         MetadataWriteOutcome.failed,
-        message: 'Android blocked writing to this file. Remove and re-add the '
-            'folder in Settings to grant edit access, then try again.',
+        message: l10n.androidBlockedWritingToThisFile,
       );
     }
 

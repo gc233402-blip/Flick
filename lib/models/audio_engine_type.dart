@@ -32,10 +32,4 @@ enum AudioEngineType {
     AudioEngineType.dapInternalHighRes => 'DAP_INTERNAL_HIGH_RES',
   };
 
-  String get userFacingLabel => switch (this) {
-    AudioEngineType.normalAndroid => 'just_audio / ExoPlayer',
-    AudioEngineType.rustOboe => 'Rust via Oboe',
-    AudioEngineType.usbDacExperimental => 'Bit-perfect (USB DAC)',
-    AudioEngineType.dapInternalHighRes => 'Rust via Oboe (high-res)',
-  };
 }

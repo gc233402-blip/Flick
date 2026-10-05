@@ -7,6 +7,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/src/rust/api/uac2_api.dart' as rust_uac2;
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2FallbackManager extends ConsumerStatefulWidget {
   const Uac2FallbackManager({super.key});
@@ -57,8 +58,8 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
         SnackBar(
           content: Text(
             success
-                ? 'Fallback audio activated'
-                : 'Failed to activate fallback',
+                ? l10n.fallbackAudioActivated
+                : l10n.failedToActivateFallback,
           ),
           backgroundColor: success ? Colors.green : Colors.red,
         ),
@@ -77,8 +78,8 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
         SnackBar(
           content: Text(
             success
-                ? 'Fallback audio deactivated'
-                : 'Failed to deactivate fallback',
+                ? l10n.fallbackAudioDeactivated
+                : l10n.failedToDeactivateFallback,
           ),
           backgroundColor: success ? Colors.green : Colors.red,
         ),
@@ -133,7 +134,7 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
               ),
               const SizedBox(width: AppConstants.spacingSm),
               Text(
-                'Fallback Audio',
+                l10n.fallbackAudio,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: context.adaptiveTextPrimary,
                       fontWeight: FontWeight.w600,
@@ -144,8 +145,8 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
           const SizedBox(height: AppConstants.spacingMd),
           _buildInfoRow(
             context,
-            'Status',
-            _fallbackInfo!.hasActiveFallback ? 'Active' : 'Inactive',
+            l10n.status,
+            _fallbackInfo!.hasActiveFallback ? l10n.active : l10n.inactive,
             LucideIcons.activity,
             valueColor: _fallbackInfo!.hasActiveFallback
                 ? Colors.green.shade400
@@ -155,7 +156,7 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
             const Divider(height: 1, color: AppColors.glassBorder),
             _buildInfoRow(
               context,
-              'Output',
+              l10n.output,
               _fallbackInfo!.fallbackName!,
               LucideIcons.speaker,
             ),
@@ -175,8 +176,8 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
               ),
               label: Text(
                 _fallbackInfo!.hasActiveFallback
-                    ? 'Deactivate Fallback'
-                    : 'Activate Fallback',
+                    ? l10n.deactivateFallback
+                    : l10n.activateFallback,
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _fallbackInfo!.hasActiveFallback
@@ -194,7 +195,7 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
           if (!_fallbackInfo!.hasActiveFallback) ...[
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              'Fallback audio will be used if UAC2 device fails',
+              l10n.fallbackAudioWillBeUsedIf,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),

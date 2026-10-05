@@ -9,6 +9,7 @@ import 'package:flick/models/playlist.dart';
 import 'package:flick/models/song.dart';
 import 'package:flick/core/utils/dev_log.dart';
 import 'package:flick/services/sources/subsonic_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class PlaylistImportResult {
   final Playlist playlist;
@@ -683,9 +684,9 @@ class PlaylistService {
     for (final song in songs) {
       final seconds = song.duration.inSeconds;
       final artist = song.artist.trim().isEmpty
-          ? 'Unknown Artist'
+          ? l10n.unknownArtist
           : song.artist;
-      final title = song.title.trim().isEmpty ? 'Unknown Title' : song.title;
+      final title = song.title.trim().isEmpty ? l10n.unknownTitle : song.title;
 
       buffer.writeln('#EXTINF:$seconds,$artist - $title');
       buffer.writeln(song.filePath);

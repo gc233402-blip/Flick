@@ -5,38 +5,39 @@ import '../../core/utils/string_sort_utils.dart';
 import '../database.dart';
 import '../../models/song.dart';
 import 'song_repository.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum ListeningRecapPeriod { daily, weekly, monthly, yearly }
 
 extension ListeningRecapPeriodX on ListeningRecapPeriod {
   String get label {
     return switch (this) {
-      ListeningRecapPeriod.daily => 'Daily',
-      ListeningRecapPeriod.weekly => 'Weekly',
-      ListeningRecapPeriod.monthly => 'Monthly',
-      ListeningRecapPeriod.yearly => 'Yearly',
+      ListeningRecapPeriod.daily => l10n.daily,
+      ListeningRecapPeriod.weekly => l10n.weekly,
+      ListeningRecapPeriod.monthly => l10n.monthly,
+      ListeningRecapPeriod.yearly => l10n.yearly,
     };
   }
 
   String get title {
     return switch (this) {
-      ListeningRecapPeriod.daily => 'Today\'s Recap',
-      ListeningRecapPeriod.weekly => 'This Week\'s Recap',
-      ListeningRecapPeriod.monthly => 'This Month\'s Recap',
-      ListeningRecapPeriod.yearly => 'This Year\'s Recap',
+      ListeningRecapPeriod.daily => l10n.todaySRecap,
+      ListeningRecapPeriod.weekly => l10n.thisWeekSRecap,
+      ListeningRecapPeriod.monthly => l10n.thisMonthSRecap,
+      ListeningRecapPeriod.yearly => l10n.thisYearSRecap,
     };
   }
 
   String get emptyMessage {
     return switch (this) {
       ListeningRecapPeriod.daily =>
-        'Play a few tracks today to build your daily recap.',
+        l10n.playAFewTracksTodayTo,
       ListeningRecapPeriod.weekly =>
-        'Your weekly recap appears once you start listening this week.',
+        l10n.yourWeeklyRecapAppearsOnceYou,
       ListeningRecapPeriod.monthly =>
-        'Your monthly recap needs a bit more listening time this month.',
+        l10n.yourMonthlyRecapNeedsABit,
       ListeningRecapPeriod.yearly =>
-        'Your yearly recap fills in as you keep listening throughout the year.',
+        l10n.yourYearlyRecapFillsInAs,
     };
   }
 
@@ -575,7 +576,7 @@ class RecentlyPlayedRepository {
       songAccumulator.addPlay(entry.playedAt);
 
       final artistKey = song.artist.trim().isEmpty
-          ? 'Unknown Artist'
+          ? l10n.unknownArtist
           : song.artist.trim();
       final artistAccumulator = artistStats.putIfAbsent(
         artistKey,
@@ -585,7 +586,7 @@ class RecentlyPlayedRepository {
 
       final albumName = (song.album?.trim().isNotEmpty ?? false)
           ? song.album!.trim()
-          : 'Unknown Album';
+          : l10n.unknownAlbum;
       final albumArtist = (song.albumArtist?.trim().isNotEmpty ?? false)
           ? song.albumArtist!.trim()
           : artistKey;
