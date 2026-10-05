@@ -12,12 +12,13 @@ class NavBarConfigNotifier extends Notifier<NavBarConfig> {
   static const _showLabelsKey = 'nav_bar_show_labels';
 
   bool _initialized = false;
+  late Future<void> _ready;
 
   @override
   NavBarConfig build() {
     if (!_initialized) {
       _initialized = true;
-      Future<void>.microtask(_load);
+      _ready = Future<void>.microtask(_load);
     }
     return NavBarConfig.defaultConfig;
   }
@@ -144,6 +145,13 @@ class NavBarConfigNotifier extends Notifier<NavBarConfig> {
   Future<void> setShowLabels(bool value) async {
     if (state.showLabels == value) return;
     state = state.copyWith(showLabels: value);
+    await _persist();
+  }
+
+  Future<void> reset() async {
+    await _ready;
+    if (!ref.mounted) return;
+    state = NavBarConfig.defaultConfig;
     await _persist();
   }
 

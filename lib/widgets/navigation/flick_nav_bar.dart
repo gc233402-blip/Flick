@@ -5,6 +5,7 @@ import 'package:flick/core/utils/app_haptics.dart';
 import 'package:flick/core/utils/responsive.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/models/nav_bar_config.dart';
+import 'package:flick/widgets/navigation/bottom_bar_geometry.dart';
 
 class FlickNavBar extends StatefulWidget {
   final int currentIndex;
@@ -37,12 +38,17 @@ class _FlickNavBarState extends State<FlickNavBar> {
   Widget build(BuildContext context) {
     final buttons = widget.config.orderedButtons;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final horizontalPadding = context.scaleSize(AppConstants.spacingLg);
+    final horizontalPadding = BottomBarGeometry.navigationInset(context);
     final verticalPadding = context.scaleSize(AppConstants.spacingSm);
 
     final borderRadius = BorderRadius.circular(context.scaleSize(20));
 
-    return Column(
+    return Padding(
+      padding: EdgeInsets.only(
+        left: MediaQuery.paddingOf(context).left,
+        right: MediaQuery.paddingOf(context).right,
+      ),
+      child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.separateMiniPlayer &&
@@ -124,6 +130,7 @@ class _FlickNavBarState extends State<FlickNavBar> {
           ),
         ),
       ],
+      ),
     );
   }
 
