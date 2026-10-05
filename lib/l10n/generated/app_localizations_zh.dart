@@ -959,6 +959,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get visualizer => '可视化';
 
   @override
+  String get visualizerColors => '颜色';
+
+  @override
+  String get visualizerAlbumColorsDescription => '跟随专辑封面颜色；无封面颜色时使用单色';
+
+  @override
+  String get visualizerRainbow => '彩虹';
+
+  @override
+  String get visualizerRainbowDescription => '在可视化效果中呈现连续的彩虹色彩';
+
+  @override
+  String get visualizerMonochrome => '单色';
+
+  @override
+  String get visualizerMonochromeDescription => '使用白色和灰色，不受专辑封面影响';
+
+  @override
+  String get visualizerBlocks => '渐隐方块';
+
+  @override
+  String get visualizerBlocksDescription => '分段柱状条，带有柔和渐隐的轨迹';
+
+  @override
   String get volume => '音量';
 
   @override
