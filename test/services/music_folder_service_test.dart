@@ -71,6 +71,31 @@ void main() {
     });
   });
 
+  group('AudioFileInfo', () {
+    test('fromMap reads the recorded relativeFolderPath', () {
+      final info = AudioFileInfo.fromMap({
+        'uri': 'content://provider/document/x',
+        'name': 'x.flac',
+        'size': 1,
+        'lastModified': 2,
+        'extension': 'flac',
+        'relativeFolderPath': 'Music/Album',
+      });
+      expect(info.relativeFolderPath, 'Music/Album');
+    });
+
+    test('fromMap leaves relativeFolderPath null when absent', () {
+      final info = AudioFileInfo.fromMap({
+        'uri': 'content://provider/document/x',
+        'name': 'x.flac',
+        'size': 1,
+        'lastModified': 2,
+        'extension': 'flac',
+      });
+      expect(info.relativeFolderPath, isNull);
+    });
+  });
+
   group('MusicFolder storage fields', () {
     test('toJson includes new fields when set', () {
       final folder = MusicFolder(

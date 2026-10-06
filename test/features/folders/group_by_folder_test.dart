@@ -6,6 +6,7 @@ Song _song(
   String title,
   String filePath, {
   String folderUri = 'file:///storage/Music',
+  String? relativeFolderPath,
 }) => Song(
   id: title,
   title: title,
@@ -14,6 +15,7 @@ Song _song(
   fileType: 'FLAC',
   filePath: filePath,
   folderUri: folderUri,
+  relativeFolderPath: relativeFolderPath,
 );
 
 void main() {
@@ -71,5 +73,76 @@ void main() {
     expect(subfolders.map((f) => f.name), ['Albums', 'Live']);
     expect(subfolders.map((f) => f.name), isNot(contains('storage')));
     expect(songs.map((s) => s.title), ['Root']);
+  });
+
+  test('groupByImmediateFolder prefers a recorded relativeFolderPath', () {
+    // Opaque document ids cannot be decoded into a path, so only the recorded
+    // field can tell these folders apart (issue #283).
+    const folderUri =
+        'content://com.android.externalstorage.documents/tree/1234-5678%3A';
+    final allSongs = [
+      _song(
+        'Root',
+        'content://provider/document/root-id',
+        folderUri: folderUri,
+        relativeFolderPath: '',
+      ),
+      _song(
+        'M1',
+        'content://provider/document/m1-id',
+        folderUri: folderUri,
+        relativeFolderPath: 'Music',
+      ),
+      _song(
+        'A1',
+        'content://provider/document/a1-id',
+        folderUri: folderUri,
+        relativeFolderPath: 'Music/Album',
+      ),
+      _song(
+        'A2',
+        'content://provider/document/a2-id',
+        folderUri: folderUri,
+        relativeFolderPath: 'Music/Album',
+      ),
+    ];
+
+    final (:subfolders, :songs) = groupByImmediateFolder(
+      allSongs: allSongs,
+      folderUri: folderUri,
+    );
+
+    expect(subfolders.map((f) => f.key), ['Music']);
+    expect(subfolders.single.songs.map((s) => s.title), ['M1', 'A1', 'A2']);
+    expect(songs.map((s) => s.title), ['Root']);
+
+    final nested = groupByImmediateFolder(
+      allSongs: allSongs,
+      folderUri: folderUri,
+      prefix: 'Music',
+    );
+    expect(nested.subfolders.single.key, 'Music/Album');
+    expect(nested.subfolders.single.songs.map((s) => s.title), ['A1', 'A2']);
+    expect(nested.songs.map((s) => s.title), ['M1']);
+  });
+
+  test('groupByImmediateFolder falls back to path reconstruction when unrecorded', () {
+    const folderUri =
+        'content://com.android.externalstorage.documents/tree/primary%3AFlacs';
+    final allSongs = [
+      _song(
+        'A1',
+        '/storage/emulated/0/Flacs/Albums/A1.flac',
+        folderUri: folderUri,
+      ),
+    ];
+
+    final (:subfolders, :songs) = groupByImmediateFolder(
+      allSongs: allSongs,
+      folderUri: folderUri,
+    );
+
+    expect(subfolders.single.key, 'Albums');
+    expect(songs, isEmpty);
   });
 }

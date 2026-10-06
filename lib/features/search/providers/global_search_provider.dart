@@ -97,7 +97,9 @@ final globalSearchResultsProvider =
   // --- Folders: FolderGroup where folder display name contains ---
   final folderGroups = <String, FolderGroup>{};
   for (final s in allSongs) {
-    final rel = SongsState.extractRelativeSubfolder(s.folderUri, s.filePath);
+    final rel =
+        s.relativeFolderPath ??
+        SongsState.extractRelativeSubfolder(s.folderUri, s.filePath);
     final folderUri = s.folderUri ?? '';
     String name;
     String key;

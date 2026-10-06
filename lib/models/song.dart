@@ -86,6 +86,12 @@ class Song {
   /// URI of the folder containing this song
   final String? folderUri;
 
+  /// Directory path relative to the scanned root, recorded at scan time using
+  /// on-disk display names ('Hindi/Album'; '' directly under the root). Null
+  /// when not recorded; the path is then reconstructed from [folderUri] and
+  /// [filePath].
+  final String? relativeFolderPath;
+
   /// Date the song was added to the library
   final DateTime? dateAdded;
 
@@ -134,6 +140,7 @@ class Song {
     this.genre,
     this.filePath,
     this.folderUri,
+    this.relativeFolderPath,
     this.dateAdded,
     this.isExternal = false,
     this.sourcePackage,
@@ -230,6 +237,7 @@ class Song {
     String? genre,
     String? filePath,
     String? folderUri,
+    String? relativeFolderPath,
     DateTime? dateAdded,
     bool? isExternal,
     String? sourcePackage,
@@ -266,6 +274,7 @@ class Song {
       genre: genre ?? this.genre,
       filePath: filePath ?? this.filePath,
       folderUri: folderUri ?? this.folderUri,
+      relativeFolderPath: relativeFolderPath ?? this.relativeFolderPath,
       dateAdded: dateAdded ?? this.dateAdded,
       isExternal: isExternal ?? this.isExternal,
       sourcePackage: sourcePackage ?? this.sourcePackage,

@@ -533,6 +533,7 @@ class SongRepository {
       genre: entity.genre,
       filePath: entity.filePath,
       folderUri: entity.folderUri,
+      relativeFolderPath: entity.relativeFolderPath,
       dateAdded: entity.dateAdded,
       sourceType: entity.sourceType,
       remoteId: entity.remoteId,

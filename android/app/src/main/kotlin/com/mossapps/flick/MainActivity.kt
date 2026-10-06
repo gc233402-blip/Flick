@@ -1956,6 +1956,7 @@ class MainActivity: FlutterActivity() {
         val mimeType: String?,
         val size: Long,
         val lastModified: Long,
+        val relativePath: String,
     )
 
     // Walks a granted SAF tree with one contentResolver.query() per directory
@@ -1982,7 +1983,7 @@ class MainActivity: FlutterActivity() {
         val visited = HashSet<String>()
         var dirCount = 0
 
-        fun scanDir(docId: String) {
+        fun scanDir(docId: String, relativePath: String) {
             if (!visited.add(docId)) return
             dirCount++
             val childrenUri = try {
@@ -2016,6 +2017,7 @@ class MainActivity: FlutterActivity() {
                                 mimeType = if (mimeIdx >= 0) c.getString(mimeIdx) else null,
                                 size = if (sizeIdx >= 0 && !c.isNull(sizeIdx)) c.getLong(sizeIdx) else 0L,
                                 lastModified = if (modIdx >= 0 && !c.isNull(modIdx)) c.getLong(modIdx) else 0L,
+                                relativePath = relativePath,
                             ),
                         )
                     }
@@ -2026,14 +2028,16 @@ class MainActivity: FlutterActivity() {
             if (hasNomedia) return
             for (e in entries) {
                 if (e.mimeType == DocumentsContract.Document.MIME_TYPE_DIR) {
-                    scanDir(e.documentId)
+                    val childPath =
+                        if (relativePath.isEmpty()) e.name else "$relativePath/${e.name}"
+                    scanDir(e.documentId, childPath)
                 } else {
                     result.add(e)
                 }
             }
         }
 
-        scanDir(rootDocId)
+        scanDir(rootDocId, "")
         Log.d("MainActivity", "SAF tree walk '$uriString' rootDocId=$rootDocId dirs=$dirCount files=${result.size}")
         return result
     }
@@ -2060,6 +2064,7 @@ class MainActivity: FlutterActivity() {
                     "lastModified" to entry.lastModified,
                     "mimeType" to entry.mimeType,
                     "extension" to extension,
+                    "relativeFolderPath" to entry.relativePath,
                 )
             }
     }

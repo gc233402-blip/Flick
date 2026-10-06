@@ -103,6 +103,36 @@ void main() {
       );
     });
 
+    test('extractRelativeSubfolder resolves a whole-volume SAF root', () {
+      expect(
+        SongsState.extractRelativeSubfolder(
+          'content://com.android.externalstorage.documents/tree/1234-5678%3A',
+          'content://com.android.externalstorage.documents/tree/1234-5678%3A/document/1234-5678%3AMusic%2FAlbum%2Fx.flac',
+        ),
+        'Music/Album',
+      );
+    });
+
+    test('extractRelativeSubfolder resolves raw paths under a whole-volume root', () {
+      expect(
+        SongsState.extractRelativeSubfolder(
+          'content://com.android.externalstorage.documents/tree/1234-5678%3A',
+          '/storage/1234-5678/Music/Album/x.flac',
+        ),
+        'Music/Album',
+      );
+    });
+
+    test('extractRelativeSubfolder treats files at a whole-volume root as root level', () {
+      expect(
+        SongsState.extractRelativeSubfolder(
+          'content://com.android.externalstorage.documents/tree/1234-5678%3A',
+          'content://com.android.externalstorage.documents/tree/1234-5678%3A/document/1234-5678%3Ax.flac',
+        ),
+        '',
+      );
+    });
+
     test('extractRelativeSubfolder handles a raw absolute folder uri', () {
       expect(
         SongsState.extractRelativeSubfolder(
@@ -125,6 +155,18 @@ void main() {
           'content://com.android.externalstorage.documents/tree/1234-5678%3AMusic',
         ),
         '/storage/1234-5678/Music',
+      );
+      expect(
+        SongsState.rawRootFromFolderUri(
+          'content://com.android.externalstorage.documents/tree/1234-5678%3A',
+        ),
+        '/storage/1234-5678',
+      );
+      expect(
+        SongsState.rawRootFromFolderUri(
+          'content://com.android.externalstorage.documents/tree/primary%3A',
+        ),
+        '/storage/emulated/0',
       );
       expect(
         SongsState.rawRootFromFolderUri('/storage/emulated/0/Flacs/'),

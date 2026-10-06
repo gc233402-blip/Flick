@@ -1108,6 +1108,7 @@ class LibraryScannerService {
         existingMap: cueExistingMap,
         ripLog: logMap[audioPath],
         lastModified: DateTime.fromMillisecondsSinceEpoch(file.lastModified),
+        relativeFolderPath: file.relativeFolderPath,
       );
 
       for (final entity in cueEntities) {
@@ -1190,6 +1191,7 @@ class LibraryScannerService {
             basic.lastModified,
           )
           ..folderUri = folderUri
+          ..relativeFolderPath = basic.relativeFolderPath
           ..fileSize = basic.size
           ..metadataComplete = false,
       );
@@ -1651,6 +1653,7 @@ class LibraryScannerService {
             lastModified: DateTime.fromMillisecondsSinceEpoch(
               basic.lastModified,
             ),
+            relativeFolderPath: basic.relativeFolderPath,
           );
 
           for (final entity in cueEntities) {
@@ -1693,6 +1696,7 @@ class LibraryScannerService {
             basic.lastModified,
           )
           ..folderUri = folderUri
+          ..relativeFolderPath = basic.relativeFolderPath
           ..fileSize = basic.size
           ..albumArtPath = existingMap[basic.uri]?.albumArtPath
           ..bitrate = meta?.bitrate != null
@@ -2224,6 +2228,7 @@ class LibraryScannerService {
                 existingMap: cueExistingMap,
                 ripLog: ripLog,
                 lastModified: lastModified,
+                relativeFolderPath: fallbackSource?.relativeFolderPath,
               );
 
               if (entities.isNotEmpty) {
@@ -3215,6 +3220,7 @@ class LibraryScannerService {
     required Map<String, SongEntity> existingMap,
     required RipLog? ripLog,
     required DateTime lastModified,
+    String? relativeFolderPath,
   }) {
     final entities = <SongEntity>[];
     for (final track in cueSheet.tracks) {
@@ -3260,6 +3266,7 @@ class LibraryScannerService {
         ..dateAdded = existing?.dateAdded ?? DateTime.now()
         ..lastModified = lastModified
         ..folderUri = folderUri
+        ..relativeFolderPath = relativeFolderPath
         ..fileSize = meta?.size ?? 0
         ..albumArtPath = existing?.albumArtPath ?? meta?.albumArtPath
         ..bitrate = meta?.bitrate != null
