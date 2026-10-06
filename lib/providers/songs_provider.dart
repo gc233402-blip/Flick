@@ -483,13 +483,19 @@ class SongsState {
     final rootId = _safPathId(folder, 'tree');
     final documentId = _safPathId(file, 'document');
     if (rootId == null || documentId == null) return null;
-    if (documentId != rootId && !documentId.startsWith('$rootId/')) {
-      return '';
-    }
+    // Whole-volume roots ('1234-5678:', 'primary:') carry no trailing '/';
+    // child document ids continue straight after the colon.
+    final volumeRoot = rootId.endsWith(':');
+    final underRoot =
+        documentId == rootId ||
+        (volumeRoot
+            ? documentId.startsWith(rootId)
+            : documentId.startsWith('$rootId/'));
+    if (!underRoot) return '';
 
     final relativeFile = documentId == rootId
         ? ''
-        : documentId.substring(rootId.length + 1);
+        : documentId.substring(volumeRoot ? rootId.length : rootId.length + 1);
     final parts = relativeFile
         .split('/')
         .where((part) => part.isNotEmpty)
@@ -535,7 +541,8 @@ class SongsState {
     if (treeId == null) return null;
 
     final colon = treeId.indexOf(':');
-    if (colon <= 0 || colon == treeId.length - 1) return null;
+    // A colon at the end is a whole-volume root (empty relative path).
+    if (colon <= 0) return null;
     final volume = treeId.substring(0, colon);
     final relative = treeId.substring(colon + 1);
     final volumeRoot = volume == 'primary'
