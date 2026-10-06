@@ -28,6 +28,7 @@ import 'package:flick/widgets/common/rotary_knob.dart';
 import 'package:flick/widgets/equalizer/parametric_eq_graph.dart';
 import 'package:flick/widgets/equalizer/graphic_eq_graph.dart';
 import 'package:flick/widgets/equalizer/interactive_eq_graph.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum _PresetFileFormat { json, txt }
 
@@ -63,7 +64,7 @@ class _EqualizerScreenState extends ConsumerState<EqualizerScreen> {
   void _showPresetsBottomSheet() {
     GlassBottomSheet.show<void>(
       context: context,
-      title: 'Presets',
+      title: l10n.presets,
       maxHeightRatio: 0.6,
       content: _PresetsSheet(),
     );
@@ -85,9 +86,9 @@ class _EqualizerScreenState extends ConsumerState<EqualizerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _Header(
-                  title: 'EQ & Dynamics',
+                  title: l10n.eqDynamics,
                   subtitle: activePresetName != null
-                      ? 'Preset: $activePresetName'
+                      ? l10n.preset(activePresetName)
                       : null,
                   onBack: () => Navigator.of(context).pop(),
                   onPresets: _showPresetsBottomSheet,
@@ -178,7 +179,7 @@ class _EffectsTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const tabs = ['EQ', 'Dynamics', 'FX'];
+    final tabs = ['EQ', l10n.dynamics, 'FX'];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMd),
       child: Row(
@@ -380,8 +381,8 @@ class _LabeledKnob extends StatelessWidget {
           const SizedBox(height: AppConstants.spacingSm),
           Tooltip(
             message: enabled
-                ? 'Double-tap to reset'
-                : 'Enable EQ to edit',
+                ? l10n.doubleTapToReset
+                : l10n.enableEqToEdit,
             child: RotaryKnob(
               value: value,
               min: min,
@@ -434,10 +435,10 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
   Future<String?> _askForName(BuildContext context, {String? initial}) {
     final result = FlickDialogs.input(
       context,
-      title: initial == null ? 'Save Preset' : 'Rename Preset',
-      hintText: 'Preset name',
+      title: initial == null ? l10n.savePreset : l10n.renamePreset,
+      hintText: l10n.presetName,
       initialValue: initial,
-      confirmLabel: 'Save',
+      confirmLabel: l10n.save,
     );
     return result;
   }
@@ -494,7 +495,7 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
         );
     if (mounted) {
       Navigator.of(context).pop();
-      _showMessage('Applied AutoEQ for ${entry.displayName}');
+      _showMessage(l10n.appliedAutoeqFor(entry.displayName));
     }
   }
 
@@ -558,12 +559,12 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
       if (imported.hasWarnings) {
         await _showImportWarnings(preset.name, imported.warnings);
       } else {
-        _showMessage('Imported "${preset.name}"');
+        _showMessage(l10n.imported(preset.name));
       }
     } on FormatException catch (error) {
       _showMessage(error.message);
     } catch (_) {
-      _showMessage('Failed to import preset file.');
+      _showMessage(l10n.failedToImportPresetFile);
     }
   }
 
@@ -575,15 +576,14 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Preset imported with adjustments'),
+        title: Text(l10n.presetImportedWithAdjustments),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '"$presetName" contains values outside the supported ranges; '
-                'these were adjusted:',
+                l10n.containsValuesOutsideTheSupportedRanges(presetName),
               ),
               const SizedBox(height: 12),
               for (final warning in warnings)
@@ -623,7 +623,7 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
 
     try {
       final savePath = await FilePicker.saveFile(
-        dialogTitle: 'Export equalizer preset',
+        dialogTitle: l10n.exportEqualizerPreset,
         fileName: suggestedName,
         type: FileType.custom,
         allowedExtensions: [extension],
@@ -631,41 +631,41 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
       );
       if (savePath == null) {
         if (kIsWeb) {
-          _showMessage('Started preset download.');
+          _showMessage(l10n.startedPresetDownload);
         }
         return;
       }
 
-      _showMessage('Exported preset to $savePath');
+      _showMessage(l10n.exportedPresetTo(savePath));
     } catch (_) {
       final fallbackPath = await _savePresetFallback(
         fileName: suggestedName,
         contents: contents,
       );
-      _showMessage('Exported preset to $fallbackPath');
+      _showMessage(l10n.exportedPresetTo2(fallbackPath));
     }
   }
 
   Future<_PresetFileFormat?> _askForExportFormat() async {
     return showFlickDialog<_PresetFileFormat>(
       context: context,
-      barrierLabel: 'Export format',
+      barrierLabel: l10n.exportFormat,
       builder: (dialogContext) => FlickDialog(
-        title: 'Format',
+        title: l10n.format,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _FormatOption(
               label: 'JSON',
-              description: 'Native Flick preset format',
+              description: l10n.nativeFlickPresetFormat,
               onTap: () =>
                   Navigator.of(dialogContext).pop(_PresetFileFormat.json),
             ),
             const SizedBox(height: AppConstants.spacingSm),
             _FormatOption(
               label: 'TXT',
-              description: 'Compatible with Poweramp EQ',
+              description: l10n.compatibleWithPowerampEq,
               onTap: () =>
                   Navigator.of(dialogContext).pop(_PresetFileFormat.txt),
             ),
@@ -701,9 +701,9 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
   Future<void> _deletePreset(EqPreset preset) async {
     final confirmed = await FlickDialogs.confirm(
       context,
-      title: 'Delete Preset?',
-      message: 'Delete "${preset.name}"? This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: l10n.deletePreset,
+      message: l10n.deleteThisCannotBeUndone(preset.name),
+      confirmLabel: l10n.delete,
       destructive: true,
     );
     if (!confirmed) return;
@@ -734,43 +734,43 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
             children: [
               _PresetActionRow(
                 icon: LucideIcons.plus,
-                title: 'Save current as preset',
-                subtitle: 'Create a custom preset',
+                title: l10n.saveCurrentAsPreset,
+                subtitle: l10n.createACustomPreset,
                 onTap: _saveNewPreset,
               ),
               _Divider(),
               _PresetActionRow(
                 icon: LucideIcons.fileUp,
-                title: 'Import preset file',
-                subtitle: 'Load a JSON or TXT preset',
+                title: l10n.importPresetFile,
+                subtitle: l10n.loadAJsonOrTxtPreset,
                 onTap: _importPresetFile,
               ),
               _Divider(),
               _PresetActionRow(
                 icon: LucideIcons.fileDown,
-                title: 'Export current preset',
-                subtitle: 'Save the current EQ as JSON or TXT',
+                title: l10n.exportCurrentPreset,
+                subtitle: l10n.saveTheCurrentEqAsJson,
                 onTap: _exportCurrentPreset,
               ),
               _Divider(),
               _PresetActionRow(
                 icon: LucideIcons.headphones,
-                title: 'AutoEQ headphones',
-                subtitle: 'Match EQ to your headphone model',
+                title: l10n.autoeqHeadphones,
+                subtitle: l10n.matchEqToYourHeadphoneModel,
                 onTap: _openAutoEqSheet,
               ),
             ],
           ),
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        _SectionHeader(title: 'Built-in'),
+        _SectionHeader(title: l10n.builtIn),
         _GlassCard(
           child: Column(
             children: [
               for (final p in BuiltInEqPresets.presets) ...[
                 _PresetRow(
                   title: p.name,
-                  subtitle: p.mode == EqMode.graphic ? 'Graphic' : 'Parametric',
+                  subtitle: p.mode == EqMode.graphic ? l10n.graphic : l10n.parametric,
                   onTap: () => _apply(p),
                 ),
                 if (p != BuiltInEqPresets.presets.last) _Divider(),
@@ -779,13 +779,13 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
           ),
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        _SectionHeader(title: 'Custom'),
+        _SectionHeader(title: l10n.custom),
         _GlassCard(
           child: _custom.isEmpty
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(AppConstants.spacingMd),
                   child: Text(
-                    'No custom presets yet.',
+                    l10n.noCustomPresetsYet,
                     style: TextStyle(
                       fontFamily: 'ProductSans',
                       color: AppColors.textSecondary,
@@ -1061,7 +1061,7 @@ class _CustomPresetRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    preset.mode == EqMode.graphic ? 'Graphic' : 'Parametric',
+                    preset.mode == EqMode.graphic ? l10n.graphic : l10n.parametric,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.adaptiveTextTertiary,
                     ),
@@ -1070,7 +1070,7 @@ class _CustomPresetRow extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Apply',
+              tooltip: l10n.apply,
               onPressed: onApply,
               icon: Icon(
                 LucideIcons.check,
@@ -1079,7 +1079,7 @@ class _CustomPresetRow extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Rename',
+              tooltip: l10n.rename,
               onPressed: onRename,
               icon: Icon(
                 LucideIcons.pencil,
@@ -1088,7 +1088,7 @@ class _CustomPresetRow extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Delete',
+              tooltip: l10n.delete,
               onPressed: onDelete,
               icon: const Icon(
                 LucideIcons.trash2,
@@ -1157,7 +1157,7 @@ class _Header extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Presets',
+            tooltip: l10n.presets,
             icon: Icon(
               LucideIcons.library,
               color: context.adaptiveTextPrimary,
@@ -1190,14 +1190,14 @@ class _TopControlsRow extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Equalizer',
+                    l10n.equalizer,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: context.adaptiveTextPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    enabled ? 'Enabled' : 'Disabled',
+                    enabled ? l10n.enabled : l10n.disabled,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.adaptiveTextTertiary,
                     ),
@@ -1259,7 +1259,7 @@ class _PreampRow extends ConsumerWidget {
                   Row(
                     children: [
                       Text(
-                        'Preamp',
+                        l10n.preamp,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           color: context.adaptiveTextPrimary,
                         ),
@@ -1546,7 +1546,7 @@ class _ScaleLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      '$value dB',
+      l10n.db2(value),
       style: Theme.of(context).textTheme.labelSmall?.copyWith(
         color: isCenter
             ? context.adaptiveTextSecondary
@@ -1579,7 +1579,7 @@ class _ModeAndActionsRow extends ConsumerWidget {
             const SizedBox(width: AppConstants.spacingMd),
             _ActionButton(
               icon: LucideIcons.rotateCcw,
-              label: 'Reset',
+              label: l10n.reset,
               onTap: () {
                 final notifier = ref.read(equalizerProvider.notifier);
                 if (mode == EqMode.graphic) {
@@ -1629,14 +1629,14 @@ class _BmtKnobsRow extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Tone Controls',
+                          l10n.toneControls,
                           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             color: context.adaptiveTextPrimary,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Bass, Mid & Treble',
+                          l10n.bassMidTreble,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: context.adaptiveTextTertiary,
                           ),
@@ -1662,7 +1662,7 @@ class _BmtKnobsRow extends ConsumerWidget {
               children: [
                 _LabeledKnob(
                   icon: LucideIcons.arrowDown,
-                  label: 'Bass',
+                  label: l10n.bass,
                   valueLabel:
                       '${bassDb >= 0 ? '+' : ''}${bassDb.toStringAsFixed(1)} dB',
                   value: bassDb,
@@ -1677,7 +1677,7 @@ class _BmtKnobsRow extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.minus,
-                  label: 'Mid',
+                  label: l10n.mid,
                   valueLabel:
                       '${midDb >= 0 ? '+' : ''}${midDb.toStringAsFixed(1)} dB',
                   value: midDb,
@@ -1692,7 +1692,7 @@ class _BmtKnobsRow extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.arrowUp,
-                  label: 'Treble',
+                  label: l10n.treble,
                   valueLabel:
                       '${trebleDb >= 0 ? '+' : ''}${trebleDb.toStringAsFixed(1)} dB',
                   value: trebleDb,
@@ -1732,25 +1732,25 @@ class _GraphicEqView extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'Graphic EQ'),
+        _SectionHeader(title: l10n.graphicEq),
         const SizedBox(height: AppConstants.spacingSm),
         _ModeSummaryRow(
           children: [
-            const _StatPill(
+            _StatPill(
               icon: LucideIcons.slidersVertical,
-              label: '31 fixed bands',
+              label: l10n.fixedBands,
             ),
             _StatPill(
               icon: adjustedBands == 0
                   ? LucideIcons.minus
                   : LucideIcons.sparkles,
               label: adjustedBands == 0
-                  ? 'Flat response'
-                  : '$adjustedBands bands adjusted',
+                  ? l10n.flatResponse
+                  : l10n.bandsAdjusted(adjustedBands),
             ),
-            const _StatPill(
+            _StatPill(
               icon: LucideIcons.refreshCcw,
-              label: 'Double-tap a band to reset',
+              label: l10n.doubleTapABandToReset,
             ),
           ],
         ),
@@ -1775,16 +1775,16 @@ class _GraphicEqView extends ConsumerWidget {
                 children: [
                   _CardHeader(
                     icon: LucideIcons.audioLines,
-                    title: 'Curve Preview',
+                    title: l10n.curvePreview,
                     subtitle:
-                        'Fixed center frequencies with a ${EqualizerNotifier.gainMaxDb.toStringAsFixed(0)} dB range. Tap to interact.',
+                        l10n.fixedCenterFrequenciesWithADb(EqualizerNotifier.gainMaxDb.toStringAsFixed(0)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _ValueBadge(
                           value: maxGain == 0
                               ? '0.0 dB'
-                              : '${maxGain.toStringAsFixed(1)} dB max',
+                              : l10n.dbMax(maxGain.toStringAsFixed(1)),
                         ),
                         const SizedBox(width: 8),
                         Icon(
@@ -1817,10 +1817,10 @@ class _GraphicEqView extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _CardHeader(
+                _CardHeader(
                   icon: LucideIcons.slidersVertical,
-                  title: 'Band Controls',
-                  subtitle: 'Swipe horizontally to fine-tune each center band.',
+                  title: l10n.bandControls,
+                  subtitle: l10n.swipeHorizontallyToFineTuneEach,
                 ),
                 const SizedBox(height: AppConstants.spacingMd),
                 SizedBox(
@@ -1884,11 +1884,11 @@ class _GraphicBandSlider extends ConsumerWidget {
   }
 
   String _bandFamilyLabel() {
-    if (frequencyHz < 125) return 'Sub';
-    if (frequencyHz < 500) return 'Bass';
-    if (frequencyHz < 2000) return 'Mid';
-    if (frequencyHz < 8000) return 'Presence';
-    return 'Air';
+    if (frequencyHz < 125) return l10n.sub;
+    if (frequencyHz < 500) return l10n.bass;
+    if (frequencyHz < 2000) return l10n.mid;
+    if (frequencyHz < 8000) return l10n.presence;
+    return l10n.air;
   }
 
   @override
@@ -1901,8 +1901,8 @@ class _GraphicBandSlider extends ConsumerWidget {
     return RepaintBoundary(
       child: Tooltip(
         message: enabled
-            ? 'Double-tap to reset this band'
-            : 'Enable EQ to edit',
+            ? l10n.doubleTapToResetThisBand
+            : l10n.enableEqToEdit,
         child: GestureDetector(
           onDoubleTap: enabled
               ? () => ref
@@ -2157,25 +2157,25 @@ class _ParametricEqViewState extends ConsumerState<_ParametricEqView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'Parametric EQ'),
+        _SectionHeader(title: l10n.parametricEq),
         const SizedBox(height: AppConstants.spacingSm),
         _ModeSummaryRow(
           children: [
             _StatPill(
               icon: LucideIcons.circleDot,
-              label: '$activeCount active bands',
+              label: l10n.activeBands(activeCount),
             ),
-            const _StatPill(
+            _StatPill(
               icon: LucideIcons.scanSearch,
-              label: 'Log-frequency control',
+              label: l10n.logFrequencyControl,
             ),
-            const _StatPill(
+            _StatPill(
               icon: LucideIcons.funnel,
-              label: 'Multi-filter bands',
+              label: l10n.multiFilterBands,
             ),
             _StatPill(
               icon: LucideIcons.slidersHorizontal,
-              label: '${bands.length}/31 bands',
+              label: l10n.bands(bands.length),
             ),
           ],
         ),
@@ -2200,9 +2200,9 @@ class _ParametricEqViewState extends ConsumerState<_ParametricEqView> {
                 children: [
                   _CardHeader(
                     icon: LucideIcons.gitBranchPlus,
-                    title: 'Curve Preview',
+                    title: l10n.curvePreview,
                     subtitle:
-                        '${bands.length} parametric bands with independent frequency, gain, and Q shaping. Tap to interact.',
+                        l10n.parametricBandsWithIndependentFrequency(bands.length),
                     trailing: Icon(
                       LucideIcons.maximize2,
                       size: 16,
@@ -2235,11 +2235,11 @@ class _ParametricEqViewState extends ConsumerState<_ParametricEqView> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _CardHeader(
+                  _CardHeader(
                     icon: LucideIcons.slidersHorizontal,
-                    title: 'Band Editors',
+                    title: l10n.bandEditors,
                     subtitle:
-                        'Tap a band to expand. Drag a knob to adjust. Tap a value to type directly.',
+                        l10n.tapABandToExpandDrag,
                   ),
                   const SizedBox(height: AppConstants.spacingMd),
                   SizedBox(
@@ -2374,10 +2374,10 @@ class _ParametricBandSummary extends StatelessWidget {
           final band = bands[index];
           final active = enabled && band.enabled;
           final gainLabel = band.type == ParametricBandType.notch
-              ? '${band.gainDb.abs().toStringAsFixed(1)} dB cut'
+              ? l10n.dbCut(band.gainDb.abs().toStringAsFixed(1))
               : '${band.gainDb >= 0 ? '+' : ''}${band.gainDb.toStringAsFixed(1)} dB';
           final valueLabel = band.type.supportsGain
-              ? '${band.type.displayName}  \u2022  $gainLabel'
+              ? l10n.u20223(band.type.displayName, gainLabel)
               : band.type.displayName;
           return Padding(
             padding: const EdgeInsets.only(right: AppConstants.spacingSm),
@@ -2402,7 +2402,7 @@ class _ParametricBandSummary extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'B${index + 1}',
+                    l10n.b(index + 1),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: active
                           ? context.adaptiveTextPrimary
@@ -2412,7 +2412,7 @@ class _ParametricBandSummary extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '${_hzLabel(band.frequencyHz)}  \u2022  $valueLabel',
+                    l10n.u2022(_hzLabel(band.frequencyHz), valueLabel),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: active
                           ? context.adaptiveTextSecondary
@@ -2500,7 +2500,7 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
       final k = hz / 1000.0;
       return '${k.toStringAsFixed(k >= 10 ? 0 : 1)} kHz';
     }
-    return '${hz.toStringAsFixed(0)} Hz';
+    return l10n.hz6(hz.toStringAsFixed(0));
   }
 
   void _showEditor({
@@ -2515,7 +2515,7 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
     showFlickDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Dismiss',
+      barrierLabel: l10n.dismiss,
       barrierColor: Colors.black.withValues(alpha: 0.3),
       builder: (_) => _InlineValueEditor(
         initialValue: value,
@@ -2575,7 +2575,7 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
               const SizedBox(width: AppConstants.spacingSm),
               Expanded(
                 child: Text(
-                  'Band ${widget.index + 1}  \u2022  ${band.type.displayName}',
+                  l10n.bandU2022(widget.index + 1, band.type.displayName),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
                     fontWeight: FontWeight.w600,
@@ -2608,7 +2608,7 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _DetailKnob(
-                label: 'Frequency',
+                label: l10n.frequency,
                 value: _hzLabel(band.frequencyHz),
                 knob: RotaryKnob(
                   value: _hzToT(band.frequencyHz),
@@ -2620,14 +2620,14 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
                           .read(equalizerProvider.notifier)
                           .setParamBandFreqHz(widget.index, _tToHz(t))
                       : null,
-                  label: 'Freq',
+                  label: l10n.freq,
                 ),
                 onTapValue: editable
                     ? () => _showEditor(
                           context: context,
                           value: band.frequencyHz,
-                          unit: 'Hz',
-                          label: 'Frequency',
+                          unit: l10n.hz5,
+                          label: l10n.frequency,
                           min: 20.0,
                           max: 20000.0,
                           onSubmitted: (v) => ref
@@ -2639,10 +2639,10 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
               if (band.type.supportsGain)
                 _DetailKnob(
                   label: band.type == ParametricBandType.notch
-                      ? 'Notch Depth'
-                      : 'Gain',
+                      ? l10n.notchDepth
+                      : l10n.gain,
                   value: band.type == ParametricBandType.notch
-                      ? '${band.gainDb.abs().toStringAsFixed(1)} dB'
+                      ? l10n.db9(band.gainDb.abs().toStringAsFixed(1))
                       : '${band.gainDb >= 0 ? '+' : ''}${band.gainDb.toStringAsFixed(1)} dB',
                   knob: RotaryKnob(
                     value: band.type == ParametricBandType.notch
@@ -2663,7 +2663,7 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
                                   : v,
                             )
                         : null,
-                    label: 'Gain',
+                    label: l10n.gain,
                     accentColor: toneColor,
                   ),
                   onTapValue: editable
@@ -2674,8 +2674,8 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
                                 : band.gainDb,
                             unit: 'dB',
                             label: band.type == ParametricBandType.notch
-                                ? 'Notch Depth'
-                                : 'Gain',
+                                ? l10n.notchDepth
+                                : l10n.gain,
                             min: band.type == ParametricBandType.notch
                                 ? 0.0
                                 : EqualizerNotifier.gainMinDb,
@@ -2743,7 +2743,7 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
                     border: Border.all(color: AppColors.glassBorder),
                   ),
                   child: Text(
-                    'Reset to 0 dB',
+                    l10n.resetTo0Db,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: context.adaptiveTextSecondary,
                       fontWeight: FontWeight.w600,
@@ -2948,8 +2948,8 @@ class _InlineValueEditorState extends State<_InlineValueEditor> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: _submit,
-                    child: const Text(
-                      'Done',
+                    child: Text(
+                      l10n.done,
                       style: TextStyle(
                         fontFamily: 'ProductSans',
                         fontWeight: FontWeight.w600,
@@ -3013,7 +3013,7 @@ class _AddBandCard extends ConsumerWidget {
               ),
               const SizedBox(height: AppConstants.spacingSm),
               Text(
-                atLimit ? 'Limit' : 'Add',
+                atLimit ? l10n.limit : l10n.add,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: enabled && !atLimit
                       ? context.adaptiveTextSecondary
@@ -3181,7 +3181,7 @@ class _ParametricBandEditor extends ConsumerWidget {
                                   : v,
                             )
                         : null,
-                    label: 'Gain',
+                    label: l10n.gain,
                     accentColor: toneColor,
                   ),
                   Container(
@@ -3197,7 +3197,7 @@ class _ParametricBandEditor extends ConsumerWidget {
                     ),
                     child: Text(
                       band.type == ParametricBandType.notch
-                          ? '${band.gainDb.abs().toStringAsFixed(1)} dB'
+                          ? l10n.db9(band.gainDb.abs().toStringAsFixed(1))
                           : '${band.gainDb >= 0 ? '+' : ''}${band.gainDb.toStringAsFixed(1)} dB',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: editable
@@ -3252,7 +3252,7 @@ class _DynamicsSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'Dynamics'),
+        _SectionHeader(title: l10n.dynamics),
         const SizedBox(height: AppConstants.spacingSm),
         _ModeSummaryRow(
           children: [
@@ -3260,17 +3260,17 @@ class _DynamicsSection extends ConsumerWidget {
               icon: compressor.enabled
                   ? LucideIcons.badgeCheck
                   : LucideIcons.circleOff,
-              label: compressor.enabled ? 'Compressor on' : 'Compressor off',
+              label: compressor.enabled ? l10n.compressorOn : l10n.compressorOff,
             ),
             _StatPill(
               icon: limiter.enabled
                   ? LucideIcons.shieldCheck
                   : LucideIcons.shieldOff,
-              label: limiter.enabled ? 'Limiter on' : 'Limiter off',
+              label: limiter.enabled ? l10n.limiterOn : l10n.limiterOff,
             ),
             _StatPill(
               icon: enabled ? LucideIcons.audioLines : LucideIcons.powerOff,
-              label: enabled ? 'Processing live' : 'Master bypassed',
+              label: enabled ? l10n.processingLive : l10n.masterBypassed,
             ),
           ],
         ),
@@ -3281,8 +3281,8 @@ class _DynamicsSection extends ConsumerWidget {
             onPressed: () =>
                 ref.read(equalizerProvider.notifier).resetDynamics(),
             icon: const Icon(LucideIcons.rotateCcw, size: 18),
-            label: const Text(
-              'Reset Dynamics',
+            label: Text(
+              l10n.resetDynamics,
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 fontWeight: FontWeight.w600,
@@ -3300,9 +3300,9 @@ class _DynamicsSection extends ConsumerWidget {
         const SizedBox(height: AppConstants.spacingMd),
         _DynamicsCard(
           icon: LucideIcons.activity,
-          title: 'Compressor',
+          title: l10n.compressor,
           subtitle:
-              'Smooths peaks and raises body before the limiter catches transients.',
+              l10n.smoothsPeaksAndRaisesBodyBefore,
           active: enabled && compressor.enabled,
           toggleValue: compressor.enabled,
           onToggleChanged: (value) =>
@@ -3315,9 +3315,9 @@ class _DynamicsSection extends ConsumerWidget {
               children: [
                 _LabeledKnob(
                   icon: LucideIcons.arrowDownWideNarrow,
-                  label: 'Threshold',
+                  label: l10n.threshold,
                   valueLabel:
-                      '${compressor.thresholdDb.toStringAsFixed(1)} dB',
+                      l10n.db10(compressor.thresholdDb.toStringAsFixed(1)),
                   value: compressor.thresholdDb,
                   min: EqualizerNotifier.compressorThresholdMinDb,
                   max: EqualizerNotifier.compressorThresholdMaxDb,
@@ -3329,7 +3329,7 @@ class _DynamicsSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.ratio,
-                  label: 'Ratio',
+                  label: l10n.ratio,
                   valueLabel: '${compressor.ratio.toStringAsFixed(1)}:1',
                   value: compressor.ratio,
                   min: EqualizerNotifier.compressorRatioMin,
@@ -3342,8 +3342,8 @@ class _DynamicsSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.timer,
-                  label: 'Attack',
-                  valueLabel: '${compressor.attackMs.toStringAsFixed(0)} ms',
+                  label: l10n.attack,
+                  valueLabel: l10n.ms2(compressor.attackMs.toStringAsFixed(0)),
                   value: compressor.attackMs,
                   min: EqualizerNotifier.compressorAttackMinMs,
                   max: EqualizerNotifier.compressorAttackMaxMs,
@@ -3355,9 +3355,9 @@ class _DynamicsSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.timerReset,
-                  label: 'Release',
+                  label: l10n.release,
                   valueLabel:
-                      '${compressor.releaseMs.toStringAsFixed(0)} ms',
+                      l10n.ms3(compressor.releaseMs.toStringAsFixed(0)),
                   value: compressor.releaseMs,
                   min: EqualizerNotifier.compressorReleaseMinMs,
                   max: EqualizerNotifier.compressorReleaseMaxMs,
@@ -3369,7 +3369,7 @@ class _DynamicsSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.volume2,
-                  label: 'Makeup',
+                  label: l10n.makeup,
                   valueLabel:
                       '${compressor.makeupGainDb >= 0 ? '+' : ''}${compressor.makeupGainDb.toStringAsFixed(1)} dB',
                   value: compressor.makeupGainDb,
@@ -3388,9 +3388,9 @@ class _DynamicsSection extends ConsumerWidget {
         const SizedBox(height: AppConstants.spacingMd),
         _DynamicsCard(
           icon: LucideIcons.shieldCheck,
-          title: 'Limiter',
+          title: l10n.limiter,
           subtitle:
-              'Adds pre-drive and catches peaks against a final output ceiling.',
+              l10n.addsPreDriveAndCatchesPeaks,
           active: enabled && limiter.enabled,
           toggleValue: limiter.enabled,
           onToggleChanged: (value) =>
@@ -3403,7 +3403,7 @@ class _DynamicsSection extends ConsumerWidget {
               children: [
                 _LabeledKnob(
                   icon: LucideIcons.gauge,
-                  label: 'Input Gain',
+                  label: l10n.inputGain,
                   valueLabel:
                       '${limiter.inputGainDb >= 0 ? '+' : ''}${limiter.inputGainDb.toStringAsFixed(1)} dB',
                   value: limiter.inputGainDb,
@@ -3417,8 +3417,8 @@ class _DynamicsSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.alignEndVertical,
-                  label: 'Ceiling',
-                  valueLabel: '${limiter.ceilingDb.toStringAsFixed(1)} dB',
+                  label: l10n.ceiling,
+                  valueLabel: l10n.db13(limiter.ceilingDb.toStringAsFixed(1)),
                   value: limiter.ceilingDb,
                   min: EqualizerNotifier.limiterCeilingMinDb,
                   max: EqualizerNotifier.limiterCeilingMaxDb,
@@ -3430,8 +3430,8 @@ class _DynamicsSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.timerReset,
-                  label: 'Release',
-                  valueLabel: '${limiter.releaseMs.toStringAsFixed(0)} ms',
+                  label: l10n.release,
+                  valueLabel: l10n.ms4(limiter.releaseMs.toStringAsFixed(0)),
                   value: limiter.releaseMs,
                   min: EqualizerNotifier.limiterReleaseMinMs,
                   max: EqualizerNotifier.limiterReleaseMaxMs,
@@ -3475,13 +3475,13 @@ class _CreativeFxSection extends ConsumerWidget {
       final k = hz / 1000.0;
       return '${k.toStringAsFixed(k >= 10 ? 0 : 1)} kHz';
     }
-    return '${hz.toStringAsFixed(0)} Hz';
+    return l10n.hz6(hz.toStringAsFixed(0));
   }
 
   String _percentLabel(double value) => '${(value * 100).round()}%';
 
   String _balanceLabel(double balance) {
-    if (balance.abs() < 0.01) return 'Center';
+    if (balance.abs() < 0.01) return l10n.center;
     final side = balance > 0 ? 'R' : 'L';
     final amount = (balance.abs() * 100).round();
     return '$side $amount%';
@@ -3489,8 +3489,8 @@ class _CreativeFxSection extends ConsumerWidget {
 
   String _widthLabel(double width) {
     final amount = (width * 100).round();
-    if ((width - 1.0).abs() < 0.01) return '$amount% neutral';
-    return width > 1.0 ? '$amount% wide' : '$amount% narrow';
+    if ((width - 1.0).abs() < 0.01) return l10n.neutral(amount);
+    return width > 1.0 ? l10n.wide(amount) : l10n.narrow(amount);
   }
 
   @override
@@ -3502,25 +3502,25 @@ class _CreativeFxSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'Creative FX'),
+        _SectionHeader(title: l10n.creativeFx),
         const SizedBox(height: AppConstants.spacingSm),
         _ModeSummaryRow(
           children: [
             _StatPill(
               icon: fx.enabled ? LucideIcons.sparkles : LucideIcons.circleOff,
-              label: fx.enabled ? 'FX on' : 'FX off',
+              label: fx.enabled ? l10n.fxOn : l10n.fxOff,
             ),
             _StatPill(
               icon: LucideIcons.slidersHorizontal,
-              label: 'Balance ${_balanceLabel(fx.balance)}',
+              label: l10n.balance2(_balanceLabel(fx.balance)),
             ),
             _StatPill(
               icon: LucideIcons.timer,
-              label: 'Tempo ${fx.tempo.toStringAsFixed(2)}x',
+              label: l10n.tempoX(fx.tempo.toStringAsFixed(2)),
             ),
             _StatPill(
               icon: LucideIcons.audioLines,
-              label: 'Mix ${_percentLabel(fx.mix)}',
+              label: l10n.mix2(_percentLabel(fx.mix)),
             ),
           ],
         ),
@@ -3530,8 +3530,8 @@ class _CreativeFxSection extends ConsumerWidget {
           child: TextButton.icon(
             onPressed: () => ref.read(equalizerProvider.notifier).resetFx(),
             icon: const Icon(LucideIcons.rotateCcw, size: 18),
-            label: const Text(
-              'Reset FX',
+            label: Text(
+              l10n.resetFx,
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 fontWeight: FontWeight.w600,
@@ -3545,9 +3545,9 @@ class _CreativeFxSection extends ConsumerWidget {
         const SizedBox(height: AppConstants.spacingMd),
         _DynamicsCard(
           icon: LucideIcons.sparkles,
-          title: 'Spatial & Time',
+          title: l10n.spatialTime,
           subtitle:
-              'Balance, tempo, damp, filter, delays, size, mix, and extra spread controls.',
+              l10n.balanceTempoDampFilterDelaysSize,
           active: enabled && fx.enabled,
           toggleValue: fx.enabled,
           onToggleChanged: (value) =>
@@ -3560,7 +3560,7 @@ class _CreativeFxSection extends ConsumerWidget {
               children: [
                 _LabeledKnob(
                   icon: LucideIcons.slidersHorizontal,
-                  label: 'Balance',
+                  label: l10n.balance,
                   valueLabel: _balanceLabel(fx.balance),
                   value: fx.balance,
                   min: EqualizerNotifier.fxBalanceMin,
@@ -3573,7 +3573,7 @@ class _CreativeFxSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.timer,
-                  label: 'Tempo',
+                  label: l10n.tempo,
                   valueLabel: '${fx.tempo.toStringAsFixed(2)}x',
                   value: fx.tempo,
                   min: EqualizerNotifier.fxTempoMin,
@@ -3586,7 +3586,7 @@ class _CreativeFxSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.activity,
-                  label: 'Damp',
+                  label: l10n.damp,
                   valueLabel: _percentLabel(fx.damp),
                   value: fx.damp,
                   min: EqualizerNotifier.fxDampMin,
@@ -3599,7 +3599,7 @@ class _CreativeFxSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.funnel,
-                  label: 'Filter',
+                  label: l10n.filter,
                   valueLabel: _hzLabel(fx.filterHz),
                   value: _hzToT(fx.filterHz),
                   min: 0.0,
@@ -3612,8 +3612,8 @@ class _CreativeFxSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.timerReset,
-                  label: 'Delays',
-                  valueLabel: '${fx.delayMs.toStringAsFixed(0)} ms',
+                  label: l10n.delays,
+                  valueLabel: l10n.ms5(fx.delayMs.toStringAsFixed(0)),
                   value: fx.delayMs,
                   min: EqualizerNotifier.fxDelayMinMs,
                   max: EqualizerNotifier.fxDelayMaxMs,
@@ -3625,7 +3625,7 @@ class _CreativeFxSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.scanSearch,
-                  label: 'Size',
+                  label: l10n.size,
                   valueLabel: _percentLabel(fx.size),
                   value: fx.size,
                   min: EqualizerNotifier.fxSizeMin,
@@ -3638,7 +3638,7 @@ class _CreativeFxSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.audioLines,
-                  label: 'Mix',
+                  label: l10n.mix,
                   valueLabel: _percentLabel(fx.mix),
                   value: fx.mix,
                   min: EqualizerNotifier.fxMixMin,
@@ -3651,7 +3651,7 @@ class _CreativeFxSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.rotateCcw,
-                  label: 'Feedback',
+                  label: l10n.feedback,
                   valueLabel: _percentLabel(fx.feedback),
                   value: fx.feedback,
                   min: EqualizerNotifier.fxFeedbackMin,
@@ -3664,7 +3664,7 @@ class _CreativeFxSection extends ConsumerWidget {
                 ),
                 _LabeledKnob(
                   icon: LucideIcons.gitBranchPlus,
-                  label: 'Width',
+                  label: l10n.width,
                   valueLabel: _widthLabel(fx.width),
                   value: fx.width,
                   min: EqualizerNotifier.fxWidthMin,
@@ -3714,13 +3714,13 @@ class _ConvolverSection extends ConsumerWidget {
       await loadConvolverIr(storedPath);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Loaded IR: $displayName')),
+          SnackBar(content: Text(l10n.loadedIr(displayName))),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not load IR: $e')),
+          SnackBar(content: Text(l10n.couldNotLoadIr(e))),
         );
       }
     }
@@ -3744,9 +3744,9 @@ class _ConvolverSection extends ConsumerWidget {
 
     return _DynamicsCard(
       icon: LucideIcons.audioWaveform,
-      title: 'Convolver / Impulse Response',
+      title: l10n.convolverImpulseResponse,
       subtitle:
-          'Load an impulse response for room reverb, crossfeed, cabinet, or correction.',
+          l10n.loadAnImpulseResponseForRoom,
       active: editable,
       toggleValue: convolver.enabled,
       onToggleChanged: (value) =>
@@ -3759,14 +3759,14 @@ class _ConvolverSection extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Impulse response',
+                    l10n.impulseResponse,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: context.adaptiveTextTertiary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    convolver.irDisplayName ?? 'None',
+                    convolver.irDisplayName ?? l10n.none,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -3784,7 +3784,7 @@ class _ConvolverSection extends ConsumerWidget {
                   ? () => _pickIr(context, ref)
                   : null,
               icon: const Icon(LucideIcons.folderOpen, size: 18),
-              label: const Text('Load IR'),
+              label: Text(l10n.loadIr),
               style: TextButton.styleFrom(
                 foregroundColor: context.adaptiveTextPrimary,
               ),
@@ -3793,7 +3793,7 @@ class _ConvolverSection extends ConsumerWidget {
               TextButton.icon(
                 onPressed: () => _clearIr(context, ref),
                 icon: const Icon(LucideIcons.trash2, size: 18),
-                label: const Text('Clear'),
+                label: Text(l10n.clear),
                 style: TextButton.styleFrom(
                   foregroundColor: context.adaptiveTextPrimary,
                 ),
@@ -3804,7 +3804,7 @@ class _ConvolverSection extends ConsumerWidget {
         Center(
           child: _LabeledKnob(
             icon: LucideIcons.audioLines,
-            label: 'Mix',
+            label: l10n.mix,
             valueLabel: _percentLabel(convolver.mix),
             value: convolver.mix,
             min: EqualizerNotifier.convolverMixMin,
@@ -3908,7 +3908,7 @@ class _ProcessingSupportNote extends StatelessWidget {
           const SizedBox(width: AppConstants.spacingSm),
           Expanded(
             child: Text(
-              'On Android, the standard just_audio playback path now applies native counterparts for EQ, dynamics, balance, and spatial FX on supported devices. The Rust engine still delivers the most exact version of these controls, so some Android results are approximate.',
+              l10n.onAndroidTheStandardJustAudio,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.adaptiveTextSecondary,
               ),
@@ -4159,14 +4159,14 @@ class _ModeToggle extends StatelessWidget {
             children: [
               Expanded(
                 child: _ModeToggleButton(
-                  label: 'Graphic',
+                  label: l10n.graphic,
                   selected: mode == EqMode.graphic,
                   onTap: () => onChanged(EqMode.graphic),
                 ),
               ),
               Expanded(
                 child: _ModeToggleButton(
-                  label: 'Parametric',
+                  label: l10n.parametric,
                   selected: mode == EqMode.parametric,
                   onTap: () => onChanged(EqMode.parametric),
                 ),

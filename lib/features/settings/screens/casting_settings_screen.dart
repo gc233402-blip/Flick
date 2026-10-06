@@ -7,6 +7,7 @@ import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/casting/cast_device.dart';
 import 'package:flick/services/casting/chromecast_backend.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class CastingSettingsScreen extends ConsumerStatefulWidget {
   const CastingSettingsScreen({super.key});
@@ -42,8 +43,8 @@ class _CastingSettingsScreenState extends ConsumerState<CastingSettingsScreen> {
       };
 
   String _subtitleFor(CastDevice d) => switch (d.backend) {
-        CastBackend.dlna => 'DLNA / UPnP',
-        CastBackend.chromecast => 'Chromecast',
+        CastBackend.dlna => l10n.dlnaUpnp,
+        CastBackend.chromecast => l10n.chromecast,
       };
 
   Future<void> _onSelect(CastDevice device) async {
@@ -51,7 +52,7 @@ class _CastingSettingsScreenState extends ConsumerState<CastingSettingsScreen> {
     if (mounted) {
       ScaffoldMessenger.maybeOf(context)?.showSnackBar(
         SnackBar(
-          content: Text('Casting to ${device.name}'),
+          content: Text(l10n.castingTo2(device.name)),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -63,17 +64,17 @@ class _CastingSettingsScreenState extends ConsumerState<CastingSettingsScreen> {
     final castState = ref.watch(castProvider);
 
     return SettingsScaffold(
-      title: 'Casting',
+      title: l10n.casting,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Available Devices'),
+          SettingsSectionHeader(l10n.availableDevices),
           SettingsCard(
             children: [
               ActionButton(
                 icon: LucideIcons.refreshCw,
-                title: castState.isDiscovering ? 'Searching…' : 'Scan for devices',
-                subtitle: 'Discovers DLNA, UPnP and Chromecast receivers on your network',
+                title: castState.isDiscovering ? l10n.searching : l10n.scanForDevices,
+                subtitle: l10n.discoversDlnaUpnpAndChromecastReceivers,
                 onTap: castState.isDiscovering
                     ? null
                     : () => ref.read(castProvider.notifier).discover(),
@@ -104,25 +105,25 @@ class _CastingSettingsScreenState extends ConsumerState<CastingSettingsScreen> {
           ],
           if (castState.activeDevice != null) ...[
             const SizedBox(height: AppConstants.spacingLg),
-            const SettingsSectionHeader('Session'),
+            SettingsSectionHeader(l10n.session),
             SettingsCard(
               children: [
                 ActionButton(
                   icon: LucideIcons.powerOff,
-                  title: 'Stop Casting',
-                  subtitle: 'Disconnect from ${castState.activeDevice!.name}',
+                  title: l10n.stopCasting,
+                  subtitle: l10n.disconnectFrom(castState.activeDevice!.name),
                   onTap: () => ref.read(castProvider.notifier).disconnect(),
                 ),
               ],
             ),
           ],
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Output Device', tag: 'Android'),
+          SettingsSectionHeader(l10n.outputDevice, tag: 'Android'),
           SettingsCard(
             children: [_OutputSection()],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('About', tag: 'Info'),
+          SettingsSectionHeader(l10n.about, tag: 'Info'),
           SettingsCard(
             children: [
               _AboutBody(),
@@ -201,8 +202,8 @@ class _EmptyStateState extends State<_EmptyState>
             const SizedBox(height: AppConstants.spacingSm),
             Text(
               widget.visible
-                  ? 'No casting devices found. Make sure your phone and the receiver are on the same network.'
-                  : 'Searching the local network…',
+                  ? l10n.noCastingDevicesFoundMakeSure
+                  : l10n.searchingTheLocalNetwork,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextTertiary,
@@ -254,14 +255,14 @@ class _OutputSectionState extends State<_OutputSection> {
           children: [
             ActionButton(
               icon: LucideIcons.refreshCw,
-              title: 'Refresh outputs',
-              subtitle: 'List available local audio output devices',
+              title: l10n.refreshOutputs,
+              subtitle: l10n.listAvailableLocalAudioOutputDevices,
               onTap: _refresh,
             ),
             if (routes.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(AppConstants.spacingLg),
-                child: Text('No output devices available.'),
+                child: Text(l10n.noOutputDevicesAvailable),
               )
             else
               for (var i = 0; i < routes.length; i++) ...[
@@ -278,7 +279,7 @@ class _OutputSectionState extends State<_OutputSection> {
     final selected = r['selected'] == true;
     return SelectionSetting(
       icon: _iconFor(r['type'] as String?),
-      title: r['name'] as String? ?? 'Output',
+      title: r['name'] as String? ?? l10n.output,
       subtitle: r['type'] as String? ?? '',
       selected: selected,
       onTap: selected
@@ -297,12 +298,7 @@ class _AboutBody extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(AppConstants.spacingLg),
       child: Text(
-        'DLNA and UPnP receivers are controlled directly in pure Dart — no extra '
-        'dependencies. Chromecast support uses the native Cast SDK. Network '
-        'sources (Subsonic, WebDAV, Jellyfin, UPnP), local files, and cached '
-        'songs can all be cast — locals are served straight from this phone. '
-        'While casting, volume keys and the system volume panel control the '
-        'connected device.',
+        l10n.dlnaAndUpnpReceiversAreControlled,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: context.adaptiveTextSecondary,
               height: 1.4,

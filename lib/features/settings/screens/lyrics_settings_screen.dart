@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/providers/app_preferences_provider.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class LyricsSettingsScreen extends ConsumerWidget {
   const LyricsSettingsScreen({super.key});
@@ -13,18 +14,18 @@ class LyricsSettingsScreen extends ConsumerWidget {
     final appPrefs = ref.watch(appPreferencesProvider);
 
     return SettingsScaffold(
-      title: 'Lyrics',
+      title: l10n.lyrics,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Saving'),
+          SettingsSectionHeader(l10n.saving2),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.fileText,
-                title: 'Match Audio Filename',
+                title: l10n.matchAudioFilename,
                 subtitle:
-                    'Use the current audio file\'s name when saving lyrics internally',
+                    l10n.useTheCurrentAudioFileS,
                 value: appPrefs.lyricsMatchAudioFilename,
                 onChanged: (value) {
                   ref
@@ -35,14 +36,14 @@ class LyricsSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Display'),
+          SettingsSectionHeader(l10n.display),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.music,
-                title: 'Karaoke effect',
+                title: l10n.karaokeEffect,
                 subtitle:
-                    'Sweep a highlight through words as they are sung',
+                    l10n.sweepAHighlightThroughWordsAs,
                 value: appPrefs.karaokeEnabled,
                 onChanged: (value) {
                   ref
@@ -53,8 +54,8 @@ class LyricsSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: Icons.format_align_left_rounded,
-                title: 'Left',
-                subtitle: 'Align lyric text to the left edge',
+                title: l10n.left,
+                subtitle: l10n.alignLyricTextToTheLeft,
                 selected: appPrefs.lyricsTextAlign == 'left',
                 onTap: () {
                   ref
@@ -65,8 +66,8 @@ class LyricsSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: Icons.format_align_center_rounded,
-                title: 'Center',
-                subtitle: 'Align lyric text to the center',
+                title: l10n.center,
+                subtitle: l10n.alignLyricTextToTheCenter,
                 selected: appPrefs.lyricsTextAlign == 'center',
                 onTap: () {
                   ref
@@ -77,8 +78,8 @@ class LyricsSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: Icons.format_align_right_rounded,
-                title: 'Right',
-                subtitle: 'Align lyric text to the right edge',
+                title: l10n.right,
+                subtitle: l10n.alignLyricTextToTheRight,
                 selected: appPrefs.lyricsTextAlign == 'right',
                 onTap: () {
                   ref

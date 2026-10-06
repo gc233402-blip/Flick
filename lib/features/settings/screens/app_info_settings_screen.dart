@@ -18,6 +18,7 @@ import 'package:flick/features/settings/screens/support_flick_screen.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class AppInfoSettingsScreen extends ConsumerStatefulWidget {
   const AppInfoSettingsScreen({super.key});
@@ -77,14 +78,14 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
 
     final updateState = ref.read(updateCheckProvider);
     if (!updateState.isOnline) {
-      _showToast('Connect to the internet to check for updates.');
+      _showToast(l10n.connectToTheInternetToCheck);
       return;
     }
     if (updateState.updateAvailable) {
       if (updateState.isPlayStoreBuild) {
-        _showToast('Update available on the Play Store.');
+        _showToast(l10n.updateAvailableOnThePlayStore);
       } else {
-        _showToast('Update available — download from flick-player.site');
+        _showToast(l10n.updateAvailableDownloadFromFlickPlayer);
       }
       return;
     }
@@ -92,7 +93,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
       _showToast(updateState.errorMessage!);
       return;
     }
-    _showToast('No new update found.');
+    _showToast(l10n.noNewUpdateFound);
   }
 
   Future<void> _openPlayStoreListing() async {
@@ -114,11 +115,11 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
         launched = await launchUrl(webUri, mode: LaunchMode.platformDefault);
       }
       if (!launched && mounted) {
-        _showToast('Could not open the Play Store');
+        _showToast(l10n.couldNotOpenThePlayStore3);
       }
     } catch (error) {
       if (mounted) {
-        _showToast('Could not open the Play Store: $error');
+        _showToast(l10n.couldNotOpenThePlayStore2(error));
       }
     }
   }
@@ -130,50 +131,50 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
     if (updateState.isChecking) {
       return (
         icon: LucideIcons.refreshCw,
-        title: 'Checking for Updates',
+        title: l10n.checkingForUpdates,
         subtitle: isPlay
-            ? 'Looking for the latest Play Store update right now'
-            : 'Looking for the latest Flick release right now',
+            ? l10n.lookingForTheLatestPlayStore
+            : l10n.lookingForTheLatestFlickRelease,
       );
     }
     if (updateState.updateAvailable) {
       return (
         icon: LucideIcons.badgeAlert,
-        title: 'Update Available',
+        title: l10n.updateAvailable,
         subtitle: isPlay
-            ? 'Open the Play Store to install the latest Flick build'
-            : 'Download the latest APK from flick-player.site',
+            ? l10n.openThePlayStoreToInstall
+            : l10n.downloadTheLatestApkFromFlick,
       );
     }
     if (updateState.errorMessage != null) {
       return (
         icon: LucideIcons.info,
-        title: 'Could Not Check for Updates',
+        title: l10n.couldNotCheckForUpdates,
         subtitle: updateState.errorMessage!,
       );
     }
     if (!updateState.isOnline) {
       return (
         icon: LucideIcons.wifiOff,
-        title: 'Offline',
-        subtitle: 'Reconnect to Wi-Fi or mobile data so Flick can scan again',
+        title: l10n.offline,
+        subtitle: l10n.reconnectToWiFiOrMobile,
       );
     }
     if (updateState.hasChecked) {
       return (
         icon: LucideIcons.badgeCheck,
-        title: 'No Update Available',
+        title: l10n.noUpdateAvailable,
         subtitle: isPlay
-            ? 'You already have the latest Play Store release'
-            : 'You already have the latest Flick release',
+            ? l10n.youAlreadyHaveTheLatestPlay
+            : l10n.youAlreadyHaveTheLatestFlick,
       );
     }
     return (
       icon: LucideIcons.info,
-      title: 'Automatic Update Checks',
+      title: l10n.automaticUpdateChecks,
       subtitle: isPlay
-          ? 'Flick scans for Play Store updates whenever you are online'
-          : 'Flick checks flick-player.site for updates whenever you are online',
+          ? l10n.flickScansForPlayStoreUpdates
+          : l10n.flickChecksFlickPlayerSiteFor,
     );
   }
 
@@ -247,8 +248,8 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
           ? title!
           : tag?.isNotEmpty == true
           ? tag!
-          : 'Latest Update',
-      body: body?.isNotEmpty == true ? body! : 'No patch notes available yet.',
+          : l10n.latestUpdate,
+      body: body?.isNotEmpty == true ? body! : l10n.noPatchNotesAvailableYet,
       url: htmlUrl?.isNotEmpty == true ? htmlUrl! : _releaseNotesUrl,
     );
   }
@@ -256,7 +257,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
   void _showPatchNotesBottomSheet() {
     GlassBottomSheet.show(
       context: context,
-      title: 'Patch Notes',
+      title: l10n.patchNotes,
       maxHeightRatio: 0.7,
       content: FutureBuilder<_PatchNotes>(
         future: _fetchPatchNotes(),
@@ -273,7 +274,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                   const CircularProgressIndicator(color: AppColors.textPrimary),
                   const SizedBox(height: AppConstants.spacingMd),
                   Text(
-                    'Loading patch notes...',
+                    l10n.loadingPatchNotes,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.adaptiveTextSecondary,
                     ),
@@ -297,7 +298,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                     border: Border.all(color: AppColors.glassBorder),
                   ),
                   child: Text(
-                    'Unable to load patch notes right now.',
+                    l10n.unableToLoadPatchNotesRight,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.adaptiveTextSecondary,
                     ),
@@ -309,7 +310,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                   child: TextButton.icon(
                     onPressed: () => _launchUrl(_releaseNotesUrl),
                     icon: const Icon(LucideIcons.externalLink),
-                    label: const Text('Open Release Notes'),
+                    label: Text(l10n.openReleaseNotes),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.textSecondary,
                     ),
@@ -398,7 +399,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                   child: TextButton.icon(
                     onPressed: () => _launchUrl(notes.url),
                     icon: const Icon(LucideIcons.externalLink),
-                    label: const Text('Open Full Notes'),
+                    label: Text(l10n.openFullNotes),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.textSecondary,
                     ),
@@ -416,7 +417,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
   void _showAboutBottomSheet() {
     GlassBottomSheet.show(
       context: context,
-      title: 'About Flick Player',
+      title: l10n.aboutFlickPlayer,
       maxHeightRatio: 0.5,
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -440,8 +441,8 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
             ),
           ),
           const SizedBox(height: AppConstants.spacingMd),
-          const Text(
-            'Flick Player',
+          Text(
+            l10n.flickPlayer,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 24,
@@ -450,8 +451,8 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Version $kAppVersion',
+          Text(
+            l10n.version(kAppVersion),
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 14,
@@ -466,8 +467,8 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
               borderRadius: BorderRadius.circular(AppConstants.radiusMd),
               border: Border.all(color: AppColors.glassBorder),
             ),
-            child: const Text(
-              'A premium music player with custom UAC 2.0 powered by Rust for the best audio experience.',
+            child: Text(
+              l10n.aPremiumMusicPlayerWithCustom,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'ProductSans',
@@ -485,8 +486,8 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                 onPressed: () =>
                     _launchUrl('https://github.com/moss-apps/Flick'),
                 icon: const Icon(LucideIcons.squareCode, size: 18),
-                label: const Text(
-                  'GitHub',
+                label: Text(
+                  l10n.github,
                   style: TextStyle(fontFamily: 'ProductSans'),
                 ),
                 style: TextButton.styleFrom(
@@ -497,8 +498,8 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
               TextButton.icon(
                 onPressed: () => _launchUrl('https://discord.gg/5hgcrdnKY6'),
                 icon: const Icon(LucideIcons.messageCircle, size: 18),
-                label: const Text(
-                  'Discord',
+                label: Text(
+                  l10n.discord,
                   style: TextStyle(fontFamily: 'ProductSans'),
                 ),
                 style: TextButton.styleFrom(
@@ -513,29 +514,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
     );
   }
 
-  static const String _flickLicenseText = '''
-MIT License
-
-Copyright (c) 2026 Flick Player Contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-''';
+  static String get _flickLicenseText => l10n.mitLicenseCopyrightC2026Flick;
 
   static bool _flickLicenseRegistered = false;
 
@@ -553,7 +532,7 @@ SOFTWARE.
         builder: (_) => Theme(
           data: Theme.of(context).copyWith(platform: TargetPlatform.iOS),
           child: LicensePage(
-            applicationName: 'Flick',
+            applicationName: l10n.flick,
             applicationVersion: kAppVersion,
             applicationIcon: Padding(
               padding: const EdgeInsets.all(AppConstants.spacingSm),
@@ -581,11 +560,11 @@ SOFTWARE.
         launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
       }
       if (!launched && mounted) {
-        _showToast('Could not open the link');
+        _showToast(l10n.couldNotOpenTheLink);
       }
     } catch (e) {
       if (mounted) {
-        _showToast('Could not open the link: $e');
+        _showToast(l10n.couldNotOpenTheLink2(e));
       }
     }
   }
@@ -595,23 +574,23 @@ SOFTWARE.
     final updateState = ref.watch(updateCheckProvider);
 
     return SettingsScaffold(
-      title: 'App Info',
+      title: l10n.appInfo,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Updates'),
+          SettingsSectionHeader(l10n.updates),
           SettingsCard(
             children: [
               ActionButton(
                 icon: LucideIcons.refreshCw,
                 title: updateState.isChecking
-                    ? 'Checking for Updates...'
-                    : 'Check Again',
+                    ? l10n.checkingForUpdates2
+                    : l10n.checkAgain,
                 subtitle: updateState.isOnline
                     ? updateState.isPlayStoreBuild
-                          ? 'Run another Play Store update scan right now'
-                          : 'Run another update scan right now'
-                    : 'Reconnect to the internet to scan for updates',
+                          ? l10n.runAnotherPlayStoreUpdateScan
+                          : l10n.runAnotherUpdateScanRightNow
+                    : l10n.reconnectToTheInternetToScan,
                 onTap: updateState.isChecking ? null : _checkForUpdatesManually,
               ),
               const SettingsDivider(),
@@ -620,23 +599,23 @@ SOFTWARE.
                 const SettingsDivider(),
                 NavigationSetting(
                   icon: LucideIcons.fileText,
-                  title: 'Patch Notes',
-                  subtitle: 'See what is new in this update',
+                  title: l10n.patchNotes,
+                  subtitle: l10n.seeWhatIsNewInThis,
                   onTap: _showPatchNotesBottomSheet,
                 ),
                 const SettingsDivider(),
                 if (updateState.isPlayStoreBuild)
                   ActionButton(
                     icon: LucideIcons.externalLink,
-                    title: 'Open in Play Store',
-                    subtitle: 'Jump to the Flick listing and update from there',
+                    title: l10n.openInPlayStore,
+                    subtitle: l10n.jumpToTheFlickListingAnd,
                     onTap: _openPlayStoreListing,
                   )
                 else
                   ActionButton(
                     icon: LucideIcons.download,
-                    title: 'Download Update',
-                    subtitle: 'Get the latest APK from flick-player.site',
+                    title: l10n.downloadUpdate,
+                    subtitle: l10n.getTheLatestApkFromFlick,
                     onTap: () =>
                         _launchUrl(UpdateCheckNotifier.flickWebsiteDownloadUrl),
                   ),
@@ -644,27 +623,27 @@ SOFTWARE.
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('About'),
+          SettingsSectionHeader(l10n.about),
           SettingsCard(
             children: [
               NavigationSetting(
                 icon: LucideIcons.info,
-                title: 'About Flick Player',
-                subtitle: 'Version $kAppVersion',
+                title: l10n.aboutFlickPlayer,
+                subtitle: l10n.version(kAppVersion),
                 onTap: _showAboutBottomSheet,
               ),
               const SettingsDivider(),
               NavigationSetting(
                 icon: LucideIcons.fileText,
-                title: 'Licenses',
-                subtitle: 'Open source licenses',
+                title: l10n.licenses,
+                subtitle: l10n.openSourceLicenses,
                 onTap: _openLicensesScreen,
               ),
               const SettingsDivider(),
               NavigationSetting(
                 icon: LucideIcons.shieldCheck,
-                title: 'Privacy Policy',
-                subtitle: 'How we handle your data',
+                title: l10n.privacyPolicy,
+                subtitle: l10n.howWeHandleYourData,
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -676,8 +655,8 @@ SOFTWARE.
               const SettingsDivider(),
               NavigationSetting(
                 icon: LucideIcons.sparkles,
-                title: 'View Onboarding',
-                subtitle: 'Replay the tutorial and feature guide',
+                title: l10n.viewOnboarding,
+                subtitle: l10n.replayTheTutorialAndFeatureGuide,
                 onTap: () {
                   ref.read(onboardingCompletedProvider.notifier).reset();
                   Navigator.of(context).push(
@@ -690,8 +669,8 @@ SOFTWARE.
               const SettingsDivider(),
               NavigationSetting(
                 icon: LucideIcons.graduationCap,
-                title: 'Interactive Tutorial',
-                subtitle: 'Step-by-step walkthrough of the app',
+                title: l10n.interactiveTutorial,
+                subtitle: l10n.stepByStepWalkthroughOfThe,
                 onTap: () {
                   ref.read(tutorialProvider.notifier).start();
                   Navigator.of(context).popUntil((route) => route.isFirst);
@@ -700,7 +679,7 @@ SOFTWARE.
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Support'),
+          SettingsSectionHeader(l10n.support),
           AnimatedBuilder(
             animation: _donationPulseAnimation,
             builder: (context, child) {
@@ -714,8 +693,8 @@ SOFTWARE.
                 children: [
                   NavigationSetting(
                     icon: LucideIcons.heart,
-                    title: 'Support Flick',
-                    subtitle: 'Donate, fund features, and keep the app alive',
+                    title: l10n.supportFlick,
+                    subtitle: l10n.donateFundFeaturesAndKeepThe,
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute<void>(

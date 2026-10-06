@@ -13,6 +13,7 @@ import 'package:flick/features/settings/screens/uac2_preferences_screen.dart';
 import 'package:flick/widgets/uac2/uac2_volume_control.dart';
 import 'package:flick/widgets/uac2/uac2_hotplug_monitor.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
+import 'package:flick/l10n/l10n.dart';
 
 
 class Uac2SettingsScreen extends ConsumerStatefulWidget {
@@ -63,7 +64,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
                           if (!isAvailable) _buildUnavailableCard(context),
                           if (isAvailable) ...[
                             const Uac2HotplugMonitor(),
-                            _buildSectionHeader(context, 'USB Audio Devices'),
+                            _buildSectionHeader(context, l10n.usbAudioDevices),
                             devicesAsync.when(
                               data: (devices) => _buildDevicesList(
                                 context,
@@ -76,15 +77,15 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
                             ),
                             if (selectedDevice != null) ...[
                               const SizedBox(height: AppConstants.spacingLg),
-                              _buildSectionHeader(context, 'Device Information'),
+                              _buildSectionHeader(context, l10n.deviceInformation),
                               _buildDeviceInfoCard(context, selectedDevice),
                               const SizedBox(height: AppConstants.spacingLg),
-                              _buildSectionHeader(context, 'Capabilities'),
+                              _buildSectionHeader(context, l10n.capabilities),
                               _buildCapabilitiesCard(context, selectedDevice),
                             ],
                             if (deviceStatus != null) ...[
                               const SizedBox(height: AppConstants.spacingLg),
-                              _buildSectionHeader(context, 'Status'),
+                              _buildSectionHeader(context, l10n.status),
                               _buildStatusCard(context, deviceStatus),
                             ],
                             if (deviceStatus != null &&
@@ -92,7 +93,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
                                 deviceStatus.hasVolumeControl &&
                                 appPreferences.showUsbVolumeOnSettings) ...[
                               const SizedBox(height: AppConstants.spacingLg),
-                              _buildSectionHeader(context, 'Volume Control'),
+                              _buildSectionHeader(context, l10n.volumeControl),
                               const Uac2VolumeControl(),
                             ],
 
@@ -127,7 +128,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
           const SizedBox(width: AppConstants.spacingSm),
           Expanded(
             child: Text(
-              'USB Audio (UAC2)',
+              l10n.usbAudioUac2,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextPrimary,
@@ -144,7 +145,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
               );
             },
             color: context.adaptiveTextPrimary,
-            tooltip: 'Preferences',
+            tooltip: l10n.preferences,
           ),
         ],
       ),
@@ -186,7 +187,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
           const SizedBox(width: AppConstants.spacingMd),
           Expanded(
             child: Text(
-              'UAC2 is not available on this platform',
+              l10n.uac2IsNotAvailableOnThis,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.adaptiveTextSecondary,
               ),
@@ -223,7 +224,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
           const SizedBox(width: AppConstants.spacingMd),
           Expanded(
             child: Text(
-              'Error: $error',
+              l10n.error(error),
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: Colors.red.shade400),
@@ -286,14 +287,14 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
           Icon(Icons.usb_off, color: context.adaptiveTextTertiary, size: 48),
           const SizedBox(height: AppConstants.spacingMd),
           Text(
-            'No USB audio devices found',
+            l10n.noUsbAudioDevicesFound,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: context.adaptiveTextSecondary,
             ),
           ),
           const SizedBox(height: AppConstants.spacingSm),
           Text(
-            'Connect a USB DAC or audio interface',
+            l10n.connectAUsbDacOrAudio,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -440,7 +441,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
               ),
               const SizedBox(width: AppConstants.spacingSm),
               Text(
-                'Refresh Devices',
+                l10n.refreshDevices,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.adaptiveTextSecondary,
                   fontWeight: FontWeight.w500,
@@ -465,35 +466,35 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
         children: [
           _buildInfoRow(
             context,
-            'Manufacturer',
-            device.manufacturer.isNotEmpty ? device.manufacturer : 'Unknown',
+            l10n.manufacturer,
+            device.manufacturer.isNotEmpty ? device.manufacturer : l10n.unknown,
             LucideIcons.building,
           ),
           _buildDivider(),
           _buildInfoRow(
             context,
-            'Product',
+            l10n.product,
             device.productName,
             LucideIcons.package,
           ),
           _buildDivider(),
           _buildInfoRow(
             context,
-            'Serial Number',
+            l10n.serialNumber,
             device.serial ?? 'N/A',
             LucideIcons.hash,
           ),
           _buildDivider(),
           _buildInfoRow(
             context,
-            'Vendor ID',
+            l10n.vendorId,
             '0x${device.vendorId.toRadixString(16).toUpperCase().padLeft(4, '0')}',
             LucideIcons.tag,
           ),
           _buildDivider(),
           _buildInfoRow(
             context,
-            'Product ID',
+            l10n.productId,
             '0x${device.productId.toRadixString(16).toUpperCase().padLeft(4, '0')}',
             LucideIcons.tag,
           ),
@@ -526,7 +527,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
         border: Border.all(color: AppColors.glassBorder),
       ),
       child: Text(
-        'Capabilities not available',
+        l10n.capabilitiesNotAvailable,
         style: Theme.of(
           context,
         ).textTheme.bodyMedium?.copyWith(color: context.adaptiveTextTertiary),
@@ -550,14 +551,14 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
         children: [
           _buildInfoRow(
             context,
-            'Device Type',
+            l10n.deviceType,
             capabilities.deviceType,
             LucideIcons.cpu,
           ),
           _buildDivider(),
           _buildInfoRow(
             context,
-            'Sample Rates',
+            l10n.sampleRates,
             capabilities.supportedSampleRates
                 .map((r) => '${r ~/ 1000}kHz')
                 .join(', '),
@@ -566,20 +567,20 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
           _buildDivider(),
           _buildInfoRow(
             context,
-            'Bit Depths',
+            l10n.bitDepths,
             capabilities.supportedBitDepths.map((d) => '${d}bit').join(', '),
             LucideIcons.layers,
           ),
           _buildDivider(),
           _buildInfoRow(
             context,
-            'Channels',
+            l10n.channels,
             capabilities.supportedChannels
                 .map(
                   (c) => c == 1
-                      ? 'Mono'
+                      ? l10n.mono
                       : c == 2
-                      ? 'Stereo'
+                      ? l10n.stereo
                       : '$c ch',
                 )
                 .join(', '),
@@ -604,7 +605,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
         children: [
           _buildInfoRow(
             context,
-            'Connection Status',
+            l10n.connectionStatus,
             _getStatusLabel(status.state),
             LucideIcons.activity,
             valueColor: _getStatusColor(status.state),
@@ -613,7 +614,7 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
             _buildDivider(),
             _buildInfoRow(
               context,
-              'Playback Path',
+              l10n.playbackPath,
               _getPlaybackPathLabel(status, diagnostics: diagnostics),
               Icons.alt_route,
             ),
@@ -622,14 +623,14 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
             _buildDivider(),
             _buildInfoRow(
               context,
-              'Capability State',
+              l10n.capabilityState,
               diagnostics.capabilityStateLabel,
               Icons.tune,
             ),
             _buildDivider(),
             _buildInfoRow(
               context,
-              'Backend',
+              l10n.backend,
               diagnostics.backendDescription,
               Icons.memory,
             ),
@@ -638,45 +639,45 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
             _buildDivider(),
             _buildInfoRow(
               context,
-              status.currentFormat!.isDsdStream ? 'Track DSD Rate' : 'Track Sample Rate',
+              status.currentFormat!.isDsdStream ? l10n.trackDsdRate : l10n.trackSampleRate,
               status.currentFormat!.displayRateLabel,
               Icons.graphic_eq,
             ),
             _buildDivider(),
             _buildInfoRow(
               context,
-              'Track Bit Depth',
+              l10n.trackBitDepth,
               status.currentFormat!.bitDepthLabel,
               LucideIcons.layers,
             ),
             _buildDivider(),
             _buildInfoRow(
               context,
-              'Track Channels',
+              l10n.trackChannels,
               status.currentFormat!.channels == 1
-                  ? 'Mono'
+                  ? l10n.mono
                   : status.currentFormat!.channels == 2
-                  ? 'Stereo'
-                  : '${status.currentFormat!.channels} channels',
+                  ? l10n.stereo
+                  : l10n.channels2(status.currentFormat!.channels),
               LucideIcons.radio,
             ),
             if (diagnostics != null) ...[
               _buildDivider(),
               _buildInfoRow(
                 context,
-                'Requested Output Rate',
+                l10n.requestedOutputRate,
                 diagnostics.requestedOutputSampleRate == null
-                    ? 'Unknown'
-                    : '${diagnostics.requestedOutputSampleRate! ~/ 1000}kHz',
+                    ? l10n.unknown
+                    : l10n.khz(diagnostics.requestedOutputSampleRate! ~/ 1000),
                 Icons.speed,
               ),
               _buildDivider(),
               _buildInfoRow(
                 context,
-                'Reported Output Rate',
+                l10n.reportedOutputRate,
                 diagnostics.reportedOutputSampleRate == null
-                    ? 'Unreported'
-                    : '${diagnostics.reportedOutputSampleRate! ~/ 1000}kHz',
+                    ? l10n.unreported
+                    : l10n.khz(diagnostics.reportedOutputSampleRate! ~/ 1000),
                 Icons.graphic_eq,
               ),
             ],
@@ -685,10 +686,10 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
             _buildDivider(),
             _buildInfoRow(
               context,
-              'Mixer Management',
+              l10n.mixerManagement,
               diagnostics.isMixerManaged
                   ? 'Android-managed'
-                  : 'Direct USB device-managed',
+                  : l10n.directUsbDeviceManaged,
               Icons.account_tree_outlined,
               valueColor: diagnostics.isMixerManaged
                   ? Colors.amber.shade300
@@ -697,12 +698,12 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
             _buildDivider(),
             _buildInfoRow(
               context,
-              'DAC Claim',
+              l10n.dacClaim,
               diagnostics.directUsbRegistered
                   ? (diagnostics.usbInterfaceClaimed
-                        ? 'Claimed by Flick'
-                        : 'Registered, not claimed')
-                  : 'Not registered',
+                        ? l10n.claimedByFlick
+                        : l10n.registeredNotClaimed)
+                  : l10n.notRegistered,
               Icons.usb,
               valueColor: diagnostics.usbInterfaceClaimed
                   ? Colors.green.shade400
@@ -711,8 +712,8 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
             _buildDivider(),
             _buildInfoRow(
               context,
-              'Audio Focus',
-              diagnostics.audioFocusHeld ? 'Held' : 'Not held',
+              l10n.audioFocus,
+              diagnostics.audioFocusHeld ? l10n.held : l10n.notHeld,
               Icons.hearing,
               valueColor: diagnostics.audioFocusHeld
                   ? Colors.green.shade400
@@ -896,17 +897,17 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
   String _getStatusLabel(Uac2State state) {
     switch (state) {
       case Uac2State.idle:
-        return 'Idle';
+        return l10n.idle;
       case Uac2State.connecting:
-        return 'Connecting';
+        return l10n.connecting;
       case Uac2State.connected:
-        return 'Connected';
+        return l10n.connected;
       case Uac2State.prewarming:
-        return 'Prewarming';
+        return l10n.prewarming;
       case Uac2State.streaming:
-        return 'Streaming';
+        return l10n.streaming;
       case Uac2State.error:
-        return 'Error';
+        return l10n.error3;
     }
   }
 
@@ -920,17 +921,17 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
 
     switch (status.routeType) {
       case Uac2RouteType.internalDac:
-        return 'Device DAC';
+        return l10n.deviceDac;
       case Uac2RouteType.externalUsb:
-        return 'Android USB route';
+        return l10n.androidUsbRoute;
       case Uac2RouteType.wired:
-        return 'Wired output';
+        return l10n.wiredOutput;
       case Uac2RouteType.bluetooth:
-        return 'Bluetooth output';
+        return l10n.bluetoothOutput;
       case Uac2RouteType.dock:
-        return 'Android dock route';
+        return l10n.androidDockRoute;
       case Uac2RouteType.unknown:
-        return status.routeLabel ?? 'Unknown';
+        return status.routeLabel ?? l10n.unknown;
     }
   }
 }

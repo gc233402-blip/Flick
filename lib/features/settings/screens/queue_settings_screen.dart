@@ -5,6 +5,7 @@ import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class QueueSettingsScreen extends ConsumerWidget {
   const QueueSettingsScreen({super.key});
@@ -14,11 +15,11 @@ class QueueSettingsScreen extends ConsumerWidget {
     final playerService = ref.read(playerServiceProvider);
 
     return SettingsScaffold(
-      title: 'Queue',
+      title: l10n.queue,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Queue'),
+          SettingsSectionHeader(l10n.queue),
           SettingsCard(
             children: [
               _WrapAroundQueueTile(playerService: playerService),
@@ -45,10 +46,10 @@ class _WrapAroundQueueTile extends StatelessWidget {
         final enabled = playerService.wrapAroundQueueNotifier.value;
         return ToggleSetting(
           icon: LucideIcons.refreshCw,
-          title: 'Wrap-around Queue',
+          title: l10n.wrapAroundQueue,
           subtitle: enabled
-              ? 'Songs before the tapped track queue at the end'
-              : 'Stop at the end of the current list',
+              ? l10n.songsBeforeTheTappedTrackQueue
+              : l10n.stopAtTheEndOfThe,
           value: enabled,
           onChanged: (value) => playerService.setWrapAroundQueue(value),
         );
@@ -70,10 +71,10 @@ class _AutoplayOnQueueEndTile extends StatelessWidget {
         final enabled = playerService.autoplayOnQueueEndNotifier.value;
         return ToggleSetting(
           icon: LucideIcons.shuffle,
-          title: 'Autoplay on Queue End',
+          title: l10n.autoplayOnQueueEnd,
           subtitle: enabled
-              ? 'Play a random library song when the queue ends'
-              : 'Stop when the queue ends',
+              ? l10n.playARandomLibrarySongWhen
+              : l10n.stopWhenTheQueueEnds,
           value: enabled,
           onChanged: (value) => playerService.setAutoplayOnQueueEnd(value),
         );

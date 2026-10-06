@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/app_preferences_provider.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class OrbitSettingsScreen extends ConsumerWidget {
   const OrbitSettingsScreen({super.key});
@@ -14,17 +15,17 @@ class OrbitSettingsScreen extends ConsumerWidget {
     final notifier = ref.read(appPreferencesProvider.notifier);
 
     return SettingsScaffold(
-      title: 'Customize Orbital',
+      title: l10n.customizeOrbital,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Geometry'),
+          SettingsSectionHeader(l10n.geometry),
           SettingsCard(
             children: [
               SliderSetting(
                 icon: LucideIcons.radius,
-                title: 'Curvature',
-                subtitle: 'Curve of the orbit arc — higher is gentler',
+                title: l10n.curvature,
+                subtitle: l10n.curveOfTheOrbitArcHigher,
                 value: prefs.orbitRadiusRatio,
                 displayValue: prefs.orbitRadiusRatio.toStringAsFixed(2),
                 min: 0.5,
@@ -35,8 +36,8 @@ class OrbitSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.moveVertical,
-                title: 'Vertical Position',
-                subtitle: 'Where the focal song sits vertically',
+                title: l10n.verticalPosition,
+                subtitle: l10n.whereTheFocalSongSitsVertically,
                 value: prefs.orbitCenterYRatio,
                 displayValue: '${(prefs.orbitCenterYRatio * 100).round()}%',
                 min: 0.30,
@@ -47,8 +48,8 @@ class OrbitSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.moveHorizontal,
-                title: 'Horizontal Reach',
-                subtitle: 'How far the arc opens from the left edge',
+                title: l10n.horizontalReach,
+                subtitle: l10n.howFarTheArcOpensFrom,
                 value: prefs.orbitCenterOffsetRatio,
                 displayValue: prefs.orbitCenterOffsetRatio.toStringAsFixed(2),
                 min: -1.0,
@@ -59,8 +60,8 @@ class OrbitSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.ruler,
-                title: 'Item Spacing',
-                subtitle: 'Distance between songs along the arc',
+                title: l10n.itemSpacing,
+                subtitle: l10n.distanceBetweenSongsAlongTheArc,
                 value: prefs.orbitItemSpacing,
                 displayValue: prefs.orbitItemSpacing.toStringAsFixed(2),
                 min: 0.15,
@@ -71,13 +72,13 @@ class OrbitSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Sizing'),
+          SettingsSectionHeader(l10n.sizing),
           SettingsCard(
             children: [
               SliderSetting(
                 icon: LucideIcons.expand,
-                title: 'Card Size',
-                subtitle: 'Base album-art size for each song card',
+                title: l10n.cardSize,
+                subtitle: l10n.baseAlbumArtSizeForEach,
                 value: prefs.orbitCardArtSize,
                 displayValue: '${prefs.orbitCardArtSize.round()}px',
                 min: 48,
@@ -88,8 +89,8 @@ class OrbitSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.arrowLeftRight,
-                title: 'Card Width',
-                subtitle: 'How wide each card spans across the screen',
+                title: l10n.cardWidth,
+                subtitle: l10n.howWideEachCardSpansAcross,
                 value: prefs.orbitCardWidthRatio,
                 displayValue: '${(prefs.orbitCardWidthRatio * 100).round()}%',
                 min: 0.5,
@@ -105,13 +106,13 @@ class OrbitSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Depth'),
+          SettingsSectionHeader(l10n.depth),
           SettingsCard(
             children: [
               SliderSetting(
                 icon: LucideIcons.maximize,
-                title: 'Selected Size',
-                subtitle: 'Scale of the centered, focused song card',
+                title: l10n.selectedSize,
+                subtitle: l10n.scaleOfTheCenteredFocusedSong,
                 value: prefs.orbitSelectedScale,
                 displayValue: prefs.orbitSelectedScale.toStringAsFixed(2),
                 min: 1.0,
@@ -122,8 +123,8 @@ class OrbitSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.chevronsDown,
-                title: 'Depth',
-                subtitle: 'How much side cards shrink away from center',
+                title: l10n.depth,
+                subtitle: l10n.howMuchSideCardsShrinkAway,
                 value: prefs.orbitDepth,
                 displayValue: '${(prefs.orbitDepth * 100).round()}%',
                 min: 0.0,
@@ -134,58 +135,58 @@ class OrbitSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Art Resolution'),
+          SettingsSectionHeader(l10n.artResolution),
           SettingsCard(
             children: [
               SelectionSetting(
                 icon: LucideIcons.imageMinus,
-                title: 'Low',
-                subtitle: 'Pixelated — lightest on memory',
+                title: l10n.low,
+                subtitle: l10n.pixelatedLightestOnMemory,
                 selected: prefs.orbitArtResolutionMultiplier == 1.0,
                 onTap: () => notifier.setOrbitArtResolutionMultiplier(1.0),
               ),
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.image,
-                title: 'Medium',
-                subtitle: 'Soft detail, balanced',
+                title: l10n.medium,
+                subtitle: l10n.softDetailBalanced,
                 selected: prefs.orbitArtResolutionMultiplier == 1.5,
                 onTap: () => notifier.setOrbitArtResolutionMultiplier(1.5),
               ),
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.aperture,
-                title: 'High',
-                subtitle: 'Sharp (recommended)',
+                title: l10n.high,
+                subtitle: l10n.sharpRecommended,
                 selected: prefs.orbitArtResolutionMultiplier == 2.0,
                 onTap: () => notifier.setOrbitArtResolutionMultiplier(2.0),
               ),
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.sparkles,
-                title: 'Ultra',
-                subtitle: 'Crispest — heavier during fast scrolling',
+                title: l10n.ultra,
+                subtitle: l10n.crispestHeavierDuringFastScrolling,
                 selected: prefs.orbitArtResolutionMultiplier == 3.0,
                 onTap: () => notifier.setOrbitArtResolutionMultiplier(3.0),
               ),
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Visuals'),
+          SettingsSectionHeader(l10n.visuals),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.spline,
-                title: 'Show Orbit Path',
-                subtitle: 'Draw the curved arc behind the songs',
+                title: l10n.showOrbitPath,
+                subtitle: l10n.drawTheCurvedArcBehindThe,
                 value: prefs.orbitShowPath,
                 onChanged: notifier.setOrbitShowPath,
               ),
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.circle,
-                title: 'Show Glow',
-                subtitle: 'Soft highlight behind the selected song',
+                title: l10n.showGlow,
+                subtitle: l10n.softHighlightBehindTheSelectedSong,
                 value: prefs.orbitShowGlow,
                 onChanged: notifier.setOrbitShowGlow,
               ),
@@ -196,13 +197,13 @@ class OrbitSettingsScreen extends ConsumerWidget {
             children: [
               NavigationSetting(
                 icon: LucideIcons.refreshCw,
-                title: 'Reset to Defaults',
-                subtitle: 'Restore the original orbital layout',
+                title: l10n.resetToDefaults,
+                subtitle: l10n.restoreTheOriginalOrbitalLayout,
                 onTap: () {
                   notifier.resetOrbitSettings();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Orbital settings reset'),
+                    SnackBar(
+                      content: Text(l10n.orbitalSettingsReset),
                       duration: Duration(seconds: 2),
                     ),
                   );

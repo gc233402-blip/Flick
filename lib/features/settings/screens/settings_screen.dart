@@ -22,6 +22,7 @@ import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/features/milestone/screens/milestones_screen.dart';
 import 'package:flick/features/manual/screens/manual_screen.dart';
 import 'package:flick/services/milestone_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -73,15 +74,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionHeader(context, 'Media'),
+                    _buildSectionHeader(context, l10n.media),
                     SettingsCard(
                       children: [
                         _CategoryTile(
                           icon: LucideIcons.library,
                           iconBg: const Color(0xFF2D4A6F),
                           iconFg: const Color(0xFF8BB8FF),
-                          title: 'Library',
-                          subtitle: 'Folders, scanning, and duplicates',
+                          title: l10n.libraryLabel,
+                          subtitle: l10n.foldersScanningAndDuplicates,
                           onTap: () =>
                               _navigate(context, const LibrarySettingsScreen()),
                         ),
@@ -90,8 +91,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.cloud,
                           iconBg: const Color(0xFF2D6F6F),
                           iconFg: const Color(0xFF8BFFE0),
-                          title: 'Network Sources',
-                          subtitle: 'Subsonic servers, sync, and streaming',
+                          title: l10n.networkSources,
+                          subtitle: l10n.subsonicServersSyncAndStreaming,
                           onTap: () =>
                               _navigate(context, const NetworkSourcesScreen()),
                         ),
@@ -100,8 +101,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.play,
                           iconBg: const Color(0xFF4A2D6F),
                           iconFg: const Color(0xFFD19FFF),
-                          title: 'Playback & Display',
-                          subtitle: 'Gapless, view mode, and appearance',
+                          title: l10n.playbackDisplay,
+                          subtitle: l10n.gaplessViewModeAndAppearance,
                           onTap: () => _navigate(
                             context,
                             const PlaybackDisplaySettingsScreen(),
@@ -112,8 +113,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.listOrdered,
                           iconBg: const Color(0xFF2D6F4A),
                           iconFg: const Color(0xFF8BFFC4),
-                          title: 'Queue',
-                          subtitle: 'Wrap-around and queue behavior',
+                          title: l10n.queue,
+                          subtitle: l10n.wrapAroundAndQueueBehavior,
                           onTap: () =>
                               _navigate(context, const QueueSettingsScreen()),
                         ),
@@ -122,8 +123,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.layoutPanelTop,
                           iconBg: const Color(0xFF4A2D6F),
                           iconFg: const Color(0xFFC4A3FF),
-                          title: 'Player Layout',
-                          subtitle: 'Layout mode, sizing, and quick actions',
+                          title: l10n.playerLayout,
+                          subtitle: l10n.layoutModeSizingAndQuickActions,
                           onTap: () => _navigate(
                             context,
                             const PlayerLayoutSettingsScreen(),
@@ -134,8 +135,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.headphones,
                           iconBg: const Color(0xFF6F4A2D),
                           iconFg: const Color(0xFFFFC48B),
-                          title: 'Audio',
-                          subtitle: 'UAC2 and equalizer',
+                          title: l10n.audio,
+                          subtitle: l10n.uac2AndEqualizer,
                           onTap: () =>
                               _navigate(context, const AudioSettingsScreen()),
                         ),
@@ -144,8 +145,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.bluetooth,
                           iconBg: const Color(0xFF2D4A6F),
                           iconFg: const Color(0xFF8BB8FF),
-                          title: 'Bluetooth',
-                          subtitle: 'Disconnect behavior and codec info',
+                          title: l10n.bluetooth,
+                          subtitle: l10n.disconnectBehaviorAndCodecInfo,
                           onTap: () => _navigate(
                             context,
                             const BluetoothSettingsScreen(),
@@ -156,8 +157,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.cast,
                           iconBg: const Color(0xFF6F2D4A),
                           iconFg: const Color(0xFFFF8BB8),
-                          title: 'Casting',
-                          subtitle: 'DLNA, UPnP and Chromecast receivers',
+                          title: l10n.casting,
+                          subtitle: l10n.dlnaUpnpAndChromecastReceivers,
                           onTap: () => _navigate(
                             context,
                             const CastingSettingsScreen(),
@@ -168,23 +169,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.fileText,
                           iconBg: const Color(0xFF4A6F2D),
                           iconFg: const Color(0xFFC4FF8B),
-                          title: 'Lyrics',
-                          subtitle: 'Lyrics saving behavior',
+                          title: l10n.lyrics,
+                          subtitle: l10n.lyricsSavingBehavior,
                           onTap: () =>
                               _navigate(context, const LyricsSettingsScreen()),
                         ),
                       ],
                     ),
                     const SizedBox(height: AppConstants.spacingLg),
-                    _buildSectionHeader(context, 'System'),
+                    _buildSectionHeader(context, l10n.system),
                     SettingsCard(
                       children: [
                         _CategoryTile(
                           icon: LucideIcons.layoutDashboard,
                           iconBg: const Color(0xFF2D6F4A),
                           iconFg: const Color(0xFF8BFFC4),
-                          title: 'Interface',
-                          subtitle: 'Animations and haptic feedback',
+                          title: l10n.interfaceLabel,
+                          subtitle: l10n.animationsAndHapticFeedback,
                           onTap: () => _navigate(
                             context,
                             const InterfaceSettingsScreen(),
@@ -195,8 +196,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.palette,
                           iconBg: const Color(0xFF2D4A6F),
                           iconFg: const Color(0xFF8BB8FF),
-                          title: 'UI Customization',
-                          subtitle: 'Show or hide home screen sections',
+                          title: l10n.uiCustomization,
+                          subtitle: l10n.showOrHideHomeScreenSections,
                           onTap: () => _navigate(
                             context,
                             const UiCustomizationSettingsScreen(),
@@ -207,8 +208,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.plug,
                           iconBg: const Color(0xFF6F2D4A),
                           iconFg: const Color(0xFFFF8BB8),
-                          title: 'Integrations',
-                          subtitle: 'Last.fm & ListenBrainz scrobbling',
+                          title: l10n.integrations,
+                          subtitle: l10n.lastFmListenbrainzScrobbling,
                           onTap: () => _navigate(
                             context,
                             const IntegrationsSettingsScreen(),
@@ -219,40 +220,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.layoutGrid,
                           iconBg: const Color(0xFF2D4A6F),
                           iconFg: const Color(0xFF8BB8FF),
-                          title: 'Widgets',
-                          subtitle: 'Customize home screen widgets',
+                          title: l10n.widgets,
+                          subtitle: l10n.customizeHomeScreenWidgets,
                           onTap: () =>
                               _navigate(context, const WidgetSettingsScreen()),
                         ),
                       ],
                     ),
                     const SizedBox(height: AppConstants.spacingLg),
-                    _buildSectionHeader(context, 'Help'),
+                    _buildSectionHeader(context, l10n.help),
                     SettingsCard(
                       children: [
                         _CategoryTile(
                           icon: LucideIcons.bookOpen,
                           iconBg: const Color(0xFF2D4A6F),
                           iconFg: const Color(0xFF8BB8FF),
-                          title: 'Help & Manual',
-                          subtitle: 'Browse the full controls guide',
+                          title: l10n.helpManual,
+                          subtitle: l10n.browseTheFullControlsGuide,
                           onTap: () =>
                               _navigate(context, const ManualScreen()),
                         ),
                       ],
                     ),
                     const SizedBox(height: AppConstants.spacingLg),
-                    _buildSectionHeader(context, 'About'),
+                    _buildSectionHeader(context, l10n.about),
                     SettingsCard(
                       children: [
                         _CategoryTile(
                           icon: LucideIcons.trophy,
                           iconBg: const Color(0xFF3A3320),
                           iconFg: const Color(0xFFD4B265),
-                          title: 'Milestones',
+                          title: l10n.milestones,
                           subtitle: _milestonesUnlocked == 0
-                              ? 'No achievements yet — keep listening'
-                              : '$_milestonesUnlocked / ${MilestoneType.values.length} unlocked',
+                              ? l10n.noAchievementsYetKeepListening
+                              : l10n.unlocked3(_milestonesUnlocked, MilestoneType.values.length),
                           onTap: () async {
                             _navigate(context, const MilestonesScreen());
                             await _refreshMilestoneCount();
@@ -263,8 +264,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: LucideIcons.info,
                           iconBg: const Color(0xFF3A3A3A),
                           iconFg: const Color(0xFFB0B0B0),
-                          title: 'App Info',
-                          subtitle: 'Updates, about, and support',
+                          title: l10n.appInfo,
+                          subtitle: l10n.updatesAboutAndSupport,
                           onTap: () =>
                               _navigate(context, const AppInfoSettingsScreen()),
                         ),
@@ -301,7 +302,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Settings',
+                  l10n.settings,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
@@ -309,7 +310,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Configure your music experience',
+                  l10n.configureYourMusicExperience,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),

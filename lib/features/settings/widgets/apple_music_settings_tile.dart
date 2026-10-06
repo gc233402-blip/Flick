@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/services/apple_music/apple_music_settings.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class AppleMusicSettingsTile extends StatefulWidget {
   const AppleMusicSettingsTile({super.key});
@@ -35,10 +36,9 @@ class _AppleMusicSettingsTileState extends State<AppleMusicSettingsTile> {
   Widget build(BuildContext context) {
     return ToggleSetting(
       icon: LucideIcons.sparkles,
-      title: 'Auto-identify untagged albums',
+      title: l10n.autoIdentifyUntaggedAlbums,
       subtitle:
-          'After scanning, match files with missing tags against Apple Music. '
-          'Only confident matches apply automatically.',
+          l10n.afterScanningMatchFilesWithMissing,
       value: _enabled,
       onChanged: _toggle,
     );

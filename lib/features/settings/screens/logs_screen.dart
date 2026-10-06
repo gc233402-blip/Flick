@@ -17,6 +17,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/utils/app_haptics.dart';
 import 'package:flick/core/utils/app_log.dart';
 import 'package:flick/widgets/common/display_mode_wrapper.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class LogsScreen extends ConsumerStatefulWidget {
   const LogsScreen({super.key});
@@ -88,7 +89,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
     await Clipboard.setData(ClipboardData(text: entries.map(_format).join('\n')));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Logs copied')),
+      SnackBar(content: Text(l10n.logsCopied)),
     );
   }
 
@@ -107,9 +108,9 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
         flush: true,
       );
       if (!mounted) return;
-      await Share.shareXFiles([XFile(file.path)], subject: 'Flick logs');
+      await Share.shareXFiles([XFile(file.path)], subject: l10n.flickLogs);
     } catch (e) {
-      _snack('Share failed: $e');
+      _snack(l10n.shareFailed(e));
     }
   }
 
@@ -125,11 +126,10 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
     if (entries.isEmpty) return;
     final ok = await FlickDialogs.confirm(
       context,
-      title: 'Upload logs as a link?',
+      title: l10n.uploadLogsAsALink,
       message:
-          'Your logs are uploaded to dpaste.com as an unlisted link that expires in 30 days. '
-          'Anyone you share the link with can read them — logs may contain file paths and device details.',
-      confirmLabel: 'Upload',
+          l10n.yourLogsAreUploadedToDpaste,
+      confirmLabel: l10n.upload,
       icon: Icons.warning_amber_rounded,
     );
     if (!ok) return;
@@ -153,10 +153,10 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
         if (!mounted) return;
         _showLinkDialog(url);
       } else {
-        _snack('Upload failed (${res.statusCode}).');
+        _snack(l10n.uploadFailed(res.statusCode));
       }
     } catch (e) {
-      _snack('Upload failed: $e');
+      _snack(l10n.uploadFailed2(e));
     } finally {
       if (mounted) setState(() => _isUploading = false);
     }
@@ -165,9 +165,9 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
   void _showLinkDialog(String url) {
     showFlickDialog<void>(
       context: context,
-      barrierLabel: 'Link ready',
+      barrierLabel: l10n.linkReady,
       builder: (ctx) => FlickDialog(
-        title: 'Link ready',
+        title: l10n.linkReady,
         content: SelectableText(
           url,
           style: TextStyle(
@@ -177,21 +177,21 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
         ),
         actions: [
           FlickDialogButton(
-            label: 'Copy',
+            label: l10n.copy,
             onPressed: () async {
               await Clipboard.setData(ClipboardData(text: url));
               if (ctx.mounted) Navigator.pop(ctx);
             },
           ),
           FlickDialogButton(
-            label: 'Share',
+            label: l10n.share,
             onPressed: () {
               Navigator.pop(ctx);
-              Share.share(url, subject: 'Flick logs');
+              Share.share(url, subject: l10n.flickLogs);
             },
           ),
           FlickDialogButton(
-            label: 'Done',
+            label: l10n.done,
             style: FlickDialogButtonStyle.primary,
             onPressed: () => Navigator.pop(ctx),
           ),
@@ -204,7 +204,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
     if (entries.isEmpty) return;
     final stamp = DateTime.now().toIso8601String().replaceAll(':', '-').split('.').first;
     final path = await FilePicker.saveFile(
-      dialogTitle: 'Save logs',
+      dialogTitle: l10n.saveLogs,
       fileName: 'flick_logs_$stamp.txt',
       type: FileType.custom,
       allowedExtensions: const ['txt'],
@@ -214,23 +214,23 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
 
     final share = await FlickDialogs.confirm(
       context,
-      title: 'Saved',
-      message: 'Saved to:\n$path\n\nShare it now?',
-      confirmLabel: 'Share',
-      cancelLabel: 'No',
+      title: l10n.saved,
+      message: l10n.savedToNNNshareIt(path),
+      confirmLabel: l10n.share,
+      cancelLabel: l10n.no,
     );
     if (share && mounted) {
-      await Share.shareXFiles([XFile(path)], subject: 'Flick logs');
+      await Share.shareXFiles([XFile(path)], subject: l10n.flickLogs);
     }
   }
 
   Future<void> _confirmClear() async {
     final ok = await FlickDialogs.confirm(
       context,
-      title: 'Clear logs?',
+      title: l10n.clearLogs,
       message:
-          'This removes all ${AppLog.instance.entries.length} entries from memory.',
-      confirmLabel: 'Clear',
+          l10n.thisRemovesAllEntriesFromMemory(AppLog.instance.entries.length),
+      confirmLabel: l10n.clear,
       destructive: true,
     );
     if (ok) {
@@ -274,7 +274,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
             icon: Icon(LucideIcons.chevronLeft, color: context.adaptiveTextPrimary),
           ),
           Text(
-            'Logs',
+            l10n.logs,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: context.adaptiveTextPrimary,
@@ -289,14 +289,14 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    tooltip: 'Copy',
+                    tooltip: l10n.copy,
                     onPressed: count == 0
                         ? null
                         : () => _copyAll(_filtered(AppLog.instance.entries)),
                     icon: Icon(LucideIcons.copy, color: context.adaptiveTextSecondary),
                   ),
                   IconButton(
-                    tooltip: 'Copy link',
+                    tooltip: l10n.copyLink,
                     onPressed: (count == 0 || _isUploading)
                         ? null
                         : () => _uploadAsLink(_filtered(AppLog.instance.entries)),
@@ -312,18 +312,18 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
                         : Icon(LucideIcons.link2, color: context.adaptiveTextSecondary),
                   ),
                   IconButton(
-                    tooltip: 'Share',
+                    tooltip: l10n.share,
                     onPressed: count == 0
                         ? null
                         : () => _shareAll(_filtered(AppLog.instance.entries)),
                     icon: Icon(LucideIcons.share2, color: context.adaptiveTextSecondary),
                   ),
                   PopupMenuButton<String>(
-                    tooltip: 'More',
+                    tooltip: l10n.more,
                     icon: Icon(LucideIcons.moreVertical, color: context.adaptiveTextSecondary),
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'save', child: Text('Save as text')),
-                      PopupMenuItem(value: 'clear', child: Text('Clear')),
+                    itemBuilder: (_) => [
+                      PopupMenuItem(value: 'save', child: Text(l10n.saveAsText)),
+                      PopupMenuItem(value: 'clear', child: Text(l10n.clear)),
                     ],
                     onSelected: (v) {
                       if (v == 'save') {
@@ -352,7 +352,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
             style: TextStyle(color: context.adaptiveTextPrimary, fontSize: 13),
             decoration: InputDecoration(
               isDense: true,
-              hintText: 'Filter logs…',
+              hintText: l10n.filterLogs,
               hintStyle: TextStyle(color: context.adaptiveTextTertiary, fontSize: 13),
               prefixIcon: Icon(LucideIcons.search, size: 16, color: context.adaptiveTextTertiary),
               filled: true,
@@ -378,7 +378,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                _chip(context, null, 'All'),
+                _chip(context, null, l10n.all),
                 for (final s in LogSource.values) _chip(context, s, s.name),
               ],
             ),
@@ -438,7 +438,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
             child: Padding(
               padding: const EdgeInsets.all(AppConstants.spacingXl),
               child: Text(
-                AppLog.instance.entries.isEmpty ? 'No logs yet.' : 'No matches.',
+                AppLog.instance.entries.isEmpty ? l10n.noLogsYet : l10n.noMatches,
                 style: TextStyle(color: context.adaptiveTextTertiary),
                 textAlign: TextAlign.center,
               ),

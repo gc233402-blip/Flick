@@ -9,6 +9,7 @@ import 'package:flick/providers/providers.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/features/settings/screens/orbit_settings_screen.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class PlaybackDisplaySettingsScreen extends ConsumerWidget {
   const PlaybackDisplaySettingsScreen({super.key});
@@ -21,21 +22,21 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
     final playerService = ref.read(playerServiceProvider);
 
     return SettingsScaffold(
-      title: 'Playback & Display',
+      title: l10n.playbackDisplay,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Playback'),
+          SettingsSectionHeader(l10n.playback),
           SettingsCard(
             children: [
               _GaplessPlaybackTile(playerService: playerService),
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.music,
-                title: 'Keep Playing on Quit',
+                title: l10n.keepPlayingOnQuit,
                 subtitle: appPrefs.keepPlayingOnQuit
-                    ? 'Playback continues when the app is swiped away'
-                    : 'Playback stops when the app is swiped away',
+                    ? l10n.playbackContinuesWhenTheAppIs
+                    : l10n.playbackStopsWhenTheAppIs,
                 value: appPrefs.keepPlayingOnQuit,
                 onChanged: (value) {
                   ref
@@ -46,10 +47,10 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.shieldCheck,
-                title: 'Background Playback Anchor',
+                title: l10n.backgroundPlaybackAnchor,
                 subtitle: appPrefs.priorityAnchorEnabled
-                    ? 'Keeps bit-perfect audio alive in the background'
-                    : 'May stop in the background on some devices',
+                    ? l10n.keepsBitPerfectAudioAliveIn
+                    : l10n.mayStopInTheBackgroundOn,
                 value: appPrefs.priorityAnchorEnabled,
                 onChanged: (value) {
                   playerService.setPriorityAnchorEnabled(value);
@@ -61,10 +62,10 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.clapperboard,
-                title: 'Motion Art in Bit-Perfect',
+                title: l10n.motionArtInBitPerfect,
                 subtitle: appPrefs.motionArtDuringBitPerfect
-                    ? 'Motion art plays during bit-perfect audio (may interrupt playback on some DAPs)'
-                    : 'Motion art is replaced while bit-perfect output is active',
+                    ? l10n.motionArtPlaysDuringBitPerfect
+                    : l10n.motionArtIsReplacedWhileBit,
                 value: appPrefs.motionArtDuringBitPerfect,
                 onChanged: (value) {
                   playerService.setMotionArtDuringBitPerfect(value);
@@ -80,10 +81,10 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
               ],
               ToggleSetting(
                 icon: LucideIcons.pictureInPicture2,
-                title: 'Floating Mini-Player',
+                title: l10n.floatingMiniPlayer,
                 subtitle: appPrefs.floatingPlayerEnabled
-                    ? 'A draggable overlay shows while using other apps'
-                    : 'Show a system overlay mini-player over other apps',
+                    ? l10n.aDraggableOverlayShowsWhileUsing
+                    : l10n.showASystemOverlayMiniPlayer,
                 value: appPrefs.floatingPlayerEnabled,
                 onChanged: (value) => _onFloatingPlayerToggled(
                   context,
@@ -95,13 +96,13 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Display'),
+          SettingsSectionHeader(l10n.display),
           SettingsCard(
             children: [
               SelectionSetting(
                 icon: LucideIcons.disc,
-                title: 'Song View: Orbital',
-                subtitle: 'Use the orbital songs browser',
+                title: l10n.songViewOrbital,
+                subtitle: l10n.useTheOrbitalSongsBrowser,
                 selected: songsViewMode == SongViewMode.orbit,
                 onTap: () {
                   ref
@@ -112,8 +113,8 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.list,
-                title: 'Song View: List',
-                subtitle: 'Use the list songs browser',
+                title: l10n.songViewList,
+                subtitle: l10n.useTheListSongsBrowser,
                 selected: songsViewMode == SongViewMode.list,
                 onTap: () {
                   ref
@@ -125,8 +126,8 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
                 const SettingsDivider(),
                 NavigationSetting(
                   icon: LucideIcons.slidersHorizontal,
-                  title: 'Customize Orbital',
-                  subtitle: 'Curvature, sizing, depth, and visuals',
+                  title: l10n.customizeOrbital,
+                  subtitle: l10n.curvatureSizingDepthAndVisuals,
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -139,8 +140,8 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.panelBottom,
-                title: 'Bottom Bar Always Visible',
-                subtitle: 'Keep mini player and nav visible',
+                title: l10n.bottomBarAlwaysVisible,
+                subtitle: l10n.keepMiniPlayerAndNavVisible,
                 value: navBarAlwaysVisible,
                 onChanged: (value) {
                   ref
@@ -151,10 +152,10 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.circleDot,
-                title: 'Floating Island',
+                title: l10n.floatingIsland,
                 subtitle: appPrefs.floatingIslandEnabled
-                    ? 'Show the floating mini-player pill on screens'
-                    : 'Hide the floating mini-player pill',
+                    ? l10n.showTheFloatingMiniPlayerPill
+                    : l10n.hideTheFloatingMiniPlayerPill,
                 value: appPrefs.floatingIslandEnabled,
                 onChanged: (value) {
                   ref
@@ -165,12 +166,12 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.maximize,
-                title: 'Immersive Full View Timer',
+                title: l10n.immersiveFullViewTimer,
                 subtitle:
-                    'Auto-show the Spotify-style immersive full view after inactivity',
+                    l10n.autoShowTheSpotifyStyleImmersive,
                 value: appPrefs.immersiveAutoFullViewSeconds.toDouble(),
                 displayValue: appPrefs.immersiveAutoFullViewSeconds == 0
-                    ? 'Off'
+                    ? l10n.off
                     : '${appPrefs.immersiveAutoFullViewSeconds}s',
                 min: 0,
                 max: 15,
@@ -184,13 +185,13 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Fast Index Scrolling'),
+          SettingsSectionHeader(l10n.fastIndexScrolling),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.arrowUpDown,
-                title: 'Fast Index Scrolling',
-                subtitle: 'Alphabetical index rail on the songs screen',
+                title: l10n.fastIndexScrolling,
+                subtitle: l10n.alphabeticalIndexRailOnTheSongs,
                 value: appPrefs.fastIndexEnabled,
                 onChanged: (value) {
                   ref
@@ -202,8 +203,8 @@ class PlaybackDisplaySettingsScreen extends ConsumerWidget {
                 const SettingsDivider(),
                 SliderSetting(
                   icon: LucideIcons.clock,
-                  title: 'Auto-hide Timeout',
-                  subtitle: 'Hide the index rail after inactivity',
+                  title: l10n.autoHideTimeout,
+                  subtitle: l10n.hideTheIndexRailAfterInactivity,
                   value: appPrefs.fastIndexTimeoutSeconds.toDouble(),
                   displayValue: '${appPrefs.fastIndexTimeoutSeconds}s',
                   min: 2,
@@ -240,10 +241,10 @@ class _DuckOnInterruptionTile extends StatelessWidget {
         final duck = playerService.duckOnInterruptionNotifier.value;
         return ToggleSetting(
           icon: LucideIcons.bellOff,
-          title: 'Duck on Notifications',
+          title: l10n.duckOnNotifications,
           subtitle: duck
-              ? 'Volume dips while notification sounds play'
-              : 'Playback pauses while notification sounds play',
+              ? l10n.volumeDipsWhileNotificationSoundsPlay
+              : l10n.playbackPausesWhileNotificationSoundsPlay,
           value: duck,
           onChanged: (value) => playerService.setDuckOnInterruption(value),
         );
@@ -269,10 +270,10 @@ class _GaplessPlaybackTile extends StatelessWidget {
         final isBitPerfect = playerService.isBitPerfectModeEnabled;
         return ToggleSetting(
           icon: LucideIcons.repeat,
-          title: 'Gapless Playback',
+          title: l10n.gaplessPlayback,
           subtitle: isBitPerfect
-              ? 'Disabled in bit-perfect mode'
-              : 'Seamless transition between tracks',
+              ? l10n.disabledInBitPerfectMode
+              : l10n.seamlessTransitionBetweenTracks,
           value: enabled,
           onChanged: (value) => playerService.setGaplessPlaybackEnabled(value),
         );
@@ -294,9 +295,9 @@ Future<void> _onFloatingPlayerToggled(
       final granted = await playerService.requestFloatingPlayerPermission();
       if (!granted) {
         messenger.showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Overlay permission is required to show the floating player',
+              l10n.overlayPermissionIsRequiredToShow,
             ),
           ),
         );
