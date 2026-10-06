@@ -23,6 +23,7 @@ import 'package:flick/features/player/widgets/sleep_timer_bottom_sheet.dart';
 import 'package:flick/features/songs/widgets/song_actions_button.dart';
 import 'package:flick/providers/favorites_provider.dart';
 import 'package:flick/widgets/common/display_mode_wrapper.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Detail screen for generated smart mixes (On Repeat, Heavy Rotation, etc.),
 /// styled after the playlist/album/artist detail screens.
@@ -112,7 +113,7 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
 
   String? get _metaLine {
     final parts = [
-      if (widget.songs.isNotEmpty) '${widget.songs.length} songs',
+      if (widget.songs.isNotEmpty) l10n.songs3(widget.songs.length),
       if (widget.songs.isNotEmpty) _formattedTotalDuration,
     ];
     return parts.isEmpty ? null : parts.join(' · ');
@@ -221,9 +222,9 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Queued ${widget.songs.length} songs'),
+        content: Text(l10n.queuedSongs(widget.songs.length)),
         action: SnackBarAction(
-          label: 'View queue',
+          label: l10n.viewQueue,
           onPressed: () => NavigationHelper.navigateToQueue(context),
         ),
       ),
@@ -257,8 +258,8 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
       SnackBar(
         content: Text(
           isAll
-              ? 'Removed ${widget.songs.length} songs from favorites'
-              : 'Added ${widget.songs.length} songs to favorites',
+              ? l10n.removedSongsFromFavorites(widget.songs.length)
+              : l10n.addedSongsToFavorites(widget.songs.length),
         ),
       ),
     );
@@ -270,12 +271,12 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
       items: [
         DetailMoreSheetItem(
           icon: LucideIcons.listPlus,
-          label: 'Add to playlist',
+          label: l10n.addToPlaylist,
           onTap: () => AddToPlaylistSheet.showSongs(context, widget.songs),
         ),
         DetailMoreSheetItem(
           icon: LucideIcons.moonStar,
-          label: 'Sleep timer',
+          label: l10n.sleepTimer,
           onTap: () => SleepTimerBottomSheet.show(context, _playerService),
         ),
       ],
@@ -341,7 +342,7 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
                         const SliverToBoxAdapter(
                           child: SizedBox(height: AppConstants.spacingLg),
                         ),
-                        _buildSectionTitle(context, 'Songs'),
+                        _buildSectionTitle(context, l10n.songs14),
                         SliverPadding(
                           padding: EdgeInsets.only(
                             bottom: AppConstants.navBarHeight + 80,

@@ -6,11 +6,12 @@ import 'package:restart_app/restart_app.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/services/player_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
-const _restartMessages = <String>[
-  'Applying new audio engine…',
-  'Reinitializing playback…',
-  'Finishing up…',
+List<String> _restartMessages(AppLocalizations l10n) => <String>[
+  l10n.applyingNewAudioEngine,
+  l10n.reinitializingPlayback,
+  l10n.finishingUp,
 ];
 
 /// Full-screen overlay shown while Flick restarts to apply a new audio engine.
@@ -51,7 +52,7 @@ class _RestartingScreenState extends State<RestartingScreen>
     _messageTimer = Timer.periodic(const Duration(milliseconds: 850), (_) {
       if (!mounted) return;
       setState(() {
-        _messageIndex = (_messageIndex + 1) % _restartMessages.length;
+        _messageIndex = (_messageIndex + 1) % _restartMessages(l10n).length;
       });
     });
     _exitTimer = Timer(const Duration(milliseconds: 2700), () async {
@@ -123,7 +124,7 @@ class _RestartingScreenState extends State<RestartingScreen>
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
                   Text(
-                    'Restarting Flick',
+                    l10n.restartingFlick,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
@@ -133,7 +134,7 @@ class _RestartingScreenState extends State<RestartingScreen>
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                     child: Text(
-                      _restartMessages[_messageIndex],
+                      _restartMessages(l10n)[_messageIndex],
                       key: ValueKey(_messageIndex),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.white.withValues(alpha: 0.7),

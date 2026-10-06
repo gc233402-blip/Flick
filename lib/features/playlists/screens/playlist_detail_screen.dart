@@ -32,6 +32,7 @@ import 'package:flick/providers/favorites_provider.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/features/playlists/widgets/playlist_sort_bottom_sheet.dart';
 import 'package:flick/features/songs/widgets/song_actions_button.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class PlaylistDetailScreen extends ConsumerStatefulWidget {
   final Playlist playlist;
@@ -135,19 +136,19 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
 
   String _formatDate(DateTime? date) {
     if (date == null) return '';
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+    final months = [
+      l10n.jan,
+      l10n.feb,
+      l10n.mar,
+      l10n.apr,
+      l10n.may,
+      l10n.jun,
+      l10n.jul,
+      l10n.aug,
+      l10n.sep,
+      l10n.oct,
+      l10n.nov,
+      l10n.dec,
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
@@ -321,9 +322,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Queued ${_songs.length} songs'),
+        content: Text(l10n.queuedSongs(_songs.length)),
         action: SnackBarAction(
-          label: 'View queue',
+          label: l10n.viewQueue,
           onPressed: () => NavigationHelper.navigateToQueue(context),
         ),
       ),
@@ -357,8 +358,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
       SnackBar(
         content: Text(
           isAll
-              ? 'Removed ${_songs.length} songs from favorites'
-              : 'Added ${_songs.length} songs to favorites',
+              ? l10n.removedSongsFromFavorites(_songs.length)
+              : l10n.addedSongsToFavorites(_songs.length),
         ),
       ),
     );
@@ -370,10 +371,10 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
     final current = ref.read(detailDescriptionProvider(_descriptionKey));
     final result = await FlickDialogs.input(
       context,
-      title: current.isEmpty ? 'Add Description' : 'Edit Description',
-      hintText: 'Write a description',
+      title: current.isEmpty ? l10n.addDescription : l10n.editDescription,
+      hintText: l10n.writeADescription,
       initialValue: current,
-      confirmLabel: 'Save',
+      confirmLabel: l10n.save,
       keyboardType: TextInputType.multiline,
       validator: (_) => null,
     );
@@ -390,13 +391,13 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
         DetailMoreSheetItem(
           icon: LucideIcons.alignLeft,
           label: ref.read(detailDescriptionProvider(_descriptionKey)).isEmpty
-              ? 'Add description'
-              : 'Edit description',
+              ? l10n.addDescription2
+              : l10n.editDescription2,
           onTap: _editDescription,
         ),
         DetailMoreSheetItem(
           icon: LucideIcons.arrowDownAZ,
-          label: 'Sort songs',
+          label: l10n.sortSongs,
           onTap: () => PlaylistSortBottomSheet.show(
             context,
             currentSort: _sortOption,
@@ -405,7 +406,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
         ),
         DetailMoreSheetItem(
           icon: LucideIcons.moonStar,
-          label: 'Sleep timer',
+          label: l10n.sleepTimer,
           onTap: () => SleepTimerBottomSheet.show(context, _playerService),
         ),
       ],
@@ -430,12 +431,12 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
         .toList();
     final bgColor = _tintBackground(_backgroundBlend);
     final meta = [
-      if (_songs.isNotEmpty) '${_songs.length} songs',
+      if (_songs.isNotEmpty) l10n.songs3(_songs.length),
       if (_songs.isNotEmpty) _formattedTotalDuration,
-      'Created ${_formatDate(playlist.createdAt)}',
+      l10n.created(_formatDate(playlist.createdAt)),
       if (playlist.updatedAt != null &&
           playlist.updatedAt != playlist.createdAt)
-        'Updated ${_formatDate(playlist.updatedAt)}',
+        l10n.updated(_formatDate(playlist.updatedAt)),
     ].join(' · ');
 
     return TweenAnimationBuilder<Color?>(
@@ -519,7 +520,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                                 ),
                                 const SizedBox(height: AppConstants.spacingMd),
                                 Text(
-                                  'No songs in this playlist',
+                                  l10n.noSongsInThisPlaylist,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(
                                         color: context.adaptiveTextSecondary,
@@ -527,7 +528,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                                 ),
                                 const SizedBox(height: AppConstants.spacingSm),
                                 Text(
-                                  'Add songs from the player menu',
+                                  l10n.addSongsFromThePlayerMenu,
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         color: context.adaptiveTextTertiary,
@@ -540,7 +541,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                       else ...[
                         _buildSectionTitle(
                           context,
-                          'Songs',
+                          l10n.songs14,
                           trailing: _buildSortButton(context),
                         ),
                         SliverPadding(
@@ -601,7 +602,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                         ),
                       ],
                       if (otherPlaylists.isNotEmpty) ...[
-                        _buildSectionTitle(context, 'Other Playlists'),
+                        _buildSectionTitle(context, l10n.otherPlaylists),
                         SliverToBoxAdapter(
                           child: SizedBox(
                             height: 180,
@@ -947,7 +948,7 @@ class _PlaylistCard extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              '${playlist.songIds.length} songs',
+              l10n.songs3(playlist.songIds.length),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.adaptiveTextTertiary,
               ),

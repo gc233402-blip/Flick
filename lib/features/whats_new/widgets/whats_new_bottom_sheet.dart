@@ -8,6 +8,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/features/whats_new/data/changelog_data.dart';
 import 'package:flick/providers/whats_new_provider.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class WhatsNewBottomSheet extends ConsumerWidget {
   const WhatsNewBottomSheet({super.key, this.entry});
@@ -19,7 +20,7 @@ class WhatsNewBottomSheet extends ConsumerWidget {
   static Future<T?> show<T>(BuildContext context, {ChangelogEntry? entry}) {
     return GlassBottomSheet.show<T>(
       context: context,
-      title: "What's New",
+      title: l10n.whatSNew,
       maxHeightRatio: 0.85,
       content: WhatsNewBottomSheet(entry: entry),
       actions: [
@@ -34,8 +35,8 @@ class WhatsNewBottomSheet extends ConsumerWidget {
             minimumSize: const Size(0, 16),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: const Text(
-            'Got it',
+          child: Text(
+            l10n.gotIt,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontWeight: FontWeight.w600,
@@ -53,7 +54,7 @@ class WhatsNewBottomSheet extends ConsumerWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingLg),
         child: Text(
-          'No changelog notes for this version yet.',
+          l10n.noChangelogNotesForThisVersion,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: context.adaptiveTextSecondary,
           ),
@@ -123,7 +124,7 @@ class _VersionHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Version ${entry.version}',
+                  l10n.version2(entry.version),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
                     fontWeight: FontWeight.w600,

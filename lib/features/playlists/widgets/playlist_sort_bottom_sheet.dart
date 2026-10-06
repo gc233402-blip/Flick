@@ -4,6 +4,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/models/playlist.dart';
 import 'package:flick/models/song.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Sort modes available inside a playlist detail view.
 enum PlaylistSortOption {
@@ -18,15 +19,15 @@ extension PlaylistSortOptionX on PlaylistSortOption {
   String get label {
     switch (this) {
       case PlaylistSortOption.manual:
-        return 'Manual Order';
+        return l10n.manualOrder;
       case PlaylistSortOption.dateAddedNewest:
-        return 'Date Added (Newest)';
+        return l10n.dateAddedNewest;
       case PlaylistSortOption.dateAddedOldest:
-        return 'Date Added (Oldest)';
+        return l10n.dateAddedOldest;
       case PlaylistSortOption.title:
-        return 'Title';
+        return l10n.title;
       case PlaylistSortOption.artist:
-        return 'Artist';
+        return l10n.artist;
     }
   }
 
@@ -183,7 +184,7 @@ class PlaylistSortBottomSheet extends StatelessWidget {
             children: [
               _buildHandle(),
               const SizedBox(height: 16),
-              _buildSectionHeader(context, 'SORT BY'),
+              _buildSectionHeader(context, l10n.sortBy),
               const SizedBox(height: 8),
               ...PlaylistSortOption.values.map(
                 (option) => _buildSortTile(context, option),
