@@ -8,6 +8,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/services/widget_sync_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class WidgetSettingsScreen extends ConsumerStatefulWidget {
   const WidgetSettingsScreen({super.key});
@@ -33,7 +34,7 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return SettingsScaffold(
-      title: 'Widgets',
+      title: l10n.widgets,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -101,7 +102,7 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        const tabs = ['Mini Player', '4×3 Flagship', '2×2'];
+        final tabs = [l10n.miniPlayer, '4×3 Flagship', '2×2'];
     return Row(
       children: List.generate(tabs.length * 2 - 1, (i) {
         if (i.isOdd) {
@@ -152,39 +153,39 @@ class _MiniPlayerTab extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SettingsSectionHeader('Background'),
+        SettingsSectionHeader(l10n.background),
         SettingsCard(
           children: [
             _OpacityOption(
-              label: 'Transparent',
+              label: l10n.transparent,
               value: 0,
               groupValue: prefs.widgetBgOpacity,
               onChanged: (v) => _updateOpacity(ref, v),
             ),
             const SettingsDivider(),
             _OpacityOption(
-              label: 'Light',
+              label: l10n.light,
               value: 1,
               groupValue: prefs.widgetBgOpacity,
               onChanged: (v) => _updateOpacity(ref, v),
             ),
             const SettingsDivider(),
             _OpacityOption(
-              label: 'Medium',
+              label: l10n.medium,
               value: 2,
               groupValue: prefs.widgetBgOpacity,
               onChanged: (v) => _updateOpacity(ref, v),
             ),
             const SettingsDivider(),
             _OpacityOption(
-              label: 'Dark',
+              label: l10n.dark,
               value: 3,
               groupValue: prefs.widgetBgOpacity,
               onChanged: (v) => _updateOpacity(ref, v),
             ),
             const SettingsDivider(),
             _OpacityOption(
-              label: 'Solid',
+              label: l10n.solid,
               value: 4,
               groupValue: prefs.widgetBgOpacity,
               onChanged: (v) => _updateOpacity(ref, v),
@@ -192,13 +193,13 @@ class _MiniPlayerTab extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Content'),
+        SettingsSectionHeader(l10n.content),
         SettingsCard(
           children: [
             ToggleSetting(
               icon: LucideIcons.image,
-              title: 'Album Art',
-              subtitle: 'Show album artwork on the mini player',
+              title: l10n.albumArt,
+              subtitle: l10n.showAlbumArtworkOnTheMini,
               value: prefs.widgetShowAlbumArt,
               onChanged: (v) {
                 ref
@@ -212,8 +213,8 @@ class _MiniPlayerTab extends ConsumerWidget {
             const SettingsDivider(),
             ToggleSetting(
               icon: LucideIcons.mic,
-              title: 'Artist Name',
-              subtitle: 'Show artist below song title',
+              title: l10n.artistName,
+              subtitle: l10n.showArtistBelowSongTitle,
               value: prefs.widgetShowArtist,
               onChanged: (v) {
                 ref
@@ -227,13 +228,13 @@ class _MiniPlayerTab extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Text Size'),
+        SettingsSectionHeader(l10n.textSize2),
         SettingsCard(
           children: [
             SliderSetting(
               icon: LucideIcons.type,
-              title: 'Font Scale',
-              subtitle: 'Scales with widget size automatically',
+              title: l10n.fontScale,
+              subtitle: l10n.scalesWithWidgetSizeAutomatically,
               value: prefs.widgetTextScale,
               displayValue: '${(prefs.widgetTextScale * 100).round()}%',
               min: 0.8,
@@ -260,11 +261,11 @@ class _MiniPlayerTab extends ConsumerWidget {
           centered: false,
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Accent Color'),
+        SettingsSectionHeader(l10n.accentColor),
         SettingsCard(
           children: [
             _AccentOption(
-              label: 'White',
+              label: l10n.white,
               color: Colors.white,
               value: 'white',
               groupValue: prefs.widgetAccentColor,
@@ -272,7 +273,7 @@ class _MiniPlayerTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Amber',
+              label: l10n.amber,
               color: const Color(0xFFFFB300),
               value: 'amber',
               groupValue: prefs.widgetAccentColor,
@@ -280,7 +281,7 @@ class _MiniPlayerTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Blue',
+              label: l10n.blue,
               color: const Color(0xFF64B5F6),
               value: 'blue',
               groupValue: prefs.widgetAccentColor,
@@ -288,7 +289,7 @@ class _MiniPlayerTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Green',
+              label: l10n.green,
               color: const Color(0xFF81C784),
               value: 'green',
               groupValue: prefs.widgetAccentColor,
@@ -296,7 +297,7 @@ class _MiniPlayerTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Purple',
+              label: l10n.purple,
               color: const Color(0xFFCE93D8),
               value: 'purple',
               groupValue: prefs.widgetAccentColor,
@@ -342,13 +343,13 @@ class _FlagshipTab extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SettingsSectionHeader('Content'),
+        SettingsSectionHeader(l10n.content),
         SettingsCard(
           children: [
             ToggleSetting(
               icon: LucideIcons.mic,
-              title: 'Artist Name',
-              subtitle: 'Show artist below song title',
+              title: l10n.artistName,
+              subtitle: l10n.showArtistBelowSongTitle,
               value: prefs.widgetFlagshipShowArtist,
               onChanged: (v) {
                 ref
@@ -362,13 +363,13 @@ class _FlagshipTab extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Text Size'),
+        SettingsSectionHeader(l10n.textSize2),
         SettingsCard(
           children: [
             SliderSetting(
               icon: LucideIcons.type,
-              title: 'Font Scale',
-              subtitle: 'Scales with widget size automatically',
+              title: l10n.fontScale,
+              subtitle: l10n.scalesWithWidgetSizeAutomatically,
               value: prefs.widgetFlagshipTextScale,
               displayValue:
                   '${(prefs.widgetFlagshipTextScale * 100).round()}%',
@@ -396,11 +397,11 @@ class _FlagshipTab extends ConsumerWidget {
           centered: true,
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Accent Color'),
+        SettingsSectionHeader(l10n.accentColor),
         SettingsCard(
           children: [
             _AccentOption(
-              label: 'White',
+              label: l10n.white,
               color: Colors.white,
               value: 'white',
               groupValue: prefs.widgetFlagshipAccent,
@@ -408,7 +409,7 @@ class _FlagshipTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Amber',
+              label: l10n.amber,
               color: const Color(0xFFFFB300),
               value: 'amber',
               groupValue: prefs.widgetFlagshipAccent,
@@ -416,7 +417,7 @@ class _FlagshipTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Blue',
+              label: l10n.blue,
               color: const Color(0xFF64B5F6),
               value: 'blue',
               groupValue: prefs.widgetFlagshipAccent,
@@ -424,7 +425,7 @@ class _FlagshipTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Green',
+              label: l10n.green,
               color: const Color(0xFF81C784),
               value: 'green',
               groupValue: prefs.widgetFlagshipAccent,
@@ -432,7 +433,7 @@ class _FlagshipTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Purple',
+              label: l10n.purple,
               color: const Color(0xFFCE93D8),
               value: 'purple',
               groupValue: prefs.widgetFlagshipAccent,
@@ -470,39 +471,39 @@ class _CompactTab extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SettingsSectionHeader('Background'),
+        SettingsSectionHeader(l10n.background),
         SettingsCard(
           children: [
             _OpacityOption(
-              label: 'Transparent',
+              label: l10n.transparent,
               value: 0,
               groupValue: prefs.widgetCompactBgOpacity,
               onChanged: (v) => _updateCompactOpacity(ref, v),
             ),
             const SettingsDivider(),
             _OpacityOption(
-              label: 'Light',
+              label: l10n.light,
               value: 1,
               groupValue: prefs.widgetCompactBgOpacity,
               onChanged: (v) => _updateCompactOpacity(ref, v),
             ),
             const SettingsDivider(),
             _OpacityOption(
-              label: 'Medium',
+              label: l10n.medium,
               value: 2,
               groupValue: prefs.widgetCompactBgOpacity,
               onChanged: (v) => _updateCompactOpacity(ref, v),
             ),
             const SettingsDivider(),
             _OpacityOption(
-              label: 'Dark',
+              label: l10n.dark,
               value: 3,
               groupValue: prefs.widgetCompactBgOpacity,
               onChanged: (v) => _updateCompactOpacity(ref, v),
             ),
             const SettingsDivider(),
             _OpacityOption(
-              label: 'Solid',
+              label: l10n.solid,
               value: 4,
               groupValue: prefs.widgetCompactBgOpacity,
               onChanged: (v) => _updateCompactOpacity(ref, v),
@@ -510,13 +511,13 @@ class _CompactTab extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Content'),
+        SettingsSectionHeader(l10n.content),
         SettingsCard(
           children: [
             ToggleSetting(
               icon: LucideIcons.image,
-              title: 'Album Art',
-              subtitle: 'Use album art as background',
+              title: l10n.albumArt,
+              subtitle: l10n.useAlbumArtAsBackground,
               value: prefs.widgetCompactShowAlbumArt,
               onChanged: (v) {
                 ref
@@ -530,8 +531,8 @@ class _CompactTab extends ConsumerWidget {
             const SettingsDivider(),
             ToggleSetting(
               icon: LucideIcons.mic,
-              title: 'Artist Name',
-              subtitle: 'Show artist below song title',
+              title: l10n.artistName,
+              subtitle: l10n.showArtistBelowSongTitle,
               value: prefs.widgetCompactShowArtist,
               onChanged: (v) {
                 ref
@@ -545,13 +546,13 @@ class _CompactTab extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Text Size'),
+        SettingsSectionHeader(l10n.textSize2),
         SettingsCard(
           children: [
             SliderSetting(
               icon: LucideIcons.type,
-              title: 'Font Scale',
-              subtitle: 'Scales with widget size automatically',
+              title: l10n.fontScale,
+              subtitle: l10n.scalesWithWidgetSizeAutomatically,
               value: prefs.widgetCompactTextScale,
               displayValue:
                   '${(prefs.widgetCompactTextScale * 100).round()}%',
@@ -579,11 +580,11 @@ class _CompactTab extends ConsumerWidget {
           centered: true,
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Accent Color'),
+        SettingsSectionHeader(l10n.accentColor),
         SettingsCard(
           children: [
             _AccentOption(
-              label: 'White',
+              label: l10n.white,
               color: Colors.white,
               value: 'white',
               groupValue: prefs.widgetCompactAccent,
@@ -591,7 +592,7 @@ class _CompactTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Amber',
+              label: l10n.amber,
               color: const Color(0xFFFFB300),
               value: 'amber',
               groupValue: prefs.widgetCompactAccent,
@@ -599,7 +600,7 @@ class _CompactTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Blue',
+              label: l10n.blue,
               color: const Color(0xFF64B5F6),
               value: 'blue',
               groupValue: prefs.widgetCompactAccent,
@@ -607,7 +608,7 @@ class _CompactTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Green',
+              label: l10n.green,
               color: const Color(0xFF81C784),
               value: 'green',
               groupValue: prefs.widgetCompactAccent,
@@ -615,7 +616,7 @@ class _CompactTab extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _AccentOption(
-              label: 'Purple',
+              label: l10n.purple,
               color: const Color(0xFFCE93D8),
               value: 'purple',
               groupValue: prefs.widgetCompactAccent,
@@ -738,11 +739,11 @@ Future<void> _showManualScaleDialog(
 }) async {
   final submitted = await FlickDialogs.input(
     context,
-    title: 'Font Scale',
+    title: l10n.fontScale,
     message:
-        'Enter a value from ${(min * 100).round()}% to ${(max * 100).round()}%',
+        l10n.enterAValueFromTo((min * 100).round(), (max * 100).round()),
     initialValue: (value * 100).round().toString(),
-    confirmLabel: 'Apply',
+    confirmLabel: l10n.apply,
     keyboardType: const TextInputType.numberWithOptions(decimal: true),
   );
   final parsed = submitted == null ? null : double.tryParse(submitted);
@@ -801,7 +802,7 @@ class _WidgetTextPreviewState extends State<_WidgetTextPreview> {
           child: Row(
             children: [
               Text(
-                'Preview',
+                l10n.preview,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: context.adaptiveTextTertiary,
                     ),
@@ -863,7 +864,7 @@ class _WidgetTextPreviewState extends State<_WidgetTextPreview> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Midnight City Dreams',
+                l10n.midnightCityDreams,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -875,7 +876,7 @@ class _WidgetTextPreviewState extends State<_WidgetTextPreview> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Neon Skyline',
+                l10n.neonSkyline,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

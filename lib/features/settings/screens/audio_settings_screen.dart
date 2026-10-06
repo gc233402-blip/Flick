@@ -16,6 +16,7 @@ import 'package:flick/providers/player_provider.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/services/replaygain_service.dart';
 import 'package:flick/services/uac2_preferences_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class AudioSettingsScreen extends ConsumerStatefulWidget {
   const AudioSettingsScreen({super.key});
@@ -37,17 +38,17 @@ class _AudioSettingsScreenState extends ConsumerState<AudioSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return SettingsScaffold(
-      title: 'Audio',
+      title: l10n.audio,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Audio'),
+          SettingsSectionHeader(l10n.audio),
           SettingsCard(
             children: [
               NavigationSetting(
                 icon: LucideIcons.usb,
-                title: 'USB Audio (UAC2)',
-                subtitle: 'Configure USB DAC/AMP devices',
+                title: l10n.usbAudioUac2,
+                subtitle: l10n.configureUsbDacAmpDevices,
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -59,8 +60,8 @@ class _AudioSettingsScreenState extends ConsumerState<AudioSettingsScreen> {
               const SettingsDivider(),
               NavigationSetting(
                 icon: LucideIcons.slidersHorizontal,
-                title: 'Equalizer',
-                subtitle: 'Adjust audio frequencies',
+                title: l10n.equalizer,
+                subtitle: l10n.adjustAudioFrequencies,
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -112,13 +113,13 @@ class _ExtendedVolumeSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SettingsSectionHeader('Volume'),
+            SettingsSectionHeader(l10n.volume),
             SettingsCard(
               children: [
                 ToggleSetting(
                   icon: LucideIcons.volume2,
-                  title: 'Extended Volume',
-                  subtitle: 'Boost beyond 100% (up to 200%)',
+                  title: l10n.extendedVolume,
+                  subtitle: l10n.boostBeyond100UpTo200,
                   value: prefs.extendedVolumeEnabled,
                   onChanged: (v) => _setEnabled(ref, playerService, v),
                 ),
@@ -181,37 +182,37 @@ class _ReplayGainSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SettingsSectionHeader('ReplayGain'),
+        SettingsSectionHeader(l10n.replaygain),
         SettingsCard(
           children: [
             SelectionSetting(
               icon: LucideIcons.volumeX,
-              title: 'Off',
-              subtitle: 'Play at the recorded level',
+              title: l10n.off,
+              subtitle: l10n.playAtTheRecordedLevel,
               selected: prefs.replayGainMode == 'off',
               onTap: () => _setMode(ref, playerService, 'off'),
             ),
             const SettingsDivider(),
             SelectionSetting(
               icon: LucideIcons.music,
-              title: 'Track',
-              subtitle: 'Normalize each track to match loudness',
+              title: l10n.track,
+              subtitle: l10n.normalizeEachTrackToMatchLoudness,
               selected: prefs.replayGainMode == 'track',
               onTap: () => _setMode(ref, playerService, 'track'),
             ),
             const SettingsDivider(),
             SelectionSetting(
               icon: LucideIcons.disc3,
-              title: 'Album',
-              subtitle: 'Keep relative levels inside each album',
+              title: l10n.album,
+              subtitle: l10n.keepRelativeLevelsInsideEachAlbum,
               selected: prefs.replayGainMode == 'album',
               onTap: () => _setMode(ref, playerService, 'album'),
             ),
             const SettingsDivider(),
             SliderSetting(
               icon: LucideIcons.gauge,
-              title: 'Pre-amp',
-              subtitle: 'Fine-tune the overall gain',
+              title: l10n.preAmp,
+              subtitle: l10n.fineTuneTheOverallGain,
               value: prefs.replayGainPreampDb.clamp(
                 replayGainPreampMinDb,
                 replayGainPreampMaxDb,
@@ -225,9 +226,9 @@ class _ReplayGainSection extends ConsumerWidget {
             const SettingsDivider(),
             ToggleSetting(
               icon: LucideIcons.shield,
-              title: 'Prevent Clipping',
+              title: l10n.preventClipping,
               subtitle:
-                  'Limit positive gain so the level never exceeds full scale',
+                  l10n.limitPositiveGainSoTheLevel,
               value: prefs.replayGainPreventClipping,
               onChanged: (v) => _setPreventClipping(ref, playerService, v),
             ),
@@ -241,11 +242,11 @@ class _ReplayGainSection extends ConsumerWidget {
 class _CrossfadeSection extends ConsumerWidget {
   const _CrossfadeSection();
 
-  static const _curveLabels = <String>[
-    'Equal Power',
-    'Linear',
-    'Square Root',
-    'S-Curve',
+  static List<String> _curveLabels(AppLocalizations l10n) => <String>[
+    l10n.equalPower,
+    l10n.linear,
+    l10n.squareRoot,
+    l10n.sCurve,
   ];
   Future<void> _setEnabled(
     WidgetRef ref,
@@ -304,21 +305,21 @@ class _CrossfadeSection extends ConsumerWidget {
         final controlsEnabled = !locked;
 
         final disabledHint = is432Hz
-            ? 'Turn off 432 Hz tuning to use crossfade'
-            : 'Not available in bit-perfect mode';
+            ? l10n.turnOff432HzTuningTo
+            : l10n.notAvailableInBitPerfectMode;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SettingsSectionHeader('Crossfade', tag: 'Experimental'),
+            SettingsSectionHeader(l10n.crossfade, tag: 'Experimental'),
             SettingsCard(
               children: [
                 ToggleSetting(
                   icon: LucideIcons.shuffle,
-                  title: 'Crossfade',
+                  title: l10n.crossfade,
                   subtitle: locked
                       ? disabledHint
-                      : 'Overlap the end of a track with the next',
+                      : l10n.overlapTheEndOfATrack,
                   value: effectiveEnabled,
                   onChanged: locked
                       ? (_) {}
@@ -327,8 +328,8 @@ class _CrossfadeSection extends ConsumerWidget {
                 const SettingsDivider(),
                 SliderSetting(
                   icon: LucideIcons.timer,
-                  title: 'Duration',
-                  subtitle: 'Length of the overlap',
+                  title: l10n.duration,
+                  subtitle: l10n.lengthOfTheOverlap,
                   value: prefs.crossfadeDurationSecs.clamp(0.5, 12.0),
                   displayValue:
                       '${prefs.crossfadeDurationSecs.toStringAsFixed(1)} s',
@@ -350,7 +351,7 @@ class _CrossfadeSection extends ConsumerWidget {
                 const SettingsDivider(),
                 _CrossfadePreview(
                   curveIndex: prefs.crossfadeCurveIndex,
-                  curveName: _curveLabels[prefs.crossfadeCurveIndex],
+                  curveName: _curveLabels(l10n)[prefs.crossfadeCurveIndex],
                   durationSecs: prefs.crossfadeDurationSecs,
                   enabled: effectiveEnabled,
                 ),
@@ -369,9 +370,7 @@ class _CrossfadeSection extends ConsumerWidget {
                     vertical: AppConstants.spacingXs,
                   ),
                   child: Text(
-                    'Crossfade is most reliable on the Standard engine. '
-                    'On the high-quality (Rust) engine it can be unstable — '
-                    'switch to Standard for consistent crossfades.',
+                    l10n.crossfadeIsMostReliableOnThe,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: context.adaptiveTextTertiary,
                         ),
@@ -389,11 +388,11 @@ class _CrossfadeSection extends ConsumerWidget {
 class _CrossfeedSection extends ConsumerWidget {
   const _CrossfeedSection();
 
-  static const _levelLabels = <String>[
-    'Off',
-    'Default',
-    'Crossfeed',
-    'Crossfeed easy',
+  static List<String> _levelLabels(AppLocalizations l10n) => <String>[
+    l10n.off,
+    l10n.defaultLabel,
+    l10n.crossfeed,
+    l10n.crossfeedEasy,
   ];
 
   Future<void> _setLevel(
@@ -418,14 +417,14 @@ class _CrossfeedSection extends ConsumerWidget {
         final controlsEnabled = !locked;
 
         final disabledHint = is432Hz
-            ? 'Turn off 432 Hz tuning to use crossfeed'
-            : 'Not available in bit-perfect mode';
+            ? l10n.turnOff432HzTuningTo2
+            : l10n.notAvailableInBitPerfectMode;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SettingsSectionHeader(
-              'Crossfeed (BS2B)',
+            SettingsSectionHeader(
+              l10n.crossfeedBs2b,
               tag: 'Experimental',
             ),
             SettingsCard(
@@ -450,8 +449,7 @@ class _CrossfeedSection extends ConsumerWidget {
                       vertical: AppConstants.spacingXs,
                     ),
                     child: Text(
-                      'Crossfeed runs on the high-quality (Rust) engine only. '
-                      'The Standard engine plays without it.',
+                      l10n.crossfeedRunsOnTheHighQuality,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: context.adaptiveTextTertiary,
                           ),
@@ -495,6 +493,7 @@ class _CrossfeedLevelPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final levelLabels = _CrossfeedSection._levelLabels(l10n);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppConstants.spacingLg,
@@ -508,7 +507,7 @@ class _CrossfeedLevelPicker extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: AppConstants.spacingXs),
             child: Text(
-              'Level',
+              l10n.level,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: enabled
                         ? context.adaptiveTextPrimary
@@ -521,13 +520,13 @@ class _CrossfeedLevelPicker extends StatelessWidget {
             children: [
               for (
                 var i = 0;
-                i < _CrossfeedSection._levelLabels.length;
+                i < levelLabels.length;
                 i++
               ) ...[
                 if (i > 0) const SizedBox(width: AppConstants.spacingSm),
                 Expanded(
                   child: _CurveChip(
-                    label: _CrossfeedSection._levelLabels[i],
+                    label: levelLabels[i],
                     selected: i == selectedIndex,
                     enabled: enabled,
                     onTap: enabled ? () => onSelect?.call(i) : null,
@@ -555,6 +554,7 @@ class _CrossfadeCurvePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final curveLabels = _CrossfadeSection._curveLabels(l10n);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppConstants.spacingLg,
@@ -568,7 +568,7 @@ class _CrossfadeCurvePicker extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: AppConstants.spacingXs),
             child: Text(
-              'Curve',
+              l10n.curve,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: enabled
                     ? context.adaptiveTextPrimary
@@ -581,13 +581,13 @@ class _CrossfadeCurvePicker extends StatelessWidget {
             children: [
               for (
                 var i = 0;
-                i < _CrossfadeSection._curveLabels.length;
+                i < curveLabels.length;
                 i++
               ) ...[
                 if (i > 0) const SizedBox(width: AppConstants.spacingSm),
                 Expanded(
                   child: _CurveChip(
-                    label: _CrossfadeSection._curveLabels[i],
+                    label: curveLabels[i],
                     selected: i == selectedIndex,
                     enabled: enabled,
                     onTap: enabled ? () => onSelect?.call(i) : null,
@@ -683,7 +683,7 @@ class _CrossfadePreview extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Preview',
+                l10n.preview,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: enabled
                       ? context.adaptiveTextPrimary
@@ -731,7 +731,7 @@ class _CrossfadePreview extends StatelessWidget {
                 ),
               ),
               Text(
-                '${durationSecs.toStringAsFixed(1)} s',
+                l10n.s2(durationSecs.toStringAsFixed(1)),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.adaptiveTextTertiary,
                 ),

@@ -8,6 +8,7 @@ import 'package:flick/models/song.dart';
 import 'package:flick/services/apple_music/album_identification_service.dart';
 import 'package:flick/services/apple_music/auto_metadata_enricher.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Lists album folders still missing artist or album tags and opens the
 /// identification sheet for each. Backed by the same grouping the background
@@ -60,7 +61,7 @@ class _MissingMetadataScreenState extends State<MissingMetadataScreen> {
   @override
   Widget build(BuildContext context) {
     return SettingsScaffold(
-      title: 'Fix Missing Metadata',
+      title: l10n.fixMissingMetadata,
       body: FutureBuilder<List<_UntaggedAlbum>>(
         future: _future,
         builder: (context, snapshot) {
@@ -75,7 +76,7 @@ class _MissingMetadataScreenState extends State<MissingMetadataScreen> {
             return Padding(
               padding: const EdgeInsets.all(AppConstants.spacingXl),
               child: Text(
-                'Every album has artist and album tags.',
+                l10n.everyAlbumHasArtistAndAlbum,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
@@ -84,7 +85,7 @@ class _MissingMetadataScreenState extends State<MissingMetadataScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SettingsSectionHeader('Needs metadata'),
+              SettingsSectionHeader(l10n.needsMetadata),
               SettingsCard(
                 children: [
                   for (var index = 0; index < albums.length; index++) ...[
@@ -121,11 +122,11 @@ class _UntaggedAlbum {
 
   String get album => _seeds.album;
 
-  String get title => album.isNotEmpty ? album : 'Unknown Album';
+  String get title => album.isNotEmpty ? album : l10n.unknownAlbum;
 
   String get subtitle {
     final count = songs.length;
-    final files = count == 1 ? '1 file' : '$count files';
+    final files = l10n.files2(count);
     return artist.isEmpty ? files : '$files • $artist';
   }
 }

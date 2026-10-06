@@ -7,6 +7,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class SupportFlickScreen extends ConsumerStatefulWidget {
   const SupportFlickScreen({super.key});
@@ -106,8 +107,8 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not open link'),
+        SnackBar(
+          content: Text(l10n.couldNotOpenLink),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -117,7 +118,7 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
   @override
   Widget build(BuildContext context) {
     return SettingsScaffold(
-      title: 'Support Flick',
+      title: l10n.supportFlick,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -128,21 +129,21 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SettingsSectionHeader('Why Donate'),
+                  SettingsSectionHeader(l10n.whyDonate),
                   SettingsCard(
                     children: [
                       _InfoTile(
                         icon: LucideIcons.user,
-                        title: 'Solo Developer',
+                        title: l10n.soloDeveloper,
                         subtitle:
-                            'Flick is built and maintained by one person with zero budget. No team, no funding, no ads.',
+                            l10n.flickIsBuiltAndMaintainedBy,
                       ),
                       const SettingsDivider(),
                       _InfoTile(
                         icon: LucideIcons.code,
-                        title: 'Free & Open Source',
+                        title: l10n.freeOpenSource,
                         subtitle:
-                            'Flick will always be free. Donations keep the project alive without paywalls or subscriptions.',
+                            l10n.flickWillAlwaysBeFreeDonations,
                       ),
                     ],
                   ),
@@ -158,28 +159,28 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SettingsSectionHeader('Where Your Money Goes'),
+                  SettingsSectionHeader(l10n.whereYourMoneyGoes),
                   SettingsCard(
                     children: [
                       _InfoTile(
                         icon: LucideIcons.smartphone,
-                        title: 'Google Play Developer Fees',
+                        title: l10n.googlePlayDeveloperFees,
                         subtitle:
-                            'Keeping Flick on the Play Store costs \$25/year in developer registration fees.',
+                            l10n.keepingFlickOnThePlayStore,
                       ),
                       const SettingsDivider(),
                       _InfoTile(
                         icon: LucideIcons.headphones,
-                        title: 'Audio Testing Equipment',
+                        title: l10n.audioTestingEquipment,
                         subtitle:
-                            'USB DACs, headphones, and reference gear to test and improve playback quality.',
+                            l10n.usbDacsHeadphonesAndReferenceGear,
                       ),
                       const SettingsDivider(),
                       _InfoTile(
                         icon: LucideIcons.music,
-                        title: 'DSD / DSF Playback',
+                        title: l10n.dsdDsfPlayback,
                         subtitle:
-                            'Funding native DSD/DSF playback development — a highly requested feature for audiophiles.',
+                            l10n.fundingNativeDsdDsfPlaybackDevelopment,
                       ),
                     ],
                   ),
@@ -195,7 +196,7 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SettingsSectionHeader('Donate'),
+                  SettingsSectionHeader(l10n.donate),
                   AnimatedBuilder(
                     animation: _pulseAnimation,
                     builder: (context, child) {
@@ -209,8 +210,8 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
                         children: [
                           NavigationSetting(
                             icon: LucideIcons.heart,
-                            title: 'Buy me a coffee',
-                            subtitle: 'Support development on Ko-fi',
+                            title: l10n.buyMeACoffee,
+                            subtitle: l10n.supportDevelopmentOnKoFi,
                             onTap: _launchKoFi,
                           ),
                         ],

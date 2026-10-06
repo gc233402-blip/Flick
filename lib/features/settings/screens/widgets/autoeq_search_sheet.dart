@@ -5,6 +5,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/services/autoeq_catalog_service.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Opens the AutoEQ headphone picker. Returns the chosen entry, or null if
 /// dismissed. The caller applies the result to the equalizer.
@@ -91,7 +92,7 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
   Future<void> _searchOnline() async {
     final query = _queryController.text.trim();
     if (query.isEmpty) {
-      _toast('Type a brand and model to search online.');
+      _toast(l10n.typeABrandAndModelTo);
       return;
     }
     String brand = _brand ?? '';
@@ -118,9 +119,9 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
           _selected = entry;
           _results = [AutoEqSearchResult(entry, 999), ..._results];
         });
-        _toast('Found "${entry.displayName}" online.');
+        _toast(l10n.foundOnline(entry.displayName));
       } else {
-        _toast('Not found online. Try a different spelling.');
+        _toast(l10n.notFoundOnlineTryADifferent);
       }
     } finally {
       if (mounted) setState(() => _searchingOnline = false);
@@ -154,7 +155,7 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
                     horizontal: AppConstants.spacingLg,
                   ),
                   children: [
-                    _brandChip(context, null, 'All'),
+                    _brandChip(context, null, l10n.all),
                     for (final b in _brands)
                       _brandChip(context, b, b),
                   ],
@@ -185,7 +186,7 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
           const SizedBox(width: AppConstants.spacingSm),
           Expanded(
             child: Text(
-              'AutoEQ Headphones',
+              l10n.autoeqHeadphones2,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
@@ -229,7 +230,9 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
           controller: _queryController,
           style: TextStyle(color: context.adaptiveTextPrimary),
           decoration: InputDecoration(
-            hintText: 'Search ${_all.isEmpty ? 'headphones' : '${_all.length} models'}…',
+            hintText: _all.isEmpty
+                ? l10n.searchHeadphones
+                : l10n.searchModelCount(_all.length),
             hintStyle: TextStyle(color: context.adaptiveTextTertiary),
             prefixIcon: Icon(
               Icons.search_rounded,
@@ -314,7 +317,7 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.spacingLg),
           child: Text(
-            'No matches. Try fewer words or search online.',
+            l10n.noMatchesTryFewerWordsOr,
             textAlign: TextAlign.center,
             style: TextStyle(color: context.adaptiveTextSecondary),
           ),
@@ -363,7 +366,7 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
           ),
         ),
         subtitle: Text(
-          '${entry.bands.length} bands · preamp ${entry.preampDb.toStringAsFixed(1)} dB · ${entry.source}',
+          l10n.bandsPreampDb(entry.bands.length, entry.preampDb.toStringAsFixed(1), entry.source),
           style: TextStyle(
             color: context.adaptiveTextTertiary,
             fontSize: 12,
@@ -411,7 +414,7 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
               TextButton.icon(
                 onPressed: _searchingOnline ? null : _searchOnline,
                 icon: const Icon(Icons.cloud_download_outlined, size: 18),
-                label: const Text('Search online'),
+                label: Text(l10n.searchOnline2),
               ),
               const Spacer(),
               FilledButton(
@@ -429,8 +432,8 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
                 ),
                 child: Text(
                   _selected == null
-                      ? 'Apply'
-                      : 'Apply ${_selected!.model}',
+                      ? l10n.apply
+                      : l10n.apply2(_selected!.model),
                 ),
               ),
             ],

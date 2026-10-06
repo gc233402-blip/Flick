@@ -17,17 +17,17 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
     final appPreferences = ref.watch(appPreferencesProvider);
 
     return SettingsScaffold(
-      title: 'UI Customization',
+      title: l10n.uiCustomization,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Home Screen Sections'),
+          SettingsSectionHeader(l10n.homeScreenSections),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.zap,
-                title: 'Quick Access',
-                subtitle: 'Show the grid of shortcut cards on the home screen',
+                title: l10n.quickAccess,
+                subtitle: l10n.showTheGridOfShortcutCards,
                 value: appPreferences.showQuickAccess,
                 onChanged: (value) {
                   ref
@@ -38,8 +38,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.sparkles,
-                title: 'Made For You',
-                subtitle: 'Show smart mixes generated from your listening habits',
+                title: l10n.madeForYou,
+                subtitle: l10n.showSmartMixesGeneratedFromYour,
                 value: appPreferences.showSmartMixes,
                 onChanged: (value) {
                   ref
@@ -50,8 +50,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.users,
-                title: 'Artists In Rotation',
-                subtitle: 'Show recently played artists on the home screen',
+                title: l10n.artistsInRotation,
+                subtitle: l10n.showRecentlyPlayedArtistsOnThe,
                 value: appPreferences.showRecentArtists,
                 onChanged: (value) {
                   ref
@@ -62,8 +62,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.clock3,
-                title: 'Recently Played',
-                subtitle: 'Show your recent listening history on the home screen',
+                title: l10n.recentlyPlayed,
+                subtitle: l10n.showYourRecentListeningHistoryOn,
                 value: appPreferences.showRecentTracks,
                 onChanged: (value) {
                   ref
@@ -74,8 +74,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.listMusic,
-                title: 'Your Playlists',
-                subtitle: 'Show playlist previews on the home screen',
+                title: l10n.yourPlaylists,
+                subtitle: l10n.showPlaylistPreviewsOnTheHome,
                 value: appPreferences.showPlaylistPreviews,
                 onChanged: (value) {
                   ref
@@ -86,8 +86,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.compass,
-                title: 'Browse More',
-                subtitle: 'Show the browse chips for library sections on the home screen',
+                title: l10n.browseMore,
+                subtitle: l10n.showTheBrowseChipsForLibrary,
                 value: appPreferences.showBrowseMore,
                 onChanged: (value) {
                   ref
@@ -98,8 +98,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.audioLines,
-                title: 'Engine Selector',
-                subtitle: 'Show the audio engine picker card on the home screen',
+                title: l10n.engineSelector,
+                subtitle: l10n.showTheAudioEnginePickerCard,
                 value: appPreferences.showEngineSelector,
                 onChanged: (value) {
                   ref
@@ -110,8 +110,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.volume2,
-                title: 'USB Volume on Home',
-                subtitle: 'Show the USB volume bar on the home screen',
+                title: l10n.usbVolumeOnHome,
+                subtitle: l10n.showTheUsbVolumeBarOn,
                 value: appPreferences.showUsbVolumeOnMenu,
                 onChanged: (value) {
                   ref
@@ -122,8 +122,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.slidersHorizontal,
-                title: 'USB Volume in Settings',
-                subtitle: 'Show the USB volume bar on the UAC2 settings screen',
+                title: l10n.usbVolumeInSettings,
+                subtitle: l10n.showTheUsbVolumeBarOn2,
                 value: appPreferences.showUsbVolumeOnSettings,
                 onChanged: (value) {
                   ref
@@ -134,13 +134,13 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Detail Screens'),
+          SettingsSectionHeader(l10n.detailScreens),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.disc3,
-                title: 'More from Artist',
-                subtitle: 'Show related albums on album pages',
+                title: l10n.moreFromArtist2,
+                subtitle: l10n.showRelatedAlbumsOnAlbumPages,
                 value: appPreferences.showMoreFromArtist,
                 onChanged: (value) {
                   ref
@@ -151,8 +151,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.users,
-                title: 'More Artists',
-                subtitle: 'Show other artists on album pages',
+                title: l10n.moreArtists2,
+                subtitle: l10n.showOtherArtistsOnAlbumPages,
                 value: appPreferences.showMoreArtists,
                 onChanged: (value) {
                   ref
@@ -163,9 +163,9 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.sparkles,
-                title: 'Animated Album Art',
+                title: l10n.animatedAlbumArt,
                 subtitle:
-                    'Apple Music Motion Art on albums plus pan/zoom, ambient glow and smooth fade on heroes',
+                    l10n.appleMusicMotionArtOnAlbums,
                 value: appPreferences.animatedAlbumArt,
                 onChanged: (value) {
                   ref
@@ -176,9 +176,9 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.image,
-                title: 'Expanded Header Art',
+                title: l10n.expandedHeaderArt,
                 subtitle:
-                    'Show more art by fading only the bottom of the header and lowering body content',
+                    l10n.showMoreArtByFadingOnly,
                 value: appPreferences.detailHeaderArtExpanded,
                 onChanged: (value) {
                   ref
@@ -189,8 +189,8 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.alignCenter,
-                title: 'Centered Header Title',
-                subtitle: 'Center the title and info in the detail header',
+                title: l10n.centeredHeaderTitle,
+                subtitle: l10n.centerTheTitleAndInfoIn,
                 value: appPreferences.detailHeaderCenteredTitle,
                 onChanged: (value) {
                   ref
@@ -201,7 +201,7 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Track Thumbnails'),
+          SettingsSectionHeader(l10n.trackThumbnails),
           SettingsCard(
             children: SongTileThumbnailMode.values.map((mode) {
               final isSelected =
@@ -231,7 +231,7 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
             }).toList(),
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Progress Bar'),
+          SettingsSectionHeader(l10n.progressBar),
           SettingsCard(
             children: [
               SelectionSetting(
@@ -262,7 +262,7 @@ class UiCustomizationSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Album Colors'),
+          SettingsSectionHeader(l10n.albumColors),
           SettingsCard(
             children: AlbumColorMode.values.map((mode) {
               final isSelected =

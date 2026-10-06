@@ -32,6 +32,7 @@ import 'package:flick/services/music_folder_service.dart';
 import 'package:flick/services/permission_service.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/widgets/common/vinyl_record.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class LibrarySettingsScreen extends ConsumerStatefulWidget {
   const LibrarySettingsScreen({super.key});
@@ -196,11 +197,11 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
           .requestIgnoreBatteryOptimizations();
       if (!mounted) return;
       if (!launched) {
-        _showToast('Unable to open battery optimization settings');
+        _showToast(l10n.unableToOpenBatteryOptimizationSettings);
       }
     } catch (e) {
       if (!mounted) return;
-      _showToast('Failed to open battery optimization settings: $e');
+      _showToast(l10n.failedToOpenBatteryOptimizationSettings(e));
     }
   }
 
@@ -217,11 +218,11 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
       final launched = await permissionService.openAllFilesAccessSettings();
       if (!mounted) return;
       if (!launched) {
-        _showToast('Unable to open All Files Access settings');
+        _showToast(l10n.unableToOpenAllFilesAccess);
       }
     } catch (e) {
       if (!mounted) return;
-      _showToast('Failed to open All Files Access settings: $e');
+      _showToast(l10n.failedToOpenAllFilesAccess(e));
     }
   }
 
@@ -246,9 +247,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
   }
 
   String get _cacheSizeLabel {
-    if (_isClearingCache) return 'Clearing...';
-    if (_artworkCacheBytes < 0) return 'Calculating size...';
-    return 'Using ${_formatBytes(_artworkCacheBytes)}';
+    if (_isClearingCache) return l10n.clearing;
+    if (_artworkCacheBytes < 0) return l10n.calculatingSize;
+    return l10n.using(_formatBytes(_artworkCacheBytes));
   }
 
   String _formatBytes(int bytes) {
@@ -267,11 +268,10 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     unawaited(
       FlickDialogs.confirm(
         context,
-        title: 'Clear Artwork Cache?',
+        title: l10n.clearArtworkCache,
         message:
-            'Cached album art (${_formatBytes(_artworkCacheBytes)}) will be removed. '
-            'Artwork reloads automatically as you browse.',
-        confirmLabel: 'Clear',
+            l10n.cachedAlbumArtWillBeRemoved(_formatBytes(_artworkCacheBytes)),
+        confirmLabel: l10n.clear,
       ).then((confirmed) {
         if (confirmed) _clearArtworkCache();
       }),
@@ -283,9 +283,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     try {
       await AlbumArtService.instance.clearCache();
       await _refreshCacheSize();
-      if (mounted) _showToast('Artwork cache cleared');
+      if (mounted) _showToast(l10n.artworkCacheCleared);
     } catch (e) {
-      if (mounted) _showToast('Failed to clear cache: $e');
+      if (mounted) _showToast(l10n.failedToClearCache(e));
     } finally {
       if (mounted) setState(() => _isClearingCache = false);
     }
@@ -302,9 +302,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
   }
 
   String get _wavCacheSizeLabel {
-    if (_isClearingWavCache) return 'Clearing...';
-    if (_wavCacheBytes < 0) return 'Calculating size...';
-    return 'Using ${_formatBytes(_wavCacheBytes)}';
+    if (_isClearingWavCache) return l10n.clearing;
+    if (_wavCacheBytes < 0) return l10n.calculatingSize;
+    return l10n.using2(_formatBytes(_wavCacheBytes));
   }
 
   String get _cacheCapLabel {
@@ -324,8 +324,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     if (mounted) {
       _showToast(
         bytes == kPlaybackCacheUnlimited
-            ? 'Playback cache unlimited'
-            : 'Playback cache limit: ${_formatBytes(bytes)}',
+            ? l10n.playbackCacheUnlimited
+            : l10n.playbackCacheLimit2(_formatBytes(bytes)),
       );
     }
   }
@@ -333,7 +333,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
   void _showCacheCapSheet() {
     GlassBottomSheet.show(
       context: context,
-      title: 'Playback Cache Limit',
+      title: l10n.playbackCacheLimit,
       isDismissible: true,
       enableDrag: true,
       maxHeightRatio: 0.5,
@@ -397,11 +397,10 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     unawaited(
       FlickDialogs.confirm(
         context,
-        title: 'Clear Converted Audio Cache?',
+        title: l10n.clearConvertedAudioCache,
         message:
-            'Cached WAV conversions (${_formatBytes(_wavCacheBytes < 0 ? 0 : _wavCacheBytes)}) '
-            'will be removed. Files convert again on next playback.',
-        confirmLabel: 'Clear',
+            l10n.cachedWavConversionsWillBeRemoved(_formatBytes(_wavCacheBytes < 0 ? 0 : _wavCacheBytes)),
+        confirmLabel: l10n.clear,
       ).then((confirmed) {
         if (confirmed) _clearWavCache();
       }),
@@ -413,9 +412,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     try {
       await AlacConverterService.clearCache();
       await _refreshWavCacheSize();
-      if (mounted) _showToast('Converted audio cache cleared');
+      if (mounted) _showToast(l10n.convertedAudioCacheCleared);
     } catch (e) {
-      if (mounted) _showToast('Failed to clear cache: $e');
+      if (mounted) _showToast(l10n.failedToClearCache(e));
     } finally {
       if (mounted) setState(() => _isClearingWavCache = false);
     }
@@ -425,11 +424,10 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     unawaited(
       FlickDialogs.confirm(
         context,
-        title: 'Remove All Songs?',
+        title: l10n.removeAllSongs,
         message:
-            'Every song is removed from your library. Files on disk are kept; '
-            'rescan your folders to add them again.',
-        confirmLabel: 'Remove',
+            l10n.everySongIsRemovedFromYour,
+        confirmLabel: l10n.remove,
         destructive: true,
       ).then((confirmed) {
         if (confirmed) _removeAllSongs();
@@ -440,9 +438,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
   Future<void> _removeAllSongs() async {
     try {
       await SongRepository().deleteAllSongs();
-      if (mounted) _showToast('Library emptied');
+      if (mounted) _showToast(l10n.libraryEmptied);
     } catch (e) {
-      if (mounted) _showToast('Failed to remove songs: $e');
+      if (mounted) _showToast(l10n.failedToRemoveSongs(e));
     }
   }
 
@@ -456,9 +454,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
         if (!granted) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
-                  'Storage permission is required to add music folders',
+                  l10n.storagePermissionIsRequiredToAdd,
                 ),
               ),
             );
@@ -485,7 +483,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to add folder: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.failedToAddFolder(e))));
       }
     }
   }
@@ -498,7 +496,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to remove folder: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.failedToRemoveFolder(e))));
       }
     }
   }
@@ -553,7 +551,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
       debugPrint('Scan session "$title" failed: $error\n$stackTrace');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Scan failed. Please try again.')),
+          SnackBar(content: Text(l10n.scanFailedPleaseTryAgain)),
         );
       }
     }
@@ -626,7 +624,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
       final progress = (lastProgress ??
               ScanProgress(songsFound: 0, totalFiles: art.total))
           .copyWith(
-            phase: 'Loading artwork',
+            phase: l10n.loadingArtwork,
             filesProcessed: art.completed,
             totalFiles: art.total,
             isComplete: false,
@@ -679,7 +677,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
 
   Future<void> _rescanAllFolders({ScanMode mode = ScanMode.quick}) {
     return _runScanSession(
-      title: 'All Folders',
+      title: l10n.allFolders,
       kind: ScanSessionKind.scan,
       onCancel: _scannerService.cancelScan,
       run: () => _scannerService.scanAllFolders(mode: mode),
@@ -690,7 +688,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
   Future<void> _showRescanModeChooser() async {
     final mode = await GlassBottomSheet.show<ScanMode>(
       context: context,
-      title: 'Rescan Library',
+      title: l10n.rescanLibrary,
       maxHeightRatio: 0.4,
       content: Builder(
         builder: (sheetContext) => Column(
@@ -698,16 +696,16 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
           children: [
             _buildRescanModeTile(
               icon: LucideIcons.zap,
-              title: 'Quick scan',
-              subtitle: 'Only re-read files that are new or changed.',
+              title: l10n.quickScan,
+              subtitle: l10n.onlyReReadFilesThatAre,
               onTap: () => Navigator.of(sheetContext).pop(ScanMode.quick),
             ),
             const SettingsDivider(),
             _buildRescanModeTile(
               icon: LucideIcons.refreshCw,
-              title: 'Full scan',
+              title: l10n.fullScan,
               subtitle:
-                  'Re-read metadata for every file. Slower; use when tags look stale.',
+                  l10n.reReadMetadataForEveryFile,
               onTap: () => Navigator.of(sheetContext).pop(ScanMode.full),
             ),
           ],
@@ -782,7 +780,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
 
     final service = AudioPreloadService.instance;
     await _runScanSession(
-      title: 'Preloading Audio',
+      title: l10n.preloadingAudio,
       kind: ScanSessionKind.preload,
       onCancel: service.cancel,
       includeProgressInSummary: false,
@@ -794,8 +792,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
               totalFiles: progress.total,
               filesProcessed: progress.completed,
               currentFile: progress.currentFile,
-              currentFolder: 'Preloading Audio',
-              phase: 'Analyzing audio',
+              currentFolder: l10n.preloadingAudio,
+              phase: l10n.analyzingAudio,
               isComplete: progress.isComplete,
             ),
           ),
@@ -809,7 +807,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
 
     final service = ReplayGainScanService();
     await _runScanSession(
-      title: 'ReplayGain Scan',
+      title: l10n.replaygainScan,
       kind: ScanSessionKind.replayGain,
       onCancel: service.cancel,
       includeProgressInSummary: false,
@@ -821,8 +819,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
               totalFiles: progress.total,
               filesProcessed: progress.completed,
               currentFile: progress.currentFile,
-              currentFolder: 'ReplayGain Scan',
-              phase: 'Analyzing loudness',
+              currentFolder: l10n.replaygainScan,
+              phase: l10n.analyzingLoudness,
               isComplete: progress.isComplete,
             ),
           ),
@@ -833,11 +831,10 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     unawaited(
       FlickDialogs.confirm(
         context,
-        title: 'Remove Folder?',
+        title: l10n.removeFolder,
         message:
-            'Remove "${folder.displayName}" and all of its songs from your '
-            'library? Files on disk are not deleted.',
-        confirmLabel: 'Remove',
+            l10n.removeAndAllOfItsSongs(folder.displayName),
+        confirmLabel: l10n.remove,
         destructive: true,
       ).then((confirmed) {
         if (confirmed) _removeFolder(folder);
@@ -956,9 +953,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                 const SizedBox(height: AppConstants.spacingSm),
                 _buildPhaseRow(
                   finishingUp
-                      ? 'Finishing up…'
+                      ? l10n.finishingUp
                       : loadingArtwork
-                      ? 'Loading artwork…'
+                      ? l10n.loadingArtwork2
                       : progress?.phase,
                   bgRunning,
                 ),
@@ -976,13 +973,13 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                 Text(
                   loadingArtwork
                       ? totalFiles > 0
-                            ? '${progress?.filesProcessed ?? 0} / $totalFiles covers'
-                            : 'Loading artwork…'
+                            ? l10n.covers(progress?.filesProcessed ?? 0, totalFiles)
+                            : l10n.loadingArtwork2
                       : totalFiles > 0
-                      ? '${progress?.filesProcessed ?? 0} / $totalFiles files'
+                      ? l10n.files(progress?.filesProcessed ?? 0, totalFiles)
                       : (progress?.filesProcessed ?? 0) > 0
-                      ? '${progress!.filesProcessed} files checked…'
-                      : 'Counting files…',
+                      ? l10n.filesChecked(progress!.filesProcessed)
+                      : l10n.countingFiles,
                   style: const TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 12,
@@ -993,7 +990,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                     progress!.folders!.length > 1) ...[
                   const SizedBox(height: AppConstants.spacingMd),
                   Text(
-                    'Folder ${progress.foldersCompleted ?? 0} of ${progress.foldersTotal ?? progress.folders!.length}',
+                    l10n.folderOf(progress.foldersCompleted ?? 0, progress.foldersTotal ?? progress.folders!.length),
                     style: const TextStyle(
                       fontFamily: 'ProductSans',
                       fontSize: 13,
@@ -1006,17 +1003,17 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                 const SizedBox(height: AppConstants.spacingLg),
                 _buildStatRow([
                   _buildScanStat(
-                    'New',
+                    l10n.newLabel,
                     '${progress?.newSongs ?? 0}',
                     LucideIcons.plus,
                   ),
                   _buildScanStat(
-                    'Mod',
+                    l10n.mod,
                     '${progress?.modifiedSongs ?? 0}',
                     LucideIcons.refreshCw,
                   ),
                   _buildScanStat(
-                    'Del',
+                    l10n.del,
                     '${progress?.deletedSongs ?? 0}',
                     LucideIcons.trash2,
                   ),
@@ -1027,17 +1024,17 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                   builder: (context, elapsed, _) {
                     return _buildStatRow([
                       _buildScanStat(
-                        'Time',
+                        l10n.time,
                         _formatDuration(elapsed),
                         LucideIcons.timer,
                       ),
                       _buildScanStat(
-                        'Rate',
+                        l10n.rate,
                         _formatRate(progress?.filesProcessed ?? 0, elapsed),
                         LucideIcons.gauge,
                       ),
                       _buildScanStat(
-                        'Engine',
+                        l10n.engine,
                         progress?.scanEngine ?? '—',
                         LucideIcons.cpu,
                       ),
@@ -1054,8 +1051,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                           foregroundColor: AppColors.textSecondary,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text(
-                          'Minimize',
+                        child: Text(
+                          l10n.minimize,
                           style: TextStyle(
                             fontFamily: 'ProductSans',
                             fontWeight: FontWeight.w500,
@@ -1090,7 +1087,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         child: Text(
-                          loadingArtwork ? 'Skip' : 'Cancel',
+                          loadingArtwork ? l10n.skip : l10n.cancel,
                           style: const TextStyle(
                             fontFamily: 'ProductSans',
                             fontWeight: FontWeight.w500,
@@ -1110,12 +1107,12 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
 
   Widget _buildFolderProgressRow(FolderScanProgress folder) {
     final status = folder.unavailable
-        ? 'Unavailable'
+        ? l10n.unavailable2
         : folder.totalFiles > 0
         ? '${folder.filesProcessed}/${folder.totalFiles}'
         : folder.isComplete
-        ? 'Done'
-        : 'Checking…';
+        ? l10n.done
+        : l10n.checking;
 
     return Padding(
       padding: const EdgeInsets.only(top: AppConstants.spacingXs),
@@ -1167,8 +1164,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
 
   Widget _buildPhaseRow(String? phase, bool bgRunning) {
     final text = bgRunning
-        ? 'Finishing metadata enrichment…'
-        : (phase ?? 'Initializing…');
+        ? l10n.finishingMetadataEnrichment
+        : (phase ?? l10n.initializing);
     if (bgRunning) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1240,8 +1237,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
               color: AppColors.textTertiary,
             ),
             const SizedBox(height: AppConstants.spacingLg),
-            const Text(
-              'USB storage not connected',
+            Text(
+              l10n.usbStorageNotConnected,
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 fontSize: 18,
@@ -1251,7 +1248,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
             ),
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              '${progress.currentFolder ?? folderName} is offline — retained songs still listed',
+              l10n.isOfflineRetainedSongsStillListed(progress.currentFolder ?? folderName),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: 'ProductSans',
@@ -1272,8 +1269,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                     borderRadius: BorderRadius.circular(AppConstants.radiusMd),
                   ),
                 ),
-                child: const Text(
-                  'Done',
+                child: Text(
+                  l10n.done,
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontWeight: FontWeight.w600,
@@ -1296,7 +1293,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
 
     GlassBottomSheet.show(
       context: context,
-      title: 'Scan Complete',
+      title: l10n.scanComplete,
       isDismissible: true,
       enableDrag: true,
       maxHeightRatio: 0.42,
@@ -1313,31 +1310,31 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
           const SizedBox(height: AppConstants.spacingLg),
           _buildStatRow([
             _buildScanStat(
-              'New',
+              l10n.newLabel,
               '${progress?.newSongs ?? 0}',
               LucideIcons.plus,
             ),
             _buildScanStat(
-              'Mod',
+              l10n.mod,
               '${progress?.modifiedSongs ?? 0}',
               LucideIcons.refreshCw,
             ),
             _buildScanStat(
-              'Del',
+              l10n.del,
               '${progress?.deletedSongs ?? 0}',
               LucideIcons.trash2,
             ),
           ]),
           const SizedBox(height: AppConstants.spacingMd),
           _buildStatRow([
-            _buildScanStat('Total', '$songs', LucideIcons.music),
+            _buildScanStat(l10n.total, '$songs', LucideIcons.music),
             _buildScanStat(
-              'Time',
+              l10n.time,
               _formatDuration(scanDuration),
               LucideIcons.timer,
             ),
             _buildScanStat(
-              'Rate',
+              l10n.rate,
               _formatRate(progress?.filesProcessed ?? songs, scanDuration),
               LucideIcons.gauge,
             ),
@@ -1373,7 +1370,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Preloading audio ${preload.completed}/${preload.total}',
+                              l10n.preloadingAudio2(preload.completed, preload.total),
                               style: const TextStyle(
                                 fontFamily: 'ProductSans',
                                 fontSize: 12,
@@ -1396,7 +1393,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                       ),
                       TextButton(
                         onPressed: AudioPreloadService.instance.cancel,
-                        child: const Text('Stop'),
+                        child: Text(l10n.stop),
                       ),
                     ],
                   ),
@@ -1424,10 +1421,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                   const SizedBox(width: AppConstants.spacingXs),
                   Expanded(
                     child: Text(
-                      'No audio was found. If this folder contains music, a '
-                      '.nomedia file may be hiding it, or Android hasn\'t '
-                      'indexed it yet. Try enabling deep scan, or remove any '
-                      '.nomedia file and re-scan.',
+                      l10n.noAudioWasFoundIfThis,
                       style: TextStyle(
                         fontFamily: 'ProductSans',
                         fontSize: 12,
@@ -1453,8 +1447,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                   borderRadius: BorderRadius.circular(AppConstants.radiusMd),
                 ),
               ),
-              child: const Text(
-                'Done',
+              child: Text(
+                l10n.done,
                 style: TextStyle(
                   fontFamily: 'ProductSans',
                   fontWeight: FontWeight.w600,
@@ -1471,7 +1465,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     final parts = <String>[];
     if (progress?.scanEngine != null) parts.add(progress!.scanEngine!);
     if (progress?.foldersTotal != null) {
-      parts.add('${progress!.foldersTotal} folders');
+      parts.add(l10n.folders2(progress!.foldersTotal!));
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1590,14 +1584,14 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Library',
+                      l10n.libraryLabel,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: context.adaptiveTextPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$_songCount songs in ${_folders.length} ${_folders.length == 1 ? 'folder' : 'folders'}',
+                      l10n.songsIn(_songCount, _folders.length),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.adaptiveTextTertiary,
                       ),
@@ -1637,7 +1631,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
           ),
           const SizedBox(width: AppConstants.spacingSm),
           Text(
-            'Scanning... ${_scanProgress?.songsFound ?? 0} songs found',
+            l10n.scanningSongsFound(_scanProgress?.songsFound ?? 0),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: context.adaptiveTextSecondary,
             ),
@@ -1691,12 +1685,12 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                   if (Platform.isAndroid)
                     Text(
                       [
-                        effectiveDeepScan ? 'Deep scan on' : 'Deep scan off',
+                        effectiveDeepScan ? l10n.deepScanOn : l10n.deepScanOff,
                         if (folder.isRemovable == true)
                           (folder.volumeState != null &&
                                   folder.volumeState != 'mounted')
-                              ? 'USB not connected'
-                              : 'External',
+                              ? l10n.usbNotConnected
+                              : l10n.externalLabel,
                       ].join(' · '),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextTertiary,
@@ -1772,13 +1766,13 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Scanning Settings',
+                          l10n.scanningSettings,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(color: context.adaptiveTextPrimary),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Filter files, size limits, and playlist import options',
+                          l10n.filterFilesSizeLimitsAndPlaylist,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: context.adaptiveTextTertiary),
                         ),
@@ -1812,9 +1806,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                       const SettingsDivider(),
                       ToggleSetting(
                         icon: LucideIcons.scanSearch,
-                        title: 'Filter Non-Music Files & Folders',
+                        title: l10n.filterNonMusicFilesFolders,
                         subtitle:
-                            'Skip unsupported files and hidden .nomedia directories',
+                            l10n.skipUnsupportedFilesAndHiddenNomedia,
                         value: prefs.filterNonMusicFilesAndFolders,
                         onChanged: (value) {
                           ref
@@ -1825,9 +1819,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                       const SettingsDivider(),
                       ToggleSetting(
                         icon: LucideIcons.fileMinus,
-                        title: 'Ignore Tracks Under 500 KB',
+                        title: l10n.ignoreTracksUnder500Kb,
                         subtitle:
-                            'Exclude tiny clips, previews, and accidental scraps',
+                            l10n.excludeTinyClipsPreviewsAndAccidental,
                         value: prefs.ignoreTracksSmallerThan500Kb,
                         onChanged: (value) {
                           ref
@@ -1838,9 +1832,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                       const SettingsDivider(),
                       ToggleSetting(
                         icon: LucideIcons.timerOff,
-                        title: 'Ignore Tracks Under 60 Seconds',
+                        title: l10n.ignoreTracksUnder60Seconds,
                         subtitle:
-                            'Hide short stingers, ringtones, and voice fragments',
+                            l10n.hideShortStingersRingtonesAndVoice,
                         value: prefs.ignoreTracksShorterThan60Seconds,
                         onChanged: (value) {
                           ref
@@ -1851,9 +1845,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                       const SettingsDivider(),
                       ToggleSetting(
                         icon: LucideIcons.listMusic,
-                        title: 'Import M3U/M3U8 Playlists',
+                        title: l10n.importM3uM3u8Playlists,
                         subtitle:
-                            'Create or refresh playlists found inside scanned folders',
+                            l10n.createOrRefreshPlaylistsFoundInside,
                         value: prefs.createPlaylistsFromM3uFiles,
                         onChanged: (value) {
                           ref
@@ -1865,9 +1859,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                         const SettingsDivider(),
                         ToggleSetting(
                           icon: LucideIcons.hardDrive,
-                          title: 'Deep Scan',
+                          title: l10n.deepScan,
                           subtitle:
-                              'Use filesystem-level scanning instead of MediaStore for full tag accuracy',
+                              l10n.useFilesystemLevelScanningInsteadOf,
                           value: prefs.useDeepScan,
                           onChanged: (value) {
                             ref
@@ -1881,12 +1875,10 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                             icon: _allFilesAccessGranted
                                 ? LucideIcons.shieldCheck
                                 : LucideIcons.folderSearch,
-                            title: 'Full Library Access',
+                            title: l10n.fullLibraryAccess,
                             subtitle: _allFilesAccessGranted
-                                ? 'Granted — scans read every volume directly, '
-                                      'including DSD/DSF/WavPack'
-                                : 'Not granted — enable so scans cover DSD/DSF/WavPack '
-                                      'files the system index may skip',
+                                ? l10n.grantedScansReadEveryVolumeDirectly
+                                : l10n.notGrantedEnableSoScansCover,
                             onTap: _openAllFilesAccessSettings,
                           ),
                         ],
@@ -1894,9 +1886,9 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                       const SettingsDivider(),
                       ToggleSetting(
                         icon: LucideIcons.audioWaveform,
-                        title: 'Preload audio data',
+                        title: l10n.preloadAudioData,
                         subtitle:
-                            'Decode songs after scanning to cache waveform peaks and loudness metrics',
+                            l10n.decodeSongsAfterScanningToCache,
                         value: prefs.preloadAudioData,
                         onChanged: (value) {
                           ref
@@ -1919,11 +1911,11 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     final appPreferences = ref.watch(appPreferencesProvider);
 
     return SettingsScaffold(
-      title: 'Library',
+      title: l10n.libraryLabel,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Library'),
+          SettingsSectionHeader(l10n.libraryLabel),
           SettingsCard(
             children: [
               _buildLibraryInfo(),
@@ -1968,8 +1960,8 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                               children: [
                                 Text(
                                   _isXiaomiDevice
-                                      ? 'Disable Battery Optimization (Recommended)'
-                                      : 'Disable Battery Optimization',
+                                      ? l10n.disableBatteryOptimizationRecommended
+                                      : l10n.disableBatteryOptimization,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(
                                         color: context.adaptiveTextPrimary,
@@ -1979,7 +1971,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                                 Text(
                                   _isXiaomiDevice
                                       ? 'Required on many Xiaomi, Redmi, and POCO devices so rescans and background features keep working'
-                                      : 'Allow Flick to run without aggressive background limits so rescans and background features keep working',
+                                      : l10n.allowFlickToRunWithoutAggressive,
                                   style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
                                         color: context.adaptiveTextTertiary,
@@ -1997,7 +1989,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                               ),
                               color: context.adaptiveTextTertiary,
                             ),
-                            tooltip: 'Dismiss',
+                            tooltip: l10n.dismiss,
                             onPressed: _dismissBatteryNotice,
                             visualDensity: VisualDensity.compact,
                             padding: EdgeInsets.zero,
@@ -2046,7 +2038,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Enable Full Library Access',
+                                  l10n.enableFullLibraryAccess,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(
                                         color: context.adaptiveTextPrimary,
@@ -2054,9 +2046,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Lets Flick scan your entire library directly, '
-                                  'including DSD/DSF/WavPack files some devices '
-                                  'hide from the system media index',
+                                  l10n.letsFlickScanYourEntireLibrary,
                                   style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
                                         color: context.adaptiveTextTertiary,
@@ -2074,7 +2064,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                               ),
                               color: context.adaptiveTextTertiary,
                             ),
-                            tooltip: 'Dismiss',
+                            tooltip: l10n.dismiss,
                             onPressed: _dismissAllFilesNotice,
                             visualDensity: VisualDensity.compact,
                             padding: EdgeInsets.zero,
@@ -2114,38 +2104,38 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
               ),
               ActionButton(
                 icon: LucideIcons.folderPlus,
-                title: 'Add Music Folder',
-                subtitle: 'Select a folder to scan',
+                title: l10n.addMusicFolder,
+                subtitle: l10n.selectAFolderToScan,
                 onTap: _isScanning ? null : _addFolder,
               ),
               if (_folders.isNotEmpty) ...[
                 const SettingsDivider(),
                 ActionButton(
                   icon: LucideIcons.refreshCw,
-                  title: 'Rescan Library',
-                  subtitle: 'Quick or full re-index of all folders',
+                  title: l10n.rescanLibrary,
+                  subtitle: l10n.quickOrFullReIndexOf,
                   onTap: _isScanning ? null : _showRescanModeChooser,
                 ),
                 const SettingsDivider(),
                 ActionButton(
                   icon: LucideIcons.audioWaveform,
-                  title: 'Preload Library Audio',
-                  subtitle: 'Cache waveforms and loudness for all songs',
+                  title: l10n.preloadLibraryAudio,
+                  subtitle: l10n.cacheWaveformsAndLoudnessForAll,
                   onTap: _isScanning ? null : _preloadLibraryAudio,
                 ),
                 const SettingsDivider(),
                 ActionButton(
                   icon: LucideIcons.gauge,
-                  title: 'Scan ReplayGain',
+                  title: l10n.scanReplaygain,
                   subtitle:
-                      'Analyze loudness and write ReplayGain tags for all songs',
+                      l10n.analyzeLoudnessAndWriteReplaygainTags,
                   onTap: _isScanning ? null : _scanReplayGain,
                 ),
                 const SettingsDivider(),
                 ActionButton(
                   icon: LucideIcons.copy,
-                  title: 'Remove Duplicates',
-                  subtitle: 'Find and remove duplicate songs',
+                  title: l10n.removeDuplicates,
+                  subtitle: l10n.findAndRemoveDuplicateSongs,
                   onTap: _isScanning ? null : _openDuplicateCleaner,
                 ),
               ],
@@ -2154,47 +2144,47 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Storage'),
+          SettingsSectionHeader(l10n.storage),
           SettingsCard(
             children: [
               ActionButton(
                 icon: LucideIcons.image,
-                title: 'Clear Artwork Cache',
+                title: l10n.clearArtworkCache2,
                 subtitle: _cacheSizeLabel,
                 onTap: _isClearingCache ? null : _confirmClearArtworkCache,
               ),
               const SettingsDivider(),
               ActionButton(
                 icon: LucideIcons.database,
-                title: 'Playback Cache Limit',
+                title: l10n.playbackCacheLimit,
                 subtitle: _cacheCapLabel,
                 onTap: _showCacheCapSheet,
               ),
               const SettingsDivider(),
               ActionButton(
                 icon: LucideIcons.fileAudio,
-                title: 'Clear Converted Audio',
+                title: l10n.clearConvertedAudio,
                 subtitle: _wavCacheSizeLabel,
                 onTap: _isClearingWavCache ? null : _confirmClearWavCache,
               ),
               const SettingsDivider(),
               ActionButton(
                 icon: LucideIcons.trash2,
-                title: 'Remove All Songs',
-                subtitle: 'Empty the library; files on disk are kept',
+                title: l10n.removeAllSongs2,
+                subtitle: l10n.emptyTheLibraryFilesOnDisk,
                 onTap: _confirmRemoveAllSongs,
               ),
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Album Artwork'),
+          SettingsSectionHeader(l10n.albumArtwork),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.crop,
-                title: 'Stretch Non-Square Art',
+                title: l10n.stretchNonSquareArt,
                 subtitle:
-                    'Off crops to fill the square; on stretches the artwork edge-to-edge',
+                    l10n.offCropsToFillTheSquare,
                 value: appPreferences.albumsStretchArtwork,
                 onChanged: (value) {
                   ref
@@ -2205,13 +2195,13 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Metadata'),
+          SettingsSectionHeader(l10n.metadata),
           SettingsCard(
             children: [
               NavigationSetting(
                 icon: LucideIcons.sparkles,
-                title: 'Fix Missing Metadata',
-                subtitle: 'Identify albums with unknown artist or title tags',
+                title: l10n.fixMissingMetadata,
+                subtitle: l10n.identifyAlbumsWithUnknownArtistOr,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const MissingMetadataScreen(),

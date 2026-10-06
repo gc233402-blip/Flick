@@ -12,6 +12,7 @@ import 'package:flick/providers/providers.dart';
 import 'package:flick/services/android_audio_device_service.dart';
 import 'package:flick/services/bluetooth_service.dart';
 import 'package:flick/services/uac2_preferences_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class BluetoothSettingsScreen extends ConsumerStatefulWidget {
   const BluetoothSettingsScreen({super.key});
@@ -107,14 +108,14 @@ class _BluetoothSettingsScreenState
 
   String _deviceSubtitle(BluetoothDeviceDto d) {
     final parts = <String>[
-      if (d.isConnected) 'Connected' else 'Paired',
+      if (d.isConnected) l10n.connected else l10n.paired,
       if (d.isA2dp) 'A2DP',
     ];
     final codec = _codecs[d.address];
     if (codec != null) parts.add(codec.codecName);
-    if (codec?.sampleRate != null) parts.add('${codec!.sampleRate} Hz');
+    if (codec?.sampleRate != null) parts.add(l10n.hz6(codec!.sampleRate!));
     final battery = _batteries[d.address];
-    if (battery != null) parts.add('$battery% battery');
+    if (battery != null) parts.add(l10n.battery(battery));
     return parts.join(' \u2022 ');
   }
 
@@ -141,19 +142,18 @@ class _BluetoothSettingsScreenState
     if (result.ok) {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Codec applied: ${BluetoothCodecType.label(codecType)}'),
+          content: Text(l10n.codecApplied(BluetoothCodecType.label(codecType))),
           duration: const Duration(seconds: 2),
         ),
       );
     } else {
       messenger.showSnackBar(
         SnackBar(
-          content: const Text(
-            'Codec forcing unavailable on this device — '
-            'set it via Developer Options → Bluetooth Audio Codec.',
+          content: Text(
+            l10n.codecForcingUnavailableOnThisDevice,
           ),
           action: SnackBarAction(
-            label: 'Open',
+            label: l10n.open,
             onPressed: () => _bt.openBluetoothCodecSettings(),
           ),
           duration: const Duration(seconds: 5),
@@ -168,10 +168,9 @@ class _BluetoothSettingsScreenState
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (!ok && messenger != null) {
       messenger.showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Developer Options is disabled. Enable it via Settings → About '
-            'phone (tap Build number 7 times), then retry.',
+            l10n.developerOptionsIsDisabledEnableIt,
           ),
           duration: Duration(seconds: 5),
         ),
@@ -222,34 +221,34 @@ class _BluetoothSettingsScreenState
     final isLdac = appPrefs.btPreferredCodec == BluetoothCodecType.ldac;
 
     return SettingsScaffold(
-      title: 'Bluetooth',
+      title: l10n.bluetooth,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!hasPermission) ...[
-            const SettingsSectionHeader('Permission'),
+            SettingsSectionHeader(l10n.permission),
             SettingsCard(
               children: [
                 ActionButton(
                   icon: LucideIcons.shieldCheck,
-                  title: 'Grant Bluetooth access',
+                  title: l10n.grantBluetoothAccess,
                   subtitle:
-                      'Required to detect devices, codecs, and battery levels',
+                      l10n.requiredToDetectDevicesCodecsAnd,
                   onTap: _requestPermission,
                 ),
               ],
             ),
             const SizedBox(height: AppConstants.spacingLg),
           ],
-          const SettingsSectionHeader('Connection Behavior'),
+          SettingsSectionHeader(l10n.connectionBehavior),
           SettingsCard(
             children: _withDividers([
               ToggleSetting(
                 icon: LucideIcons.bluetooth,
-                title: 'Pause on Disconnect',
+                title: l10n.pauseOnDisconnect,
                 subtitle: appPrefs.pauseOnBluetoothDisconnect
-                    ? 'Playback pauses when Bluetooth or headphones disconnect'
-                    : 'Playback continues when audio output disconnects',
+                    ? l10n.playbackPausesWhenBluetoothOrHeadphones
+                    : l10n.playbackContinuesWhenAudioOutput,
                 value: appPrefs.pauseOnBluetoothDisconnect,
                 onChanged: (v) => ref
                     .read(appPreferencesProvider.notifier)
@@ -257,10 +256,10 @@ class _BluetoothSettingsScreenState
               ),
               ToggleSetting(
                 icon: LucideIcons.bluetoothConnected,
-                title: 'Pause on Bluetooth Connect',
+                title: l10n.pauseOnBluetoothConnect,
                 subtitle: appPrefs.pauseOnBluetoothConnect
-                    ? 'Playback pauses when a Bluetooth audio device connects'
-                    : 'Playback continues when a Bluetooth device connects',
+                    ? l10n.playbackPausesWhenABluetoothAudio
+                    : l10n.playbackContinuesWhenABluetoothDevice,
                 value: appPrefs.pauseOnBluetoothConnect,
                 onChanged: (v) => ref
                     .read(appPreferencesProvider.notifier)
@@ -268,10 +267,10 @@ class _BluetoothSettingsScreenState
               ),
               ToggleSetting(
                 icon: LucideIcons.play,
-                title: 'Resume on Reconnect',
+                title: l10n.resumeOnReconnect,
                 subtitle: appPrefs.resumeOnBluetoothReconnect
-                    ? 'Playback resumes when a device reconnects within 30 seconds'
-                    : 'Keep playback paused when a device reconnects',
+                    ? l10n.playbackResumesWhenADeviceReconnects
+                    : l10n.keepPlaybackPausedWhenADevice,
                 value: appPrefs.resumeOnBluetoothReconnect,
                 onChanged: (v) => ref
                     .read(appPreferencesProvider.notifier)
@@ -279,10 +278,10 @@ class _BluetoothSettingsScreenState
               ),
               ToggleSetting(
                 icon: LucideIcons.usb,
-                title: 'Pause on USB DAC Attach',
+                title: l10n.pauseOnUsbDacAttach,
                 subtitle: appPrefs.pauseOnUsbDacConnect
-                    ? 'Playback pauses when a USB DAC is plugged in'
-                    : 'Playback continues when a USB DAC is plugged in',
+                    ? l10n.playbackPausesWhenAUsbDac
+                    : l10n.playbackContinuesWhenAUsbDac,
                 value: appPrefs.pauseOnUsbDacConnect,
                 onChanged: (v) => ref
                     .read(appPreferencesProvider.notifier)
@@ -290,10 +289,10 @@ class _BluetoothSettingsScreenState
               ),
               ToggleSetting(
                 icon: LucideIcons.usb,
-                title: 'Pause on USB DAC Detach',
+                title: l10n.pauseOnUsbDacDetach,
                 subtitle: appPrefs.pauseOnUsbDacDisconnect
-                    ? 'Playback pauses when a USB DAC is physically unplugged'
-                    : 'Playback continues when a USB DAC is unplugged',
+                    ? l10n.playbackPausesWhenAUsbDac2
+                    : l10n.playbackContinuesWhenAUsbDac2,
                 value: appPrefs.pauseOnUsbDacDisconnect,
                 onChanged: (v) => ref
                     .read(appPreferencesProvider.notifier)
@@ -303,13 +302,13 @@ class _BluetoothSettingsScreenState
           ),
           const SizedBox(height: AppConstants.spacingLg),
           if (hasPermission && _devices.isNotEmpty) ...[
-            const SettingsSectionHeader('Devices'),
+            SettingsSectionHeader(l10n.devices),
             SettingsCard(
               children: _withDividers([
                 SelectionSetting(
                   icon: LucideIcons.bluetooth,
-                  title: 'Automatic',
-                  subtitle: 'Let Android choose the output device',
+                  title: l10n.automatic,
+                  subtitle: l10n.letAndroidChooseTheOutputDevice,
                   selected: appPrefs.preferredBluetoothDevice.isEmpty,
                   onTap: () => ref
                       .read(appPreferencesProvider.notifier)
@@ -333,25 +332,23 @@ class _BluetoothSettingsScreenState
             ),
             const SizedBox(height: AppConstants.spacingLg),
           ],
-          const SettingsSectionHeader('Codec \u0026 Audio', tag: 'Experimental'),
+          SettingsSectionHeader(l10n.codecU0026Audio, tag: 'Experimental'),
           SettingsCard(
             children: _withDividers([
               ToggleSetting(
                 icon: LucideIcons.slidersHorizontal,
-                title: 'Codec Control',
+                title: l10n.codecControl,
                 subtitle: codecControlOn
-                    ? 'Flick will force your chosen codec on connect'
-                    : 'Let Android negotiate the codec automatically',
+                    ? l10n.flickWillForceYourChosenCodec
+                    : l10n.letAndroidNegotiateTheCodecAutomatically,
                 value: codecControlOn,
                 onChanged: _onCodecControlEnabled,
               ),
               if (codecControlOn) ...[
                 ActionButton(
                   icon: LucideIcons.externalLink,
-                  title: 'Open Bluetooth Codec Settings',
-                  subtitle: 'Android Developer Options — the reliable way to '
-                      'switch codec (in-app forcing uses a hidden system API '
-                      'that is blocked on stock Android)',
+                  title: l10n.openBluetoothCodecSettings,
+                  subtitle: l10n.androidDeveloperOptionsTheReliableWay,
                   onTap: _openBluetoothCodecSettings,
                 ),
                 ..._codecOptions.map(
@@ -367,7 +364,7 @@ class _BluetoothSettingsScreenState
                   (e) => SelectionSetting(
                     icon: LucideIcons.music,
                     title: e.$2,
-                    subtitle: 'Sample rate',
+                    subtitle: l10n.sampleRate,
                     selected: appPrefs.btSampleRate == e.$1,
                     onTap: () => _onSampleRateSelected(e.$1),
                   ),
@@ -377,7 +374,7 @@ class _BluetoothSettingsScreenState
                     (e) => SelectionSetting(
                       icon: LucideIcons.bitcoin,
                       title: e.$2,
-                      subtitle: 'LDAC bits per sample',
+                      subtitle: l10n.ldacBitsPerSample,
                       selected: appPrefs.btLdacBitsPerSample == e.$1,
                       onTap: () => _onLdacBitsSelected(e.$1),
                     ),
@@ -395,17 +392,17 @@ class _BluetoothSettingsScreenState
               ],
               ToggleSetting(
                 icon: LucideIcons.volume2,
-                title: 'Absolute Volume Sync',
+                title: l10n.absoluteVolumeSync,
                 subtitle: appPrefs.btAbsoluteVolumeSync
-                    ? 'Phone and headset volume are linked'
-                    : 'Phone and headset volume are independent',
+                    ? l10n.phoneAndHeadsetVolumeAreLinked
+                    : l10n.phoneAndHeadsetVolumeAreIndependent,
                 value: appPrefs.btAbsoluteVolumeSync,
                 onChanged: _onAbsoluteVolumeChanged,
               ),
             ]),
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Output Mode', tag: 'Experimental'),
+          SettingsSectionHeader(l10n.outputMode, tag: 'Experimental'),
           SettingsCard(
             children: _withDividers([
               ValueListenableBuilder<bool>(
@@ -414,10 +411,10 @@ class _BluetoothSettingsScreenState
                 builder: (context, hiRes, _) {
                   return ToggleSetting(
                     icon: LucideIcons.gem,
-                    title: 'Hi-Res Direct',
+                    title: l10n.hiResDirect,
                     subtitle: hiRes
-                        ? 'Routes Bluetooth through the hi-res Rust engine'
-                        : 'Standard Bluetooth routing via Android',
+                        ? l10n.routesBluetoothThroughTheHiRes
+                        : l10n.standardBluetoothRoutingViaAndroid,
                     value: hiRes,
                     onChanged: (v) => _uac2Prefs.setBtHiResDirect(v),
                   );
@@ -429,10 +426,10 @@ class _BluetoothSettingsScreenState
                 builder: (context, lowLatency, _) {
                   return ToggleSetting(
                     icon: LucideIcons.zap,
-                    title: 'Low-latency Mode',
+                    title: l10n.lowLatencyMode,
                     subtitle: lowLatency
-                        ? 'Routes Bluetooth through the Rust engine'
-                        : 'Standard Bluetooth routing via Android',
+                        ? l10n.routesBluetoothThroughTheRustEngine
+                        : l10n.standardBluetoothRoutingViaAndroid,
                     value: lowLatency,
                     onChanged: (v) => _uac2Prefs.setBtLowLatencyMode(v),
                   );
@@ -441,7 +438,7 @@ class _BluetoothSettingsScreenState
             ]),
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Codec Info'),
+          SettingsSectionHeader(l10n.codecInfo),
           SettingsCard(
             children: [
               ValueListenableBuilder<AndroidPlaybackDeviceInfo>(
@@ -479,31 +476,31 @@ const _codecOptions = <int>[
 ];
 
 String _codecLabel(int ct) =>
-    ct < 0 ? 'Automatic' : BluetoothCodecType.label(ct);
+    ct < 0 ? l10n.automatic : BluetoothCodecType.label(ct);
 
 String _codecDescription(int ct) => switch (ct) {
-      -1 => 'Let Android choose the best codec',
-      BluetoothCodecType.sbc => 'Universal compatibility',
-      BluetoothCodecType.aac => 'High quality, widely supported',
-      BluetoothCodecType.aptx => 'Low latency, good quality',
-      BluetoothCodecType.aptxHd => 'High-resolution aptX',
-      BluetoothCodecType.aptxAdaptive => 'Variable bitrate, low latency',
-      BluetoothCodecType.ldac => 'Highest bitrate (up to 990 kbps)',
+      -1 => l10n.letAndroidChooseTheBestCodec,
+      BluetoothCodecType.sbc => l10n.universalCompatibility,
+      BluetoothCodecType.aac => l10n.highQualityWidelySupported,
+      BluetoothCodecType.aptx => l10n.lowLatencyGoodQuality,
+      BluetoothCodecType.aptxHd => l10n.highResolutionAptx,
+      BluetoothCodecType.aptxAdaptive => l10n.variableBitrateLowLatency,
+      BluetoothCodecType.ldac => l10n.highestBitrateUpTo990Kbps,
       _ => '',
     };
 
 String _ldacBitrateLabel(BtLdacBitrate b) => switch (b) {
-      BtLdacBitrate.adaptive => 'LDAC Adaptive',
-      BtLdacBitrate.kbps330 => 'LDAC 330 kbps',
-      BtLdacBitrate.kbps660 => 'LDAC 660 kbps',
-      BtLdacBitrate.kbps990 => 'LDAC 990 kbps',
+      BtLdacBitrate.adaptive => l10n.ldacAdaptive,
+      BtLdacBitrate.kbps330 => l10n.ldac330Kbps,
+      BtLdacBitrate.kbps660 => l10n.ldac660Kbps,
+      BtLdacBitrate.kbps990 => l10n.ldac990Kbps,
     };
 
 String _ldacBitrateDescription(BtLdacBitrate b) => switch (b) {
-      BtLdacBitrate.adaptive => 'Bitrate adjusts to signal quality',
-      BtLdacBitrate.kbps330 => 'Prioritise connection stability',
-      BtLdacBitrate.kbps660 => 'Balanced quality and stability',
-      BtLdacBitrate.kbps990 => 'Maximum audio quality',
+      BtLdacBitrate.adaptive => l10n.bitrateAdjustsToSignalQuality,
+      BtLdacBitrate.kbps330 => l10n.prioritiseConnectionStability,
+      BtLdacBitrate.kbps660 => l10n.balancedQualityAndStability,
+      BtLdacBitrate.kbps990 => l10n.maximumAudioQuality,
     };
 
 class _BluetoothCodecInfo extends StatelessWidget {
@@ -516,17 +513,17 @@ class _BluetoothCodecInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final negotiatedLine = StringBuffer();
     if (negotiated != null) {
-      negotiatedLine.write('Negotiated: ${negotiated!.codecName}');
+      negotiatedLine.write(l10n.negotiated(negotiated!.codecName));
       if (negotiated!.sampleRate != null) {
         negotiatedLine.write(' \u2022 ${_formatHz(negotiated!.sampleRate!)}');
       }
       if (negotiated!.bitsPerSample != null) {
-        negotiatedLine.write(' \u2022 ${negotiated!.bitsPerSample}-bit');
+        negotiatedLine.write(l10n.u2022Bit(negotiated!.bitsPerSample!));
       }
     }
     final currentRouteLabel = deviceInfo.isBluetoothRoute
-        ? 'Current route: ${deviceInfo.routeSummary}.'
-        : 'When you play over Bluetooth, Android negotiates the codec with your headphones or speaker.';
+        ? l10n.currentRoute(deviceInfo.routeSummary)
+        : l10n.whenYouPlayOverBluetoothAndroid;
 
     return Padding(
       padding: const EdgeInsets.all(AppConstants.spacingLg),
@@ -555,7 +552,7 @@ class _BluetoothCodecInfo extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Bluetooth codec info',
+                      l10n.bluetoothCodecInfo,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: context.adaptiveTextPrimary,
                           ),
@@ -588,12 +585,12 @@ class _BluetoothCodecInfo extends StatelessWidget {
           Wrap(
             spacing: AppConstants.spacingSm,
             runSpacing: AppConstants.spacingSm,
-            children: const [
+            children: [
               _CodecChip('SBC'),
               _CodecChip('AAC'),
               _CodecChip('aptX'),
-              _CodecChip('aptX HD'),
-              _CodecChip('aptX Adaptive'),
+              _CodecChip(l10n.aptxHd),
+              _CodecChip(l10n.aptxAdaptive),
               _CodecChip('LDAC'),
               _CodecChip('LC3'),
               _CodecChip('LHDC'),
@@ -601,7 +598,7 @@ class _BluetoothCodecInfo extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingLg),
           Text(
-            'Flick can attempt to prefer a specific codec above, but success depends on your device, headset, and Android version. Codec forcing uses a hidden system API and may not work on non-rooted devices.',
+            l10n.flickCanAttemptToPreferA,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.adaptiveTextSecondary,
                   height: 1.4,
@@ -609,7 +606,7 @@ class _BluetoothCodecInfo extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingSm),
           Text(
-            'You can also change the codec in Android Developer Options under "Bluetooth Audio Codec".',
+            l10n.youCanAlsoChangeTheCodec,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.adaptiveTextTertiary,
                   height: 1.4,
@@ -654,5 +651,5 @@ String _formatHz(int hz) {
     final khz = hz / 1000.0;
     return '${khz.toStringAsFixed(khz == khz.roundToDouble() ? 1 : 1)} kHz';
   }
-  return '$hz Hz';
+  return l10n.hz3(hz);
 }
