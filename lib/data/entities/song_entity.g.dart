@@ -100,60 +100,65 @@ const SongEntitySchema = CollectionSchema(
       name: r'readMode',
       type: IsarType.string,
     ),
-    r'remoteId': PropertySchema(
+    r'relativeFolderPath': PropertySchema(
       id: 23,
+      name: r'relativeFolderPath',
+      type: IsarType.string,
+    ),
+    r'remoteId': PropertySchema(
+      id: 24,
       name: r'remoteId',
       type: IsarType.string,
     ),
     r'remoteServerId': PropertySchema(
-      id: 24,
+      id: 25,
       name: r'remoteServerId',
       type: IsarType.long,
     ),
     r'replaygainAlbumGain': PropertySchema(
-      id: 25,
+      id: 26,
       name: r'replaygainAlbumGain',
       type: IsarType.double,
     ),
     r'replaygainAlbumPeak': PropertySchema(
-      id: 26,
+      id: 27,
       name: r'replaygainAlbumPeak',
       type: IsarType.double,
     ),
     r'replaygainTrackGain': PropertySchema(
-      id: 27,
+      id: 28,
       name: r'replaygainTrackGain',
       type: IsarType.double,
     ),
     r'replaygainTrackPeak': PropertySchema(
-      id: 28,
+      id: 29,
       name: r'replaygainTrackPeak',
       type: IsarType.double,
     ),
-    r'ripper': PropertySchema(id: 29, name: r'ripper', type: IsarType.string),
+    r'ripper': PropertySchema(id: 30, name: r'ripper', type: IsarType.string),
     r'sampleRate': PropertySchema(
-      id: 30,
+      id: 31,
       name: r'sampleRate',
       type: IsarType.long,
     ),
     r'sourceType': PropertySchema(
-      id: 31,
+      id: 32,
       name: r'sourceType',
       type: IsarType.string,
     ),
     r'startOffsetMs': PropertySchema(
-      id: 32,
+      id: 33,
       name: r'startOffsetMs',
       type: IsarType.long,
     ),
-    r'testCrc': PropertySchema(id: 33, name: r'testCrc', type: IsarType.string),
-    r'title': PropertySchema(id: 34, name: r'title', type: IsarType.string),
+    r'testCrc': PropertySchema(id: 34, name: r'testCrc', type: IsarType.string),
+    r'title': PropertySchema(id: 35, name: r'title', type: IsarType.string),
     r'trackNumber': PropertySchema(
-      id: 35,
+      id: 36,
       name: r'trackNumber',
       type: IsarType.long,
     ),
-    r'year': PropertySchema(id: 36, name: r'year', type: IsarType.long),
+    r'year': PropertySchema(id: 37, name: r'year', type: IsarType.long),
   },
 
   estimateSize: _songEntityEstimateSize,
@@ -383,6 +388,12 @@ int _songEntityEstimateSize(
     }
   }
   {
+    final value = object.relativeFolderPath;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.remoteId;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -439,20 +450,21 @@ void _songEntitySerialize(
   writer.writeString(offsets[20], object.mediaStoreUri);
   writer.writeBool(offsets[21], object.metadataComplete);
   writer.writeString(offsets[22], object.readMode);
-  writer.writeString(offsets[23], object.remoteId);
-  writer.writeLong(offsets[24], object.remoteServerId);
-  writer.writeDouble(offsets[25], object.replaygainAlbumGain);
-  writer.writeDouble(offsets[26], object.replaygainAlbumPeak);
-  writer.writeDouble(offsets[27], object.replaygainTrackGain);
-  writer.writeDouble(offsets[28], object.replaygainTrackPeak);
-  writer.writeString(offsets[29], object.ripper);
-  writer.writeLong(offsets[30], object.sampleRate);
-  writer.writeString(offsets[31], object.sourceType);
-  writer.writeLong(offsets[32], object.startOffsetMs);
-  writer.writeString(offsets[33], object.testCrc);
-  writer.writeString(offsets[34], object.title);
-  writer.writeLong(offsets[35], object.trackNumber);
-  writer.writeLong(offsets[36], object.year);
+  writer.writeString(offsets[23], object.relativeFolderPath);
+  writer.writeString(offsets[24], object.remoteId);
+  writer.writeLong(offsets[25], object.remoteServerId);
+  writer.writeDouble(offsets[26], object.replaygainAlbumGain);
+  writer.writeDouble(offsets[27], object.replaygainAlbumPeak);
+  writer.writeDouble(offsets[28], object.replaygainTrackGain);
+  writer.writeDouble(offsets[29], object.replaygainTrackPeak);
+  writer.writeString(offsets[30], object.ripper);
+  writer.writeLong(offsets[31], object.sampleRate);
+  writer.writeString(offsets[32], object.sourceType);
+  writer.writeLong(offsets[33], object.startOffsetMs);
+  writer.writeString(offsets[34], object.testCrc);
+  writer.writeString(offsets[35], object.title);
+  writer.writeLong(offsets[36], object.trackNumber);
+  writer.writeLong(offsets[37], object.year);
 }
 
 SongEntity _songEntityDeserialize(
@@ -486,20 +498,21 @@ SongEntity _songEntityDeserialize(
   object.mediaStoreUri = reader.readStringOrNull(offsets[20]);
   object.metadataComplete = reader.readBool(offsets[21]);
   object.readMode = reader.readStringOrNull(offsets[22]);
-  object.remoteId = reader.readStringOrNull(offsets[23]);
-  object.remoteServerId = reader.readLongOrNull(offsets[24]);
-  object.replaygainAlbumGain = reader.readDoubleOrNull(offsets[25]);
-  object.replaygainAlbumPeak = reader.readDoubleOrNull(offsets[26]);
-  object.replaygainTrackGain = reader.readDoubleOrNull(offsets[27]);
-  object.replaygainTrackPeak = reader.readDoubleOrNull(offsets[28]);
-  object.ripper = reader.readStringOrNull(offsets[29]);
-  object.sampleRate = reader.readLongOrNull(offsets[30]);
-  object.sourceType = reader.readStringOrNull(offsets[31]);
-  object.startOffsetMs = reader.readLongOrNull(offsets[32]);
-  object.testCrc = reader.readStringOrNull(offsets[33]);
-  object.title = reader.readString(offsets[34]);
-  object.trackNumber = reader.readLongOrNull(offsets[35]);
-  object.year = reader.readLongOrNull(offsets[36]);
+  object.relativeFolderPath = reader.readStringOrNull(offsets[23]);
+  object.remoteId = reader.readStringOrNull(offsets[24]);
+  object.remoteServerId = reader.readLongOrNull(offsets[25]);
+  object.replaygainAlbumGain = reader.readDoubleOrNull(offsets[26]);
+  object.replaygainAlbumPeak = reader.readDoubleOrNull(offsets[27]);
+  object.replaygainTrackGain = reader.readDoubleOrNull(offsets[28]);
+  object.replaygainTrackPeak = reader.readDoubleOrNull(offsets[29]);
+  object.ripper = reader.readStringOrNull(offsets[30]);
+  object.sampleRate = reader.readLongOrNull(offsets[31]);
+  object.sourceType = reader.readStringOrNull(offsets[32]);
+  object.startOffsetMs = reader.readLongOrNull(offsets[33]);
+  object.testCrc = reader.readStringOrNull(offsets[34]);
+  object.title = reader.readString(offsets[35]);
+  object.trackNumber = reader.readLongOrNull(offsets[36]);
+  object.year = reader.readLongOrNull(offsets[37]);
   return object;
 }
 
@@ -559,9 +572,9 @@ P _songEntityDeserializeProp<P>(
     case 23:
       return (reader.readStringOrNull(offset)) as P;
     case 24:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 25:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 26:
       return (reader.readDoubleOrNull(offset)) as P;
     case 27:
@@ -569,20 +582,22 @@ P _songEntityDeserializeProp<P>(
     case 28:
       return (reader.readDoubleOrNull(offset)) as P;
     case 29:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 30:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 31:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 32:
-      return (reader.readLongOrNull(offset)) as P;
-    case 33:
       return (reader.readStringOrNull(offset)) as P;
-    case 34:
-      return (reader.readString(offset)) as P;
-    case 35:
+    case 33:
       return (reader.readLongOrNull(offset)) as P;
+    case 34:
+      return (reader.readStringOrNull(offset)) as P;
+    case 35:
+      return (reader.readString(offset)) as P;
     case 36:
+      return (reader.readLongOrNull(offset)) as P;
+    case 37:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -4376,6 +4391,165 @@ extension SongEntityQueryFilter
     });
   }
 
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'relativeFolderPath'),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'relativeFolderPath'),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'relativeFolderPath',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'relativeFolderPath',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'relativeFolderPath',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'relativeFolderPath',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'relativeFolderPath',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'relativeFolderPath',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'relativeFolderPath',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'relativeFolderPath',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'relativeFolderPath', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition>
+  relativeFolderPathIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'relativeFolderPath', value: ''),
+      );
+    });
+  }
+
   QueryBuilder<SongEntity, SongEntity, QAfterFilterCondition> remoteIdIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -6203,6 +6377,20 @@ extension SongEntityQuerySortBy
     });
   }
 
+  QueryBuilder<SongEntity, SongEntity, QAfterSortBy>
+  sortByRelativeFolderPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'relativeFolderPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterSortBy>
+  sortByRelativeFolderPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'relativeFolderPath', Sort.desc);
+    });
+  }
+
   QueryBuilder<SongEntity, SongEntity, QAfterSortBy> sortByRemoteId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'remoteId', Sort.asc);
@@ -6672,6 +6860,20 @@ extension SongEntityQuerySortThenBy
     });
   }
 
+  QueryBuilder<SongEntity, SongEntity, QAfterSortBy>
+  thenByRelativeFolderPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'relativeFolderPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SongEntity, SongEntity, QAfterSortBy>
+  thenByRelativeFolderPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'relativeFolderPath', Sort.desc);
+    });
+  }
+
   QueryBuilder<SongEntity, SongEntity, QAfterSortBy> thenByRemoteId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'remoteId', Sort.asc);
@@ -7015,6 +7217,17 @@ extension SongEntityQueryWhereDistinct
     });
   }
 
+  QueryBuilder<SongEntity, SongEntity, QDistinct> distinctByRelativeFolderPath({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(
+        r'relativeFolderPath',
+        caseSensitive: caseSensitive,
+      );
+    });
+  }
+
   QueryBuilder<SongEntity, SongEntity, QDistinct> distinctByRemoteId({
     bool caseSensitive = true,
   }) {
@@ -7257,6 +7470,13 @@ extension SongEntityQueryProperty
   QueryBuilder<SongEntity, String?, QQueryOperations> readModeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'readMode');
+    });
+  }
+
+  QueryBuilder<SongEntity, String?, QQueryOperations>
+  relativeFolderPathProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'relativeFolderPath');
     });
   }
 
