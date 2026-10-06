@@ -23,6 +23,7 @@ import 'package:flick/features/search/widgets/search_filter_chips.dart';
 import 'package:flick/features/artists/screens/artist_detail_screen.dart';
 import 'package:flick/features/albums/screens/album_detail_screen.dart';
 import 'package:flick/features/playlists/screens/playlist_detail_screen.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -135,7 +136,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   focusNode: _focusNode,
                   autofocus: autoFocus,
                   textInputAction: TextInputAction.search,
-                  hintText: 'Search songs, artists, albums...',
+                  hintText: l10n.searchSongsArtistsAlbums,
                   showBackground: false,
                   onChanged: _onSearchChanged,
                   onClear: _clearSearch,
@@ -217,7 +218,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.spacingLg),
           child: Text(
-            'Search failed: $e',
+            l10n.searchFailed2(e),
             style: TextStyle(color: context.adaptiveTextTertiary),
           ),
         ),
@@ -237,7 +238,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Search your library',
+            l10n.searchYourLibrary,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 15,
@@ -246,7 +247,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Find songs, artists, albums, folders…',
+            l10n.findSongsArtistsAlbumsFolders,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 13,
@@ -255,7 +256,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tap chips to filter categories',
+            l10n.tapChipsToFilterCategories,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 11,
@@ -279,7 +280,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No results for "$query"',
+            l10n.noResultsFor(query),
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 15,
@@ -288,7 +289,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Try another keyword or enable more categories',
+            l10n.tryAnotherKeywordOrEnableMore,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 12,
@@ -312,7 +313,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No categories selected',
+            l10n.noCategoriesSelected,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 15,
@@ -321,7 +322,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Tap All or enable a chip to see results',
+            l10n.tapAllOrEnableAChip,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 12,
@@ -368,7 +369,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: GestureDetector(
                 onTap: () => _toggleExpanded(cat),
                 child: Text(
-                  'See all $count',
+                  l10n.seeAll2(count),
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 12,
@@ -668,7 +669,7 @@ class _SectionHeader extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                   child: Text(
-                    expanded ? 'Show less' : 'See all',
+                    expanded ? l10n.showLess : l10n.seeAll,
                     style: TextStyle(
                       fontFamily: 'ProductSans',
                       fontSize: 12,
@@ -847,7 +848,7 @@ class _ArtistTile extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        '${songs.length} songs · $albumCount albums',
+        l10n.songsAlbums2(songs.length, albumCount),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -912,7 +913,7 @@ class _AlbumTile extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        '${album.albumArtist} · ${album.songs.length} tracks',
+        l10n.tracks5(album.albumArtist, album.songs.length),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -964,7 +965,7 @@ class _FolderTile extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        '${songs.length} songs',
+        l10n.songs12(songs.length),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -1077,7 +1078,7 @@ class _PlaylistTile extends ConsumerWidget {
         ),
       ),
       subtitle: Text(
-        '$count songs',
+        l10n.songs13(count),
         style: TextStyle(
           fontFamily: 'ProductSans',
           fontSize: 12,

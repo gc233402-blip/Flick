@@ -20,6 +20,7 @@ import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Groups songs by immediate subfolder relative to [prefix] within [folderUri].
 ({List<FolderGroup> subfolders, List<Song> songs}) groupByImmediateFolder({
@@ -316,14 +317,14 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Folders',
+                  l10n.folders,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
                   ),
                 ),
                 Text(
-                  '${_folders.length} music folders',
+                  l10n.musicFolders(_folders.length),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),
@@ -364,7 +365,7 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
           ),
           const SizedBox(height: AppConstants.spacingLg),
           Text(
-            'No Folders Added',
+            l10n.noFoldersAdded,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: context.adaptiveTextSecondary,
               fontWeight: FontWeight.w600,
@@ -372,7 +373,7 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
           ),
           const SizedBox(height: AppConstants.spacingSm),
           Text(
-            'Add music folders in Settings',
+            l10n.addMusicFoldersInSettings,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -735,7 +736,7 @@ class _RootFolderCardState extends State<_RootFolderCard>
                                   ),
                                 ),
                                 child: Text(
-                                  '${widget.entry.songs.length} tracks',
+                                  l10n.tracks3(widget.entry.songs.length),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 11,
@@ -772,13 +773,13 @@ class _RootFolderCardState extends State<_RootFolderCard>
                         const SizedBox(height: 2),
                         Text(
                           [
-                            '${widget.entry.songs.length} songs',
+                            l10n.songs15(widget.entry.songs.length),
                             if (widget.entry.folder.isRemovable == true)
                               (widget.entry.folder.volumeState != null &&
                                       widget.entry.folder.volumeState !=
                                           'mounted')
-                                  ? 'USB not connected'
-                                  : 'External',
+                                  ? l10n.usbNotConnected
+                                  : l10n.externalLabel,
                           ].join(' · '),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: context.adaptiveTextSecondary),
@@ -1181,7 +1182,7 @@ class _FolderBrowserScreenState extends ConsumerState<FolderBrowserScreen> {
                       const SizedBox(width: AppConstants.spacingSm),
                     ],
                     Text(
-                      '$count items',
+                      l10n.items(count),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextTertiary,
                       ),
@@ -1358,7 +1359,7 @@ class _FolderBrowserScreenState extends ConsumerState<FolderBrowserScreen> {
           ),
           const SizedBox(height: AppConstants.spacingMd),
           Text(
-            'No Songs Found',
+            l10n.noSongsFound,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: context.adaptiveTextSecondary,
               fontWeight: FontWeight.w600,
@@ -1366,7 +1367,7 @@ class _FolderBrowserScreenState extends ConsumerState<FolderBrowserScreen> {
           ),
           const SizedBox(height: AppConstants.spacingSm),
           Text(
-            'This folder appears to be empty',
+            l10n.thisFolderAppearsToBeEmpty,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -1577,7 +1578,7 @@ class _SubfolderCardState extends State<_SubfolderCard>
                                   ),
                                 ),
                                 child: Text(
-                                  '${widget.folder.songs.length} tracks',
+                                  l10n.tracks4(widget.folder.songs.length),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 11,
@@ -1613,7 +1614,7 @@ class _SubfolderCardState extends State<_SubfolderCard>
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${widget.folder.songs.length} songs',
+                          l10n.songs5(widget.folder.songs.length),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: context.adaptiveTextSecondary),
                           maxLines: 1,
@@ -2029,13 +2030,13 @@ class _FolderTreeRow extends StatelessWidget {
   String get _subtitle {
     if (node.children.isNotEmpty) {
       final count = node.children.length;
-      return '$count ${count == 1 ? 'subfolder' : 'subfolders'}';
+      return l10n.subfolderCount(count);
     }
     if (node.songs.isNotEmpty) {
       final count = node.songs.length;
-      return '$count ${count == 1 ? 'song' : 'songs'}';
+      return l10n.song2(count);
     }
-    return 'Empty';
+    return l10n.empty;
   }
 
   Widget _buildChevron(BuildContext context) {
@@ -2246,7 +2247,7 @@ class _FolderRootSortSheetState extends State<_FolderRootSortSheet> {
             children: [
               _buildHandle(),
               const SizedBox(height: 16),
-              _buildSectionHeader(context, 'SORT BY'),
+              _buildSectionHeader(context, l10n.sortBy),
               const SizedBox(height: 8),
               ...FolderRootSortOption.values.map(
                 (option) => _buildSortTile(context, option),
@@ -2254,7 +2255,7 @@ class _FolderRootSortSheetState extends State<_FolderRootSortSheet> {
               const SizedBox(height: 16),
               const Divider(color: AppColors.glassBorder, height: 1),
               const SizedBox(height: 12),
-              _buildSectionHeader(context, 'FOLDER LIMIT'),
+              _buildSectionHeader(context, l10n.folderLimit),
               const SizedBox(height: 4),
               Row(
                 children: [
@@ -2263,7 +2264,7 @@ class _FolderRootSortSheetState extends State<_FolderRootSortSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Folders shown per page',
+                          l10n.foldersShownPerPage,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: context.adaptiveTextTertiary),
                         ),
@@ -2417,9 +2418,9 @@ class _FolderRootSortSheetState extends State<_FolderRootSortSheet> {
   String _labelFor(FolderRootSortOption option) {
     switch (option) {
       case FolderRootSortOption.name:
-        return 'Name (A-Z)';
+        return l10n.nameAZ;
       case FolderRootSortOption.songCount:
-        return 'Song Count';
+        return l10n.songCount;
     }
   }
 }
@@ -2457,7 +2458,7 @@ class _FolderBrowserSortSheet extends StatelessWidget {
             children: [
               _buildHandle(),
               const SizedBox(height: 16),
-              _buildSectionHeader(context, 'SORT BY'),
+              _buildSectionHeader(context, l10n.sortBy),
               const SizedBox(height: 8),
               ...FolderBrowserSortOption.values.map(
                 (option) => _buildSortTile(context, option),
@@ -2465,7 +2466,7 @@ class _FolderBrowserSortSheet extends StatelessWidget {
               const SizedBox(height: 16),
               const Divider(color: AppColors.glassBorder, height: 1),
               const SizedBox(height: 12),
-              _buildSectionHeader(context, 'FILTER BY FORMAT'),
+              _buildSectionHeader(context, l10n.filterByFormat),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -2584,15 +2585,15 @@ class _FolderBrowserSortSheet extends StatelessWidget {
   String _labelFor(FolderBrowserSortOption option) {
     switch (option) {
       case FolderBrowserSortOption.name:
-        return 'Folder Name';
+        return l10n.folderName;
       case FolderBrowserSortOption.songCount:
-        return 'Folder Song Count';
+        return l10n.folderSongCount;
       case FolderBrowserSortOption.title:
-        return 'Song Title';
+        return l10n.songTitle;
       case FolderBrowserSortOption.artist:
-        return 'Song Artist';
+        return l10n.songArtist;
       case FolderBrowserSortOption.dateAdded:
-        return 'Date Added';
+        return l10n.dateAdded;
     }
   }
 

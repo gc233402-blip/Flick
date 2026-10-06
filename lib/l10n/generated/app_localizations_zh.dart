@@ -12,6 +12,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aDraggableOverlayShowsWhileUsing => '使用其他应用时显示可拖动的悬浮窗';
 
   @override
+  String get aPlaylistWithThisNameAlready => '已存在同名播放列表';
+
+  @override
   String get aPremiumMusicPlayerWithCustom =>
       '一款内置自定义 UAC 2.0、由 Rust 驱动的高品质音乐播放器，带来最佳音频体验。';
 
@@ -35,6 +38,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get aboutFlickPlayer => '关于 Flick Player';
+
+  @override
+  String get aboutThisAlbum => '关于这张专辑';
 
   @override
   String get absoluteVolumeSync => '绝对音量同步';
@@ -66,6 +72,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get add => '添加';
 
   @override
+  String get addAMusicFolderInSettings => '在设置中添加音乐文件夹';
+
+  @override
   String get addANextTrackButton => '添加“下一首”按钮';
 
   @override
@@ -75,15 +84,44 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addAtLeastOneLyricLine => '请先添加至少一行歌词。';
 
   @override
+  String get addDescription => '添加说明';
+
+  @override
+  String get addDescription2 => '添加说明';
+
+  @override
   String get addMusicFolder => '添加音乐文件夹';
+
+  @override
+  String get addMusicFoldersInSettings => '在设置中添加音乐文件夹';
+
+  @override
+  String get addMusicWithAlbumTagsTo => '添加带专辑标签的音乐即可在此看到';
+
+  @override
+  String get addMusicWithArtistTagsTo => '添加带艺术家标签的音乐即可在此看到';
 
   @override
   String get addServer => '添加服务器';
 
   @override
+  String addSongsToPlaylist(Object arg1) {
+    return '添加 $arg1 首歌曲到播放列表';
+  }
+
+  @override
   String addSongsToPlaylist2(Object arg1) {
     return '添加 $arg1 首歌曲到播放列表';
   }
+
+  @override
+  String get addToFavorites => '添加到收藏';
+
+  @override
+  String get addToFavorites2 => '添加到收藏';
+
+  @override
+  String get addToPlaylist => '添加到播放列表';
 
   @override
   String get addToPlaylist2 => '添加到播放列表';
@@ -92,8 +130,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addToQueue => '添加到队列';
 
   @override
+  String get addToQueue2 => '添加到播放队列';
+
+  @override
   String addedSongsTo(Object arg1, Object arg2) {
     return '已将 $arg1 首歌曲添加到“$arg2”';
+  }
+
+  @override
+  String addedSongsTo2(Object arg1, Object playlistName) {
+    return '已将 $arg1 首歌曲添加到 $playlistName';
+  }
+
+  @override
+  String addedSongsToFavorites(Object arg1) {
+    return '已将 $arg1 首歌曲添加到收藏';
+  }
+
+  @override
+  String addedSongsToFavorites3(Object arg1) {
+    return '已将 $arg1 首歌曲添加到收藏';
+  }
+
+  @override
+  String addedTo(Object arg1) {
+    return '已添加到 $arg1';
   }
 
   @override
@@ -103,6 +164,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get addedToFavorites => '已加入收藏';
+
+  @override
+  String addedToFavorites2(Object arg1) {
+    return '已将“$arg1”添加到收藏';
+  }
 
   @override
   String get addsPreDriveAndCatchesPeaks => '增加前置驱动，并针对最终输出上限抑制峰值。';
@@ -171,13 +237,43 @@ class AppLocalizationsZh extends AppLocalizations {
   String get albumArtist => '专辑艺术家';
 
   @override
+  String get albumArtists => '专辑艺术家';
+
+  @override
   String get albumArtwork => '专辑封面';
 
   @override
   String get albumColors => '专辑配色';
 
   @override
+  String get albumCount => '专辑数量';
+
+  @override
+  String get albumLimit => '专辑上限';
+
+  @override
+  String get albumName => '专辑名称';
+
+  @override
   String get albums => '专辑';
+
+  @override
+  String albums2(Object arg1) {
+    return '$arg1 张专辑';
+  }
+
+  @override
+  String albums3(Object _totalAlbums) {
+    return '$_totalAlbums 张专辑';
+  }
+
+  @override
+  String get albumsShownPerPage => '每页显示的专辑数';
+
+  @override
+  String albumsSongs(Object arg1, Object arg2) {
+    return '$arg1 张专辑 • $arg2 首歌曲';
+  }
 
   @override
   String get alignLyricTextToTheCenter => '歌词文本居中对齐';
@@ -190,6 +286,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get all => '全部';
+
+  @override
+  String get allArtists => '全部艺术家';
 
   @override
   String get allClearNoDuplicates => '全部干净 — 无重复项';
@@ -254,6 +353,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get analyzingLoudness => '正在分析响度';
 
   @override
+  String get andArtwork => ' 和封面';
+
+  @override
   String get androidAudioApi => 'Android 音频 API';
 
   @override
@@ -305,6 +407,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appearsInTheOverflowMenu => '显示在溢出菜单中';
 
   @override
+  String get appleMusicDataUnavailable => 'Apple Music 数据不可用';
+
+  @override
+  String get appleMusicDataUpdated => 'Apple Music 数据已更新';
+
+  @override
+  String get appleMusicLookupFailedCheckYour => 'Apple Music 查询失败，请检查网络连接。';
+
+  @override
   String get appleMusicMotionArtOnAlbums =>
       '专辑上的 Apple Music 动态封面，以及主视觉的平移/缩放、氛围光晕与平滑淡入淡出';
 
@@ -322,10 +433,24 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get applySelected => '应用所选';
+
+  @override
+  String applyTo(int count) {
+    return '应用到 $count 首歌曲';
+  }
+
+  @override
+  String get apr => '4 月';
+
+  @override
   String get aptxAdaptive => 'aptX Adaptive';
 
   @override
   String get aptxHd => 'aptX HD';
+
+  @override
+  String get areYouSureYouWantTo2 => '确定要清空全部收听历史吗？此操作无法撤销。';
 
   @override
   String get areYouSureYouWantTo3 => '确定要重置所有 UAC2 偏好设置吗？此操作无法撤销。';
@@ -344,6 +469,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get artists => '艺术家';
+
+  @override
+  String artists2(Object arg1) {
+    return '$arg1 位艺术家';
+  }
 
   @override
   String get artistsInRotation => '高频播放的艺术家';
@@ -397,6 +527,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get audioTestingEquipment => '音频测试设备';
+
+  @override
+  String get aug => '8 月';
 
   @override
   String get auto => '自动';
@@ -692,10 +825,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bouncy => '弹跳';
 
   @override
+  String get browseByArtworkOpenAnyAlbum => '按封面浏览，打开任意专辑，直接进入曲目列表。';
+
+  @override
   String get browseMore => '浏览更多';
 
   @override
   String get browseTheFullControlsGuide => '浏览完整的操作指南';
+
+  @override
+  String get browseYourArtistsExploreTheirDiscographies =>
+      '浏览你的艺术家，探索他们的作品，播放他们的曲目。';
 
   @override
   String get buffer => '缓冲区';
@@ -716,6 +856,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get buyMeACoffee => '请我喝杯咖啡';
+
+  @override
+  String by(Object arg1, Object arg2) {
+    return '$arg2 的《$arg1》';
+  }
 
   @override
   String get bypassAllDspEqDynamicsCrossfade =>
@@ -912,6 +1057,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get clearFilters => '清除筛选';
 
   @override
+  String get clearHistory => '清空历史';
+
+  @override
   String get clearLogs => '清除日志？';
 
   @override
@@ -949,6 +1097,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get collapsed => '收起';
+
+  @override
+  String get collection => '收藏';
 
   @override
   String get color => '色彩';
@@ -1109,6 +1260,9 @@ class AppLocalizationsZh extends AppLocalizations {
       '请从 ListenBrainz 设置中复制用户令牌，粘贴到下方。';
 
   @override
+  String get copyright => '版权';
+
+  @override
   String get cornerRadius => '圆角半径';
 
   @override
@@ -1187,13 +1341,38 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get create => '创建';
+
+  @override
   String get createACustomPreset => '创建自定义预设';
 
   @override
   String get createLyrics => '创建歌词';
 
   @override
+  String get createNewPlaylist => '新建播放列表';
+
+  @override
+  String get createNewPlaylist2 => '新建播放列表';
+
+  @override
   String get createOrRefreshPlaylistsFoundInside => '为扫描到的文件夹创建或刷新播放列表';
+
+  @override
+  String get createPlaylist => '新建播放列表';
+
+  @override
+  String get createPlaylistFromSelected => '用所选歌曲新建播放列表';
+
+  @override
+  String createdAndAddedSong(Object arg1) {
+    return '已创建 $arg1 并添加歌曲';
+  }
+
+  @override
+  String createdAndAddedSongs(Object name, Object arg1) {
+    return '已创建 $name 并添加 $arg1 首歌曲';
+  }
 
   @override
   String get creativeFx => '创意效果';
@@ -1234,6 +1413,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get cueSheetTracksCannotBeEdited => 'CUE 表曲目无法编辑。';
+
+  @override
+  String get cueSheetTracksCannotBeEdited2 => 'CUE 表曲目无法编辑';
+
+  @override
+  String get currentArtwork => '当前封面';
+
+  @override
+  String get currentCustomArt => '当前自定义封面';
 
   @override
   String get currentPlaybackMode => '当前播放模式';
@@ -1300,6 +1488,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get customizeWhichTabsAppearAndTheir => '自定义显示哪些标签页及其大小';
 
   @override
+  String dAgo2(Object arg1) {
+    return '$arg1 天前';
+  }
+
+  @override
   String get dacClaim => 'DAC 占用';
 
   @override
@@ -1324,6 +1517,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dataCollection => '数据收集';
+
+  @override
+  String get date => '日期';
 
   @override
   String get dateAdded => '添加日期';
@@ -1370,6 +1566,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deactivateFallback => '停用回退';
 
   @override
+  String get dec => '12 月';
+
+  @override
   String get decode => '解码';
 
   @override
@@ -1409,7 +1608,33 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get deleteFile => '删除文件';
+
+  @override
+  String get deleteFiles => '删除文件';
+
+  @override
   String get deletePreset => '删除预设？';
+
+  @override
+  String get deleteSelected => '删除所选';
+
+  @override
+  String get deleteSong => '删除歌曲';
+
+  @override
+  String get deleteSong2 => '删除歌曲？';
+
+  @override
+  String get deleteSong3 => '删除歌曲';
+
+  @override
+  String deleteSongs(Object arg1) {
+    return '删除 $arg1 首歌曲？';
+  }
+
+  @override
+  String get deleteSongs2 => '删除歌曲';
 
   @override
   String deleteThisCannotBeUndone(Object arg1) {
@@ -1417,7 +1642,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String deleted(Object arg1) {
+    return '已删除“$arg1”';
+  }
+
+  @override
+  String deletedSongs(Object arg1) {
+    return '已删除 $arg1 首歌曲';
+  }
+
+  @override
   String get depth => '深度';
+
+  @override
+  String get deselectAll => '取消全选';
 
   @override
   String get detailScreens => '详情页面';
@@ -1497,10 +1735,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get disc => '碟号';
 
   @override
+  String get disc2 => '碟片编号';
+
+  @override
   String get discard => '放弃';
 
   @override
   String get discardChanges => '放弃更改？';
+
+  @override
+  String get discardChanges2 => '放弃更改？';
 
   @override
   String get disconnect => '断开';
@@ -1673,7 +1917,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dynamics => '动态';
 
   @override
+  String get earlier => '更早';
+
+  @override
   String get editCredentials => '编辑凭据';
+
+  @override
+  String get editDescription => '编辑说明';
+
+  @override
+  String get editDescription2 => '编辑说明';
 
   @override
   String get editMetadata => '编辑元数据';
@@ -1689,6 +1942,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get editToken => '编辑令牌';
+
+  @override
+  String get empty => '空';
 
   @override
   String get emptyLine => '（空行）';
@@ -1730,9 +1986,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get english => '英语';
 
   @override
+  String enterAValidNumber(Object label) {
+    return '输入有效的 $label 数值';
+  }
+
+  @override
   String enterAValueFromTo(Object arg1, Object arg2) {
     return '请输入 $arg1% 到 $arg2% 之间的值';
   }
+
+  @override
+  String get enterAYear19999 => '输入年份（1–9999）';
 
   @override
   String get enterYourApiKey => '输入你的 API 密钥';
@@ -1776,7 +2040,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorLoadingPlaylists => '加载播放列表失败';
 
   @override
+  String errorLoadingPlaylists2(Object error) {
+    return '加载播放列表失败：$error';
+  }
+
+  @override
   String get errorLoadingPreference => '加载偏好设置出错';
+
+  @override
+  String get errorLoadingSongs => '加载歌曲失败';
 
   @override
   String get etherealTones => '空灵音色';
@@ -1853,11 +2125,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get externalSongsCannotBeEdited => '外部歌曲无法编辑。';
 
   @override
+  String get externalSongsCannotBeEdited2 => '外部歌曲无法编辑';
+
+  @override
   String get failedToActivateFallback => '启用回退失败';
 
   @override
   String failedToAddFolder(Object e) {
     return '添加文件夹失败：$e';
+  }
+
+  @override
+  String failedToAddToFavorites(Object arg1) {
+    return '无法将“$arg1”添加到收藏';
   }
 
   @override
@@ -1895,6 +2175,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String failedToSaveMetadata(Object e) {
     return '保存元数据失败：$e';
   }
+
+  @override
+  String get failedToSaveMetadata2 => '保存元数据失败。';
 
   @override
   String get failedToStartStreaming => '无法启动音频流';
@@ -1936,10 +2219,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get favorites => '收藏';
 
   @override
+  String get feb => '2 月';
+
+  @override
   String get feedback => '反馈';
 
   @override
   String get file => '文件';
+
+  @override
+  String get fileInformation => '文件信息';
 
   @override
   String get filePath => '文件路径';
@@ -1963,6 +2252,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get filter => '滤波器';
 
   @override
+  String get filterByFormat => '按格式筛选';
+
+  @override
   String get filterFilesSizeLimitsAndPlaylist => '文件过滤、大小限制与播放列表导入选项';
 
   @override
@@ -1976,6 +2268,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get findAndRemoveDuplicateSongs => '查找并移除重复歌曲';
+
+  @override
+  String get findSongsArtistsAlbumsFolders => '查找歌曲、艺术家、专辑、文件夹…';
 
   @override
   String get fineTuneTheOverallGain => '微调整体增益';
@@ -2064,6 +2359,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get folder => '文件夹';
 
   @override
+  String get folderLimit => '文件夹上限';
+
+  @override
+  String get folderName => '文件夹名称';
+
+  @override
   String folderOf(Object current, Object total) {
     return '第 $current 个文件夹，共 $total 个';
   }
@@ -2072,6 +2373,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String folderOf2(Object current, Object total) {
     return '第 $current 个文件夹，共 $total 个';
   }
+
+  @override
+  String get folderSongCount => '文件夹歌曲数';
 
   @override
   String get folders => '文件夹';
@@ -2083,6 +2387,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get foldersScanningAndDuplicates => '文件夹、扫描与重复项';
+
+  @override
+  String get foldersShownPerPage => '每页显示的文件夹数';
 
   @override
   String get fontScale => '字体缩放';
@@ -2268,6 +2575,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get growsFurtherIfLargerSystemText => '系统文字更大时还会增高';
 
   @override
+  String hAgo(Object arg1) {
+    return '$arg1 小时前';
+  }
+
+  @override
   String get hapticFeedback => '触感反馈';
 
   @override
@@ -2350,6 +2662,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get highestQuality => '最高音质';
 
   @override
+  String get historyCleared => '历史已清空';
+
+  @override
   String get holdASongToUnfavorite => '按住歌曲取消收藏';
 
   @override
@@ -2398,6 +2713,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get iconSize => '图标大小';
 
   @override
+  String identified(int count, Object note) {
+    return '已识别 $count 首歌曲$note。';
+  }
+
+  @override
+  String get identifyAlbum => '识别专辑';
+
+  @override
+  String get identifyAlbum2 => '识别专辑';
+
+  @override
   String get identifyAlbumsWithUnknownArtistOr => '识别艺术家或标题标签未知的专辑';
 
   @override
@@ -2431,6 +2757,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get importedArtIsSavedInsideThe => '导入的封面保存在应用内，并同步到本专辑的每首歌曲。';
+
+  @override
+  String get importedArtIsSavedInsideThe2 => '导入的封面仅保存在应用内，且仅用于此歌曲。';
+
+  @override
   String get impulseResponse => '脉冲响应';
 
   @override
@@ -2439,6 +2771,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String inLabel(Object folder) {
     return '位于 $folder';
+  }
+
+  @override
+  String inYourLibrary(int count) {
+    return '音乐库中共有 $count 首歌曲';
   }
 
   @override
@@ -2486,19 +2823,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get itemSpacing => '项目间距';
 
   @override
+  String items(Object count) {
+    return '$count 项';
+  }
+
+  @override
+  String get jan => '1 月';
+
+  @override
   String get jellyfin => 'Jellyfin';
 
   @override
   String get jellyfinEmby => 'Jellyfin · Emby';
 
   @override
+  String get jul => '7 月';
+
+  @override
   String get jumpToTheFlickListingAnd => '前往 Flick 应用商店页面并在那里更新';
+
+  @override
+  String get jun => '6 月';
 
   @override
   String get justAudioExoplayer => 'just_audio / ExoPlayer';
 
   @override
   String get justAudioExoplayerDefault => 'just_audio / ExoPlayer（默认）';
+
+  @override
+  String get justNow => '刚刚';
 
   @override
   String get karaokeEffect => '卡拉 OK 效果';
@@ -2589,6 +2943,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get label => '标签';
 
   @override
+  String get labelOrganization => '厂牌 / 组织';
+
+  @override
   String get language => '语言';
 
   @override
@@ -2617,6 +2974,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get lastUpdated => '最后更新';
+
+  @override
+  String get lastWeek => '上周';
 
   @override
   String get lateNightSessions => '深夜场';
@@ -2720,6 +3080,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get light => '浅色';
+
+  @override
+  String likedSongs(Object arg1) {
+    return '$arg1 首喜欢的歌曲';
+  }
 
   @override
   String get limit => '限制';
@@ -2850,6 +3215,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get longSongTitles => '长歌名';
 
   @override
+  String get lookingForCoverArtFromMusicbrainz =>
+      '正在从 MusicBrainz 和 Cover Art Archive 查找封面。';
+
+  @override
   String get lookingForTheLatestFlickRelease => '正在检查最新的 Flick 版本';
 
   @override
@@ -2920,6 +3289,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String mAgo(Object arg1) {
+    return '$arg1 分钟前';
+  }
+
+  @override
   String get madeForYou => '为你打造';
 
   @override
@@ -2929,16 +3303,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get manufacturer => '制造商';
 
   @override
+  String get mar => '3 月';
+
+  @override
   String get masterBypassed => '主控已旁路';
 
   @override
   String get matchAudioFilename => '与音频文件名一致';
 
   @override
+  String matchByArtistAlbumAndTrack(int count) {
+    return '按艺术家、专辑和曲目长度匹配 $count 个文件';
+  }
+
+  @override
   String get matchEqToYourHeadphoneModel => '将均衡器匹配到你的耳机型号';
 
   @override
   String get matchNavigation => '匹配导航栏';
+
+  @override
+  String get matches => '匹配结果';
 
   @override
   String maxB(Object arg1) {
@@ -2950,6 +3335,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get maximumSmoothnessUsesMoreBattery => '最流畅——更耗电';
+
+  @override
+  String get may => '5 月';
 
   @override
   String get may42026 => '2026 年 5 月 4 日';
@@ -3066,7 +3454,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get more => '更多';
 
   @override
+  String get moreActions => '更多操作';
+
+  @override
+  String get moreArtists => '更多艺术家';
+
+  @override
   String get moreArtists2 => '更多艺术家';
+
+  @override
+  String moreFrom(Object arg1) {
+    return '更多来自 $arg1';
+  }
+
+  @override
+  String get moreFromArtist => '艺术家的更多内容';
 
   @override
   String get moreFromArtist2 => '该艺术家的更多作品';
@@ -3076,6 +3478,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mostDlnaServersNeedNoPassword => '大多数 DLNA 服务器无需密码';
+
+  @override
+  String get mostPlayed => '最常播放';
 
   @override
   String get motionArtInBitPerfect => '位完美模式下的动态封面';
@@ -3125,6 +3530,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get multiFilterBands => '多滤波器频段';
 
   @override
+  String musicFolders(Object arg1) {
+    return '$arg1 个音乐文件夹';
+  }
+
+  @override
   String get mute => '静音';
 
   @override
@@ -3136,6 +3546,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String nDb(Object arg1, Object arg2) {
     return '$arg1%\n$arg2 dB';
   }
+
+  @override
+  String get nameAZ => '名称（A-Z）';
 
   @override
   String narrow(Object amount) {
@@ -3222,6 +3635,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noAchievementsYetKeepListening => '暂无成就 —— 继续收听吧';
 
   @override
+  String get noAlbumsFound => '未找到专辑';
+
+  @override
+  String get noAppleMusicReleaseFoundTry =>
+      '未找到 Apple Music 发行版。请尝试修改艺术家或专辑名后重新搜索。';
+
+  @override
+  String get noArtistsFound => '未找到艺术家';
+
+  @override
+  String noArtistsMatch(Object _searchQuery) {
+    return '没有匹配“$_searchQuery”的艺术家';
+  }
+
+  @override
   String get noAudioWasFoundIfThis =>
       '未找到音频。如果这个文件夹里确实有音乐，可能是被 `.nomedia` 文件隐藏了，或者 Android 还没索引到。可以试试开启深度扫描，或删除 `.nomedia` 文件后重新扫描。';
 
@@ -3229,10 +3657,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noCastingDevicesFoundMakeSure => '未发现投放设备。请确保手机与接收端处于同一网络。';
 
   @override
+  String get noCategoriesSelected => '未选择分类';
+
+  @override
   String get noCustomPresetsYet => '还没有自定义预设。';
 
   @override
   String get noDuplicatesFound => '未发现重复项';
+
+  @override
+  String get noFavoritesYet => '还没有收藏';
+
+  @override
+  String get noFoldersAdded => '未添加文件夹';
+
+  @override
+  String get noHistoryYet => '暂无历史';
 
   @override
   String get noInternetConnectionPleaseCheckYour => '无网络连接。请检查网络后重试。';
@@ -3247,13 +3687,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noLyricsYet => '暂无歌词';
 
   @override
+  String get noMatchFound => '未找到匹配项';
+
+  @override
   String get noMatches => '无匹配项。';
+
+  @override
+  String get noMatchesFound => '未找到匹配项';
 
   @override
   String get noMatchesTryFewerWordsOr => '无匹配结果。试试减少关键词或在线搜索。';
 
   @override
+  String get noMusicYet => '还没有音乐';
+
+  @override
+  String get noNewAdditionsYet => '暂无新增内容';
+
+  @override
   String get noNewUpdateFound => '未发现新版本。';
+
+  @override
+  String get noOnlineArtworkFound => '未找到在线封面';
 
   @override
   String get noOutputDevicesAvailable => '无可用输出设备。';
@@ -3262,7 +3717,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noPatchNotesAvailableYet => '暂无更新说明。';
 
   @override
+  String get noPlaylistsYet => '还没有播放列表';
+
+  @override
   String get noPlaylistsYetNcreateOneIn => '还没有播放列表。\n在「播放列表」标签页里创建一个。';
+
+  @override
+  String noResultsFor(Object query) {
+    return '未找到“$query”的结果';
+  }
 
   @override
   String noResultsFoundFor(Object query) {
@@ -3280,6 +3743,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noSongPlaying => '暂无播放';
+
+  @override
+  String get noSongsFound => '未找到歌曲';
 
   @override
   String get noUpdateAvailable => '无可用更新';
@@ -3342,6 +3808,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noticeableTintingFromAlbumArt => '来自专辑封面的明显着色。';
 
   @override
+  String get nov => '11 月';
+
+  @override
   String get now => '现在';
 
   @override
@@ -3357,6 +3826,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get oceanWaves => '海浪';
 
   @override
+  String get oct => '10 月';
+
+  @override
   String get off => '关闭';
 
   @override
@@ -3368,6 +3840,9 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get onAndroidTheStandardJustAudio =>
       '在 Android 上，标准的 just_audio 播放路径现在会在受支持的设备上应用 EQ、动态、平衡与空间音效的原生对应实现。Rust 引擎仍能提供这些控制最精确的版本，因此部分 Android 上的效果只是近似。';
+
+  @override
+  String get onlineResults => '在线结果';
 
   @override
   String get onlyLibraryEntriesAreRemovedYour => '仅移除音乐库条目——音频文件仍保留在磁盘上。';
@@ -3383,6 +3858,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get openFullNotes => '查看完整说明';
+
+  @override
+  String get openInAppleMusic => '在 Apple Music 中打开';
 
   @override
   String get openInBrowser => '在浏览器中打开';
@@ -3511,6 +3989,9 @@ class AppLocalizationsZh extends AppLocalizations {
       '1. 在「歌词行」里选一行，然后切到「工具」。\n2. 播放并逐词点击大按钮「打点」——第一次点击同时给整行打点。\n3. 点击词块可以微调、重新计时或清除。\n4. 每个词都打过点的行会保存为逐词卡拉 OK 时间轴。';
 
   @override
+  String get pickImage => '选择图片';
+
+  @override
   String get pinchApartNarrowerHigherQNpinch =>
       '双指分开 = 更窄（Q 值更高）\n双指合拢 = 更宽（Q 值更低）';
 
@@ -3626,10 +4107,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playbackStopsWhenTheAppIs => '应用被划掉后停止播放';
 
   @override
+  String played(int count) {
+    return '已播放 $count 首歌曲';
+  }
+
+  @override
   String get playerLayout => '播放器布局';
 
   @override
   String get playlist2 => '播放列表';
+
+  @override
+  String get playlistName => '播放列表名称';
 
   @override
   String get playlists => '播放列表';
@@ -3739,6 +4228,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String queuedSongs(Object arg1) {
+    return '已加入队列 $arg1 首歌曲';
+  }
+
+  @override
+  String queuedSongs3(Object arg1) {
+    return '已加入队列 $arg1 首歌曲';
+  }
+
+  @override
   String get quickAccess => '快速访问';
 
   @override
@@ -3781,6 +4280,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get recentlyAdded => '最近添加';
+
+  @override
   String get recentlyPlayed => '最近播放';
 
   @override
@@ -3811,6 +4313,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get recorded => '已录制';
 
   @override
+  String get refreshAppleMusic => '刷新 Apple Music';
+
+  @override
   String get refreshDevices => '刷新设备';
 
   @override
@@ -3824,6 +4329,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get refreshRate => '刷新率';
+
+  @override
+  String get refreshingAppleMusicData => '正在刷新 Apple Music 数据';
 
   @override
   String get registeredNotClaimed => '已注册，未占用';
@@ -3852,6 +4360,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get removeCustomArt => '移除自定义封面';
+
+  @override
   String get removeDuplicates => '移除重复项';
 
   @override
@@ -3868,7 +4379,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get removeFolder => '移除文件夹？';
 
   @override
+  String get removeFromFavorites => '取消收藏';
+
+  @override
   String get removeFromFavorites2 => '取消收藏';
+
+  @override
+  String get removeFromLibrary => '从音乐库移除';
+
+  @override
+  String get removeFromPlaylist => '从播放列表移除';
 
   @override
   String get removeServer => '移除服务器？';
@@ -3877,12 +4397,59 @@ class AppLocalizationsZh extends AppLocalizations {
   String get removeServer2 => '移除服务器';
 
   @override
+  String get removeTheDatabaseEntriesOrDelete => '移除数据库条目或从设备删除文件。此操作无法撤销。';
+
+  @override
+  String get removeTheDatabaseEntryOrDelete => '移除数据库条目或从设备删除文件。此操作无法撤销。';
+
+  @override
+  String get removeTheseSongsFromYourLibrary => '从音乐库移除这些歌曲。设备上的文件不受影响。';
+
+  @override
+  String get removeThisSongFromYourLibrary => '从音乐库移除这首歌曲。设备上的文件不受影响。';
+
+  @override
+  String removedCustomAlbumArtFor(Object arg1) {
+    return '已移除“$arg1”的自定义专辑封面。';
+  }
+
+  @override
+  String removedCustomAlbumArtFor2(Object arg1) {
+    return '已移除“$arg1”的自定义专辑封面。';
+  }
+
+  @override
   String removedDuplicatesKept(Object arg1, Object arg2) {
     return '已移除 $arg1 个重复项 — 保留 $arg2 个。';
   }
 
   @override
+  String removedFromFavorites(Object arg1) {
+    return '已将“$arg1”从收藏中移除';
+  }
+
+  @override
+  String removedFromFavorites2(Object arg1) {
+    return '已将 $arg1 从收藏中移除';
+  }
+
+  @override
   String get removedFromFavorites3 => '已从收藏移除';
+
+  @override
+  String removedFromLibrary(Object arg1) {
+    return '已从音乐库移除“$arg1”';
+  }
+
+  @override
+  String removedSongsFromFavorites(Object arg1) {
+    return '已从收藏移除 $arg1 首歌曲';
+  }
+
+  @override
+  String removedSongsFromLibrary(Object arg1) {
+    return '已从音乐库移除 $arg1 首歌曲';
+  }
 
   @override
   String get removing => '正在移除…';
@@ -3987,6 +4554,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get restoreTheOriginalOrbitalLayout => '恢复原始轨道布局';
+
+  @override
+  String results(Object arg1) {
+    return '结果（$arg1）';
+  }
 
   @override
   String get resumeOnReconnect => '重新连接时继续';
@@ -4097,6 +4669,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get saveAsText => '保存为文本';
 
   @override
+  String get saveChanges => '保存更改';
+
+  @override
   String get saveConnect => '保存并连接';
 
   @override
@@ -4131,6 +4706,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get saved => '已保存';
 
   @override
+  String get savedAndVerified => '已保存并验证';
+
+  @override
   String get savedLyricsAndLinkedThemTo => '歌词已保存并关联到这首歌曲。';
 
   @override
@@ -4146,6 +4724,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String savedToNNNshareIt(Object path) {
     return '已保存到：\n$path\n\n现在分享？';
   }
+
+  @override
+  String get savedVerificationPending => '已保存（待验证）';
 
   @override
   String get saving => '保存中…';
@@ -4201,6 +4782,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scroll => '滚动';
 
   @override
+  String get scrollForMore => '滚动加载更多';
+
+  @override
   String get scrollingPausesWhenReducedMotionIs => '启用“减弱动态效果”时暂停滚动';
 
   @override
@@ -4213,7 +4797,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchAcrossSongsArtistsAndAlbums => '即时搜索歌曲、艺术家和专辑。';
 
   @override
+  String get searchAgain => '重新搜索';
+
+  @override
   String get searchArtistTitle => '搜索艺术家 + 标题…';
+
+  @override
+  String get searchArtists => '搜索艺术家…';
+
+  @override
+  String get searchFailed => '搜索失败';
+
+  @override
+  String searchFailed2(Object e) {
+    return '搜索失败：$e';
+  }
 
   @override
   String get searchHeadphones => '搜索耳机…';
@@ -4242,7 +4840,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get searchResults => '搜索结果';
 
   @override
+  String get searchSongsArtists => '搜索歌曲、艺术家…';
+
+  @override
+  String get searchSongsArtistsAlbums => '搜索歌曲、艺术家、专辑…';
+
+  @override
+  String get searchYourLibrary => '搜索音乐库';
+
+  @override
   String get searching => '正在搜索…';
+
+  @override
+  String get searchingOnline => '正在在线搜索';
 
   @override
   String get searchingTheLocalNetwork => '正在搜索本地网络…';
@@ -4251,7 +4861,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get secondsOfInactivityBeforeCollapsing => '无操作多少秒后收起';
 
   @override
+  String get seeAll => '查看全部';
+
+  @override
+  String seeAll2(Object count) {
+    return '查看全部 $count';
+  }
+
+  @override
   String get seeWhatIsNewInThis => '查看本次更新的新内容';
+
+  @override
+  String get select => '选择';
 
   @override
   String get selectAFolderToScan => '选择要扫描的文件夹';
@@ -4261,10 +4882,27 @@ class AppLocalizationsZh extends AppLocalizations {
       '1. 选中一行直接编辑它的时间戳，或使用「使用当前时间」。\n2. 在词时间轴上拖动分界点，可拉长或缩短它前面的片段——编辑会吸附到 10ms。\n3. 在检查器里点击字母，可把一个词拆成分别计时的音节（适合先慢后快的节奏），再拖动它们的分界点。\n4. 拖动最后一个分界点（或用「长度 ±」）来给下一行重新计时。用「自动填充」可均匀铺开词。\n5. 用位移控件可整体移动所有已打点的歌词。\n6. 保存即可生成最终的 `.lrc` 文件。';
 
   @override
+  String get selectARelease => '选择发行版';
+
+  @override
+  String get selectAll => '全选';
+
+  @override
+  String get selectAll2 => '全选';
+
+  @override
   String get selectDevice => '选择设备';
 
   @override
+  String selected(Object count) {
+    return '已选择 $count 项';
+  }
+
+  @override
   String get selectedSize => '选中尺寸';
+
+  @override
+  String get sep => '9 月';
 
   @override
   String get separateFromNavBar => '与导航栏分离';
@@ -4366,6 +5004,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showLabels => '显示标签';
 
   @override
+  String get showLess => '收起';
+
+  @override
   String get showLyrics => '显示歌词';
 
   @override
@@ -4458,6 +5099,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showYourRecentListeningHistoryOn => '在主屏幕显示你的最近收听记录';
 
   @override
+  String showingAllAlbums(Object totalCount) {
+    return '显示全部 $totalCount 张专辑';
+  }
+
+  @override
+  String showingOfAlbums(Object visibleCount, Object totalCount) {
+    return '显示 $totalCount 张专辑中的 $visibleCount 张';
+  }
+
+  @override
   String get shownWhenThereIsRoomBeside => '控件旁边有空间时显示';
 
   @override
@@ -4498,6 +5149,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get silkySmoothBZierCurvesFluid => '丝滑的贝塞尔曲线——流畅自然';
+
+  @override
+  String get similarArtists => '相似艺术家';
 
   @override
   String get simple => '简单';
@@ -4567,10 +5221,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get somethingWentWrong => '出错了';
 
   @override
+  String song2(int count) {
+    return '$count 首歌曲';
+  }
+
+  @override
+  String get songActions => '歌曲操作';
+
+  @override
+  String get songArtist => '歌曲艺术家';
+
+  @override
+  String get songCount => '歌曲数量';
+
+  @override
   String get songGestures => '歌曲手势';
 
   @override
   String get songMetadata => '歌曲元数据';
+
+  @override
+  String get songTitle => '歌曲标题';
 
   @override
   String get songViewList => '歌曲视图：列表';
@@ -4579,11 +5250,61 @@ class AppLocalizationsZh extends AppLocalizations {
   String get songViewOrbital => '歌曲视图：Orbital';
 
   @override
+  String songs(Object arg1, Object arg2) {
+    return '$arg1 • $arg2 首歌曲';
+  }
+
+  @override
+  String songs12(Object arg1) {
+    return '$arg1 首歌曲';
+  }
+
+  @override
+  String songs13(Object count) {
+    return '$count 首歌曲';
+  }
+
+  @override
   String get songs14 => '歌曲';
+
+  @override
+  String songs15(Object arg1) {
+    return '$arg1 首歌曲';
+  }
+
+  @override
+  String songs2(Object songCount) {
+    return '$songCount 首歌曲';
+  }
+
+  @override
+  String songs3(Object arg1) {
+    return '$arg1 首歌曲';
+  }
+
+  @override
+  String songs4(Object _totalSongs) {
+    return '$_totalSongs 首歌曲';
+  }
+
+  @override
+  String songs5(Object arg1) {
+    return '$arg1 首歌曲';
+  }
 
   @override
   String songs9(Object arg1) {
     return '$arg1 首歌曲';
+  }
+
+  @override
+  String songsAlbums(Object arg1, Object uniqueAlbums) {
+    return '$arg1 首歌曲 • $uniqueAlbums 张专辑';
+  }
+
+  @override
+  String songsAlbums2(Object arg1, Object albumCount) {
+    return '$arg1 首歌曲 · $albumCount 张专辑';
   }
 
   @override
@@ -4604,6 +5325,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get songsTab => '歌曲标签页';
+
+  @override
+  String songsU2022Albums(Object arg1, Object uniqueAlbums) {
+    return '$arg1 首歌曲 • $uniqueAlbums 张专辑';
+  }
+
+  @override
+  String get songsYouPlayWillAppearHere => '你播放的歌曲会显示在这里';
+
+  @override
+  String get songsYouScanIntoYourLibrary => '扫描进音乐库的歌曲会显示在这里';
+
+  @override
+  String get sortBy => '排序方式';
 
   @override
   String get sortFilter => '排序与筛选';
@@ -4741,6 +5476,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sub => '超低音';
 
   @override
+  String subfolderCount(int count) {
+    return '$count 个子文件夹';
+  }
+
+  @override
   String get subsonic => 'Subsonic';
 
   @override
@@ -4842,11 +5582,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tapABandToExpandDrag => '点按频段可展开，拖动旋钮可调节，点按数值可直接输入。';
 
   @override
+  String get tapAllOrEnableAChip => '点按“全部”或启用标签以查看结果';
+
+  @override
+  String get tapChipsToFilterCategories => '点按标签筛选分类';
+
+  @override
   String get tapEditTextTopRight =>
       '1. 点右上角「编辑文本」，把歌词粘贴进来——一行一句。\n2. 播放这首歌。\n3. 在「歌词行」列表里选中当前这一行。\n4. 听到那一句时点「打点并下一句」。\n5. 完成后保存。';
 
   @override
   String get tapIconsToSwitchTabsLong => '点按图标切换标签页，长按可自定义导航栏。';
+
+  @override
+  String get tapTheHeartIconOnAny => '点按任意歌曲上的爱心图标\n即可加入收藏';
 
   @override
   String get tapTheMiniPlayerForWaveform => '点按迷你播放器，打开波形进度条、均衡器、歌词和可视化效果。';
@@ -4914,6 +5663,12 @@ class AppLocalizationsZh extends AppLocalizations {
       '这会清除你当前的连续收听天数和已解锁的连续收听里程碑。此操作无法撤销。';
 
   @override
+  String get thisFolderAppearsToBeEmpty => '此文件夹似乎是空的';
+
+  @override
+  String get thisMonth => '本月';
+
+  @override
   String get thisMonthSRecap => '本月回顾';
 
   @override
@@ -4927,6 +5682,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get thisSongHasNoFilePath => '这首歌曲没有文件路径，无法编辑。';
+
+  @override
+  String get thisSongIsMissingAlbumMetadata => '此歌曲缺少专辑元数据，在线匹配受限。';
+
+  @override
+  String get thisSongOnly => '仅这首歌曲';
+
+  @override
+  String get thisWeek => '本周';
 
   @override
   String get thisWeekSRecap => '本周回顾';
@@ -4962,6 +5726,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get toRemove => '待移除';
 
   @override
+  String get today => '今天';
+
+  @override
   String get todaySRecap => '今日回顾';
 
   @override
@@ -4969,6 +5736,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools => '工具';
+
+  @override
+  String get topSongs => '最常播放的歌曲';
 
   @override
   String get total => '总计';
@@ -4982,6 +5752,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get track3 => '曲目编号';
+
+  @override
   String get trackBitDepth => '曲目位深';
 
   @override
@@ -4989,6 +5762,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trackConsecutiveListeningDaysAndShow => '记录连续收听天数并弹出提示';
+
+  @override
+  String get trackCount => '曲目数量';
 
   @override
   String get trackDsdRate => '曲目 DSD 速率';
@@ -5003,6 +5779,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trackThumbnails => '曲目缩略图';
 
   @override
+  String tracks(Object _totalTracks) {
+    return '$_totalTracks 首曲目';
+  }
+
+  @override
+  String tracks2(Object arg1) {
+    return '$arg1 首曲目';
+  }
+
+  @override
+  String tracks3(Object arg1) {
+    return '$arg1 首曲目';
+  }
+
+  @override
+  String tracks4(Object arg1) {
+    return '$arg1 首曲目';
+  }
+
+  @override
+  String tracks5(Object arg1, Object arg2) {
+    return '$arg1 · $arg2 首曲目';
+  }
+
+  @override
+  String tracks6(Object arg1) {
+    return '$arg1 首曲目';
+  }
+
+  @override
+  String tracks7(Object trackCount, Object arg1) {
+    return '$trackCount 首曲目 • $arg1';
+  }
+
+  @override
+  String tracks8(Object arg1) {
+    return '$arg1 首曲目';
+  }
+
+  @override
   String get transparent => '透明';
 
   @override
@@ -5015,10 +5831,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get truncate => '截断';
 
   @override
+  String get tryAdjustingYourSearchQuery => '试试调整搜索关键词';
+
+  @override
   String get tryAgain => '重试';
 
   @override
+  String get tryAnotherKeywordOrEnableMore => '换个关键词或启用更多分类';
+
+  @override
   String get tryOriginalSearch => '尝试原始搜索';
+
+  @override
+  String get tryPickingALocalImageIf => '如果发行版元数据较为少见，可尝试选择本地图片。';
 
   @override
   String get turnOff432HzTuningTo => '关闭 432 Hz 调音才能使用淡入淡出';
@@ -5106,6 +5931,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get undo => '撤销';
 
   @override
+  String get unfavorite => '取消收藏';
+
+  @override
+  String get unfavoriteSelected => '取消收藏所选';
+
+  @override
   String get universalCompatibility => '通用兼容性';
 
   @override
@@ -5119,6 +5950,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unknownBitrate => '码率未知';
+
+  @override
+  String get unknownFolder => '未知文件夹';
 
   @override
   String get unknownTitle => '未知标题';
@@ -5154,6 +5988,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get updateAvailableOnThePlayStore => 'Play 商店有可用更新。';
+
+  @override
+  String updatedAlbumArtFor(Object arg1) {
+    return '已更新“$arg1”的专辑封面。';
+  }
+
+  @override
+  String updatedAlbumArtFor2(Object arg1) {
+    return '已更新“$arg1”的专辑封面。';
+  }
 
   @override
   String get updates => '更新';
@@ -5403,6 +6247,11 @@ class AppLocalizationsZh extends AppLocalizations {
       '想了解每个控件的说明？随时可从「设置 → 帮助与手册」打开应用内手册。';
 
   @override
+  String was(Object arg1) {
+    return '原为：$arg1';
+  }
+
+  @override
   String get wave => '波形';
 
   @override
@@ -5448,6 +6297,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get white => '白色';
+
+  @override
+  String get wholeAlbum => '整张专辑';
 
   @override
   String get whyDonate => '为何捐赠';
@@ -5503,6 +6355,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wrapAroundQueue => '队列循环';
 
   @override
+  String get writeADescription => '写点描述';
+
+  @override
   String x(Object min) {
     return '${min}x';
   }
@@ -5524,6 +6379,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get yearly => '每年';
 
   @override
+  String get yesterday => '昨天';
+
+  @override
   String get youAlreadyHaveTheLatestFlick => '你已是最新的 Flick 版本';
 
   @override
@@ -5537,6 +6395,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get youCustomizedWhichVersionsToKeep => '你已自定义要保留的版本。不错 — 由你掌控。';
 
   @override
+  String get youHaveUnsavedChangesAreYou => '你有未保存的更改，确定要放弃吗？';
+
+  @override
   String get youHaveUnsavedLyricEditsLeave => '歌词编辑尚未保存。要不保存就离开同步工作室吗？';
 
   @override
@@ -5544,6 +6405,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get youReOfflineSomeOnlineFeatures => '你处于离线状态。部分在线功能可能无法使用。';
+
+  @override
+  String get yourCollectionAtAGlance => '你的收藏一览';
+
+  @override
+  String get yourLibrary => '你的音乐库';
+
+  @override
+  String get yourLibraryAtAGlance => '你的音乐库一览';
 
   @override
   String get yourLibraryIsTidyWeLl => '你的音乐库很整洁。下次扫描后若出现新的重复项，我们会通知你。';

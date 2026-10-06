@@ -18,6 +18,7 @@ import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/glass_search_bar.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum ArtistSortOption { name, songs, albums }
 
@@ -104,9 +105,9 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
       case ArtistSortOption.albums:
         _sortedArtists.sort((a, b) {
           final aAlbums =
-              a.value.map((s) => s.album ?? 'Unknown').toSet().length;
+              a.value.map((s) => s.album ?? l10n.unknown).toSet().length;
           final bAlbums =
-              b.value.map((s) => s.album ?? 'Unknown').toSet().length;
+              b.value.map((s) => s.album ?? l10n.unknown).toSet().length;
           return bAlbums.compareTo(aAlbums);
         });
     }
@@ -123,7 +124,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
       _artists.values.fold(0, (count, songs) => count + songs.length);
 
   int get _totalAlbums => _artists.values
-      .expand((songs) => songs.map((s) => s.album ?? 'Unknown'))
+      .expand((songs) => songs.map((s) => s.album ?? l10n.unknown))
       .toSet()
       .length;
 
@@ -250,7 +251,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Artists',
+                      l10n.artists,
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
                             fontWeight: FontWeight.w700,
@@ -258,7 +259,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
                           ),
                     ),
                     Text(
-                      '${_artists.length} artists',
+                      l10n.artists2(_artists.length),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextTertiary,
                       ),
@@ -294,7 +295,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
             ),
             child: GlassSearchBar(
               controller: _searchController,
-              hintText: 'Search artists...',
+              hintText: l10n.searchArtists,
               showBackground: false,
               onChanged: (value) {
                 setState(() => _searchQuery = value.toLowerCase());
@@ -360,7 +361,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Your library at a glance',
+                      l10n.yourLibraryAtAGlance,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: context.adaptiveTextPrimary,
                         fontWeight: FontWeight.w700,
@@ -375,7 +376,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
                 ),
                 const SizedBox(height: AppConstants.spacingXs),
                 Text(
-                  'Browse your artists, explore their discographies, and play their tracks.',
+                  l10n.browseYourArtistsExploreTheirDiscographies,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextSecondary,
                   ),
@@ -388,17 +389,17 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
                     _buildInfoChip(
                       context,
                       icon: LucideIcons.mic,
-                      label: '${_artists.length} artists',
+                      label: l10n.artists2(_artists.length),
                     ),
                     _buildInfoChip(
                       context,
                       icon: LucideIcons.music4,
-                      label: '$_totalSongs songs',
+                      label: l10n.songs4(_totalSongs),
                     ),
                     _buildInfoChip(
                       context,
                       icon: LucideIcons.disc3,
-                      label: '$_totalAlbums albums',
+                      label: l10n.albums3(_totalAlbums),
                     ),
                   ],
                 ),
@@ -408,7 +409,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Your library at a glance',
+                  l10n.yourLibraryAtAGlance,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
                     fontWeight: FontWeight.w700,
@@ -474,7 +475,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
           ),
           const SizedBox(height: AppConstants.spacingLg),
           Text(
-            'No Artists Found',
+            l10n.noArtistsFound,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: context.adaptiveTextSecondary,
               fontWeight: FontWeight.w600,
@@ -482,7 +483,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
           ),
           const SizedBox(height: AppConstants.spacingSm),
           Text(
-            'Add music with artist tags to see them here',
+            l10n.addMusicWithArtistTagsTo,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -507,8 +508,8 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
           ),
           child: Text(
             _searchQuery.isNotEmpty
-                ? 'Results (${filtered.length})'
-                : 'All Artists',
+                ? l10n.results(filtered.length)
+                : l10n.allArtists,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: context.adaptiveTextSecondary,
               fontWeight: FontWeight.w700,
@@ -530,7 +531,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
                       ),
                       const SizedBox(height: AppConstants.spacingMd),
                       Text(
-                        'No artists match "$_searchQuery"',
+                        l10n.noArtistsMatch(_searchQuery),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: context.adaptiveTextSecondary,
                         ),
@@ -612,7 +613,7 @@ class _ArtistCardState extends State<_ArtistCard>
   @override
   Widget build(BuildContext context) {
     final uniqueAlbums =
-        widget.songs.map((s) => s.album ?? 'Unknown').toSet().length;
+        widget.songs.map((s) => s.album ?? l10n.unknown).toSet().length;
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -672,7 +673,7 @@ class _ArtistCardState extends State<_ArtistCard>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${widget.songs.length} songs \u2022 $uniqueAlbums albums',
+                          l10n.songsU2022Albums(widget.songs.length, uniqueAlbums),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: context.adaptiveTextTertiary,
@@ -738,7 +739,7 @@ class _ArtistSortSheet extends ConsumerWidget {
             children: [
               _buildHandle(),
               const SizedBox(height: 16),
-              _buildSectionHeader(context, 'SORT BY'),
+              _buildSectionHeader(context, l10n.sortBy),
               const SizedBox(height: 8),
               ...ArtistSortOption.values.map(
                 (option) => _buildSortTile(context, option),
@@ -749,8 +750,8 @@ class _ArtistSortSheet extends ConsumerWidget {
               _buildToggleTile(
                 context,
                 icon: LucideIcons.disc3,
-                label: 'More from artist',
-                subtitle: 'Show related albums on album pages',
+                label: l10n.moreFromArtist,
+                subtitle: l10n.showRelatedAlbumsOnAlbumPages,
                 value: prefs.showMoreFromArtist,
                 onChanged: ref
                     .read(appPreferencesProvider.notifier)
@@ -759,8 +760,8 @@ class _ArtistSortSheet extends ConsumerWidget {
               _buildToggleTile(
                 context,
                 icon: LucideIcons.users,
-                label: 'More artists',
-                subtitle: 'Show other artists on album pages',
+                label: l10n.moreArtists,
+                subtitle: l10n.showOtherArtistsOnAlbumPages,
                 value: prefs.showMoreArtists,
                 onChanged: ref
                     .read(appPreferencesProvider.notifier)
@@ -871,11 +872,11 @@ class _ArtistSortSheet extends ConsumerWidget {
   String _labelFor(ArtistSortOption option) {
     switch (option) {
       case ArtistSortOption.name:
-        return 'Artist Name';
+        return l10n.artistName;
       case ArtistSortOption.songs:
-        return 'Song Count';
+        return l10n.songCount;
       case ArtistSortOption.albums:
-        return 'Album Count';
+        return l10n.albumCount;
     }
   }
 
