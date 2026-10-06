@@ -8,6 +8,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/providers/lastfm_provider.dart';
 import 'package:flick/core/utils/dev_log.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Self-contained Last.fm connect/disconnect tile.
 class LastFmSettingsTile extends ConsumerStatefulWidget {
@@ -77,8 +78,8 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
         // Provide more specific error message for network issues
         final errorMessage = e.toString().contains('SocketException') ||
                 e.toString().contains('Failed host lookup')
-            ? 'No internet connection. Please check your network and try again.'
-            : 'Could not connect to Last.fm. Check your API credentials and try again.';
+            ? l10n.noInternetConnectionPleaseCheckYour
+            : l10n.couldNotConnectToLastFm;
         
         _showError(errorMessage);
       } else {
@@ -94,7 +95,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
       await auth.exchangeTokenForSession();
       devLog('[LastFm] _completeAuth: Token exchange successful');
       ref.invalidate(lastFmSessionProvider);
-      _showSuccess('Last.fm connected!');
+      _showSuccess(l10n.lastFmConnected2);
     } catch (e, stackTrace) {
       devLog('[LastFm] _completeAuth: ERROR - $e');
       devLog('[LastFm] _completeAuth: Stack trace: $stackTrace');
@@ -153,7 +154,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Disconnect Last.fm?',
+                          l10n.disconnectLastFm,
                           style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
                             color: context.adaptiveTextPrimary,
                             fontWeight: FontWeight.w600,
@@ -195,7 +196,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Your scrobbling history will remain on Last.fm, but Flick will stop sending scrobbles.',
+                            l10n.yourScrobblingHistoryWillRemainOn,
                             style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
                               color: context.adaptiveTextSecondary,
                               height: 1.4,
@@ -228,8 +229,8 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                               ),
                             ),
                           ),
-                          child: const Text(
-                            'Cancel',
+                          child: Text(
+                            l10n.cancel,
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -249,8 +250,8 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                               ),
                             ),
                           ),
-                          child: const Text(
-                            'Disconnect',
+                          child: Text(
+                            l10n.disconnect,
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -344,7 +345,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Last.fm Configuration',
+                              l10n.lastFmConfiguration,
                               style: Theme.of(ctx).textTheme.titleLarge
                                   ?.copyWith(
                                     color: context.adaptiveTextPrimary,
@@ -353,7 +354,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Connect to scrobble your music',
+                              l10n.connectToScrobbleYourMusic,
                               style: Theme.of(ctx).textTheme.bodySmall
                                   ?.copyWith(
                                     color: context.adaptiveTextSecondary,
@@ -401,7 +402,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Get your API credentials',
+                                    l10n.getYourApiCredentials,
                                     style: Theme.of(ctx).textTheme.bodyMedium
                                         ?.copyWith(
                                           color: context.adaptiveTextPrimary,
@@ -444,7 +445,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
 
                       // API Key field
                       Text(
-                        'API Key',
+                        l10n.apiKey,
                         style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                           color: context.adaptiveTextPrimary,
                           fontWeight: FontWeight.w600,
@@ -455,7 +456,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                         controller: apiKeyController,
                         style: TextStyle(color: context.adaptiveTextPrimary),
                         decoration: InputDecoration(
-                          hintText: 'Enter your API key',
+                          hintText: l10n.enterYourApiKey,
                           hintStyle: TextStyle(
                             color: context.adaptiveTextTertiary,
                           ),
@@ -497,7 +498,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
 
                       // Shared Secret field
                       Text(
-                        'Shared Secret',
+                        l10n.sharedSecret,
                         style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                           color: context.adaptiveTextPrimary,
                           fontWeight: FontWeight.w600,
@@ -509,7 +510,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                         obscureText: obscureSecret,
                         style: TextStyle(color: context.adaptiveTextPrimary),
                         decoration: InputDecoration(
-                          hintText: 'Enter your shared secret',
+                          hintText: l10n.enterYourSharedSecret,
                           hintStyle: TextStyle(
                             color: context.adaptiveTextTertiary,
                           ),
@@ -583,7 +584,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                                 ),
                               ),
                               child: Text(
-                                'Cancel',
+                                l10n.cancel,
                                 style: TextStyle(
                                   color: context.adaptiveTextSecondary,
                                   fontWeight: FontWeight.w600,
@@ -619,7 +620,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                                   devLog('[LastFm] Dialog closed');
                                   
                                   _showSuccess(
-                                    'Credentials saved successfully!',
+                                    l10n.credentialsSavedSuccessfully,
                                   );
                                   
                                   if (autoConnectAfterSave && mounted) {
@@ -652,8 +653,8 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                                   ),
                                 ),
                               ),
-                              child: const Text(
-                                'Save & Connect',
+                              child: Text(
+                                l10n.saveConnect,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
@@ -727,14 +728,14 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Last.fm',
+                  l10n.lastFm,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Loading session...',
+                  l10n.loadingSession,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),
@@ -751,8 +752,8 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
     return _buildTapTile(
       context,
       icon: Icons.error_outline,
-      title: 'Last.fm',
-      subtitle: 'Could not load session',
+      title: l10n.lastFm,
+      subtitle: l10n.couldNotLoadSession,
       onTap: _startAuth,
       trailing: Icon(
         Icons.chevron_right,
@@ -766,8 +767,8 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
     return _buildTapTile(
       context,
       icon: Icons.radio_button_checked,
-      title: 'Last.fm',
-      subtitle: 'Connected as $username',
+      title: l10n.lastFm,
+      subtitle: l10n.connectedAs(username),
       onTap: () => _showConnectedBottomSheet(username),
       trailing: Icon(
         Icons.check_circle,
@@ -826,7 +827,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Last.fm Connected',
+                          l10n.lastFmConnected,
                           style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
                             color: context.adaptiveTextPrimary,
                             fontWeight: FontWeight.w600,
@@ -834,7 +835,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Your music is being scrobbled',
+                          l10n.yourMusicIsBeingScrobbled,
                           style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
                             color: context.adaptiveTextSecondary,
                           ),
@@ -885,7 +886,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Connected Account',
+                                l10n.connectedAccount,
                                 style: Theme.of(ctx).textTheme.bodySmall
                                     ?.copyWith(
                                       color: context.adaptiveTextSecondary,
@@ -918,7 +919,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                         _showApiKeyDialog();
                       },
                       icon: const Icon(Icons.edit, size: 18),
-                      label: const Text('Edit Credentials'),
+                      label: Text(l10n.editCredentials),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: BorderSide(
@@ -944,7 +945,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                         _disconnect();
                       },
                       icon: const Icon(Icons.logout, size: 18),
-                      label: const Text('Disconnect'),
+                      label: Text(l10n.disconnect),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red.withValues(alpha: 0.1),
                         foregroundColor: Colors.red,
@@ -973,10 +974,10 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
     return _buildTapTile(
       context,
       icon: Icons.radio_button_unchecked,
-      title: 'Last.fm',
+      title: l10n.lastFm,
       subtitle: _awaitingCallback
-          ? 'Waiting for browser authorization...'
-          : 'Connect to scrobble your listening history',
+          ? l10n.waitingForBrowserAuthorization
+          : l10n.connectToScrobbleYourListeningHistory,
       onTap: _awaitingCallback
           ? null
           : () {

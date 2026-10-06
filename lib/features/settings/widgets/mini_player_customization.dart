@@ -10,6 +10,7 @@ import 'package:flick/providers/mini_player_config_provider.dart';
 import 'package:flick/widgets/common/mini_player_bar.dart';
 import 'package:flick/widgets/navigation/flick_nav_bar.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class MiniPlayerCustomization extends ConsumerWidget {
   const MiniPlayerCustomization({super.key});
@@ -58,16 +59,16 @@ class MiniPlayerCustomization extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SettingsSectionHeader('Preview'),
+        SettingsSectionHeader(l10n.preview),
         const MiniPlayerPreview(),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Mini Player Layout'),
+        SettingsSectionHeader(l10n.miniPlayerLayout),
         SettingsCard(
           children: [
             ToggleSetting(
               icon: LucideIcons.split,
-              title: 'Separate from Nav Bar',
-              subtitle: 'Show the mini player as its own bar above the buttons',
+              title: l10n.separateFromNavBar,
+              subtitle: l10n.showTheMiniPlayerAsIts,
               value: prefs.separateMiniPlayerFromNavBar,
               onChanged: (value) => ref
                   .read(appPreferencesProvider.notifier)
@@ -76,19 +77,19 @@ class MiniPlayerCustomization extends ConsumerWidget {
             const SettingsDivider(),
             if (prefs.separateMiniPlayerFromNavBar) ...[
               _Choices<MiniPlayerWidthMode>(
-                title: 'Width',
+                title: l10n.width,
                 value: config.widthMode,
-                options: const {
-                  MiniPlayerWidthMode.matchNavigation: 'Match navigation',
-                  MiniPlayerWidthMode.custom: 'Custom',
+                options: {
+                  MiniPlayerWidthMode.matchNavigation: l10n.matchNavigation,
+                  MiniPlayerWidthMode.custom: l10n.custom,
                 },
                 onChanged: (value) =>
                     notifier.update((c) => c.copyWith(widthMode: value)),
               ),
               if (config.widthMode == MiniPlayerWidthMode.custom)
                 slider(
-                  'Custom Width',
-                  'Centered; widens to fit your controls',
+                  l10n.customWidth,
+                  l10n.centeredWidensToFitYourControls,
                   config.widthFraction,
                   0.7,
                   1,
@@ -98,13 +99,13 @@ class MiniPlayerCustomization extends ConsumerWidget {
                 ),
               const SettingsDivider(),
               slider(
-                'Gap Above Navigation',
-                'Space between the two bars',
+                l10n.gapAboveNavigation,
+                l10n.spaceBetweenTheTwoBars,
                 config.navigationGap,
                 0,
                 24,
                 24,
-                '${config.navigationGap.round()} dp',
+                l10n.dp(config.navigationGap.round()),
                 (c, value) => c.copyWith(navigationGap: value),
               ),
               const SettingsDivider(),
@@ -112,8 +113,7 @@ class MiniPlayerCustomization extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(AppConstants.spacingLg),
                 child: Text(
-                  'Separate the mini player to customize its width and gap. '
-                  'Your custom values are saved while joined.',
+                  l10n.separateTheMiniPlayerToCustomize,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextSecondary,
                   ),
@@ -122,67 +122,67 @@ class MiniPlayerCustomization extends ConsumerWidget {
               const SettingsDivider(),
             ],
             slider(
-              'Mini Player Height',
-              'Grows further if larger system text needs room',
+              l10n.miniPlayerHeight,
+              l10n.growsFurtherIfLargerSystemText,
               config.height,
               48,
               88,
               40,
-              '${config.height.round()} dp',
+              l10n.dp2(config.height.round()),
               (c, value) => c.copyWith(height: value),
             ),
             const SettingsDivider(),
             slider(
-              'Corner Radius',
-              'From square corners to a rounded bar',
+              l10n.cornerRadius,
+              l10n.fromSquareCornersToARounded,
               config.cornerRadius,
               0,
               32,
               32,
-              '${config.cornerRadius.round()} dp',
+              l10n.dp3(config.cornerRadius.round()),
               (c, value) => c.copyWith(cornerRadius: value),
             ),
           ],
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Content & Controls'),
+        SettingsSectionHeader(l10n.contentControls),
         SettingsCard(
           children: [
             toggle(
-              'Album Artwork',
-              'Shown when there is room beside the controls',
+              l10n.albumArtwork,
+              l10n.shownWhenThereIsRoomBeside,
               LucideIcons.image,
               config.showArtwork,
               (c, value) => c.copyWith(showArtwork: value),
             ),
             const SettingsDivider(),
             toggle(
-              'Artist',
-              'Show the artist below the song title',
+              l10n.artist,
+              l10n.showTheArtistBelowTheSong,
               LucideIcons.type,
               config.showArtist,
               (c, value) => c.copyWith(showArtist: value),
             ),
             const SettingsDivider(),
             toggle(
-              'Progress',
-              'Show a thin playback progress line',
+              l10n.progress,
+              l10n.showAThinPlaybackProgressLine,
               LucideIcons.timer,
               config.showProgress,
               (c, value) => c.copyWith(showProgress: value),
             ),
             const SettingsDivider(),
             toggle(
-              'Previous Song',
-              'Add a previous-track button',
+              l10n.previousSong2,
+              l10n.addAPreviousTrackButton,
               LucideIcons.skipBack,
               config.showPrevious,
               (c, value) => c.copyWith(showPrevious: value),
             ),
             const SettingsDivider(),
             toggle(
-              'Next Song',
-              'Add a next-track button',
+              l10n.nextSong2,
+              l10n.addANextTrackButton,
               LucideIcons.skipForward,
               config.showNext,
               (c, value) => c.copyWith(showNext: value),
@@ -190,12 +190,12 @@ class MiniPlayerCustomization extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Mini Player Appearance'),
+        SettingsSectionHeader(l10n.miniPlayerAppearance),
         SettingsCard(
           children: [
             slider(
-              'Background Opacity',
-              'Adjust the mini player surface',
+              l10n.backgroundOpacity,
+              l10n.adjustTheMiniPlayerSurface,
               config.backgroundOpacity,
               0,
               1,
@@ -205,20 +205,20 @@ class MiniPlayerCustomization extends ConsumerWidget {
             ),
             const SettingsDivider(),
             toggle(
-              'Border',
-              'Outline the mini player',
+              l10n.border,
+              l10n.outlineTheMiniPlayer,
               LucideIcons.square,
               config.showBorder,
               (c, value) => c.copyWith(showBorder: value),
             ),
             const SettingsDivider(),
             _Choices<MiniPlayerShadow>(
-              title: 'Shadow',
+              title: l10n.shadow,
               value: config.shadow,
-              options: const {
-                MiniPlayerShadow.off: 'Off',
-                MiniPlayerShadow.subtle: 'Subtle',
-                MiniPlayerShadow.strong: 'Strong',
+              options: {
+                MiniPlayerShadow.off: l10n.off,
+                MiniPlayerShadow.subtle: l10n.subtle,
+                MiniPlayerShadow.strong: l10n.strong,
               },
               onChanged: (value) =>
                   notifier.update((c) => c.copyWith(shadow: value)),
@@ -226,12 +226,12 @@ class MiniPlayerCustomization extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppConstants.spacingLg),
-        const SettingsSectionHeader('Text & Gestures'),
+        SettingsSectionHeader(l10n.textGestures),
         SettingsCard(
           children: [
             slider(
-              'Text Size',
-              'Also respects your system text size',
+              l10n.textSize2,
+              l10n.alsoRespectsYourSystemTextSize,
               config.textScale,
               0.85,
               1.3,
@@ -241,21 +241,21 @@ class MiniPlayerCustomization extends ConsumerWidget {
             ),
             const SettingsDivider(),
             _Choices<MiniPlayerTitleMode>(
-              title: 'Long Song Titles',
+              title: l10n.longSongTitles,
               value: config.titleMode,
-              options: const {
-                MiniPlayerTitleMode.truncate: 'Truncate',
-                MiniPlayerTitleMode.scroll: 'Scroll',
+              options: {
+                MiniPlayerTitleMode.truncate: l10n.truncate,
+                MiniPlayerTitleMode.scroll: l10n.scroll,
               },
-              subtitle: 'Scrolling pauses when reduced motion is enabled',
+              subtitle: l10n.scrollingPausesWhenReducedMotionIs,
               onChanged: (value) =>
                   notifier.update((c) => c.copyWith(titleMode: value)),
             ),
             const SettingsDivider(),
             SelectionSetting(
               icon: LucideIcons.audioLines,
-              title: 'Visualizer',
-              subtitle: 'Swipe to show or hide the visualizer',
+              title: l10n.visualizer,
+              subtitle: l10n.swipeToShowOrHideThe,
               selected: prefs.miniPlayerSwipeAction == 'visualizer',
               onTap: () => ref
                   .read(appPreferencesProvider.notifier)
@@ -264,8 +264,8 @@ class MiniPlayerCustomization extends ConsumerWidget {
             const SettingsDivider(),
             SelectionSetting(
               icon: LucideIcons.skipForward,
-              title: 'Switch Songs',
-              subtitle: 'Swipe left/right to skip tracks',
+              title: l10n.switchSongs,
+              subtitle: l10n.swipeLeftRightToSkipTracks,
               selected: prefs.miniPlayerSwipeAction == 'switchSongs',
               onTap: () => ref
                   .read(appPreferencesProvider.notifier)
@@ -276,7 +276,7 @@ class MiniPlayerCustomization extends ConsumerWidget {
         const SizedBox(height: AppConstants.spacingSm),
         TextButton.icon(
           icon: const Icon(LucideIcons.rotateCcw, size: 18),
-          label: const Text('Reset Mini Player to Defaults'),
+          label: Text(l10n.resetMiniPlayerToDefaults),
           onPressed: () async {
             await Future.wait([
               notifier.reset(),
@@ -289,7 +289,7 @@ class MiniPlayerCustomization extends ConsumerWidget {
             ]);
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Mini player defaults restored')),
+                SnackBar(content: Text(l10n.miniPlayerDefaultsRestored)),
               );
             }
           },
@@ -326,12 +326,12 @@ class _MiniPlayerPreviewState extends ConsumerState<MiniPlayerPreview> {
           spacing: 8,
           children: [
             ChoiceChip(
-              label: const Text('Expanded'),
+              label: Text(l10n.expanded),
               selected: !_collapsed,
               onSelected: (_) => setState(() => _collapsed = false),
             ),
             ChoiceChip(
-              label: const Text('Collapsed'),
+              label: Text(l10n.collapsed),
               selected: _collapsed,
               onSelected: (_) => setState(() => _collapsed = true),
             ),
@@ -366,8 +366,8 @@ class _MiniPlayerPreviewState extends ConsumerState<MiniPlayerPreview> {
                       collapsed: _collapsed,
                       songId: song?.id ?? 'preview',
                       title:
-                          song?.title ?? 'A song with a long title to preview',
-                      artist: song?.artist ?? 'Sample artist',
+                          song?.title ?? l10n.aSongWithALongTitle,
+                      artist: song?.artist ?? l10n.sampleArtist,
                       albumArt: song?.albumArt,
                       audioSourcePath: song?.filePath,
                       progress: 0.42,
@@ -385,8 +385,8 @@ class _MiniPlayerPreviewState extends ConsumerState<MiniPlayerPreview> {
         const SizedBox(height: AppConstants.spacingSm),
         Text(
           song == null
-              ? 'Sample song · preview only'
-              : 'Current song · preview only',
+              ? l10n.sampleSongPreviewOnly
+              : l10n.currentSongPreviewOnly,
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: context.adaptiveTextSecondary),

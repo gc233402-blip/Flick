@@ -17,10 +17,10 @@ class InterfaceSettingsScreen extends ConsumerWidget {
   Future<void> _confirmResetStreak(BuildContext context) async {
     final confirmed = await FlickDialogs.confirm(
       context,
-      title: 'Reset streak data?',
+      title: l10n.resetStreakData,
       message:
-          'This clears your current day streak and any unlocked streak milestones. This cannot be undone.',
-      confirmLabel: 'Reset',
+          l10n.thisClearsYourCurrentDayStreak,
+      confirmLabel: l10n.reset,
       destructive: true,
     );
     if (confirmed) {
@@ -33,7 +33,7 @@ class InterfaceSettingsScreen extends ConsumerWidget {
     final appPreferences = ref.watch(appPreferencesProvider);
 
     return SettingsScaffold(
-      title: 'Interface',
+      title: l10n.interfaceLabel,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -56,7 +56,7 @@ class InterfaceSettingsScreen extends ConsumerWidget {
                       SelectionSetting(
                         icon: LucideIcons.languages,
                         title: '简体中文',
-                        subtitle: 'Simplified Chinese',
+                        subtitle: l10n.simplifiedChinese,
                         selected: selectedLocale?.languageCode == 'zh',
                         onTap: () => LocaleController.instance.select(
                           const Locale('zh', 'CN'),
@@ -65,8 +65,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
                       const SettingsDivider(),
                       SelectionSetting(
                         icon: LucideIcons.globe,
-                        title: 'English',
-                        subtitle: 'English',
+                        title: l10n.english,
+                        subtitle: l10n.english,
                         selected: selectedLocale?.languageCode == 'en',
                         onTap: () => LocaleController.instance.select(
                           const Locale('en'),
@@ -79,13 +79,13 @@ class InterfaceSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Interface'),
+          SettingsSectionHeader(l10n.interfaceLabel),
           SettingsCard(
             children: [
               ToggleSetting(
                 icon: LucideIcons.activity,
-                title: 'Animations',
-                subtitle: 'Enable animated transitions and effects',
+                title: l10n.animations,
+                subtitle: l10n.enableAnimatedTransitionsAndEffects,
                 value: appPreferences.animationsEnabled,
                 onChanged: (value) {
                   ref
@@ -97,8 +97,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.vibrate,
-                title: 'Haptic Feedback',
-                subtitle: 'Enable vibration on interactions',
+                title: l10n.hapticFeedback,
+                subtitle: l10n.enableVibrationOnInteractions,
                 value: appPreferences.hapticsEnabled,
                 onChanged: (value) {
                   ref
@@ -122,8 +122,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.arrowLeftRight,
-                title: 'Swipe Actions',
-                subtitle: 'Swipe songs left to queue or right to favorite',
+                title: l10n.swipeActions,
+                subtitle: l10n.swipeSongsLeftToQueueOr,
                 value: appPreferences.swipeActionsEnabled,
                 onChanged: (value) {
                   ref
@@ -134,8 +134,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.keyboard,
-                title: 'Auto-Focus Search',
-                subtitle: 'Automatically open keyboard when switching to search',
+                title: l10n.autoFocusSearch,
+                subtitle: l10n.automaticallyOpenKeyboardWhenSwitchingTo,
                 value: appPreferences.autoFocusSearch,
                 onChanged: (value) {
                   ref
@@ -146,8 +146,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.layoutGrid,
-                title: 'Library Glance Card',
-                subtitle: 'Show the "at a glance" summary on Artists/Albums',
+                title: l10n.libraryGlanceCard,
+                subtitle: l10n.showTheAtAGlanceSummary,
                 value: !appPreferences.glanceCardHidden,
                 onChanged: (value) {
                   ref
@@ -158,8 +158,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.flame,
-                title: 'Day Streaks',
-                subtitle: 'Track consecutive listening days and show the popup',
+                title: l10n.dayStreaks,
+                subtitle: l10n.trackConsecutiveListeningDaysAndShow,
                 value: appPreferences.streaksEnabled,
                 onChanged: (value) {
                   ref
@@ -170,15 +170,15 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ActionButton(
                 icon: LucideIcons.trash2,
-                title: 'Reset Streak Data',
-                subtitle: 'Clear the counter and any unlocked streak milestones',
+                title: l10n.resetStreakData2,
+                subtitle: l10n.clearTheCounterAndAnyUnlocked,
                 onTap: () => _confirmResetStreak(context),
               ),
               const SettingsDivider(),
               NavigationSetting(
                 icon: LucideIcons.navigation,
-                title: 'Bottom Bar',
-                subtitle: 'Customize which tabs appear and their size',
+                title: l10n.bottomBar,
+                subtitle: l10n.customizeWhichTabsAppearAndTheir,
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -190,8 +190,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               NavigationSetting(
                 icon: LucideIcons.audioLines,
-                title: 'Visualizer',
-                subtitle: 'Animation style and frequency focus',
+                title: l10n.visualizer,
+                subtitle: l10n.animationStyleAndFrequencyFocus,
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -203,13 +203,13 @@ class InterfaceSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Refresh Rate'),
+          SettingsSectionHeader(l10n.refreshRate),
           SettingsCard(
             children: [
               SelectionSetting(
                 icon: LucideIcons.smartphone,
-                title: 'Adaptive',
-                subtitle: 'Let the system decide — best battery life',
+                title: l10n.adaptive,
+                subtitle: l10n.letTheSystemDecideBestBattery,
                 selected: appPreferences.refreshRateMode == 'adaptive',
                 onTap: () {
                   ref
@@ -220,8 +220,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.gauge,
-                title: 'Standard (60Hz)',
-                subtitle: 'Cap at 60Hz — balanced smoothness and battery',
+                title: l10n.standard60hz,
+                subtitle: l10n.capAt60hzBalancedSmoothnessAnd,
                 selected: appPreferences.refreshRateMode == 'standard',
                 onTap: () {
                   ref
@@ -232,8 +232,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.zap,
-                title: 'High (120Hz)',
-                subtitle: 'Maximum smoothness — uses more battery',
+                title: l10n.high120hz,
+                subtitle: l10n.maximumSmoothnessUsesMoreBattery,
                 selected: appPreferences.refreshRateMode == 'high',
                 onTap: () {
                   ref
@@ -244,13 +244,13 @@ class InterfaceSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Search Playback'),
+          SettingsSectionHeader(l10n.searchPlayback),
           SettingsCard(
             children: [
               SelectionSetting(
                 icon: LucideIcons.listMusic,
-                title: 'Search Results',
-                subtitle: 'Continue through the search results',
+                title: l10n.searchResults,
+                subtitle: l10n.continueThroughTheSearchResults,
                 selected: appPreferences.searchPlaybackMode == 'results',
                 onTap: () {
                   ref
@@ -261,8 +261,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.library,
-                title: 'Full Library',
-                subtitle: 'Continue through your entire library',
+                title: l10n.fullLibrary,
+                subtitle: l10n.continueThroughYourEntireLibrary,
                 selected: appPreferences.searchPlaybackMode == 'library',
                 onTap: () {
                   ref
@@ -273,7 +273,7 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.listPlus,
-                title: 'Active Queue',
+                title: l10n.activeQueue,
                 subtitle:
                     'Insert into the current queue, fall back to results',
                 selected: appPreferences.searchPlaybackMode == 'queue',
@@ -286,13 +286,13 @@ class InterfaceSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Favorite Removal'),
+          SettingsSectionHeader(l10n.favoriteRemoval),
           SettingsCard(
             children: [
               SelectionSetting(
                 icon: LucideIcons.arrowLeftRight,
-                title: 'Swipe',
-                subtitle: 'Swipe left to unfavorite a song',
+                title: l10n.swipe,
+                subtitle: l10n.swipeLeftToUnfavoriteASong,
                 selected: appPreferences.favoriteRemovalMode == 'swipe',
                 onTap: () {
                   ref
@@ -303,8 +303,8 @@ class InterfaceSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SelectionSetting(
                 icon: LucideIcons.mousePointerClick,
-                title: 'Long Press',
-                subtitle: 'Hold a song to unfavorite',
+                title: l10n.longPress,
+                subtitle: l10n.holdASongToUnfavorite,
                 selected: appPreferences.favoriteRemovalMode == 'longpress',
                 onTap: () {
                   ref

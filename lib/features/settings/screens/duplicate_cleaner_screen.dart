@@ -11,6 +11,7 @@ import 'package:flick/core/utils/audio_metadata_utils.dart';
 import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/duplicate_cleaner_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -19,11 +20,11 @@ import 'package:flick/services/duplicate_cleaner_service.dart';
 String _formatFileSize(int? bytes) {
   if (bytes == null || bytes <= 0) return '—';
   if (bytes < 1024) return '$bytes B';
-  if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+  if (bytes < 1024 * 1024) return l10n.kb((bytes / 1024).toStringAsFixed(1));
   if (bytes < 1024 * 1024 * 1024) {
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    return l10n.mb((bytes / (1024 * 1024)).toStringAsFixed(1));
   }
-  return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
+  return l10n.gb((bytes / (1024 * 1024 * 1024)).toStringAsFixed(2));
 }
 
 String _fileName(String path) {
@@ -139,7 +140,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             ),
             const SizedBox(height: AppConstants.spacingLg),
             Text(
-              'Scanning for duplicates…',
+              l10n.scanningForDuplicates,
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 fontSize: 17,
@@ -149,7 +150,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             ),
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              'Grouping by title & artist — this is usually quick.',
+              l10n.groupingByTitleArtistThisIs,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'ProductSans',
@@ -187,7 +188,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             ),
             const SizedBox(height: AppConstants.spacingLg),
             Text(
-              'Something went wrong',
+              l10n.somethingWentWrong,
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 fontSize: 18,
@@ -210,7 +211,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             SizedBox(
               width: double.infinity,
               child: FlickDialogButton(
-                label: 'Try again',
+                label: l10n.tryAgain,
                 style: FlickDialogButtonStyle.primary,
                 onPressed: () => ref
                     .read(duplicateScanProvider.notifier)
@@ -226,7 +227,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
   Widget _buildEmptyView(BuildContext context) {
     return Center(
       child: Text(
-        'No scan results yet',
+        l10n.noScanResultsYet,
         style: TextStyle(
           fontFamily: 'ProductSans',
           fontSize: 15,
@@ -261,7 +262,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             ),
             const SizedBox(height: AppConstants.spacingLg),
             Text(
-              'All clear — no duplicates',
+              l10n.allClearNoDuplicates,
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 fontSize: 19,
@@ -271,7 +272,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             ),
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              'Your library is tidy. We’ll let you know if new duplicates appear after the next scan.',
+              l10n.yourLibraryIsTidyWeLl,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'ProductSans',
@@ -282,7 +283,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             ),
             const SizedBox(height: AppConstants.spacingLg),
             FlickDialogButton(
-              label: 'Scan again',
+              label: l10n.scanAgain,
               style: FlickDialogButtonStyle.secondary,
               onPressed: () => ref
                   .read(duplicateScanProvider.notifier)
@@ -316,9 +317,9 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 6),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Check versions to keep — unchecked will be removed',
+                  l10n.checkVersionsToKeepUncheckedWill,
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 12,
@@ -335,8 +336,8 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
                         .read(duplicateScanProvider.notifier)
                         .resetAllToRecommended();
                   },
-                  child: const Text(
-                    'Reset',
+                  child: Text(
+                    l10n.reset,
                     style: TextStyle(
                       fontFamily: 'ProductSans',
                       fontSize: 12,
@@ -387,12 +388,12 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasResult = scanState.result != null;
     final subtitle = scanState.isScanning
-        ? 'Scanning your library…'
+        ? l10n.scanningYourLibrary
         : hasResult
             ? (scanState.result!.totalDuplicates == 0
-                ? 'No duplicates found'
-                : '${scanState.result!.totalGroups} groups • ${scanState.result!.totalDuplicates} to remove')
-            : 'Find and clean up duplicate songs';
+                ? l10n.noDuplicatesFound
+                : l10n.groupsToRemove(scanState.result!.totalGroups, scanState.result!.totalDuplicates))
+            : l10n.findAndCleanUpDuplicateSongs;
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -426,7 +427,7 @@ class _Header extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Duplicate Cleaner',
+                  l10n.duplicateCleaner,
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 18,
@@ -541,8 +542,8 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Review before you clean',
+                    Text(
+                      l10n.reviewBeforeYouClean,
                       style: TextStyle(
                         fontFamily: 'ProductSans',
                         fontSize: 14.5,
@@ -553,8 +554,8 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                     const SizedBox(height: 3),
                     Text(
                       _collapsed
-                          ? '${result.totalGroups} groups • $toRemove to remove'
-                          : 'Only library entries are removed — your audio files stay on disk.',
+                          ? l10n.groupsToRemove2(result.totalGroups, toRemove)
+                          : l10n.onlyLibraryEntriesAreRemovedYour,
                       style: TextStyle(
                         fontFamily: 'ProductSans',
                         fontSize: 12,
@@ -623,7 +624,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               _SummaryStat(
-                                label: 'Groups',
+                                label: l10n.groups,
                                 value: result.totalGroups.toString(),
                                 icon: LucideIcons.layers,
                               ),
@@ -633,7 +634,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                                 color: AppColors.glassBorder,
                               ),
                               _SummaryStat(
-                                label: 'To remove',
+                                label: l10n.toRemove,
                                 value: toRemove.toString(),
                                 icon: LucideIcons.trash2,
                                 highlight: true,
@@ -644,7 +645,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                                 color: AppColors.glassBorder,
                               ),
                               _SummaryStat(
-                                label: 'Will keep',
+                                label: l10n.willKeep,
                                 value: scanState.selectedKeepCount
                                     .toString(),
                                 icon: LucideIcons.shieldCheck,
@@ -662,9 +663,9 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                                 color: AppColors.textSecondary,
                               ),
                               const SizedBox(width: 6),
-                              const Expanded(
+                              Expanded(
                                 child: Text(
-                                  "You customized which versions to keep. Nice — you're in control.",
+                                  l10n.youCustomizedWhichVersionsToKeep,
                                   style: TextStyle(
                                     fontFamily: 'ProductSans',
                                     fontSize: 11.5,
@@ -780,8 +781,8 @@ class _BottomActionBar extends ConsumerWidget {
               Expanded(
                 child: Text(
                   isRemoving
-                      ? 'Removing duplicates…'
-                      : 'Ready to remove $toRemove song${toRemove == 1 ? '' : 's'} — keeping ${scanState.selectedKeepCount} in total.',
+                      ? l10n.removingDuplicates
+                      : l10n.readyToRemoveSongKeepingIn(toRemove, scanState.selectedKeepCount),
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 12,
@@ -810,7 +811,7 @@ class _BottomActionBar extends ConsumerWidget {
                     )
                   : const Icon(LucideIcons.trash2, size: 18),
               label: Text(
-                isRemoving ? 'Removing…' : 'Remove $toRemove duplicates',
+                isRemoving ? l10n.removing : l10n.removeDuplicates3(toRemove),
                 style: const TextStyle(
                   fontFamily: 'ProductSans',
                   fontSize: 15,
@@ -848,7 +849,7 @@ class _BottomActionBar extends ConsumerWidget {
                 ),
               ),
               child: Text(
-                'Or remove all using recommended picks',
+                l10n.orRemoveAllUsingRecommendedPicks,
                 style: TextStyle(
                   fontFamily: 'ProductSans',
                   fontSize: 12.5,
@@ -873,10 +874,10 @@ class _BottomActionBar extends ConsumerWidget {
     final kept = ref.read(duplicateScanProvider).selectedKeepCount;
     final confirmed = await FlickDialogs.confirm(
       context,
-      title: 'Remove $toRemove duplicates?',
+      title: l10n.removeDuplicates2(toRemove),
       message:
-          'We’ll keep your $kept checked version${kept == 1 ? '' : 's'} and remove the other ${toRemove == 1 ? 'copy' : 'copies'} from your library. Audio files on disk are not deleted.',
-      confirmLabel: 'Remove',
+          l10n.weLlKeepYourCheckedVersion(kept, toRemove),
+      confirmLabel: l10n.remove,
       destructive: true,
       icon: LucideIcons.trash2,
     );
@@ -898,7 +899,7 @@ class _BottomActionBar extends ConsumerWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Removed ${result.removedCount} duplicates — kept ${result.keptCount}.',
+                  l10n.removedDuplicatesKept(result.removedCount, result.keptCount),
                   style: const TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 13,
@@ -921,10 +922,10 @@ class _BottomActionBar extends ConsumerWidget {
   ) async {
     final confirmed = await FlickDialogs.confirm(
       context,
-      title: 'Remove all with best picks?',
+      title: l10n.removeAllWithBestPicks,
       message:
-          'We’ll keep the best-quality version in each group (prefers album art, then highest bitrate) and remove $toRemove ${toRemove == 1 ? 'copy' : 'copies'}. Files on disk are not deleted.',
-      confirmLabel: 'Remove all',
+          l10n.weLlKeepTheBestQuality(toRemove),
+      confirmLabel: l10n.removeAll,
       destructive: true,
       icon: LucideIcons.sparkles,
     );
@@ -942,9 +943,9 @@ class _BottomActionBar extends ConsumerWidget {
           children: [
             const Icon(LucideIcons.check, size: 18, color: Colors.green),
             const SizedBox(width: 10),
-            const Expanded(
+            Expanded(
               child: Text(
-                'Duplicates removed using recommended picks.',
+                l10n.duplicatesRemovedUsingRecommendedPicks,
                 style: TextStyle(
                   fontFamily: 'ProductSans',
                   fontSize: 13,
@@ -1012,11 +1013,11 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
             sampleRate: kept.sampleRate,
             bitDepth: kept.bitDepth,
           ) ??
-          'Unknown bitrate';
-      keepingBadgeText = 'Keeping • $type • $br';
+          l10n.unknownBitrate;
+      keepingBadgeText = l10n.keeping(type, br);
     } else {
       keepingBadgeText =
-          'Keeping $keptCount of ${widget.group.songs.length} • $removeCount to remove';
+          l10n.keepingOfToRemove(keptCount, widget.group.songs.length, removeCount);
     }
 
     return Container(
@@ -1074,7 +1075,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            '${widget.group.songs.first.artist} • ${widget.group.songs.length} copies',
+                            l10n.copies(widget.group.songs.first.artist, widget.group.songs.length),
                             style: TextStyle(
                               fontFamily: 'ProductSans',
                               fontSize: 12,
@@ -1174,8 +1175,8 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                           const SizedBox(height: AppConstants.spacingSm),
                           Row(
                             children: [
-                              const Text(
-                                'Choose which to keep',
+                              Text(
+                                l10n.chooseWhichToKeep,
                                 style: TextStyle(
                                   fontFamily: 'ProductSans',
                                   fontSize: 12,
@@ -1209,8 +1210,8 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                       border: Border.all(
                                           color: AppColors.glassBorderStrong),
                                     ),
-                                    child: const Text(
-                                      'Recommended only',
+                                    child: Text(
+                                      l10n.recommendedOnly,
                                       style: TextStyle(
                                         fontFamily: 'ProductSans',
                                         fontSize: 10.5,
@@ -1247,8 +1248,8 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                     border: Border.all(
                                         color: AppColors.glassBorderStrong),
                                   ),
-                                  child: const Text(
-                                    'Keep all',
+                                  child: Text(
+                                    l10n.keepAll,
                                     style: TextStyle(
                                       fontFamily: 'ProductSans',
                                       fontSize: 10.5,
@@ -1262,7 +1263,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                           ),
                           const SizedBox(height: AppConstants.spacingXs),
                           Text(
-                            'Check the versions you want to keep — unchecked ones will be removed from your library. At least one must stay.',
+                            l10n.checkTheVersionsYouWantTo,
                             style: TextStyle(
                               fontFamily: 'ProductSans',
                               fontSize: 11.5,
@@ -1274,7 +1275,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                           if (keepSet.length > 1) ...[
                             const SizedBox(height: 6),
                             Text(
-                              '$keptCount kept • $removeCount will be removed',
+                              l10n.keptWillBeRemoved(keptCount, removeCount),
                               style: TextStyle(
                                 fontFamily: 'ProductSans',
                                 fontSize: 11,
@@ -1311,7 +1312,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                           borderRadius: BorderRadius.circular(
                                               AppConstants.radiusMd),
                                         ),
-                                        content: const Row(
+                                        content: Row(
                                           children: [
                                             Icon(LucideIcons.info,
                                                 size: 16,
@@ -1319,7 +1320,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                             SizedBox(width: 8),
                                             Expanded(
                                               child: Text(
-                                                'At least one version must stay.',
+                                                l10n.atLeastOneVersionMustStay,
                                                 style: TextStyle(
                                                   fontFamily: 'ProductSans',
                                                   fontSize: 12,
@@ -1376,8 +1377,8 @@ class _SongSelectRow extends StatelessWidget {
           sampleRate: song.sampleRate,
           bitDepth: song.bitDepth,
         ) ??
-        'Unknown bitrate';
-    final typeLabel = (song.fileType as String?)?.toUpperCase() ?? 'Unknown';
+        l10n.unknownBitrate;
+    final typeLabel = (song.fileType as String?)?.toUpperCase() ?? l10n.unknown;
     final sizeLabel = _formatFileSize(song.fileSize as int?);
     final file = _fileName(song.filePath as String);
     final folder = _folderName(song.filePath as String);
@@ -1504,7 +1505,7 @@ class _SongSelectRow extends StatelessWidget {
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: const [
+                                children: [
                                   Icon(
                                     LucideIcons.star,
                                     size: 10,
@@ -1512,7 +1513,7 @@ class _SongSelectRow extends StatelessWidget {
                                   ),
                                   SizedBox(width: 3),
                                   Text(
-                                    'Recommended',
+                                    l10n.recommended,
                                     style: TextStyle(
                                       fontFamily: 'ProductSans',
                                       fontSize: 10,
@@ -1528,7 +1529,7 @@ class _SongSelectRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        selected ? 'Keeping this version' : 'Will be removed',
+                        selected ? l10n.keepingThisVersion : l10n.willBeRemoved,
                         style: TextStyle(
                           fontFamily: 'ProductSans',
                           fontSize: 11,
@@ -1552,7 +1553,7 @@ class _SongSelectRow extends StatelessWidget {
                       ),
                       if (folder.isNotEmpty)
                         Text(
-                          'in $folder',
+                          l10n.inLabel(folder),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -1575,8 +1576,8 @@ class _SongSelectRow extends StatelessWidget {
                                 color: AppColors.textSecondary,
                               ),
                               const SizedBox(width: 4),
-                              const Text(
-                                'Has artwork',
+                              Text(
+                                l10n.hasArtwork,
                                 style: TextStyle(
                                   fontFamily: 'ProductSans',
                                   fontSize: 10.5,

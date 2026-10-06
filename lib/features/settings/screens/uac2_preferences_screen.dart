@@ -21,6 +21,7 @@ import 'package:flick/widgets/common/engine_restart_notice.dart';
 import 'package:flick/widgets/uac2/uac2_volume_control.dart';
 import 'package:flick/features/settings/screens/logs_screen.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class Uac2PreferencesScreen extends ConsumerStatefulWidget {
   const Uac2PreferencesScreen({super.key});
@@ -84,7 +85,7 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
                             const EngineRestartNotice(),
                             const SizedBox(height: AppConstants.spacingLg),
                           ],
-                          _buildSectionHeader(context, 'Audio Format'),
+                          _buildSectionHeader(context, l10n.audioFormat),
                           _buildFormatPreferences(
                             context,
                             preferencesService,
@@ -93,7 +94,7 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
                             audioFormatAsync,
                           ),
                           const SizedBox(height: AppConstants.spacingLg),
-                          _buildSectionHeader(context, 'Experimental'),
+                          _buildSectionHeader(context, l10n.experimental),
                           _buildExperimentalWarning(context),
                           _buildDsdOptions(
                             context,
@@ -107,7 +108,7 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
                             tuning432HzAsync,
                           ),
                           const SizedBox(height: AppConstants.spacingLg),
-                          _buildSectionHeader(context, 'Advanced'),
+                          _buildSectionHeader(context, l10n.advanced),
                           _buildAdvancedOptions(
                             context,
                             preferencesService,
@@ -127,7 +128,7 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
                             error: (_, _) => false,
                           )) ...[
                             const SizedBox(height: AppConstants.spacingLg),
-                            _buildSectionHeader(context, 'Volume'),
+                            _buildSectionHeader(context, l10n.volume),
                             const Uac2VolumeControl(),
                           ],
                           const SizedBox(height: AppConstants.navBarHeight + 120),
@@ -159,7 +160,7 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
           ),
           const SizedBox(width: AppConstants.spacingSm),
           Text(
-            'UAC2 Preferences',
+            l10n.uac2Preferences,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: context.adaptiveTextPrimary,
@@ -212,10 +213,10 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
             data: (enabled) => _buildSwitchTile(
               context,
               icon: LucideIcons.settings,
-              title: 'Audio Format',
+              title: l10n.audioFormat,
               subtitle: enabled
-                  ? 'Format strategy and custom format controls are active.'
-                  : 'Format controls are disabled. The engine uses its default format.',
+                  ? l10n.formatStrategyAndCustomFormatControls
+                  : l10n.formatControlsAreDisabledTheEngine,
               value: enabled,
               onChanged: (value) async {
                 await service.setAudioFormatEnabled(value);
@@ -230,23 +231,23 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
             data: (formatPref) => _buildNavigationTile(
               context,
               icon: LucideIcons.slidersHorizontal,
-              title: 'Format Strategy',
+              title: l10n.formatStrategy,
               subtitle: formatBlocked
-                  ? 'Disabled in Bit-perfect (USB DAC) mode (exact rate required)'
+                  ? l10n.disabledInBitPerfectUsbDac
                   : !isAudioFormatEnabled
-                  ? 'Audio Format is disabled'
+                  ? l10n.audioFormatIsDisabled
                   : _getFormatPreferenceLabel(formatPref),
               onTap: formatBlocked
                   ? () => isBitPerfectEnabled
                       ? _showBitPerfectBlockedDialog(
                           context,
-                          'Format Strategy',
-                          'Format strategy is disabled in Bit-perfect (USB DAC) mode because exact sample rate matching is required. Disable Bit-perfect (USB DAC) to change format preferences.',
+                          l10n.formatStrategy,
+                          l10n.formatStrategyIsDisabledInBit,
                         )
                       : _showBitPerfectBlockedDialog(
                           context,
-                          'Format Strategy',
-                          'Format strategy is unavailable because Audio Format is disabled in Settings.',
+                          l10n.formatStrategy,
+                          l10n.formatStrategyIsUnavailableBecauseAudio,
                         )
                   : () => _showFormatPreferenceDialog(
                       context,
@@ -263,27 +264,27 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
             data: (format) => _buildNavigationTile(
               context,
               icon: LucideIcons.music,
-              title: 'Custom Format',
+              title: l10n.customFormat,
               subtitle: formatBlocked
                   ? isBitPerfectEnabled
-                      ? 'Disabled in Bit-perfect (USB DAC) mode (exact rate required)'
-                      : 'Audio Format is disabled'
+                      ? l10n.disabledInBitPerfectUsbDac
+                      : l10n.audioFormatIsDisabled
                   : format != null
                   ? format.isDsdStream
-                        ? '${format.displayRateLabel} / ${format.channels}ch'
-                        : '${format.sampleRate ~/ 1000}kHz / ${format.bitDepth}bit / ${format.channels}ch'
-                  : 'Not set',
+                        ? l10n.ch3(format.displayRateLabel, format.channels)
+                        : l10n.khzBitCh(format.sampleRate ~/ 1000, format.bitDepth, format.channels)
+                  : l10n.notSet,
               onTap: formatBlocked
                   ? () => isBitPerfectEnabled
                       ? _showBitPerfectBlockedDialog(
                           context,
-                          'Custom Format',
-                          'Custom format is disabled in Bit-perfect (USB DAC) mode because exact sample rate matching is required. Disable Bit-perfect (USB DAC) to set custom formats.',
+                          l10n.customFormat,
+                          l10n.customFormatIsDisabledInBit,
                         )
                       : _showBitPerfectBlockedDialog(
                           context,
-                          'Custom Format',
-                          'Custom format is unavailable because Audio Format is disabled in Settings.',
+                          l10n.customFormat,
+                          l10n.customFormatIsUnavailableBecauseAudio,
                         )
                   : () => _showCustomFormatDialog(context, service, format),
               isDisabled: formatBlocked,
@@ -321,7 +322,7 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
             data: (engine) => _buildNavigationTile(
               context,
               icon: LucideIcons.audioLines,
-              title: 'Playback Engine',
+              title: l10n.playbackEngine,
               subtitle: _audioEnginePreferenceSubtitle(engine),
                onTap: () => _showAudioEngineDialog(
                  context,
@@ -343,7 +344,7 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
               data: (pref) => _buildNavigationTile(
                 context,
                 icon: LucideIcons.circuitBoard,
-                title: 'Android Audio API',
+                title: l10n.androidAudioApi,
                 subtitle: _androidAudioApiSubtitle(pref),
                 onTap: () => _showAndroidAudioApiDialog(context, service, pref),
               ),
@@ -356,9 +357,9 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
             data: (enabled) => _buildSwitchTile(
               context,
               icon: LucideIcons.badgeInfo,
-              title: 'Developer Mode',
+              title: l10n.developerMode,
               subtitle:
-                  'Show verbose audio diagnostics and engine/session trace logs.',
+                  l10n.showVerboseAudioDiagnosticsAndEngine,
               value: enabled,
               onChanged: (value) async {
                 await service.setDeveloperModeEnabled(value);
@@ -375,8 +376,8 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
                     _buildNavigationTile(
                       context,
                       icon: LucideIcons.terminal,
-                      title: 'Logs',
-                      subtitle: 'Verbose Dart, Rust, and crash logs',
+                      title: l10n.logs,
+                      subtitle: l10n.verboseDartRustAndCrashLogs,
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => const LogsScreen(),
@@ -394,9 +395,9 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
             data: (enabled) => _buildSwitchTile(
               context,
               icon: LucideIcons.lock,
-              title: 'Bit-perfect (USB DAC)',
+              title: l10n.bitPerfectUsbDac,
               subtitle:
-                  'Use the verified direct USB path and disable software DSP controls that would break bit-perfect playback on an external USB DAC.',
+                  l10n.useTheVerifiedDirectUsbPath,
               value: enabled,
               onChanged: (value) async {
                 final changed = value != enabled;
@@ -421,9 +422,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                 }
                 if (!applied && value) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
-                        'Bit-perfect (USB DAC) could not be enabled. Check the USB diagnostics for the failure reason.',
+                        l10n.bitPerfectUsbDacCouldNot,
                       ),
                     ),
                   );
@@ -432,11 +433,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                 if (changed) {
                   if (value && EqEngineHint.parametricPeqActive) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
-                          'Bit-perfect enabled — parametric EQ is bypassed on '
-                          'the direct USB path. Restart the app to apply '
-                          'playback changes.',
+                          l10n.bitPerfectEnabledParametricEqIs,
                         ),
                         behavior: SnackBarBehavior.floating,
                       ),
@@ -456,9 +455,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               data: (enabled) => _buildSwitchTile(
                 context,
                 icon: LucideIcons.headphones,
-                title: 'Bit-perfect (DAP Internal)',
+                title: l10n.bitPerfectDapInternal,
                 subtitle:
-                    'Bypass all DSP (EQ, dynamics, crossfade, speed) on the native DAP internal high-res path. Disable to use software effects. Turning off Bit-perfect (USB DAC) also disables this.',
+                    l10n.bypassAllDspEqDynamicsCrossfade,
                 value: enabled,
                 onChanged: (value) async {
                   await PlayerService().setDapBitPerfectEnabled(value);
@@ -470,8 +469,8 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                     SnackBar(
                       content: Text(
                         value
-                            ? 'Bit-perfect (DAP Internal) enabled — all DSP bypassed.'
-                            : 'Bit-perfect (DAP Internal) disabled — software effects active.',
+                            ? l10n.bitPerfectDapInternalEnabledAll
+                            : l10n.bitPerfectDapInternalDisabledSoftware,
                       ),
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -488,9 +487,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             data: (enabled) => _buildSwitchTile(
               context,
               icon: LucideIcons.zap,
-              title: 'Auto Bit-perfect for USB DACs',
+              title: l10n.autoBitPerfectForUsbDacs,
               subtitle:
-                  'Switch to the exclusive USB path automatically when a DAC is attached. Declined DACs are remembered.',
+                  l10n.switchToTheExclusiveUsbPath,
               value: enabled,
               onChanged: (value) async {
                 await service.setAutoEngageUsbDacEnabled(value);
@@ -509,17 +508,17 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                       _buildNavigationTile(
                         context,
                         icon: LucideIcons.rotateCcw,
-                        title: 'Reset Declined USB DACs',
+                        title: l10n.resetDeclinedUsbDacs,
                         subtitle:
-                            '${declined.length} DAC${declined.length == 1 ? '' : 's'} will be offered again.',
+                            l10n.dacWillBeOfferedAgain(declined.length),
                         onTap: () async {
                           await service.clearDeclinedUsbDevices();
                           ref.invalidate(declinedUsbDevicesProvider);
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
-                                  'USB DAC auto bit-perfect offers reset.',
+                                  l10n.usbDacAutoBitPerfectOffers,
                                 ),
                                 behavior: SnackBarBehavior.floating,
                               ),
@@ -536,10 +535,10 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             data: (killOnQuit) => _buildSwitchTile(
               context,
               icon: LucideIcons.power,
-              title: 'Stop USB on Quit',
+              title: l10n.stopUsbOnQuit,
               subtitle: killOnQuit
-                  ? 'The Isochronous USB engine will be stopped when the app quits.'
-                  : 'The Isochronous USB engine will stay alive when the app quits.',
+                  ? l10n.theIsochronousUsbEngineWillBe
+                  : l10n.theIsochronousUsbEngineWillStay,
               value: killOnQuit,
               onChanged: (value) async {
                 await service.setKillIsochronousUsbOnQuit(value);
@@ -554,8 +553,8 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
           _buildNavigationTile(
             context,
             icon: LucideIcons.trash2,
-            title: 'Reset Preferences',
-            subtitle: 'Clear all UAC2 settings',
+            title: l10n.resetPreferences,
+            subtitle: l10n.clearAllUac2Settings,
             onTap: () => _showResetConfirmation(context, service),
             isDestructive: true,
           ),
@@ -626,17 +625,17 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
 
   String _audioEnginePreferenceSubtitle(AudioEnginePreference engine) {
     return switch (engine) {
-      AudioEnginePreference.exoPlayer => 'just_audio / ExoPlayer (default)',
-      AudioEnginePreference.rustOboe => 'Rust via Oboe',
-      AudioEnginePreference.isochronousUsb => 'Isochronous USB',
+      AudioEnginePreference.exoPlayer => l10n.justAudioExoplayerDefault,
+      AudioEnginePreference.rustOboe => l10n.rustViaOboe,
+      AudioEnginePreference.isochronousUsb => l10n.isochronousUsb,
     };
   }
 
   String _androidAudioApiSubtitle(AudioApiPreference pref) {
     return switch (pref) {
-      AudioApiPreference.auto => 'AAudio with OpenSL ES fallback (default)',
-      AudioApiPreference.aAudio => 'AAudio (Android 8.1+)',
-      AudioApiPreference.openSles => 'OpenSL ES (legacy)',
+      AudioApiPreference.auto => l10n.aaudioWithOpenslEsFallbackDefault,
+      AudioApiPreference.aAudio => l10n.aaudioAndroid81,
+      AudioApiPreference.openSles => l10n.openslEsLegacy,
     };
   }
 
@@ -647,19 +646,19 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   ) async {
     await showFlickDialog<void>(
       context: context,
-      barrierLabel: 'Android Audio API',
+      barrierLabel: l10n.androidAudioApi,
       builder: (dialogContext) {
         return FlickDialog(
-          title: 'Android Audio API',
+          title: l10n.androidAudioApi,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildAudioEngineOption(
                 dialogContext,
-                title: 'Auto',
+                title: l10n.auto,
                 subtitle:
-                    'Let Oboe pick the best API. AAudio first, then OpenSL ES fallback.',
+                    l10n.letOboePickTheBestApi,
                 selected: current == AudioApiPreference.auto,
                 onTap: () async {
                   final changed = current != AudioApiPreference.auto;
@@ -677,9 +676,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               const SizedBox(height: AppConstants.spacingSm),
               _buildAudioEngineOption(
                 dialogContext,
-                title: 'AAudio',
+                title: l10n.aaudio,
                 subtitle:
-                    'Use AAudio directly. Lowest latency on Android 8.1 and newer.',
+                    l10n.useAaudioDirectlyLowestLatencyOn,
                 selected: current == AudioApiPreference.aAudio,
                 onTap: () async {
                   final changed = current != AudioApiPreference.aAudio;
@@ -697,9 +696,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               const SizedBox(height: AppConstants.spacingSm),
               _buildAudioEngineOption(
                 dialogContext,
-                title: 'OpenSL ES',
+                title: l10n.openslEs,
                 subtitle:
-                    'Use the legacy OpenSL ES backend. Troubleshooting fallback for older or problematic devices.',
+                    l10n.useTheLegacyOpenslEsBackend,
                 selected: current == AudioApiPreference.openSles,
                 onTap: () async {
                   final changed = current != AudioApiPreference.openSles;
@@ -741,10 +740,10 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
 
     await showFlickDialog<void>(
       context: context,
-      barrierLabel: 'Playback Engine',
+      barrierLabel: l10n.playbackEngine,
       builder: (dialogContext) {
         return FlickDialog(
-          title: 'Playback Engine',
+          title: l10n.playbackEngine,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -755,13 +754,13 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               ],
               _buildAudioEngineOption(
                 dialogContext,
-                title: 'just_audio / ExoPlayer',
+                title: l10n.justAudioExoplayer,
                 subtitle: dapBothOff
-                    ? 'Disabled while both bit-perfect options are off on this DAP.'
-                    : 'Default Android playback engine used by Flick right now.',
+                    ? l10n.disabledWhileBothBitPerfectOptions
+                    : l10n.defaultAndroidPlaybackEngineUsedBy,
                 selected: effective == AudioEnginePreference.exoPlayer,
                 enabled: !dapBothOff,
-                badgeText: dapBothOff ? 'Locked' : null,
+                badgeText: dapBothOff ? l10n.locked : null,
                 onTap: dapBothOff
                     ? null
                     : () async {
@@ -791,13 +790,13 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               const SizedBox(height: AppConstants.spacingSm),
               _buildAudioEngineOption(
                 dialogContext,
-                title: 'Rust via Oboe',
+                title: l10n.rustViaOboe,
                 subtitle: dapBothOff
-                    ? 'Keeps software volume and DSP active on the DAP shared path.'
-                    : 'Android-managed Rust playback path using the native Oboe backend.',
+                    ? l10n.keepsSoftwareVolumeAndDspActive
+                    : l10n.androidManagedRustPlaybackPathUsing,
                 selected: effective == AudioEnginePreference.rustOboe,
                 badgeText:
-                    (dapBothOff && effective != current) ? 'Active' : null,
+                    (dapBothOff && effective != current) ? l10n.active : null,
                 onTap: () async {
                   final wasBitPerfectEnabled =
                       await service.getBitPerfectEnabled();
@@ -825,9 +824,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               const SizedBox(height: AppConstants.spacingSm),
               _buildAudioEngineOption(
                 dialogContext,
-                title: 'Isochronous USB',
+                title: l10n.isochronousUsb,
                 subtitle:
-                    'Direct libusb isochronous USB engine. Best paired with Bit-perfect (USB DAC) for verified external DAC playback.',
+                    l10n.directLibusbIsochronousUsbEngineBest,
                 selected: effective == AudioEnginePreference.isochronousUsb,
                 onTap: () async {
                   await PlayerService().setAudioEnginePreference(
@@ -870,7 +869,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
           const SizedBox(width: AppConstants.spacingSm),
           Expanded(
             child: Text(
-              'Both bit-perfect options are off on this DAP, so the standard engine is unavailable. You can still use Rust via Oboe or Isochronous USB.',
+              l10n.bothBitPerfectOptionsAreOff,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.adaptiveTextSecondary,
                 height: 1.35,
@@ -985,8 +984,8 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
     final messenger = ScaffoldMessenger.of(context);
     messenger.removeCurrentSnackBar();
     messenger.showSnackBar(
-      const SnackBar(
-        content: Text('Restart the app to apply playback changes.'),
+      SnackBar(
+        content: Text(l10n.restartTheAppToApplyPlayback),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -996,8 +995,8 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
     final messenger = ScaffoldMessenger.of(context);
     messenger.removeCurrentSnackBar();
     messenger.showSnackBar(
-      const SnackBar(
-        content: Text('Restart your device to apply output format changes.'),
+      SnackBar(
+        content: Text(l10n.restartYourDeviceToApplyOutput),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -1042,17 +1041,17 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
     final modeLabel = _currentPlaybackModeLabel(diagnostics);
     final modeDescription = switch (diagnostics?.pathManagement) {
       AudioPathManagement.directUsbExperimental =>
-        'Exclusive USB is active and bypassing the Android mixer.',
+        l10n.exclusiveUsbIsActiveAndBypassing,
       AudioPathManagement.alsaDirectDap =>
-        'Direct ALSA output is active and bypassing the Android audio server.',
+        l10n.directAlsaOutputIsActiveAnd,
       AudioPathManagement.managedDirectExclusive =>
-        'Exclusive direct PCM is active and bypassing the Android mixer at the track\'s native rate.',
+        l10n.exclusiveDirectPcmIsActiveAnd,
       AudioPathManagement.androidManagedLowLatency =>
-        'Playback is using Android-managed output and may be resampled.',
+        l10n.playbackIsUsingAndroidManagedOutput,
       AudioPathManagement.androidManagedShared =>
-        'Playback is using the standard Android output path.',
+        l10n.playbackIsUsingTheStandardAndroid,
       null =>
-        'Playback mode will update after the next route or playback refresh.',
+        l10n.playbackModeWillUpdateAfterThe,
     };
 
     return Padding(
@@ -1077,7 +1076,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Current Playback Mode',
+                  l10n.currentPlaybackMode,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
                     fontWeight: FontWeight.w500,
@@ -1107,7 +1106,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   }
 
   String _currentPlaybackModeLabel(AudioOutputDiagnostics? diagnostics) {
-    return diagnostics?.capabilityStateLabel ?? 'Waiting for playback';
+    return diagnostics?.capabilityStateLabel ?? l10n.waitingForPlayback;
   }
 
   Widget _buildNavigationTile(
@@ -1195,7 +1194,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
     return Padding(
       padding: const EdgeInsets.all(AppConstants.spacingMd),
       child: Text(
-        'Error loading preference',
+        l10n.errorLoadingPreference,
         style: TextStyle(color: Colors.red.shade400),
       ),
     );
@@ -1208,11 +1207,11 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   String _getFormatPreferenceLabel(Uac2FormatPreference pref) {
     switch (pref) {
       case Uac2FormatPreference.highestQuality:
-        return 'Highest Quality';
+        return l10n.highestQuality;
       case Uac2FormatPreference.compatibility:
-        return 'Compatibility';
+        return l10n.compatibility;
       case Uac2FormatPreference.custom:
-        return 'Custom';
+        return l10n.custom;
     }
   }
 
@@ -1223,22 +1222,22 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   ) {
     showFlickDialog<void>(
       context: context,
-      barrierLabel: 'Format Strategy',
+      barrierLabel: l10n.formatStrategy,
       builder: (context) => FlickDialog(
-        title: 'Format Strategy',
+        title: l10n.formatStrategy,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildFormatWarningCallout(
               context,
-              'Changing sample rate, bit depth, or channel handling can resample songs and may affect playback quality, pitch, speed, or stability on some devices.',
+              l10n.changingSampleRateBitDepthOr,
             ),
             const SizedBox(height: AppConstants.spacingMd),
             _buildFormatOption(
               context,
               Uac2FormatPreference.highestQuality,
-              'Highest Quality',
-              'Use the highest fixed output rate and bit depth available',
+              l10n.highestQuality,
+              l10n.useTheHighestFixedOutputRate,
               current,
               service,
             ),
@@ -1246,8 +1245,8 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             _buildFormatOption(
               context,
               Uac2FormatPreference.compatibility,
-              'Compatibility',
-              'Use a fixed 48kHz/16bit output for better compatibility',
+              l10n.compatibility,
+              l10n.useAFixed48khz16bitOutput,
               current,
               service,
             ),
@@ -1255,7 +1254,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             _buildFormatOption(
               context,
               Uac2FormatPreference.custom,
-              'Custom',
+              l10n.custom,
               'Use your selected fixed sample rate, bit depth, and channels',
               current,
               service,
@@ -1302,21 +1301,21 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
 
     showFlickDialog<void>(
       context: context,
-      barrierLabel: 'Custom Format',
+      barrierLabel: l10n.customFormat,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setState) => FlickDialog(
-          title: 'Custom Format',
+          title: l10n.customFormat,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildFormatWarningCallout(
                 context,
-                'Custom format forces playback to the selected output format. If the chosen sample rate, bit depth, or channels do not suit the song or device, you may hear altered sound, pitch, speed, or instability.',
+                l10n.customFormatForcesPlaybackToThe,
               ),
               const SizedBox(height: AppConstants.spacingMd),
               Text(
-                'Sample Rate',
+                l10n.sampleRate2,
                 style: TextStyle(
                   color: context.adaptiveTextSecondary,
                   fontWeight: FontWeight.w600,
@@ -1337,7 +1336,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                       384000,
                     ].map((rate) {
                       return ChoiceChip(
-                        label: Text('${rate ~/ 1000}kHz'),
+                        label: Text(l10n.khz(rate ~/ 1000)),
                         selected: sampleRate == rate,
                         onSelected: (selected) {
                           if (selected) setState(() => sampleRate = rate);
@@ -1347,7 +1346,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               ),
               const SizedBox(height: AppConstants.spacingMd),
               Text(
-                'Bit Depth',
+                l10n.bitDepth2,
                 style: TextStyle(
                   color: context.adaptiveTextSecondary,
                   fontWeight: FontWeight.w600,
@@ -1358,7 +1357,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                 spacing: 8,
                 children: [16, 24, 32].map((depth) {
                   return ChoiceChip(
-                    label: Text('${depth}bit'),
+                    label: Text(l10n.bit(depth)),
                     selected: bitDepth == depth,
                     onSelected: (selected) {
                       if (selected) setState(() => bitDepth = depth);
@@ -1368,7 +1367,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
               ),
               const SizedBox(height: AppConstants.spacingMd),
               Text(
-                'Channels',
+                l10n.channels,
                 style: TextStyle(
                   color: context.adaptiveTextSecondary,
                   fontWeight: FontWeight.w600,
@@ -1379,7 +1378,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                 spacing: 8,
                 children: [1, 2].map((ch) {
                   return ChoiceChip(
-                    label: Text(ch == 1 ? 'Mono' : 'Stereo'),
+                    label: Text(ch == 1 ? l10n.mono : l10n.stereo),
                     selected: channels == ch,
                     onSelected: (selected) {
                       if (selected) setState(() => channels = ch);
@@ -1391,11 +1390,11 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
           ),
           actions: [
             FlickDialogButton(
-              label: 'Cancel',
+              label: l10n.cancel,
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             FlickDialogButton(
-              label: 'Save',
+              label: l10n.save,
               style: FlickDialogButtonStyle.primary,
               onPressed: () async {
                 final formatChanged =
@@ -1435,10 +1434,10 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
     unawaited(
       FlickDialogs.confirm(
         context,
-        title: 'Reset Preferences',
+        title: l10n.resetPreferences,
         message:
-            'Are you sure you want to reset all UAC2 preferences? This action cannot be undone.',
-        confirmLabel: 'Reset',
+            l10n.areYouSureYouWantTo3,
+        confirmLabel: l10n.reset,
         destructive: true,
       ).then((confirmed) async {
         if (!confirmed) return;
@@ -1452,8 +1451,8 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
         ref.invalidate(uac2ExclusiveDacModeProvider);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('UAC2 preferences reset successfully'),
+            SnackBar(
+              content: Text(l10n.uac2PreferencesResetSuccessfully),
             ),
           );
         }
@@ -1468,9 +1467,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   ) {
     showFlickDialog<void>(
       context: context,
-      barrierLabel: '$featureName Unavailable',
+      barrierLabel: l10n.unavailable(featureName),
       builder: (dialogContext) => FlickDialog(
-        title: '$featureName Unavailable',
+        title: l10n.unavailable(featureName),
         icon: Icons.warning_amber_rounded,
         iconColor: Colors.amber.shade300,
         content: Text(
@@ -1505,7 +1504,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             data: (mode) => _buildNavigationTile(
               context,
               icon: LucideIcons.radio,
-              title: 'DSD Output Mode',
+              title: l10n.dsdOutputMode,
               subtitle: _dsdOutputModeSubtitle(mode),
               onTap: () => _showDsdOutputModeDialog(context, service, mode),
             ),
@@ -1518,7 +1517,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             builder: (context, variant, _) => _buildNavigationTile(
               context,
               icon: LucideIcons.binary,
-              title: 'DAP Native Bit Order',
+              title: l10n.dapNativeBitOrder,
               subtitle: _dsdWireVariantSubtitle(variant),
               onTap: () => _showDsdWireVariantDialog(context, service, variant),
             ),
@@ -1529,7 +1528,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             builder: (context, grouping, _) => _buildNavigationTile(
               context,
               icon: LucideIcons.columns2,
-              title: 'DAP Native Byte Grouping',
+              title: l10n.dapNativeByteGrouping,
               subtitle: _dsdWireGroupingSubtitle(grouping),
               onTap: () => _showDsdWireGroupingDialog(context, service, grouping),
             ),
@@ -1554,9 +1553,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
         data: (enabled) => _buildSwitchTile(
           context,
           icon: LucideIcons.music2,
-          title: '432 Hz Tuning',
+          title: l10n.hzTuning,
           subtitle:
-              'Experimental — down-tune playback by 432/440. This disables bit-perfect passthrough and runs the DSP path.',
+              l10n.experimentalDownTunePlaybackBy432,
           value: enabled,
           onChanged: (value) async {
             if (value && !enabled && !_awaiting432HzConfirm) {
@@ -1581,12 +1580,10 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
     _awaiting432HzConfirm = true;
     return FlickDialogs.confirm(
       context,
-      title: 'Enable 432 Hz Tuning?',
+      title: l10n.enable432HzTuning,
       message:
-          'This slows playback to 432/440 (~1.8% lower pitch and tempo) and '
-          'disables bit-perfect passthrough. Music will sound slightly lower '
-          'in tone. Only enable this if you intentionally want A=432 tuning.',
-      confirmLabel: 'Enable',
+          l10n.thisSlowsPlaybackTo432440,
+      confirmLabel: l10n.enable,
       icon: Icons.warning_amber_rounded,
       iconColor: Colors.amber,
     ).then((result) {
@@ -1617,7 +1614,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             const SizedBox(width: AppConstants.spacingSm),
             Expanded(
               child: Text(
-                'Not recommended for normal usage. DSD playback is unstable and may cause audio glitches.',
+                l10n.notRecommendedForNormalUsageDsd,
                 style: TextStyle(
                   color: warnColor.withValues(alpha: 0.9),
                   fontSize: 12,
@@ -1634,13 +1631,13 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   String _dsdOutputModeSubtitle(DsdOutputMode mode) {
     switch (mode) {
       case DsdOutputMode.auto:
-        return 'Auto — Native DSD on DAPs, DoP for USB DACs, PCM otherwise';
+        return l10n.autoNativeDsdOnDapsDop;
       case DsdOutputMode.forcePcm:
-        return 'Force PCM — Always convert DSD to PCM';
+        return l10n.forcePcmAlwaysConvertDsdTo;
       case DsdOutputMode.forceDop:
-        return 'Force DoP — Always use DSD over PCM (USB DAC)';
+        return l10n.forceDopAlwaysUseDsdOver;
       case DsdOutputMode.native:
-        return 'Native DSD — Experimental (may be buggy)';
+        return l10n.nativeDsdExperimentalMayBeBuggy;
     }
   }
 
@@ -1652,16 +1649,16 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   ) {
     showFlickDialog<void>(
       context: context,
-      barrierLabel: 'DSD Output Mode',
+      barrierLabel: l10n.dsdOutputMode,
       builder: (dialogContext) => FlickDialog(
-        title: 'DSD Output Mode',
+        title: l10n.dsdOutputMode,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildDsdOptionTile(
               dialogContext,
-              title: 'Auto',
-              subtitle: 'Coming Soon',
+              title: l10n.auto,
+              subtitle: l10n.comingSoon,
               enabled: false,
               selected: false,
               onTap: () {},
@@ -1669,8 +1666,8 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             const SizedBox(height: AppConstants.spacingSm),
             _buildDsdOptionTile(
               dialogContext,
-              title: 'Force PCM',
-              subtitle: 'Coming Soon',
+              title: l10n.forcePcm,
+              subtitle: l10n.comingSoon,
               enabled: false,
               selected: false,
               onTap: () {},
@@ -1678,8 +1675,8 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             const SizedBox(height: AppConstants.spacingSm),
             _buildDsdOptionTile(
               dialogContext,
-              title: 'Force DoP',
-              subtitle: 'Coming Soon',
+              title: l10n.forceDop,
+              subtitle: l10n.comingSoon,
               enabled: false,
               selected: false,
               onTap: () {},
@@ -1687,10 +1684,9 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
             const SizedBox(height: AppConstants.spacingSm),
             _buildDsdOptionTile(
               dialogContext,
-              title: 'Native DSD (Experimental)',
+              title: l10n.nativeDsdExperimental,
               subtitle:
-                  'Raw DSD stream to DAC. Requires ENCODING_DSD hardware support; '
-                  'otherwise falls back to DoP or PCM automatically.',
+                  l10n.rawDsdStreamToDacRequires,
               selected: current == DsdOutputMode.native,
               onTap: () async {
                 await service.setDsdOutputMode(DsdOutputMode.native);
@@ -1702,7 +1698,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
         ),
         actions: [
           FlickDialogButton(
-            label: 'Cancel',
+            label: l10n.cancel,
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
         ],
@@ -1713,28 +1709,28 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   String _dsdWireVariantSubtitle(DsdWireVariant variant) {
     switch (variant) {
       case DsdWireVariant.auto:
-        return 'Auto — BE-MSB default; only change if native DSD hisses';
+        return l10n.autoBeMsbDefaultOnlyChange;
       case DsdWireVariant.beMsb:
-        return 'BE-MSB — big-endian subslot, MSB first (default)';
+        return l10n.beMsbBigEndianSubslotMsb;
       case DsdWireVariant.leMsb:
-        return 'LE-MSB — little-endian subslot, MSB first';
+        return l10n.leMsbLittleEndianSubslotMsb;
       case DsdWireVariant.beLsb:
-        return 'BE-LSB — big-endian subslot, LSB first';
+        return l10n.beLsbBigEndianSubslotLsb;
       case DsdWireVariant.leLsb:
-        return 'LE-LSB — little-endian subslot, LSB first';
+        return l10n.leLsbLittleEndianSubslotLsb;
     }
   }
 
   String _dsdWireGroupingSubtitle(DsdWireGrouping grouping) {
     switch (grouping) {
       case DsdWireGrouping.auto:
-        return 'Auto — U8 byte-interleaved (recommended)';
+        return l10n.autoU8ByteInterleavedRecommended;
       case DsdWireGrouping.u32:
-        return 'U32 — 4-byte subslots, LLLL|RRRR (legacy)';
+        return l10n.u324ByteSubslotsLlllRrrr;
       case DsdWireGrouping.u16:
-        return 'U16 — 2-byte subslots, LL|RR';
+        return l10n.u162ByteSubslotsLlRr;
       case DsdWireGrouping.u8:
-        return 'U8 — byte-interleaved LRLR';
+        return l10n.u8ByteInterleavedLrlr;
     }
   }
 
@@ -1745,32 +1741,32 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   ) {
     showFlickDialog<void>(
       context: context,
-      barrierLabel: 'DAP Native Byte Grouping',
+      barrierLabel: l10n.dapNativeByteGrouping,
       builder: (dialogContext) => FlickDialog(
-        title: 'DAP Native Byte Grouping',
+        title: l10n.dapNativeByteGrouping,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             for (final (grouping, title, subtitle) in [
               (
                 DsdWireGrouping.auto,
-                'Auto',
-                'U8 — byte-interleaved, recommended default'
+                l10n.auto,
+                l10n.u8ByteInterleavedRecommendedDefault
               ),
               (
                 DsdWireGrouping.u32,
                 'U32',
-                '32-bit subslots: LLLL|RRRR per frame (legacy)'
+                l10n.bitSubslotsLlllRrrrPer
               ),
               (
                 DsdWireGrouping.u16,
                 'U16',
-                '16-bit subslots: LL|RR per frame'
+                l10n.bitSubslotsLlRrPer
               ),
               (
                 DsdWireGrouping.u8,
                 'U8',
-                'Byte-interleaved: LRLR stream'
+                l10n.byteInterleavedLrlrStream
               ),
             ]) ...[
               _buildDsdOptionTile(
@@ -1799,7 +1795,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
         ),
         actions: [
           FlickDialogButton(
-            label: 'Cancel',
+            label: l10n.cancel,
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
         ],
@@ -1814,37 +1810,37 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
   ) {
     showFlickDialog<void>(
       context: context,
-      barrierLabel: 'DAP Native Bit Order',
+      barrierLabel: l10n.dapNativeBitOrder,
       builder: (dialogContext) => FlickDialog(
-        title: 'DAP Native Bit Order',
+        title: l10n.dapNativeBitOrder,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             for (final (variant, title, subtitle) in [
               (
                 DsdWireVariant.auto,
-                'Auto',
-                'BE-MSB packing — the default wire convention'
+                l10n.auto,
+                l10n.beMsbPackingTheDefaultWire
               ),
               (
                 DsdWireVariant.beMsb,
                 'BE-MSB',
-                'Big-endian 32-bit subslot, MSB-first bits'
+                l10n.bigEndian32BitSubslotMsb
               ),
               (
                 DsdWireVariant.leMsb,
                 'LE-MSB',
-                'Little-endian subslot, MSB-first bits'
+                l10n.littleEndianSubslotMsbFirstBits
               ),
               (
                 DsdWireVariant.beLsb,
                 'BE-LSB',
-                'Big-endian subslot, LSB-first (bit-reversed) bits'
+                l10n.bigEndianSubslotLsbFirstBit
               ),
               (
                 DsdWireVariant.leLsb,
                 'LE-LSB',
-                'Little-endian subslot, LSB-first bits'
+                l10n.littleEndianSubslotLsbFirstBits
               ),
             ]) ...[
               _buildDsdOptionTile(
@@ -1874,7 +1870,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
         ),
         actions: [
           FlickDialogButton(
-            label: 'Cancel',
+            label: l10n.cancel,
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
         ],

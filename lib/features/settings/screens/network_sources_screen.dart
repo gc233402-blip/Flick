@@ -12,6 +12,7 @@ import '../../../services/library_scanner_service.dart' show ScanProgress;
 import '../../../services/sources/network_source_service.dart';
 import '../widgets/settings_widgets.dart';
 import 'network_server_edit_screen.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Manage configured network music servers (Subsonic, Jellyfin, WebDAV,
 /// UPnP/DLNA, SMB, Tidal).
@@ -107,13 +108,12 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
             duration: const Duration(seconds: 6),
             content: Text(
               authFailure
-                  ? 'Credentials rejected by ${server.label}. '
-                      'Re-enter the password.'
-                  : 'Sync failed: $e',
+                  ? l10n.credentialsRejectedByReEnterThe(server.label)
+                  : l10n.syncFailed(e),
             ),
             action: authFailure
                 ? SnackBarAction(
-                    label: 'Fix',
+                    label: l10n.fix,
                     onPressed: () => _openEditor(server: server),
                   )
                 : null,
@@ -133,7 +133,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
   @override
   Widget build(BuildContext context) {
     return SettingsScaffold(
-      title: 'Network Sources',
+      title: l10n.networkSources,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -151,8 +151,8 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
             const SizedBox(height: AppConstants.spacingMd),
             ActionButton(
               icon: LucideIcons.plus,
-              title: 'Add Server',
-              subtitle: 'Connect a music server',
+              title: l10n.addServer,
+              subtitle: l10n.connectAMusicServer,
               onTap: () => _openEditor(),
             ),
           ],
@@ -187,7 +187,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
             ),
             const SizedBox(height: AppConstants.spacingLg),
             Text(
-              'No servers connected',
+              l10n.noServersConnected,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: context.adaptiveTextPrimary,
@@ -196,8 +196,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
             ),
             const SizedBox(height: AppConstants.spacingXs),
             Text(
-              'Connect a Subsonic, Jellyfin, WebDAV, UPnP, or Tidal server to '
-              'stream your remote library.',
+              l10n.connectASubsonicJellyfinWebdavUpnp,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.adaptiveTextTertiary,
@@ -210,7 +209,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
               child: FilledButton.icon(
                 onPressed: () => _openEditor(),
                 icon: const Icon(LucideIcons.plus, size: 18),
-                label: const Text('Add Server'),
+                label: Text(l10n.addServer),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -282,7 +281,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
                   ),
                   if (!isSyncing)
                     IconButton(
-                      tooltip: 'Sync now',
+                      tooltip: l10n.syncNow,
                       onPressed: () {
                         AppHaptics.tap();
                         _syncServer(server);
@@ -315,7 +314,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
     final synced = server.lastSyncedAt;
     final parts = <String>[
       if (songCount > 0) '$songCount ${songCount == 1 ? 'song' : 'songs'}',
-      synced == null ? 'Never synced' : 'Synced ${_formatDate(synced)}',
+      synced == null ? l10n.neverSynced : l10n.synced2(_formatDate(synced)),
     ];
     return Row(
       children: [
@@ -362,7 +361,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                p?.phase ?? 'Syncing…',
+                p?.phase ?? l10n.syncing,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.adaptiveAccent,
@@ -403,7 +402,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
         if ((p?.songsFound ?? 0) > 0) ...[
           const SizedBox(height: 4),
           Text(
-            '${p!.songsFound} songs found',
+            l10n.songsFound(p!.songsFound),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: context.adaptiveTextTertiary,
             ),

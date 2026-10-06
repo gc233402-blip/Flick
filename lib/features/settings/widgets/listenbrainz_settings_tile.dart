@@ -7,6 +7,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/providers/listenbrainz_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Self-contained ListenBrainz connect/disconnect tile.
 class ListenBrainzSettingsTile extends ConsumerStatefulWidget {
@@ -92,7 +93,7 @@ class _ListenBrainzSettingsTileState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Disconnect ListenBrainz?',
+                          l10n.disconnectListenbrainz,
                           style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
                             color: context.adaptiveTextPrimary,
                             fontWeight: FontWeight.w600,
@@ -133,7 +134,7 @@ class _ListenBrainzSettingsTileState
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Your listens will remain on ListenBrainz, but Flick will stop submitting them.',
+                            l10n.yourListensWillRemainOnListenbrainz,
                             style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
                               color: context.adaptiveTextSecondary,
                               height: 1.4,
@@ -163,8 +164,8 @@ class _ListenBrainzSettingsTileState
                               ),
                             ),
                           ),
-                          child: const Text(
-                            'Cancel',
+                          child: Text(
+                            l10n.cancel,
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -184,8 +185,8 @@ class _ListenBrainzSettingsTileState
                               ),
                             ),
                           ),
-                          child: const Text(
-                            'Disconnect',
+                          child: Text(
+                            l10n.disconnect,
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -256,7 +257,7 @@ class _ListenBrainzSettingsTileState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'ListenBrainz Connected',
+                          l10n.listenbrainzConnected,
                           style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
                             color: context.adaptiveTextPrimary,
                             fontWeight: FontWeight.w600,
@@ -264,7 +265,7 @@ class _ListenBrainzSettingsTileState
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Your music is being submitted',
+                          l10n.yourMusicIsBeingSubmitted,
                           style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
                             color: context.adaptiveTextSecondary,
                           ),
@@ -315,7 +316,7 @@ class _ListenBrainzSettingsTileState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Connected Account',
+                                l10n.connectedAccount,
                                 style: Theme.of(ctx).textTheme.bodySmall
                                     ?.copyWith(
                                       color: context.adaptiveTextSecondary,
@@ -345,7 +346,7 @@ class _ListenBrainzSettingsTileState
                         _showTokenDialog();
                       },
                       icon: const Icon(Icons.edit, size: 18),
-                      label: const Text('Edit Token'),
+                      label: Text(l10n.editToken),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: BorderSide(
@@ -371,7 +372,7 @@ class _ListenBrainzSettingsTileState
                         _disconnect();
                       },
                       icon: const Icon(Icons.logout, size: 18),
-                      label: const Text('Disconnect'),
+                      label: Text(l10n.disconnect),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red.withValues(alpha: 0.1),
                         foregroundColor: Colors.red,
@@ -423,14 +424,14 @@ class _ListenBrainzSettingsTileState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'ListenBrainz',
+                  l10n.listenbrainz,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Loading session...',
+                  l10n.loadingSession,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),
@@ -447,8 +448,8 @@ class _ListenBrainzSettingsTileState
     return _buildTapTile(
       context,
       icon: Icons.error_outline,
-      title: 'ListenBrainz',
-      subtitle: 'Could not load session',
+      title: l10n.listenbrainz,
+      subtitle: l10n.couldNotLoadSession,
       onTap: _showTokenDialog,
       trailing: Icon(
         Icons.chevron_right,
@@ -462,8 +463,8 @@ class _ListenBrainzSettingsTileState
     return _buildTapTile(
       context,
       icon: Icons.radio_button_checked,
-      title: 'ListenBrainz',
-      subtitle: 'Connected as $username',
+      title: l10n.listenbrainz,
+      subtitle: l10n.connectedAs(username),
       onTap: () => _showConnectedBottomSheet(username),
       trailing: Icon(
         Icons.check_circle,
@@ -477,8 +478,8 @@ class _ListenBrainzSettingsTileState
     return _buildTapTile(
       context,
       icon: Icons.radio_button_unchecked,
-      title: 'ListenBrainz',
-      subtitle: 'Connect to submit your listening history',
+      title: l10n.listenbrainz,
+      subtitle: l10n.connectToSubmitYourListeningHistory,
       onTap: _showTokenDialog,
       trailing: Icon(
         Icons.chevron_right,
@@ -581,7 +582,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
     final token = widget.tokenController.text.trim();
 
     if (token.isEmpty) {
-      setState(() => _errorMessage = 'Please enter your ListenBrainz user token.');
+      setState(() => _errorMessage = l10n.pleaseEnterYourListenbrainzUserToken);
       return;
     }
 
@@ -595,8 +596,8 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('ListenBrainz connected!'),
+          SnackBar(
+            content: Text(l10n.listenbrainzConnected2),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -605,8 +606,8 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
       if (mounted) {
         final message = e.toString().contains('SocketException') ||
                 e.toString().contains('Failed host lookup')
-            ? 'No internet connection. Please check your network and try again.'
-            : 'Could not connect to ListenBrainz. Check your token and try again.';
+            ? l10n.noInternetConnectionPleaseCheckYour
+            : l10n.couldNotConnectToListenbrainzCheck;
         setState(() {
           _isConnecting = false;
           _errorMessage = message;
@@ -648,7 +649,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
               child: Text(
-                'Connect ListenBrainz',
+                l10n.connectListenbrainz,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: context.adaptiveTextPrimary,
                   fontWeight: FontWeight.w600,
@@ -659,7 +660,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
-                      'Copy your user token from ListenBrainz settings and paste it below.',
+                      l10n.copyYourUserTokenFromListenbrainz,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.adaptiveTextSecondary,
                         height: 1.4,
@@ -679,8 +680,8 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
                           );
                           if (!launched && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Could not open browser.'),
+                              SnackBar(
+                                content: Text(l10n.couldNotOpenBrowser),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );
@@ -689,7 +690,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Could not open link: $e'),
+                                content: Text(l10n.couldNotOpenLink2(e)),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );
@@ -714,7 +715,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Open listenbrainz.org/settings',
+                              l10n.openListenbrainzOrgSettings,
                               style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
                                     color: Theme.of(context).colorScheme.primary,
@@ -737,8 +738,8 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
                 autocorrect: false,
                 enableSuggestions: false,
                 decoration: InputDecoration(
-                  labelText: 'User Token',
-                  hintText: 'Paste your ListenBrainz token',
+                  labelText: l10n.userToken,
+                  hintText: l10n.pasteYourListenbrainzToken,
                   errorText: _errorMessage,
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -781,8 +782,8 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Connect',
+                      : Text(
+                          l10n.connect,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                 ),

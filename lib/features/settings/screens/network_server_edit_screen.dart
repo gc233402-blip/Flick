@@ -21,6 +21,7 @@ import '../../../services/sources/jellyfin_service.dart';
 import '../../../services/sources/network_source_service.dart';
 import '../../../services/sources/tidal_service.dart';
 import '../widgets/settings_widgets.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Add or edit a network server. All registered protocols are selectable;
 /// each dispatches test/sync/stream through [networkSourceServiceFor].
@@ -51,54 +52,54 @@ class _ProtocolMeta {
   final String passwordHelper;
 }
 
-const List<_ProtocolMeta> _protocols = [
+List<_ProtocolMeta> _protocols = [
   _ProtocolMeta(
     id: NetworkProtocol.subsonic,
-    label: 'Subsonic',
-    subtitle: 'Navidrome · Airsonic · Gonic',
+    label: l10n.subsonic,
+    subtitle: l10n.navidromeAirsonicGonic,
     icon: LucideIcons.radio,
     urlHint: 'https://music.example.com/subsonic',
-    passwordHelper: 'Stored as a salted hash, never in plaintext',
+    passwordHelper: l10n.storedAsASaltedHashNever,
   ),
   _ProtocolMeta(
     id: NetworkProtocol.jellyfin,
-    label: 'Jellyfin',
-    subtitle: 'Jellyfin · Emby',
+    label: l10n.jellyfin,
+    subtitle: l10n.jellyfinEmby,
     icon: LucideIcons.clapperboard,
     urlHint: 'https://jf.example.com',
-    passwordHelper: 'Kept in secure storage to re-sign in when the token expires',
+    passwordHelper: l10n.keptInSecureStorageToRe,
   ),
   _ProtocolMeta(
     id: NetworkProtocol.webdav,
-    label: 'WebDAV',
-    subtitle: 'Nextcloud · ownCloud · SabreDAV',
+    label: l10n.webdav,
+    subtitle: l10n.nextcloudOwncloudSabredav,
     icon: LucideIcons.cloud,
     urlHint: 'https://cloud.example.com/remote.php/dav/files/user',
-    passwordHelper: 'HTTP Basic needs it recoverable; stored encoded',
+    passwordHelper: l10n.httpBasicNeedsItRecoverableStored,
   ),
   _ProtocolMeta(
     id: NetworkProtocol.upnp,
-    label: 'UPnP / DLNA',
-    subtitle: 'MinimServer · Serviio · Kodi',
+    label: l10n.upnpDlna,
+    subtitle: l10n.minimserverServiioKodi,
     icon: LucideIcons.cast,
     urlHint: 'http://192.168.1.10:8200/rootDesc.xml',
-    passwordHelper: 'Most DLNA servers need no password',
+    passwordHelper: l10n.mostDlnaServersNeedNoPassword,
   ),
   _ProtocolMeta(
     id: NetworkProtocol.smb,
     label: 'SMB',
-    subtitle: 'Samba · Windows share (transport pending)',
+    subtitle: l10n.sambaWindowsShareTransportPending,
     icon: LucideIcons.hardDrive,
     urlHint: 'smb://nas/music',
-    passwordHelper: 'Stored encoded; playback unavailable in this build',
+    passwordHelper: l10n.storedEncodedPlaybackUnavailableInThis,
   ),
   _ProtocolMeta(
     id: NetworkProtocol.tidal,
-    label: 'Tidal',
-    subtitle: 'Sign in with your account · HiFi lossless',
+    label: l10n.tidal,
+    subtitle: l10n.signInWithYourAccountHifi,
     icon: LucideIcons.waves,
     urlHint: TidalService.tidalBaseUrl,
-    passwordHelper: 'OAuth sign-in; no password stored here',
+    passwordHelper: l10n.oauthSignInNoPasswordStored,
   ),
 ];
 
@@ -189,7 +190,7 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
       ..id = old?.id ?? Isar.autoIncrement
       ..lastSyncedAt = old?.lastSyncedAt
       ..label = _labelController.text.trim().isEmpty
-          ? (_isTidal ? 'Tidal' : '')
+          ? (_isTidal ? l10n.tidal : '')
           : _labelController.text.trim()
       ..protocol = _selectedProtocol
       ..baseUrl = _isTidal
@@ -324,10 +325,10 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
     AppHaptics.tap();
     final confirmed = await FlickDialogs.confirm(
       context,
-      title: 'Remove server?',
+      title: l10n.removeServer,
       message:
-          'Delete "${server.label}" and all songs and playlists synced from it? Cached downloads are kept.',
-      confirmLabel: 'Delete',
+          l10n.deleteAndAllSongsAndPlaylists(server.label),
+      confirmLabel: l10n.delete,
       destructive: true,
     );
     if (!confirmed) return;
@@ -350,26 +351,26 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
       : LucideIcons.xCircle;
 
   String get _testLabel {
-    if (_testPassed == true) return _isTidal ? 'Signed in' : 'Connection OK';
+    if (_testPassed == true) return _isTidal ? l10n.signedIn : l10n.connectionOk;
     if (_testPassed == false) {
-      return _isTidal ? 'Sign-in Failed — Retry' : 'Connection Failed — Retry';
+      return _isTidal ? l10n.signInFailedRetry : l10n.connectionFailedRetry;
     }
     if (_isTidal) {
       final hasToken = _resolvedToken != null ||
           (widget.server?.token?.isNotEmpty ?? false);
-      return hasToken ? 'Test Connection' : 'Sign in with Tidal';
+      return hasToken ? l10n.testConnection : l10n.signInWithTidal;
     }
-    return 'Test Connection';
+    return l10n.testConnection;
   }
 
   @override
   Widget build(BuildContext context) {
     return SettingsScaffold(
-      title: _isNew ? 'Add Server' : 'Edit Server',
+      title: _isNew ? l10n.addServer : l10n.editServer,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SettingsSectionHeader('Protocol'),
+          SettingsSectionHeader(l10n.protocol),
           SettingsCard(
             children: [
               for (var i = 0; i < _protocols.length; i++) ...[
@@ -402,8 +403,7 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
                 top: AppConstants.spacingSm,
               ),
               child: Text(
-                'SMB shares can be added now, but streaming needs a native '
-                'transport that is not yet wired into this build.',
+                l10n.smbSharesCanBeAddedNow,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.adaptiveTextTertiary,
                     ),
@@ -416,30 +416,28 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
                 top: AppConstants.spacingSm,
               ),
               child: Text(
-                'Sign in with your own Tidal account. HiFi lossless (FLAC/ALAC) '
-                'plays through the bit-perfect engine; HiRes/MQA and Atmos are '
-                'gated by Tidal and will show an error instead of playing.',
+                l10n.signInWithYourOwnTidal,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.adaptiveTextTertiary,
                     ),
               ),
             ),
           const SizedBox(height: AppConstants.spacingLg),
-          SettingsSectionHeader('Connection'),
+          SettingsSectionHeader(l10n.connection),
           SettingsCard(
             children: [
               _TextFieldSetting(
                 controller: _labelController,
                 icon: LucideIcons.tag,
-                label: 'Label',
-                hint: 'My ${_meta.label}',
+                label: l10n.label,
+                hint: l10n.my(_meta.label),
               ),
               if (!_isTidal) ...[
                 const SettingsDivider(),
                 _TextFieldSetting(
                   controller: _urlController,
                   icon: LucideIcons.link,
-                  label: 'Server URL',
+                  label: l10n.serverUrl,
                   hint: _meta.urlHint,
                   keyboardType: TextInputType.url,
                 ),
@@ -447,17 +445,17 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
                 _TextFieldSetting(
                   controller: _usernameController,
                   icon: LucideIcons.user,
-                  label: 'Username',
+                  label: l10n.username,
                 ),
                 const SettingsDivider(),
                 _TextFieldSetting(
                   controller: _passwordController,
                   icon: LucideIcons.lock,
-                  label: 'Password',
+                  label: l10n.password,
                   obscureText: true,
                   helperText: _isNew
                       ? _meta.passwordHelper
-                      : 'Leave empty to keep the current credentials',
+                      : l10n.leaveEmptyToKeepTheCurrent,
                 ),
               ],
             ],
@@ -508,7 +506,7 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
                       height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(_isNew ? 'Add Server' : 'Save'),
+                  : Text(_isNew ? l10n.addServer : l10n.save),
             ),
           ),
           if (!_isNew) ...[
@@ -517,7 +515,7 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
               child: TextButton.icon(
                 onPressed: _saving ? null : _delete,
                 icon: const Icon(LucideIcons.trash2, size: 16),
-                label: const Text('Remove server'),
+                label: Text(l10n.removeServer2),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.textTertiary,
                 ),
@@ -586,8 +584,7 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  "Couldn't open the browser automatically. Authorize on any "
-                  "device with this link — we'll finish signing in once you do:",
+                  l10n.couldnTOpenTheBrowserAutomatically,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.adaptiveTextSecondary,
                   ),
@@ -620,12 +617,12 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
             children: [
               _linkAction(
                 icon: LucideIcons.externalLink,
-                label: 'Open in browser',
+                label: l10n.openInBrowser,
                 onTap: () => _openLink(uri),
               ),
               _linkAction(
                 icon: LucideIcons.copy,
-                label: 'Copy link',
+                label: l10n.copyLink,
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: uri));
                   AppHaptics.tap();
@@ -762,7 +759,7 @@ class _TextFieldSettingState extends State<_TextFieldSetting> {
                               size: 18,
                             ),
                             color: context.adaptiveTextSecondary,
-                            tooltip: _obscured ? 'Show password' : 'Hide password',
+                            tooltip: _obscured ? l10n.showPassword : l10n.hidePassword,
                             onPressed: () {
                               AppHaptics.tap();
                               setState(() => _obscured = !_obscured);

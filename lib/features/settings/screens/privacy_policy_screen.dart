@@ -3,6 +3,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/constants/app_constants.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -31,54 +32,54 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _Section(
-                          title: 'Data Collection',
+                          title: l10n.dataCollection,
                           content:
-                              'Flick Player does not collect, store, or transmit any personal data. No personal information, usage analytics, crash reports, or advertising identifiers are gathered. No data is shared with third parties.',
+                              l10n.flickPlayerDoesNotCollectStore,
                         ),
                         _Section(
-                          title: 'Local Data',
+                          title: l10n.localData,
                           content:
-                              'All data is stored locally on your device only: music library metadata, play history, playlists, equalizer presets, and app preferences. Last.fm credentials are stored securely on-device. This data never leaves your device unless you explicitly use an integration.',
+                              l10n.allDataIsStoredLocallyOn,
                         ),
                         _Section(
-                          title: 'Camera and Photos',
+                          title: l10n.cameraAndPhotos,
                           content:
-                              'Camera and photo library access is used solely for the Flick Replay feature to create custom poster backgrounds for listening recap posters. Photos are only used at your explicit request and remain entirely on your device. No images are uploaded or transmitted.',
+                              l10n.cameraAndPhotoLibraryAccessIs,
                         ),
                         _Section(
-                          title: 'Storage Permissions',
+                          title: l10n.storagePermissions,
                           content:
-                              'Storage access is required to scan and read music files, extract metadata, import/export EQ presets, and save recap images. All processing happens on-device.',
+                              l10n.storageAccessIsRequiredToScan,
                         ),
                         _Section(
-                          title: 'USB Device Access',
+                          title: l10n.usbDeviceAccess,
                           content:
-                              'USB Audio Class 2.0 devices (external DACs/AMPs) are accessed locally for bit-perfect audio playback. No USB device information is transmitted externally.',
+                              l10n.usbAudioClass20Devices,
                         ),
                         _Section(
-                          title: 'Last.fm Scrobbling',
+                          title: l10n.lastFmScrobbling,
                           content:
-                              'If you connect your Last.fm account, credentials are stored securely on-device. Play data is sent only to Last.fm. We do not receive or process this data.',
+                              l10n.ifYouConnectYourLastFm,
                         ),
                         _Section(
-                          title: 'Album Art Import',
+                          title: l10n.albumArtImport,
                           content:
-                              'The app queries public APIs (MusicBrainz/Cover Art Archive, iTunes, Deezer) to find matching album art. Search queries use local music metadata. Downloaded images are cached locally.',
+                              l10n.theAppQueriesPublicApisMusicbrainz,
                         ),
                         _Section(
-                          title: 'Moss Ecosystem',
+                          title: l10n.mossEcosystem,
                           content:
-                              'Flick can receive playback handoffs from Locker (another Moss app). Playback intents contain only song file paths/metadata. No personal data is exchanged. The integration is entirely local.',
+                              l10n.flickCanReceivePlaybackHandoffsFrom,
                         ),
                         _Section(
-                          title: 'In-App Updates',
+                          title: l10n.inAppUpdates,
                           content:
-                              'Play Store updates use Google Play In-App Update API (governed by Google\'s privacy policies). Patch notes are fetched from GitHub Releases API without sending personal data.',
+                              l10n.playStoreUpdatesUseGooglePlay,
                         ),
                         _Section(
-                          title: 'Children\'s Privacy',
+                          title: l10n.childrenSPrivacy,
                           content:
-                              'The app does not knowingly collect any information from anyone, regardless of age.',
+                              l10n.theAppDoesNotKnowinglyCollect,
                         ),
                         const SizedBox(height: AppConstants.spacingLg),
                         Container(
@@ -95,7 +96,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Last Updated',
+                                l10n.lastUpdated,
                                 style: Theme.of(
                                   context,
                                 ).textTheme.titleSmall?.copyWith(
@@ -105,7 +106,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'May 4, 2026',
+                                l10n.may42026,
                                 style: Theme.of(
                                   context,
                                 ).textTheme.bodyMedium?.copyWith(
@@ -148,7 +149,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
           ),
           const SizedBox(width: AppConstants.spacingSm),
           Text(
-            'Privacy Policy',
+            l10n.privacyPolicy,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: context.adaptiveTextPrimary,

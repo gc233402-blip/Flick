@@ -14,8 +14,8 @@ import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 
 import 'package:flick/l10n/l10n.dart';
 String _placementLabel(double value) {
-  if (value == 0) return 'Center';
-  return value < 0 ? '${value.abs().round()} up' : '${value.round()} down';
+  if (value == 0) return l10n.center;
+  return value < 0 ? l10n.up(value.abs().round()) : l10n.down(value.round());
 }
 
 String _percentLabel(double value) =>
@@ -30,7 +30,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
     final playerScreenMode = ref.watch(playerScreenModeProvider);
 
     return SettingsScaffold(
-      title: 'Player Layout',
+      title: l10n.playerLayout,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -79,7 +79,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Fullscreen',
+                          l10n.fullscreen,
                           style: TextStyle(
                             fontFamily: 'ProductSans',
                             fontSize: 11,
@@ -95,7 +95,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Layout Mode'),
+          SettingsSectionHeader(l10n.layoutMode),
           SettingsCard(
             children: [
               SelectionSetting(
@@ -124,13 +124,13 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Immersive'),
+          SettingsSectionHeader(l10n.immersive),
           SettingsCard(
             children: [
               SliderSetting(
                 icon: LucideIcons.type,
-                title: 'Text Size',
-                subtitle: 'Adjust metadata text size in immersive mode',
+                title: l10n.textSize2,
+                subtitle: l10n.adjustMetadataTextSizeInImmersive,
                 value: appPrefs.immersiveTextScale,
                 displayValue: _percentLabel(appPrefs.immersiveTextScale),
                 min: 0.82,
@@ -145,8 +145,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.arrowUpDown,
-                title: 'Text Placement',
-                subtitle: 'Shift metadata text up or down',
+                title: l10n.textPlacement2,
+                subtitle: l10n.shiftMetadataTextUpOrDown,
                 value: appPrefs.immersiveVerticalOffset,
                 displayValue: _placementLabel(appPrefs.immersiveVerticalOffset),
                 min: -36,
@@ -161,8 +161,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.maximize,
-                title: 'Full-view Card Size',
-                subtitle: 'Scale the full-view album art card',
+                title: l10n.fullViewCardSize2,
+                subtitle: l10n.scaleTheFullViewAlbumArt,
                 value: appPrefs.immersiveFullViewScale,
                 displayValue: _percentLabel(appPrefs.immersiveFullViewScale),
                 min: 0.82,
@@ -177,8 +177,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.fileText,
-                title: 'Show Title',
-                subtitle: 'Display the track title in immersive mode',
+                title: l10n.showTitle2,
+                subtitle: l10n.displayTheTrackTitleInImmersive,
                 value: appPrefs.immersiveShowTitle,
                 onChanged: (value) {
                   ref
@@ -189,8 +189,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.mic,
-                title: 'Show Artist',
-                subtitle: 'Display the artist name in immersive mode',
+                title: l10n.showArtist2,
+                subtitle: l10n.displayTheArtistNameInImmersive,
                 value: appPrefs.immersiveShowArtist,
                 onChanged: (value) {
                   ref
@@ -201,8 +201,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.info,
-                title: 'Show File Info',
-                subtitle: 'Display file format and bitrate in immersive mode',
+                title: l10n.showFileInfo2,
+                subtitle: l10n.displayFileFormatAndBitrateIn,
                 value: appPrefs.immersiveShowFileInfo,
                 onChanged: (value) {
                   ref
@@ -213,11 +213,11 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.clock,
-                title: 'Auto Full View',
-                subtitle: 'Auto-show full view after inactivity',
+                title: l10n.autoFullView,
+                subtitle: l10n.autoShowFullViewAfterInactivity,
                 value: appPrefs.immersiveAutoFullViewSeconds.toDouble(),
                 displayValue: appPrefs.immersiveAutoFullViewSeconds == 0
-                    ? 'Off'
+                    ? l10n.off
                     : '${appPrefs.immersiveAutoFullViewSeconds}s',
                 min: 0,
                 max: 15,
@@ -231,13 +231,13 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Artwork Card'),
+          SettingsSectionHeader(l10n.artworkCard),
           SettingsCard(
             children: [
               SliderSetting(
                 icon: LucideIcons.rectangleHorizontal,
-                title: 'Artwork Size',
-                subtitle: 'Scale the album art card',
+                title: l10n.artworkSize2,
+                subtitle: l10n.scaleTheAlbumArtCard,
                 value: appPrefs.artworkCardArtworkScale,
                 displayValue: _percentLabel(appPrefs.artworkCardArtworkScale),
                 min: 0.8,
@@ -252,8 +252,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.type,
-                title: 'Text Size',
-                subtitle: 'Adjust metadata text size in artwork card mode',
+                title: l10n.textSize2,
+                subtitle: l10n.adjustMetadataTextSizeInArtwork,
                 value: appPrefs.artworkCardTextScale,
                 displayValue: _percentLabel(appPrefs.artworkCardTextScale),
                 min: 0.82,
@@ -268,8 +268,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.arrowUpDown,
-                title: 'Content Placement',
-                subtitle: 'Shift only the song details up or down',
+                title: l10n.contentPlacement2,
+                subtitle: l10n.shiftOnlyTheSongDetailsUp,
                 value: appPrefs.artworkCardVerticalOffset,
                 displayValue:
                     _placementLabel(appPrefs.artworkCardVerticalOffset),
@@ -285,8 +285,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               SliderSetting(
                 icon: LucideIcons.moveVertical,
-                title: 'Artwork Placement',
-                subtitle: 'Shift only the album art up or down',
+                title: l10n.artworkPlacement2,
+                subtitle: l10n.shiftOnlyTheAlbumArtUp,
                 value: appPrefs.artworkCardArtworkOffset,
                 displayValue:
                     _placementLabel(appPrefs.artworkCardArtworkOffset),
@@ -302,8 +302,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.fileText,
-                title: 'Show Title',
-                subtitle: 'Display the track title in artwork card mode',
+                title: l10n.showTitle2,
+                subtitle: l10n.displayTheTrackTitleInArtwork,
                 value: appPrefs.artworkCardShowTitle,
                 onChanged: (value) {
                   ref
@@ -314,8 +314,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.mic,
-                title: 'Show Artist',
-                subtitle: 'Display the artist name in artwork card mode',
+                title: l10n.showArtist2,
+                subtitle: l10n.displayTheArtistNameInArtwork,
                 value: appPrefs.artworkCardShowArtist,
                 onChanged: (value) {
                   ref
@@ -326,8 +326,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.disc,
-                title: 'Show Album',
-                subtitle: 'Display the album name in artwork card mode',
+                title: l10n.showAlbum2,
+                subtitle: l10n.displayTheAlbumNameInArtwork,
                 value: appPrefs.artworkCardShowAlbum,
                 onChanged: (value) {
                   ref
@@ -338,9 +338,9 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.info,
-                title: 'Show File Info',
+                title: l10n.showFileInfo2,
                 subtitle:
-                    'Display file format and bitrate in artwork card mode',
+                    l10n.displayFileFormatAndBitrateIn2,
                 value: appPrefs.artworkCardShowFileInfo,
                 onChanged: (value) {
                   ref
@@ -351,8 +351,8 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.frame,
-                title: 'Show Frame',
-                subtitle: 'Show the glass frame around album art',
+                title: l10n.showFrame2,
+                subtitle: l10n.showTheGlassFrameAroundAlbum,
                 value: appPrefs.artworkCardShowFrame,
                 onChanged: (value) {
                   ref
@@ -363,10 +363,9 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               ToggleSetting(
                 icon: LucideIcons.shieldCheck,
-                title: 'Bit-Perfect Capsule',
+                title: l10n.bitPerfectCapsule,
                 subtitle:
-                    'Replace album name with a verified bit-perfect capsule '
-                    'when streaming bit-perfect',
+                    l10n.replaceAlbumNameWithAVerified,
                 value: appPrefs.replaceAlbumWithBitPerfectCapsule,
                 onChanged: (value) {
                   ref
@@ -377,12 +376,12 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          const SettingsSectionHeader('Quick Actions'),
+          SettingsSectionHeader(l10n.quickActions),
           SettingsCard(
             children: [
               NavigationSetting(
                 icon: Icons.arrow_upward_rounded,
-                title: 'Left (Top) Button',
+                title: l10n.leftTopButton,
                 subtitle: PlayerActionButtonX.fromStorageValue(
                   appPrefs.leftTopActionButton,
                 ).label,
@@ -390,7 +389,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => _ActionButtonPickerScreen(
-                        title: 'Left (Top) Button',
+                        title: l10n.leftTopButton,
                         currentValue: PlayerActionButtonX.fromStorageValue(
                           appPrefs.leftTopActionButton,
                         ),
@@ -407,7 +406,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               NavigationSetting(
                 icon: Icons.arrow_back_rounded,
-                title: 'Left (Bottom) Button',
+                title: l10n.leftBottomButton,
                 subtitle: PlayerActionButtonX.fromStorageValue(
                   appPrefs.leftActionButton,
                 ).label,
@@ -415,7 +414,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => _ActionButtonPickerScreen(
-                        title: 'Left (Bottom) Button',
+                        title: l10n.leftBottomButton,
                         currentValue: PlayerActionButtonX.fromStorageValue(
                           appPrefs.leftActionButton,
                         ),
@@ -432,7 +431,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               NavigationSetting(
                 icon: Icons.arrow_upward_rounded,
-                title: 'Right (Top) Button',
+                title: l10n.rightTopButton,
                 subtitle: PlayerActionButtonX.fromStorageValue(
                   appPrefs.rightTopActionButton,
                 ).label,
@@ -440,7 +439,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => _ActionButtonPickerScreen(
-                        title: 'Right (Top) Button',
+                        title: l10n.rightTopButton,
                         currentValue: PlayerActionButtonX.fromStorageValue(
                           appPrefs.rightTopActionButton,
                         ),
@@ -457,7 +456,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
               const SettingsDivider(),
               NavigationSetting(
                 icon: Icons.arrow_forward_rounded,
-                title: 'Right (Bottom) Button',
+                title: l10n.rightBottomButton,
                 subtitle: PlayerActionButtonX.fromStorageValue(
                   appPrefs.rightActionButton,
                 ).label,
@@ -465,7 +464,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => _ActionButtonPickerScreen(
-                        title: 'Right (Bottom) Button',
+                        title: l10n.rightBottomButton,
                         currentValue: PlayerActionButtonX.fromStorageValue(
                           appPrefs.rightActionButton,
                         ),
@@ -666,7 +665,7 @@ class _LayoutPreview extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'Live Preview',
+                  l10n.livePreview,
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 12,
@@ -696,9 +695,9 @@ class _LayoutPreview extends StatelessWidget {
             child: Stack(
               children: [
                 if (song == null)
-                  const Center(
+                  Center(
                     child: Text(
-                      'No song playing',
+                      l10n.noSongPlaying,
                       style: TextStyle(
                         fontFamily: 'ProductSans',
                         fontSize: 14,
@@ -739,7 +738,7 @@ class _LayoutPreview extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28),
                   child: Text(
-                    song?.title ?? 'Unknown',
+                    song?.title ?? l10n.unknown,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
@@ -755,7 +754,7 @@ class _LayoutPreview extends StatelessWidget {
                 const SizedBox(height: 4),
               if (artworkCardShowArtist)
                 Text(
-                  song?.artist ?? 'Unknown Artist',
+                  song?.artist ?? l10n.unknownArtist,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -845,7 +844,7 @@ class _LayoutPreview extends StatelessWidget {
                     children: [
                       if (immersiveShowTitle)
                         Text(
-                          song?.title ?? 'Unknown',
+                          song?.title ?? l10n.unknown,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -860,7 +859,7 @@ class _LayoutPreview extends StatelessWidget {
                         const SizedBox(height: 5),
                       if (immersiveShowArtist)
                         Text(
-                          song?.artist ?? 'Unknown Artist',
+                          song?.artist ?? l10n.unknownArtist,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -965,7 +964,7 @@ class _ActionButtonPickerScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SettingsSectionHeader('Choose Action'),
+          SettingsSectionHeader(l10n.chooseAction),
           SettingsCard(
             children: PlayerActionButton.values.fold<List<Widget>>(
               [],
@@ -1078,7 +1077,7 @@ class _FullScreenPreview extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
-                        song?.title ?? 'Midnight Signal',
+                        song?.title ?? l10n.midnightSignal,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
@@ -1094,7 +1093,7 @@ class _FullScreenPreview extends StatelessWidget {
                     const SizedBox(height: 8),
                   if (artworkCardShowArtist)
                     Text(
-                      song?.artist ?? 'Flick Preview',
+                      song?.artist ?? l10n.flickPreview,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -1107,7 +1106,7 @@ class _FullScreenPreview extends StatelessWidget {
                     const SizedBox(height: 6),
                   if (artworkCardShowAlbum)
                     Text(
-                      song?.album ?? 'Mirror Test',
+                      song?.album ?? l10n.mirrorTest,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -1183,7 +1182,7 @@ class _FullScreenPreview extends StatelessWidget {
                     children: [
                       if (immersiveShowTitle)
                         Text(
-                          song?.title ?? 'Midnight Signal',
+                          song?.title ?? l10n.midnightSignal,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -1198,7 +1197,7 @@ class _FullScreenPreview extends StatelessWidget {
                         const SizedBox(height: 8),
                       if (immersiveShowArtist)
                         Text(
-                          song?.artist ?? 'Flick Preview',
+                          song?.artist ?? l10n.flickPreview,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
