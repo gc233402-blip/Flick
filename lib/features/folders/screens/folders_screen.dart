@@ -33,10 +33,9 @@ import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
   for (final song in allSongs) {
     if (song.folderUri != folderUri) continue;
 
-    final relPath = SongsState.extractRelativeSubfolder(
-      song.folderUri,
-      song.filePath,
-    );
+    final relPath =
+        song.relativeFolderPath ??
+        SongsState.extractRelativeSubfolder(song.folderUri, song.filePath);
 
     if (prefix.isNotEmpty) {
       if (relPath != prefix && !relPath.startsWith('$prefix/')) continue;
