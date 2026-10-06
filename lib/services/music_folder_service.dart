@@ -83,6 +83,12 @@ class AudioFileInfo {
   final int? year;
   final int? dateAdded;
 
+  /// Directory path relative to the scanned root, recorded by the SAF walker
+  /// using on-disk display names ('Hindi/Album'; '' directly under the root).
+  /// Null when the source cannot provide it (MediaStore, Rust walks), in which
+  /// case callers reconstruct the path from URIs instead.
+  final String? relativeFolderPath;
+
   AudioFileInfo({
     required this.uri,
     required this.name,
@@ -105,6 +111,7 @@ class AudioFileInfo {
     this.genre,
     this.year,
     this.dateAdded,
+    this.relativeFolderPath,
   });
 
   factory AudioFileInfo.fromMap(Map<String, dynamic> map) {
@@ -134,6 +141,7 @@ class AudioFileInfo {
       genre: map['genre'] as String?,
       year: (map['year'] as num?)?.toInt(),
       dateAdded: (map['dateAdded'] as num?)?.toInt(),
+      relativeFolderPath: map['relativeFolderPath'] as String?,
     );
   }
 }
