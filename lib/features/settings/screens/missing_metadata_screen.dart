@@ -126,7 +126,7 @@ class _UntaggedAlbum {
 
   String get subtitle {
     final count = songs.length;
-    final files = count == 1 ? '1 file' : l10n.files2(count);
+    final files = l10n.files2(count);
     return artist.isEmpty ? files : '$files • $artist';
   }
 }

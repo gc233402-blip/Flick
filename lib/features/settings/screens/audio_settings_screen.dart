@@ -242,7 +242,7 @@ class _ReplayGainSection extends ConsumerWidget {
 class _CrossfadeSection extends ConsumerWidget {
   const _CrossfadeSection();
 
-  static final _curveLabels = <String>[
+  static List<String> _curveLabels(AppLocalizations l10n) => <String>[
     l10n.equalPower,
     l10n.linear,
     l10n.squareRoot,
@@ -351,7 +351,7 @@ class _CrossfadeSection extends ConsumerWidget {
                 const SettingsDivider(),
                 _CrossfadePreview(
                   curveIndex: prefs.crossfadeCurveIndex,
-                  curveName: _curveLabels[prefs.crossfadeCurveIndex],
+                  curveName: _curveLabels(l10n)[prefs.crossfadeCurveIndex],
                   durationSecs: prefs.crossfadeDurationSecs,
                   enabled: effectiveEnabled,
                 ),
@@ -388,7 +388,7 @@ class _CrossfadeSection extends ConsumerWidget {
 class _CrossfeedSection extends ConsumerWidget {
   const _CrossfeedSection();
 
-  static final _levelLabels = <String>[
+  static List<String> _levelLabels(AppLocalizations l10n) => <String>[
     l10n.off,
     l10n.defaultLabel,
     l10n.crossfeed,
@@ -493,6 +493,7 @@ class _CrossfeedLevelPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final levelLabels = _CrossfeedSection._levelLabels(l10n);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppConstants.spacingLg,
@@ -519,13 +520,13 @@ class _CrossfeedLevelPicker extends StatelessWidget {
             children: [
               for (
                 var i = 0;
-                i < _CrossfeedSection._levelLabels.length;
+                i < levelLabels.length;
                 i++
               ) ...[
                 if (i > 0) const SizedBox(width: AppConstants.spacingSm),
                 Expanded(
                   child: _CurveChip(
-                    label: _CrossfeedSection._levelLabels[i],
+                    label: levelLabels[i],
                     selected: i == selectedIndex,
                     enabled: enabled,
                     onTap: enabled ? () => onSelect?.call(i) : null,
@@ -553,6 +554,7 @@ class _CrossfadeCurvePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final curveLabels = _CrossfadeSection._curveLabels(l10n);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppConstants.spacingLg,
@@ -579,13 +581,13 @@ class _CrossfadeCurvePicker extends StatelessWidget {
             children: [
               for (
                 var i = 0;
-                i < _CrossfadeSection._curveLabels.length;
+                i < curveLabels.length;
                 i++
               ) ...[
                 if (i > 0) const SizedBox(width: AppConstants.spacingSm),
                 Expanded(
                   child: _CurveChip(
-                    label: _CrossfadeSection._curveLabels[i],
+                    label: curveLabels[i],
                     selected: i == selectedIndex,
                     enabled: enabled,
                     onTap: enabled ? () => onSelect?.call(i) : null,

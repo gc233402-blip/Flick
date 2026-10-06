@@ -52,7 +52,7 @@ class _ProtocolMeta {
   final String passwordHelper;
 }
 
-List<_ProtocolMeta> _protocols = [
+List<_ProtocolMeta> _protocolsFor(AppLocalizations l10n) => [
   _ProtocolMeta(
     id: NetworkProtocol.subsonic,
     label: l10n.subsonic,
@@ -126,7 +126,7 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
   String? _resolvedToken;
 
   _ProtocolMeta get _meta =>
-      _protocols.firstWhere((p) => p.id == _selectedProtocol);
+      _protocolsFor(l10n).firstWhere((p) => p.id == _selectedProtocol);
 
   @override
   void initState() {
@@ -365,6 +365,7 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final protocols = _protocolsFor(l10n);
     return SettingsScaffold(
       title: _isNew ? l10n.addServer : l10n.editServer,
       body: Column(
@@ -373,18 +374,18 @@ class _NetworkServerEditScreenState extends State<NetworkServerEditScreen> {
           SettingsSectionHeader(l10n.protocol),
           SettingsCard(
             children: [
-              for (var i = 0; i < _protocols.length; i++) ...[
+              for (var i = 0; i < protocols.length; i++) ...[
                 if (i > 0) const SettingsDivider(),
                 SelectionSetting(
-                  icon: _protocols[i].icon,
-                  title: _protocols[i].label,
-                  subtitle: _protocols[i].subtitle,
-                  selected: _selectedProtocol == _protocols[i].id,
+                  icon: protocols[i].icon,
+                  title: protocols[i].label,
+                  subtitle: protocols[i].subtitle,
+                  selected: _selectedProtocol == protocols[i].id,
                   onTap: _isNew
                       ? () {
                           AppHaptics.tap();
                           setState(() {
-                            _selectedProtocol = _protocols[i].id;
+                            _selectedProtocol = protocols[i].id;
                             _testPassed = null;
                             _testError = null;
                             _testVerificationUri = null;

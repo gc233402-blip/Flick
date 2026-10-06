@@ -3197,8 +3197,8 @@ abstract class AppLocalizations {
   /// lib/features/settings/screens/missing_metadata_screen.dart:128
   ///
   /// In en, this message translates to:
-  /// **'{count} files'**
-  String files2(Object count);
+  /// **'{count, plural, =1{{count} file} other{{count} files}}'**
+  String files2(int count);
 
   /// lib/features/settings/screens/library_settings_screen.dart:984
   ///

@@ -19,7 +19,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aSmoothContinuousWaveAcrossFrequencies => '横跨各频率的平滑连续波形';
 
   @override
-  String get aSongWithALongTitle => 'A song with a long title to preview';
+  String get aSongWithALongTitle => '一首标题很长的歌曲，用于预览';
 
   @override
   String get aaudio => 'AAudio';
@@ -63,10 +63,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get add => '添加';
 
   @override
-  String get addANextTrackButton => 'Add a next-track button';
+  String get addANextTrackButton => '添加“下一首”按钮';
 
   @override
-  String get addAPreviousTrackButton => 'Add a previous-track button';
+  String get addAPreviousTrackButton => '添加“上一首”按钮';
 
   @override
   String get addMusicFolder => '添加音乐文件夹';
@@ -90,7 +90,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get adjustSpacingBetweenButtons => '调整按钮之间的间距';
 
   @override
-  String get adjustTheMiniPlayerSurface => 'Adjust the mini player surface';
+  String get adjustTheMiniPlayerSurface => '调整迷你播放器的表面';
 
   @override
   String get adjustTheSizeOfTheBottom => '调整底部栏的大小';
@@ -188,8 +188,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get alphabeticalIndexRailOnTheSongs => '歌曲界面的字母索引栏';
 
   @override
-  String get alsoRespectsYourSystemTextSize =>
-      'Also respects your system text size';
+  String get alsoRespectsYourSystemTextSize => '同时遵循系统文字大小';
 
   @override
   String get amber => '琥珀色';
@@ -416,7 +415,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get background => '背景';
 
   @override
-  String get backgroundOpacity => 'Background Opacity';
+  String get backgroundOpacity => '背景不透明度';
 
   @override
   String get backgroundPlaybackAnchor => '后台播放锚点';
@@ -588,7 +587,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get boostBeyond100UpTo200 => '超过 100% 的增强（最高 200%）';
 
   @override
-  String get border => 'Border';
+  String get border => '边框';
 
   @override
   String get bothBitPerfectOptionsAreOff =>
@@ -712,8 +711,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get centeredHeaderTitle => '头部标题居中';
 
   @override
-  String get centeredWidensToFitYourControls =>
-      'Centered; widens to fit your controls';
+  String get centeredWidensToFitYourControls => '居中；会加宽以容纳控件';
 
   @override
   String ch3(Object arg1, Object arg2) {
@@ -828,7 +826,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get collapseAfter => '收起延时';
 
   @override
-  String get collapsed => 'Collapsed';
+  String get collapsed => '收起';
 
   @override
   String get comingSoon => '即将推出';
@@ -932,7 +930,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get content => '内容';
 
   @override
-  String get contentControls => 'Content & Controls';
+  String get contentControls => '内容与控件';
 
   @override
   String get contentPlacement2 => '内容位置';
@@ -983,7 +981,7 @@ class AppLocalizationsZh extends AppLocalizations {
       '请从 ListenBrainz 设置中复制用户令牌，粘贴到下方。';
 
   @override
-  String get cornerRadius => 'Corner Radius';
+  String get cornerRadius => '圆角半径';
 
   @override
   String get cosmicOrchestra => '宇宙管弦乐团';
@@ -1100,7 +1098,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get currentSongPreviewOnly => 'Current song · preview only';
+  String get currentSongPreviewOnly => '当前歌曲 · 仅供预览';
 
   @override
   String get curvature => '曲率';
@@ -1138,7 +1136,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get customFormatIsUnavailableBecauseAudio => '由于设置中已禁用音频格式，自定义格式不可用。';
 
   @override
-  String get customWidth => 'Custom Width';
+  String get customWidth => '自定义宽度';
 
   @override
   String get customizeAudioDisplayNavigationAnd => '自定义音频、显示、导航与集成。';
@@ -1601,7 +1599,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exclusiveUsbIsStillUnavailableCheck => 'USB 独占仍不可用。请检查 USB 诊断。';
 
   @override
-  String get expanded => 'Expanded';
+  String get expanded => '展开';
 
   @override
   String get expandedHeaderArt => '扩展头部封面';
@@ -1730,7 +1728,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String files2(Object count) {
+  String files2(int count) {
     return '$count 个文件';
   }
 
@@ -1918,8 +1916,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get fromSquareCornersToARounded =>
-      'From square corners to a rounded bar';
+  String get fromSquareCornersToARounded => '从直角到圆角栏';
 
   @override
   String get fullBleedAlbumArtWithThe => '满幅专辑封面，呈现当前的电影质感。';
@@ -1959,7 +1956,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gain => '增益';
 
   @override
-  String get gapAboveNavigation => 'Gap Above Navigation';
+  String get gapAboveNavigation => '导航栏上方间距';
 
   @override
   String get gaplessPlayback => '无缝播放';
@@ -2023,8 +2020,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get growsFurtherIfLargerSystemText =>
-      'Grows further if larger system text needs room';
+  String get growsFurtherIfLargerSystemText => '系统文字更大时还会增高';
 
   @override
   String get hapticFeedback => '触感反馈';
@@ -2519,7 +2515,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get longPress => '长按';
 
   @override
-  String get longSongTitles => 'Long Song Titles';
+  String get longSongTitles => '长歌名';
 
   @override
   String get lookingForTheLatestFlickRelease => '正在检查最新的 Flick 版本';
@@ -2579,7 +2575,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get matchEqToYourHeadphoneModel => '将均衡器匹配到你的耳机型号';
 
   @override
-  String get matchNavigation => 'Match navigation';
+  String get matchNavigation => '匹配导航栏';
 
   @override
   String get maximumAudioQuality => '最高音质';
@@ -2632,16 +2628,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get miniPlayer => '迷你播放器';
 
   @override
-  String get miniPlayerAppearance => 'Mini Player Appearance';
+  String get miniPlayerAppearance => '迷你播放器外观';
 
   @override
-  String get miniPlayerDefaultsRestored => 'Mini player defaults restored';
+  String get miniPlayerDefaultsRestored => '迷你播放器已恢复默认设置';
 
   @override
-  String get miniPlayerHeight => 'Mini Player Height';
+  String get miniPlayerHeight => '迷你播放器高度';
 
   @override
-  String get miniPlayerLayout => 'Mini Player Layout';
+  String get miniPlayerLayout => '迷你播放器布局';
 
   @override
   String get minimize => '最小化';
@@ -2816,7 +2812,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nextSong => '下一首';
 
   @override
-  String get nextSong2 => 'Next Song';
+  String get nextSong2 => '下一首';
 
   @override
   String get nextcloudOwncloudSabredav => 'Nextcloud · ownCloud · SabreDAV';
@@ -2991,7 +2987,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get orbitalSettingsReset => '轨道设置已重置';
 
   @override
-  String get outlineTheMiniPlayer => 'Outline the mini player';
+  String get outlineTheMiniPlayer => '为迷你播放器描边';
 
   @override
   String get output => '输出';
@@ -3221,7 +3217,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get previousSong => '上一首';
 
   @override
-  String get previousSong2 => 'Previous Song';
+  String get previousSong2 => '上一首';
 
   @override
   String get prewarming => '预热中';
@@ -3242,7 +3238,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get productId => '产品 ID';
 
   @override
-  String get progress => 'Progress';
+  String get progress => '进度';
 
   @override
   String get progressBar => '进度条';
@@ -3439,7 +3435,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get resetFx => '重置效果';
 
   @override
-  String get resetMiniPlayerToDefaults => 'Reset Mini Player to Defaults';
+  String get resetMiniPlayerToDefaults => '将迷你播放器重置为默认值';
 
   @override
   String get resetNavigationToDefaults => '恢复导航栏默认设置';
@@ -3539,7 +3535,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sambaWindowsShareTransportPending => 'Samba · Windows 共享（传输待实现）';
 
   @override
-  String get sampleArtist => 'Sample artist';
+  String get sampleArtist => '示例艺术家';
 
   @override
   String get sampleRate => '采样率';
@@ -3551,7 +3547,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sampleRates => '采样率';
 
   @override
-  String get sampleSongPreviewOnly => 'Sample song · preview only';
+  String get sampleSongPreviewOnly => '示例歌曲 · 仅供预览';
 
   @override
   String get samples => '采样数';
@@ -3633,11 +3629,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scanningYourLibrary => '正在扫描音乐库…';
 
   @override
-  String get scroll => 'Scroll';
+  String get scroll => '滚动';
 
   @override
-  String get scrollingPausesWhenReducedMotionIs =>
-      'Scrolling pauses when reduced motion is enabled';
+  String get scrollingPausesWhenReducedMotionIs => '启用“减弱动态效果”时暂停滚动';
 
   @override
   String get seamlessTransitionBetweenTracks => '曲目间无缝衔接';
@@ -3691,7 +3686,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get separateTheMiniPlayerToCustomize =>
-      'Separate the mini player to customize its width and gap. Your custom values are saved while joined.';
+      '分离迷你播放器后可自定义其宽度和间距。合并时你的自定义值会保留。';
 
   @override
   String get serialNumber => '序列号';
@@ -3706,7 +3701,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings => '设置';
 
   @override
-  String get shadow => 'Shadow';
+  String get shadow => '阴影';
 
   @override
   String get shadowJazz => '暗影爵士';
@@ -3738,8 +3733,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showASystemOverlayMiniPlayer => '在其他应用上层显示系统悬浮迷你播放器';
 
   @override
-  String get showAThinPlaybackProgressLine =>
-      'Show a thin playback progress line';
+  String get showAThinPlaybackProgressLine => '显示一条细播放进度线';
 
   @override
   String get showAlbum2 => '显示专辑';
@@ -3799,8 +3793,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showSmartMixesGeneratedFromYour => '显示根据你的收听习惯生成的智能混音';
 
   @override
-  String get showTheArtistBelowTheSong =>
-      'Show the artist below the song title';
+  String get showTheArtistBelowTheSong => '在歌名下方显示艺术家';
 
   @override
   String get showTheAtAGlanceSummary => '在艺术家/专辑页显示速览摘要';
@@ -3853,8 +3846,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get showYourRecentListeningHistoryOn => '在主屏幕显示你的最近收听记录';
 
   @override
-  String get shownWhenThereIsRoomBeside =>
-      'Shown when there is room beside the controls';
+  String get shownWhenThereIsRoomBeside => '控件旁边有空间时显示';
 
   @override
   String get showsWhatSPlayingTapTo => '显示当前播放内容，点按打开完整播放器。';
@@ -3974,7 +3966,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sortFilter => '排序与筛选';
 
   @override
-  String get spaceBetweenTheTwoBars => 'Space between the two bars';
+  String get spaceBetweenTheTwoBars => '两条栏之间的间距';
 
   @override
   String get spaceOdyssey => '太空漫游';
@@ -4065,7 +4057,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get stretchNonSquareArt => '拉伸非方形封面';
 
   @override
-  String get strong => 'Strong';
+  String get strong => '强烈';
 
   @override
   String get sub => '超低音';
@@ -4172,7 +4164,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get testConnection => '测试连接';
 
   @override
-  String get textGestures => 'Text & Gestures';
+  String get textGestures => '文字与手势';
 
   @override
   String get textPlacement2 => '文字位置';
@@ -4279,7 +4271,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trueRandomMayRepeatBeforeList => '完全随机（列表结束前可能重复）';
 
   @override
-  String get truncate => 'Truncate';
+  String get truncate => '截断';
 
   @override
   String get tryAgain => '重试';

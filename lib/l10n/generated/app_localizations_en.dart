@@ -1816,8 +1816,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String files2(Object count) {
-    return '$count files';
+  String files2(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count files',
+      one: '$count file',
+    );
+    return '$_temp0';
   }
 
   @override

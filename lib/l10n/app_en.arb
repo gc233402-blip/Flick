@@ -2442,12 +2442,12 @@
       }
     }
   },
-  "files2": "{count} files",
+  "files2": "{count, plural, =1{{count} file} other{{count} files}}",
   "@files2": {
     "description": "lib/features/settings/screens/missing_metadata_screen.dart:128",
     "placeholders": {
       "count": {
-        "type": "Object"
+        "type": "int"
       }
     }
   },
