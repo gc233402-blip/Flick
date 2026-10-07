@@ -45,6 +45,7 @@ class AudioSessionManager {
     null,
   );
   final ValueNotifier<String?> fallbackReasonNotifier = ValueNotifier(null);
+  AudioEngineType? _fallbackRequestedMode;
   final ValueNotifier<rust_audio.AudioCapabilityInfo> capabilityInfoNotifier =
       ValueNotifier(
         const rust_audio.AudioCapabilityInfo(
@@ -65,6 +66,7 @@ class AudioSessionManager {
   AudioEngineType get selectedMode => selectedModeNotifier.value;
   AudioEngineType? get initializedMode => initializedModeNotifier.value;
   String? get fallbackReason => fallbackReasonNotifier.value;
+  AudioEngineType? get fallbackRequestedMode => _fallbackRequestedMode;
 
   void _debugLog(String message) {
     devLog(message);
@@ -119,17 +121,28 @@ class AudioSessionManager {
     );
 
     if (needsDisposal || needsInitialization) {
-      await _onSwitchEngine(
-        from: previousInitialized,
-        to: mode,
-        initializeNewEngine: initializeNewEngine,
-        reason: reason,
-      );
+      try {
+        await _onSwitchEngine(
+          from: previousInitialized,
+          to: mode,
+          initializeNewEngine: initializeNewEngine,
+          reason: reason,
+        );
+      } catch (_) {
+        // The outgoing engine may already have been disposed by the handler.
+        // Do not report it as initialized or skip its reinitialization later.
+        initializedModeNotifier.value = null;
+        rethrow;
+      }
     }
 
     initializedModeNotifier.value = initializeNewEngine
         ? mode
         : (previousInitialized == mode ? previousInitialized : null);
+    if (initializeNewEngine && mode == _fallbackRequestedMode) {
+      _fallbackRequestedMode = null;
+      clearFallbackReason();
+    }
   }
 
   Future<AudioEngineType> resolvePreferredMode({bool refresh = false}) async {
@@ -142,6 +155,7 @@ class AudioSessionManager {
     required AudioEngineType fallbackMode,
     required String reason,
   }) async {
+    _fallbackRequestedMode = requestedMode;
     fallbackReasonNotifier.value =
         '${requestedMode.logLabel} -> ${fallbackMode.logLabel}: $reason';
     if (selectedMode != fallbackMode) {
