@@ -8305,6 +8305,258 @@ abstract class AppLocalizations {
   /// **'Shuffle songs in current list'**
   String get shuffleSongsInCurrentList;
 
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'AccurateRip not verified'**
+  String get signalAccurateUnverified;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'AccurateRip verified in log'**
+  String get signalAccurateVerified;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Alt setting'**
+  String get signalAltSetting;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Buffer capacity'**
+  String get signalBufferCapacity;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Buffer fill'**
+  String get signalBufferFill;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Buffer occupancy at open'**
+  String get signalBufferOccupancy;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Buffer target'**
+  String get signalBufferTarget;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Copy CRC'**
+  String get signalCopyCrc;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot compare'**
+  String get signalCrcCannotCompare;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'CRC comparison'**
+  String get signalCrcComparison;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Match'**
+  String get signalCrcMatch;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Mismatch'**
+  String get signalCrcMismatch;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Drift from target'**
+  String get signalDriftFromTarget;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'DSD bit rate'**
+  String get signalDsdBitRate;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'File format'**
+  String get signalFileFormat;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Frames / packet'**
+  String get signalFramesPerPacket;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Max packet'**
+  String get signalMaxPacket;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'No ripping or verification information was found for this track.'**
+  String get signalNoRipDescription;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Not reported'**
+  String get signalNotReported;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Not verified'**
+  String get signalNotVerified;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Rip history unavailable'**
+  String get signalRecordingUnavailable;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Information from the rip log, not a stage of the current playback path.'**
+  String get signalRipDescription;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Rip provenance'**
+  String get signalRipProvenance;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Ripper'**
+  String get signalRipper;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Service interval'**
+  String get signalServiceInterval;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot'**
+  String get signalSnapshot;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot at open'**
+  String get signalSnapshotAtOpen;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Properties of the source file, not the output sent to the device.'**
+  String get signalSourceDescription;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Source format details'**
+  String get signalSourceDetails;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Subslot'**
+  String get signalSubslot;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Sync type'**
+  String get signalSyncType;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'target'**
+  String get signalTarget;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Test CRC'**
+  String get signalTestCrc;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get signalTransportFormat;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Underruns'**
+  String get signalUnderruns;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Usage type'**
+  String get signalUsageType;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Transport values available when this sheet opened. This is not a live packet trace.'**
+  String get signalUsbDescription;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'URB details are only reported for the direct USB path. No transfer activity is inferred.'**
+  String get signalUsbMissingDescription;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'USB transport'**
+  String get signalUsbTransport;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'USB transport details unavailable'**
+  String get signalUsbUnavailable;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Verification not reported'**
+  String get signalVerificationMissing;
+
+  /// lib/features/player/widgets/audio_signal_report.dart
+  ///
+  /// In en, this message translates to:
+  /// **'Verified in log'**
+  String get signalVerifiedInLog;
+
   /// lib/features/settings/screens/network_server_edit_screen.dart:355
   ///
   /// In en, this message translates to:

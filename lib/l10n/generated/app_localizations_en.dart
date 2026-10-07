@@ -4750,6 +4750,137 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shuffleSongsInCurrentList => 'Shuffle songs in current list';
 
   @override
+  String get signalAccurateUnverified => 'AccurateRip not verified';
+
+  @override
+  String get signalAccurateVerified => 'AccurateRip verified in log';
+
+  @override
+  String get signalAltSetting => 'Alt setting';
+
+  @override
+  String get signalBufferCapacity => 'Buffer capacity';
+
+  @override
+  String get signalBufferFill => 'Buffer fill';
+
+  @override
+  String get signalBufferOccupancy => 'Buffer occupancy at open';
+
+  @override
+  String get signalBufferTarget => 'Buffer target';
+
+  @override
+  String get signalCopyCrc => 'Copy CRC';
+
+  @override
+  String get signalCrcCannotCompare => 'Cannot compare';
+
+  @override
+  String get signalCrcComparison => 'CRC comparison';
+
+  @override
+  String get signalCrcMatch => 'Match';
+
+  @override
+  String get signalCrcMismatch => 'Mismatch';
+
+  @override
+  String get signalDriftFromTarget => 'Drift from target';
+
+  @override
+  String get signalDsdBitRate => 'DSD bit rate';
+
+  @override
+  String get signalFileFormat => 'File format';
+
+  @override
+  String get signalFramesPerPacket => 'Frames / packet';
+
+  @override
+  String get signalMaxPacket => 'Max packet';
+
+  @override
+  String get signalNoRipDescription =>
+      'No ripping or verification information was found for this track.';
+
+  @override
+  String get signalNotReported => 'Not reported';
+
+  @override
+  String get signalNotVerified => 'Not verified';
+
+  @override
+  String get signalRecordingUnavailable => 'Rip history unavailable';
+
+  @override
+  String get signalRipDescription =>
+      'Information from the rip log, not a stage of the current playback path.';
+
+  @override
+  String get signalRipProvenance => 'Rip provenance';
+
+  @override
+  String get signalRipper => 'Ripper';
+
+  @override
+  String get signalServiceInterval => 'Service interval';
+
+  @override
+  String get signalSnapshot => 'Snapshot';
+
+  @override
+  String get signalSnapshotAtOpen => 'Snapshot at open';
+
+  @override
+  String get signalSourceDescription =>
+      'Properties of the source file, not the output sent to the device.';
+
+  @override
+  String get signalSourceDetails => 'Source format details';
+
+  @override
+  String get signalSubslot => 'Subslot';
+
+  @override
+  String get signalSyncType => 'Sync type';
+
+  @override
+  String get signalTarget => 'target';
+
+  @override
+  String get signalTestCrc => 'Test CRC';
+
+  @override
+  String get signalTransportFormat => 'Transport';
+
+  @override
+  String get signalUnderruns => 'Underruns';
+
+  @override
+  String get signalUsageType => 'Usage type';
+
+  @override
+  String get signalUsbDescription =>
+      'Transport values available when this sheet opened. This is not a live packet trace.';
+
+  @override
+  String get signalUsbMissingDescription =>
+      'URB details are only reported for the direct USB path. No transfer activity is inferred.';
+
+  @override
+  String get signalUsbTransport => 'USB transport';
+
+  @override
+  String get signalUsbUnavailable => 'USB transport details unavailable';
+
+  @override
+  String get signalVerificationMissing => 'Verification not reported';
+
+  @override
+  String get signalVerifiedInLog => 'Verified in log';
+
+  @override
   String get signInFailedRetry => 'Sign-in Failed — Retry';
 
   @override
