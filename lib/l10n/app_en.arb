@@ -6328,6 +6328,174 @@
   "@shuffleSongsInCurrentList": {
     "description": "lib/models/shuffle_mode.dart:20"
   },
+  "signalAccurateUnverified": "AccurateRip not verified",
+  "@signalAccurateUnverified": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalAccurateVerified": "AccurateRip verified in log",
+  "@signalAccurateVerified": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalAltSetting": "Alt setting",
+  "@signalAltSetting": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalBufferCapacity": "Buffer capacity",
+  "@signalBufferCapacity": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalBufferFill": "Buffer fill",
+  "@signalBufferFill": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalBufferOccupancy": "Buffer occupancy at open",
+  "@signalBufferOccupancy": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalBufferTarget": "Buffer target",
+  "@signalBufferTarget": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalCopyCrc": "Copy CRC",
+  "@signalCopyCrc": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalCrcCannotCompare": "Cannot compare",
+  "@signalCrcCannotCompare": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalCrcComparison": "CRC comparison",
+  "@signalCrcComparison": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalCrcMatch": "Match",
+  "@signalCrcMatch": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalCrcMismatch": "Mismatch",
+  "@signalCrcMismatch": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalDriftFromTarget": "Drift from target",
+  "@signalDriftFromTarget": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalDsdBitRate": "DSD bit rate",
+  "@signalDsdBitRate": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalFileFormat": "File format",
+  "@signalFileFormat": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalFramesPerPacket": "Frames / packet",
+  "@signalFramesPerPacket": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalMaxPacket": "Max packet",
+  "@signalMaxPacket": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalNoRipDescription": "No ripping or verification information was found for this track.",
+  "@signalNoRipDescription": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalNotReported": "Not reported",
+  "@signalNotReported": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalNotVerified": "Not verified",
+  "@signalNotVerified": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalRecordingUnavailable": "Rip history unavailable",
+  "@signalRecordingUnavailable": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalRipDescription": "Information from the rip log, not a stage of the current playback path.",
+  "@signalRipDescription": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalRipProvenance": "Rip provenance",
+  "@signalRipProvenance": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalRipper": "Ripper",
+  "@signalRipper": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalServiceInterval": "Service interval",
+  "@signalServiceInterval": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalSnapshot": "Snapshot",
+  "@signalSnapshot": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalSnapshotAtOpen": "Snapshot at open",
+  "@signalSnapshotAtOpen": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalSourceDescription": "Properties of the source file, not the output sent to the device.",
+  "@signalSourceDescription": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalSourceDetails": "Source format details",
+  "@signalSourceDetails": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalSubslot": "Subslot",
+  "@signalSubslot": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalSyncType": "Sync type",
+  "@signalSyncType": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalTarget": "target",
+  "@signalTarget": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalTestCrc": "Test CRC",
+  "@signalTestCrc": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalTransportFormat": "Transport",
+  "@signalTransportFormat": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalUnderruns": "Underruns",
+  "@signalUnderruns": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalUsageType": "Usage type",
+  "@signalUsageType": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalUsbDescription": "Transport values available when this sheet opened. This is not a live packet trace.",
+  "@signalUsbDescription": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalUsbMissingDescription": "URB details are only reported for the direct USB path. No transfer activity is inferred.",
+  "@signalUsbMissingDescription": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalUsbTransport": "USB transport",
+  "@signalUsbTransport": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalUsbUnavailable": "USB transport details unavailable",
+  "@signalUsbUnavailable": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalVerificationMissing": "Verification not reported",
+  "@signalVerificationMissing": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
+  "signalVerifiedInLog": "Verified in log",
+  "@signalVerifiedInLog": {
+    "description": "lib/features/player/widgets/audio_signal_report.dart"
+  },
   "signInFailedRetry": "Sign-in Failed — Retry",
   "@signInFailedRetry": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:355"

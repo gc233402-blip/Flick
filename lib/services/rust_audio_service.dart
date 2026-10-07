@@ -34,6 +34,8 @@ class RustAudioService {
   final ValueNotifier<Duration> durationNotifier = ValueNotifier(Duration.zero);
   final ValueNotifier<double> bufferLevelNotifier = ValueNotifier(0.0);
   final ValueNotifier<double> volumeNotifier = ValueNotifier(1.0);
+
+  /// User preference, not the effective DSP setting (which may be suppressed).
   final ValueNotifier<bool> crossfadeEnabledNotifier = ValueNotifier(false);
   final ValueNotifier<double> crossfadeDurationNotifier = ValueNotifier(3.0);
   final ValueNotifier<int> crossfeedLevelNotifier = ValueNotifier(0);
@@ -266,6 +268,9 @@ class RustAudioService {
     }
   }
 
+  /// Whether a next track is already queued in the engine.
+  bool get hasQueuedNext => _nextPath != null;
+
   /// Play an audio file.
   Future<void> play(String path) async {
     if (!_initialized) {
@@ -444,14 +449,13 @@ class RustAudioService {
     }
   }
 
-  /// Enable or disable crossfade.
+  /// Apply effective crossfade policy without changing the user's preference.
   Future<void> setCrossfade({
     required bool enabled,
     double? durationSecs,
   }) async {
     if (!_initialized) return;
 
-    crossfadeEnabledNotifier.value = enabled;
     if (durationSecs != null) {
       crossfadeDurationNotifier.value = durationSecs;
     }
@@ -459,6 +463,11 @@ class RustAudioService {
     await rust_audio.audioSetCrossfade(
       enabled: enabled,
       durationSecs: crossfadeDurationNotifier.value,
+    );
+    devLog(
+      '[crossfade] applied: effective=$enabled, '
+      'preference=${crossfadeEnabledNotifier.value}, '
+      'duration=${crossfadeDurationNotifier.value}s',
     );
   }
 
@@ -686,6 +695,12 @@ class RustAudioService {
           }
         },
         trackEnded: (path) {
+          final enginePath = currentPath;
+          devLog(
+            '[crossfade] TrackEnded: queued=${_nextPath != null}, '
+            'engineHasSource=${enginePath != null}, '
+            'engineMatchesRequested=${_nextPath != null && enginePath == _nextPath}',
+          );
           // Track finished, next track should auto-start if queued
           if (_nextPath != null) {
             _currentPath = _nextPath;
@@ -704,6 +719,9 @@ class RustAudioService {
           onError?.call(message);
         },
         nextTrackReady: (path) {
+          devLog(
+            '[crossfade] NextTrackReady: matchesRequested=${path == _nextPath}',
+          );
           onNextTrackReady?.call(path);
         },
       );

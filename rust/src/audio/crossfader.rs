@@ -309,9 +309,15 @@ impl Crossfader {
 
         let mut completed = false;
 
-        // Process frame by frame for smooth gain transitions
+        // Process frame by frame for smooth gain transitions. If the fade ends
+        // inside this callback, the already-read incoming samples must fill
+        // the rest of the block at unity gain (not the outgoing track).
         for frame in 0..frames {
-            let (gain_a, gain_b) = self.current_gains();
+            let (gain_a, gain_b) = if completed {
+                (0.0, 1.0)
+            } else {
+                self.current_gains()
+            };
 
             for ch in 0..channels {
                 let idx = frame * channels + ch;
@@ -323,7 +329,7 @@ impl Crossfader {
                 }
             }
 
-            if self.advance() {
+            if !completed && self.advance() {
                 completed = true;
             }
         }
@@ -456,6 +462,24 @@ mod tests {
         }
 
         assert!(!crossfader.is_active());
+    }
+
+    #[test]
+    fn mix_finishing_mid_callback_keeps_incoming_track_at_full_gain() {
+        let mut crossfader = Crossfader::new(10, 0.3); // three frames
+        crossfader.set_curve(CrossfadeCurve::Linear);
+        crossfader.start();
+        let outgoing = [1.0; 8];
+        let incoming = [0.25; 8];
+        let mut output = [0.0; 8];
+
+        assert!(crossfader
+            .mix(&outgoing, &incoming, &mut output, 2)
+            .unwrap());
+        assert!(!crossfader.is_active());
+        // Frame four shares the callback that completed the fade. It must
+        // already be the incoming track, not a full-volume outgoing blip.
+        assert_eq!(&output[6..8], &[0.25, 0.25]);
     }
 
     #[test]

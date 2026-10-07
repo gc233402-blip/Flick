@@ -421,15 +421,26 @@ impl SourceProvider {
         self.next.as_ref()
     }
 
-    /// Check if the next source has enough buffered data for crossfade.
+    /// Check if the next source has buffered audio before mixing it in.
     pub fn next_has_enough_buffer(&self, min_secs: f64) -> bool {
         if let Some(next) = &self.next {
+            let buffered_samples = next.consumer.occupied_len();
+            if next.info.channels == 0 || next.info.output_sample_rate == 0 ||
+                buffered_samples < next.info.channels {
+                return false;
+            }
+            // A short, fully decoded source can be shorter than the requested
+            // prebuffer, but must still contain actual audio to fade into.
             if next.decoder_finished.load(Ordering::Acquire) {
                 return true;
             }
-            let buffered_secs = next.consumer.occupied_len() as f64
-                / (next.info.output_sample_rate as f64 * next.info.channels as f64);
-            buffered_secs >= min_secs
+            let samples_per_second =
+                next.info.output_sample_rate as f64 * next.info.channels as f64;
+            let buffered_secs = buffered_samples as f64 / samples_per_second;
+            // At very high rates the entire ring may hold less than the
+            // requested prebuffer; never wait for an impossible amount.
+            let threshold = min_secs.min(next.capacity as f64 / samples_per_second * 0.5);
+            buffered_secs >= threshold
         } else {
             false
         }
@@ -460,6 +471,30 @@ impl SourceProvider {
         }
         self.current = self.next.take();
         old
+    }
+
+    /// Remove and stop the current source, leaving a queued successor (and
+    /// its decoder) intact.
+    ///
+    /// Seek/replay paths must use this instead of [`stop`](Self::stop): the
+    /// successor still belongs to the new timeline, and the Dart side keeps
+    /// its queued-track state across a seek, so wiping it here forces a hard
+    /// reload at track end instead of a crossfade/gapless handoff.
+    pub fn take_current(&mut self) -> Option<AudioSource> {
+        let source = self.current.take();
+        if let Some(ref current) = source {
+            current.signal_stop();
+        }
+        source
+    }
+
+    /// Drop the queued successor (stopping its decoder), leaving the current
+    /// source untouched.
+    pub fn clear_next(&mut self) {
+        if let Some(ref source) = self.next {
+            source.signal_stop();
+        }
+        self.next = None;
     }
 
     /// Stop all playback.
@@ -553,6 +588,30 @@ mod tests {
     }
 
     #[test]
+    fn next_buffer_readiness_requires_real_audio() {
+        let (source, mut producer) = AudioSource::new(source_info("next.flac"));
+        let mut provider = SourceProvider::new(48_000, 2);
+        provider.queue_next(source);
+
+        assert!(!provider.next_has_enough_buffer(0.0));
+        assert!(!provider.next_has_enough_buffer(0.1));
+        assert_eq!(producer.write(&[0.1, 0.1]), 2);
+        assert!(provider.next_has_enough_buffer(0.0));
+        assert!(!provider.next_has_enough_buffer(0.1));
+        producer.finish();
+        assert!(provider.next_has_enough_buffer(0.1));
+    }
+
+    #[test]
+    fn completed_empty_next_source_is_not_ready_to_crossfade() {
+        let (source, producer) = AudioSource::new(source_info("empty.flac"));
+        producer.finish();
+        let mut provider = SourceProvider::new(48_000, 2);
+        provider.queue_next(source);
+        assert!(!provider.next_has_enough_buffer(0.0));
+    }
+
+    #[test]
     fn read_clears_finished_current_source_without_next_track() {
         let (mut source, mut producer) = AudioSource::new(source_info("track.flac"));
         source.set_ready();
@@ -615,5 +674,43 @@ mod tests {
         let mut output = [0.0; 4];
         assert_eq!(source.read(&mut output), 4);
         assert_eq!(output, [0.8, -0.8, 0.4, -0.4]);
+    }
+
+    #[test]
+    fn take_current_keeps_queued_successor() {
+        let (current, _current_producer) = AudioSource::new(source_info("cur.flac"));
+        let (next, _next_producer) = AudioSource::new(source_info("next.flac"));
+
+        let mut provider = SourceProvider::new(48_000, 2);
+        provider.set_current(current);
+        provider.queue_next(next);
+
+        let taken = provider.take_current();
+
+        assert!(taken.is_some());
+        assert!(provider.current().is_none());
+        assert!(provider.has_next());
+        assert_eq!(
+            provider.next().unwrap().info.path,
+            PathBuf::from("next.flac")
+        );
+    }
+
+    #[test]
+    fn clear_next_drops_only_the_successor() {
+        let (current, _current_producer) = AudioSource::new(source_info("cur.flac"));
+        let (next, _next_producer) = AudioSource::new(source_info("next.flac"));
+
+        let mut provider = SourceProvider::new(48_000, 2);
+        provider.set_current(current);
+        provider.queue_next(next);
+
+        provider.clear_next();
+
+        assert!(!provider.has_next());
+        assert_eq!(
+            provider.current().unwrap().info.path,
+            PathBuf::from("cur.flac")
+        );
     }
 }

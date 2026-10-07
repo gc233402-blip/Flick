@@ -4481,6 +4481,132 @@ class AppLocalizationsZh extends AppLocalizations {
   String get shuffleSongsInCurrentList => '随机播放当前列表中的歌曲';
 
   @override
+  String get signalAccurateUnverified => 'AccurateRip 未验证';
+
+  @override
+  String get signalAccurateVerified => '在日志中已通过 AccurateRip 校验';
+
+  @override
+  String get signalAltSetting => '备用接口设置';
+
+  @override
+  String get signalBufferCapacity => '缓冲区容量';
+
+  @override
+  String get signalBufferFill => '缓冲区填充量';
+
+  @override
+  String get signalBufferOccupancy => '打开时的缓冲区占用量';
+
+  @override
+  String get signalBufferTarget => '缓冲区目标值';
+
+  @override
+  String get signalCopyCrc => '复制 CRC';
+
+  @override
+  String get signalCrcCannotCompare => '无法比对';
+
+  @override
+  String get signalCrcComparison => 'CRC 比对';
+
+  @override
+  String get signalCrcMatch => '一致';
+
+  @override
+  String get signalCrcMismatch => '不一致';
+
+  @override
+  String get signalDriftFromTarget => '相对目标值的偏差';
+
+  @override
+  String get signalDsdBitRate => 'DSD 比特率';
+
+  @override
+  String get signalFileFormat => '文件格式';
+
+  @override
+  String get signalFramesPerPacket => '每包帧数';
+
+  @override
+  String get signalMaxPacket => '最大数据包';
+
+  @override
+  String get signalNoRipDescription => '未找到此曲目的抓轨或校验信息。';
+
+  @override
+  String get signalNotReported => '未报告';
+
+  @override
+  String get signalNotVerified => '未验证';
+
+  @override
+  String get signalRecordingUnavailable => '抓轨记录不可用';
+
+  @override
+  String get signalRipDescription => '此信息来自抓轨日志，并非当前播放路径中的一个环节。';
+
+  @override
+  String get signalRipProvenance => '抓轨溯源';
+
+  @override
+  String get signalRipper => '抓轨软件';
+
+  @override
+  String get signalServiceInterval => '服务间隔';
+
+  @override
+  String get signalSnapshot => '快照';
+
+  @override
+  String get signalSnapshotAtOpen => '打开时的快照';
+
+  @override
+  String get signalSourceDescription => '源文件的属性，并非发送到设备的输出属性。';
+
+  @override
+  String get signalSourceDetails => '源文件格式详情';
+
+  @override
+  String get signalSubslot => '子槽';
+
+  @override
+  String get signalSyncType => '同步类型';
+
+  @override
+  String get signalTarget => '目标值';
+
+  @override
+  String get signalTestCrc => '测试 CRC';
+
+  @override
+  String get signalTransportFormat => '传输';
+
+  @override
+  String get signalUnderruns => '缓冲区欠载次数';
+
+  @override
+  String get signalUsageType => '用途类型';
+
+  @override
+  String get signalUsbDescription => '打开此面板时可获取的传输数据。这不是实时数据包跟踪。';
+
+  @override
+  String get signalUsbMissingDescription => '仅在直连 USB 路径下报告 URB 详情。不会推断任何传输活动。';
+
+  @override
+  String get signalUsbTransport => 'USB 传输';
+
+  @override
+  String get signalUsbUnavailable => 'USB 传输详情不可用';
+
+  @override
+  String get signalVerificationMissing => '未报告校验结果';
+
+  @override
+  String get signalVerifiedInLog => '在日志中已验证';
+
+  @override
   String get signInFailedRetry => '登录失败 —— 重试';
 
   @override

@@ -22,7 +22,7 @@ use once_cell::sync::Lazy;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicU32, AtomicU8, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU8, Ordering};
 use std::sync::Mutex;
 
 static ENGINE_MANAGER: Lazy<EngineManager> = Lazy::new(EngineManager::new);
@@ -45,6 +45,11 @@ static LAST_VOLUME: AtomicU32 = AtomicU32::new(1.0f32.to_bits());
 static PENDING_XF_ENABLED: AtomicU8 = AtomicU8::new(u8::MAX);
 static PENDING_XF_DURATION: AtomicU32 = AtomicU32::new(0xFFFF_FFFF);
 static PENDING_XF_CURVE: AtomicU8 = AtomicU8::new(u8::MAX);
+
+// While crossfade is enabled the output clock stays pinned to the rate of
+// the track that started playback, so mismatched-rate successors can still be
+// queued and faded; explicit plays still renegotiate to the native rate.
+static CROSSFADE_PINS_OUTPUT_RATE: AtomicBool = AtomicBool::new(false);
 
 // ponytail: pending EQ so it survives engine recreation. A USB DAC rebuilds
 // the engine on a sample-rate change between tracks; volume and crossfade are
@@ -615,6 +620,39 @@ fn queue_compatible_with_engine(
     plan: &TrackEnginePlan,
 ) -> bool {
     engine_sample_rate == plan.sample_rate && engine_is_raw == plan.is_raw
+}
+
+/// What to do with a successor track against the live engine's fixed config.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum QueuePlanDecision {
+    /// Same clock and pipeline: queue as-is for gapless/crossfade.
+    Compatible,
+    /// Crossfade pins the output clock: decode the successor at the engine
+    /// rate so the boundary can still crossfade.
+    PinResampleToEngineRate,
+    /// Let the track-ended fallback renegotiate the output.
+    Skip,
+}
+
+/// Decide how to queue a successor against the live engine.
+///
+/// `queue_compatible_with_engine` alone can never fade a rate-changing
+/// boundary because the successor is skipped. While crossfade pins the output
+/// clock, PCM successors (never DSD/raw) are decoded at the engine rate
+/// instead.
+fn decide_queue_plan(
+    engine_sample_rate: u32,
+    engine_is_raw: bool,
+    plan: &TrackEnginePlan,
+    crossfade_pins_output_rate: bool,
+) -> QueuePlanDecision {
+    if queue_compatible_with_engine(engine_sample_rate, engine_is_raw, plan) {
+        return QueuePlanDecision::Compatible;
+    }
+    if crossfade_pins_output_rate && !engine_is_raw && !plan.is_raw && plan.dsd_mode.is_none() {
+        return QueuePlanDecision::PinResampleToEngineRate;
+    }
+    QueuePlanDecision::Skip
 }
 
 fn prepare_decoder_source(
@@ -1387,17 +1425,34 @@ pub fn audio_queue_next(path: String) -> Result<(), String> {
     let (output_sample_rate, output_channels, engine_is_raw) =
         with_audio_engine(|handle| Ok((handle.sample_rate(), handle.channels(), handle.is_dop())))?;
     let plan = plan_track_engine_config(&path)?;
-    if !queue_compatible_with_engine(output_sample_rate, engine_is_raw, &plan) {
-        log_info!(
-            "[AUDIO] queue_next: skipping {} — needs {} Hz raw_dsd={}, engine runs {} Hz raw_dsd={}; \
-             the track-ended fallback will renegotiate the output",
-            path.display(),
-            plan.sample_rate,
-            plan.is_raw,
-            output_sample_rate,
-            engine_is_raw
-        );
-        return Ok(());
+    match decide_queue_plan(
+        output_sample_rate,
+        engine_is_raw,
+        &plan,
+        CROSSFADE_PINS_OUTPUT_RATE.load(Ordering::Relaxed),
+    ) {
+        QueuePlanDecision::Compatible => {}
+        QueuePlanDecision::PinResampleToEngineRate => {
+            log_info!(
+                "[AUDIO] queue_next: crossfade pin — {} is {} Hz, engine runs {} Hz; \
+                 decoding at the engine rate (resampled) so the boundary can crossfade",
+                path.display(),
+                plan.sample_rate,
+                output_sample_rate
+            );
+        }
+        QueuePlanDecision::Skip => {
+            log_info!(
+                "[AUDIO] queue_next: skipping {} — needs {} Hz raw_dsd={}, engine runs {} Hz raw_dsd={}; \
+                 the track-ended fallback will renegotiate the output",
+                path.display(),
+                plan.sample_rate,
+                plan.is_raw,
+                output_sample_rate,
+                engine_is_raw
+            );
+            return Ok(());
+        }
     }
     let (source, handle) =
         prepare_decoder_source(&path, plan.dsd_mode, output_sample_rate, output_channels)?;
@@ -1477,7 +1532,8 @@ pub fn audio_queue_next_from_http(
     .unwrap_or(DEFAULT_ENGINE_SAMPLE_RATE);
     let (output_sample_rate, output_channels, engine_is_raw) =
         with_audio_engine(|handle| Ok((handle.sample_rate(), handle.channels(), handle.is_dop())))?;
-    if engine_is_raw || planned_rate != output_sample_rate {
+    let crossfade_pin = CROSSFADE_PINS_OUTPUT_RATE.load(Ordering::Relaxed);
+    if engine_is_raw || (planned_rate != output_sample_rate && !crossfade_pin) {
         log_info!(
             "[AUDIO] queue_next(http): skipping {} — needs {} Hz, engine runs {} Hz raw_dsd={}; \
              the track-ended fallback will renegotiate the output",
@@ -1487,6 +1543,15 @@ pub fn audio_queue_next_from_http(
             engine_is_raw
         );
         return Ok(());
+    }
+    if planned_rate != output_sample_rate {
+        log_info!(
+            "[AUDIO] queue_next(http): crossfade pin — {} is {} Hz, engine runs {} Hz; \
+             decoding at the engine rate (resampled) so the boundary can crossfade",
+            url,
+            planned_rate,
+            output_sample_rate
+        );
     }
     let (source, decoder_thread) = DecoderThread::spawn_from_probe_result(
         probe_result,
@@ -1655,6 +1720,10 @@ pub fn audio_clear_ir() -> Result<(), String> {
 /// passthrough guard here was redundant and self-defeating — it blocked the
 /// very `crossfade_forces_dsp` flip that lets crossfade escape passthrough.
 pub fn audio_set_crossfade(enabled: bool, duration_secs: f32) -> Result<(), String> {
+    // While crossfade is on, keep the output clock pinned to the rate of the
+    // track that started playback so mismatched-rate successors can still be
+    // queued and faded; explicit plays still renegotiate to the native rate.
+    CROSSFADE_PINS_OUTPUT_RATE.store(enabled, Ordering::Relaxed);
     set_pending_crossfade(enabled, duration_secs);
     with_audio_engine(|handle| handle.set_crossfade(enabled, duration_secs))
 }
@@ -1901,6 +1970,70 @@ mod tests {
         assert!(
             !queue_compatible_with_engine(44_100, false, &dop),
             "raw flip must skip"
+        );
+    }
+
+    #[test]
+    fn decide_queue_plan_pins_pcm_rate_change_when_crossfading() {
+        let pcm_96 = TrackEnginePlan {
+            sample_rate: 96_000,
+            is_raw: false,
+            dsd_mode: None,
+        };
+        assert_eq!(
+            decide_queue_plan(44_100, false, &pcm_96, true),
+            QueuePlanDecision::PinResampleToEngineRate,
+            "crossfade must be able to queue a rate-changing PCM successor"
+        );
+
+        let pcm_44 = TrackEnginePlan {
+            sample_rate: 44_100,
+            is_raw: false,
+            dsd_mode: None,
+        };
+        assert_eq!(
+            decide_queue_plan(44_100, false, &pcm_44, true),
+            QueuePlanDecision::Compatible
+        );
+        assert_eq!(
+            decide_queue_plan(44_100, false, &pcm_96, false),
+            QueuePlanDecision::Skip,
+            "without the pin a rate change must still renegotiate"
+        );
+    }
+
+    #[test]
+    fn decide_queue_plan_never_pins_dsd_or_raw_engines() {
+        let dsd_plan = TrackEnginePlan {
+            sample_rate: 176_400,
+            is_raw: true,
+            dsd_mode: Some(DsdOutputMode::Dop),
+        };
+        assert_eq!(
+            decide_queue_plan(44_100, false, &dsd_plan, true),
+            QueuePlanDecision::Skip,
+            "DSD boundaries hard-cut instead of pinning"
+        );
+
+        let dsd_pcm = TrackEnginePlan {
+            sample_rate: 44_100,
+            is_raw: false,
+            dsd_mode: Some(DsdOutputMode::PcmDecimation),
+        };
+        assert_eq!(
+            decide_queue_plan(96_000, false, &dsd_pcm, true),
+            QueuePlanDecision::Skip
+        );
+
+        let pcm = TrackEnginePlan {
+            sample_rate: 44_100,
+            is_raw: false,
+            dsd_mode: None,
+        };
+        assert_eq!(
+            decide_queue_plan(176_400, true, &pcm, true),
+            QueuePlanDecision::Skip,
+            "a raw engine cannot take a PCM pin"
         );
     }
 
