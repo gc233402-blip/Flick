@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/services/player_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class PitchBottomSheet extends StatelessWidget {
   final PlayerService playerService;
@@ -33,8 +34,8 @@ class PitchBottomSheet extends StatelessWidget {
             children: [
               const Icon(LucideIcons.music, color: AppColors.accent, size: 24),
               const SizedBox(width: 12),
-              const Text(
-                'Pitch',
+              Text(
+                l10n.pitch,
                 style: TextStyle(
                   fontFamily: 'ProductSans',
                   fontSize: 18,
@@ -90,8 +91,9 @@ class PitchBottomSheet extends StatelessWidget {
               valueListenable: playerService.pitchSemitonesNotifier,
               builder: (context, semitones, _) {
                 final v = semitones.round();
+                final sign = v > 0 ? '+' : '';
                 return Text(
-                  v == 0 ? 'Off' : '${v > 0 ? "+" : ""}$v semitones',
+                  v == 0 ? l10n.off : '$sign${l10n.pitchSemitones(v)}',
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 16,
