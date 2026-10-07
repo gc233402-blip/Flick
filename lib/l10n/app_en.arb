@@ -43,6 +43,10 @@
   "@accentColor": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:263"
   },
+  "accuraterip": "AccurateRip",
+  "@accuraterip": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1102"
+  },
   "activateFallback": "Activate Fallback",
   "@activateFallback": {
     "description": "lib/widgets/uac2/uac2_fallback_manager.dart:179"
@@ -80,6 +84,10 @@
   "@addAPreviousTrackButton": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:177"
   },
+  "addAtLeastOneLyricLine": "Add at least one lyric line first.",
+  "@addAtLeastOneLyricLine": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:475"
+  },
   "addMusicFolder": "Add Music Folder",
   "@addMusicFolder": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:2117"
@@ -87,6 +95,48 @@
   "addServer": "Add Server",
   "@addServer": {
     "description": "lib/features/settings/screens/network_sources_screen.dart:154"
+  },
+  "addSongsToPlaylist2": "Add {arg1} Songs to Playlist",
+  "@addSongsToPlaylist2": {
+    "description": "lib/features/player/widgets/add_to_playlist_sheet.dart:52",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "addToPlaylist2": "Add to Playlist",
+  "@addToPlaylist2": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:211"
+  },
+  "addToQueue": "Add to Queue",
+  "@addToQueue": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:202"
+  },
+  "addedSongsTo": "Added {arg1} songs to \"{arg2}\"",
+  "@addedSongsTo": {
+    "description": "lib/features/player/widgets/add_to_playlist_sheet.dart:158",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "addedTo2": "Added to \"{arg1}\"",
+  "@addedTo2": {
+    "description": "lib/features/player/widgets/add_to_playlist_sheet.dart:157",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "addedToFavorites": "Added to favorites",
+  "@addedToFavorites": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:487"
   },
   "addsPreDriveAndCatchesPeaks": "Adds pre-drive and catches peaks against a final output ceiling.",
   "@addsPreDriveAndCatchesPeaks": {
@@ -136,6 +186,10 @@
   "@advanced": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:905"
   },
+  "advancedMode": "Advanced mode",
+  "@advancedMode": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:686"
+  },
   "afterScanningMatchFilesWithMissing": "After scanning, match files with missing tags against Apple Music. Only confident matches apply automatically.",
   "@afterScanningMatchFilesWithMissing": {
     "description": "lib/features/settings/widgets/apple_music_settings_tile.dart:40"
@@ -168,6 +222,10 @@
   "albumArtImport": "Album Art Import",
   "@albumArtImport": {
     "description": "lib/features/settings/screens/privacy_policy_screen.dart:64"
+  },
+  "albumArtist": "Album Artist",
+  "@albumArtist": {
+    "description": "lib/features/player/widgets/song_metadata_sheet.dart:68"
   },
   "albumArtwork": "Album Artwork",
   "@albumArtwork": {
@@ -221,13 +279,25 @@
   "@allPass": {
     "description": "lib/providers/equalizer_provider.dart:41"
   },
+  "allResultsAreHiddenByActive": "All results are hidden by active filters.",
+  "@allResultsAreHiddenByActive": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:701"
+  },
   "allSongs": "All Songs",
   "@allSongs": {
     "description": "lib/models/playback_context.dart:15"
   },
+  "allWordsStamped": "All words stamped",
+  "@allWordsStamped": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1392"
+  },
   "allowFlickToRunWithoutAggressive": "Allow Flick to run without aggressive background limits so rescans and background features keep working",
   "@allowFlickToRunWithoutAggressive": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1982"
+  },
+  "allowed": "Allowed",
+  "@allowed": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:683"
   },
   "alphabetical": "Alphabetical",
   "@alphabetical": {
@@ -240,6 +310,15 @@
   "alsoRespectsYourSystemTextSize": "Also respects your system text size",
   "@alsoRespectsYourSystemTextSize": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:234"
+  },
+  "alt": "Alt {arg1}",
+  "@alt": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1003",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "amber": "Amber",
   "@amber": {
@@ -367,6 +446,10 @@
   "@artist": {
     "description": "lib/features/albums/widgets/identify_album_sheet.dart:254"
   },
+  "artistIsNotAvailableForThis": "Artist is not available for this song",
+  "@artistIsNotAvailableForThis": {
+    "description": "lib/features/player/widgets/player_navigation.dart:45"
+  },
   "artistName": "Artist Name",
   "@artistName": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:215"
@@ -387,9 +470,17 @@
   "@artworkCard": {
     "description": "lib/features/player/widgets/player_layout_sheet.dart:203"
   },
+  "artworkPlacement": "Artwork placement",
+  "@artworkPlacement": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:239"
+  },
   "artworkPlacement2": "Artwork Placement",
   "@artworkPlacement2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:288"
+  },
+  "artworkSize": "Artwork size",
+  "@artworkSize": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:208"
   },
   "artworkSize2": "Artwork Size",
   "@artworkSize2": {
@@ -435,6 +526,10 @@
   "@audioFormatIsDisabled": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:237"
   },
+  "audioSignalPath": "Audio Signal Path",
+  "@audioSignalPath": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:480"
+  },
   "audioTestingEquipment": "Audio Testing Equipment",
   "@audioTestingEquipment": {
     "description": "lib/features/settings/screens/support_flick_screen.dart:173"
@@ -442,6 +537,10 @@
   "auto": "Auto",
   "@auto": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:1224"
+  },
+  "autoAdvance": "Auto Advance",
+  "@autoAdvance": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1427"
   },
   "autoBeMsbDefaultOnlyChange": "Auto — BE-MSB default; only change if native DSD hisses",
   "@autoBeMsbDefaultOnlyChange": {
@@ -454,6 +553,10 @@
   "autoCollapse": "Auto Collapse",
   "@autoCollapse": {
     "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:77"
+  },
+  "autoFill": "Auto-fill",
+  "@autoFill": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1689"
   },
   "autoFocusSearch": "Auto-Focus Search",
   "@autoFocusSearch": {
@@ -535,6 +638,10 @@
   "backOnline": "Back online",
   "@backOnline": {
     "description": "lib/widgets/common/offline_notice.dart:137"
+  },
+  "backToLocker": "Back to Locker",
+  "@backToLocker": {
+    "description": "lib/features/player/screens/full_player_screen.dart:731"
   },
   "backend": "Backend",
   "@backend": {
@@ -703,6 +810,10 @@
   "@beMsbPackingTheDefaultWire": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1827"
   },
+  "besideTheSong": "Beside the song",
+  "@besideTheSong": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:499"
+  },
   "bigEndian32BitSubslotMsb": "Big-endian 32-bit subslot, MSB-first bits",
   "@bigEndian32BitSubslotMsb": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1832"
@@ -720,6 +831,10 @@
       }
     }
   },
+  "bitDepth": "Bit depth",
+  "@bitDepth": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:612"
+  },
   "bitDepth2": "Bit Depth",
   "@bitDepth2": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1350"
@@ -727,6 +842,14 @@
   "bitDepths": "Bit Depths",
   "@bitDepths": {
     "description": "lib/features/settings/screens/uac2_settings_screen.dart:569"
+  },
+  "bitPerfect": "BIT-PERFECT",
+  "@bitPerfect": {
+    "description": "lib/features/player/widgets/bit_perfect_capsule.dart:144"
+  },
+  "bitPerfect2": "Bit-perfect",
+  "@bitPerfect2": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:420"
   },
   "bitPerfectCapsule": "Bit-Perfect Capsule",
   "@bitPerfectCapsule": {
@@ -774,6 +897,10 @@
       }
     }
   },
+  "bitPerfectVerified": "Bit-perfect verified",
+  "@bitPerfectVerified": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:490"
+  },
   "bitSubslotsLlRrPer": "16-bit subslots: LL|RR per frame",
   "@bitSubslotsLlRrPer": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1768"
@@ -785,6 +912,10 @@
   "bitrateAdjustsToSignalQuality": "Bitrate adjusts to signal quality",
   "@bitrateAdjustsToSignalQuality": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:503"
+  },
+  "blocked": "Blocked",
+  "@blocked": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:683"
   },
   "blue": "Blue",
   "@blue": {
@@ -837,6 +968,10 @@
   "browseTheFullControlsGuide": "Browse the full controls guide",
   "@browseTheFullControlsGuide": {
     "description": "lib/features/settings/screens/settings_screen.dart:238"
+  },
+  "buffer": "Buffer",
+  "@buffer": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1024"
   },
   "build": "{kAppVersion} (build {kAppBuild})",
   "@build": {
@@ -920,6 +1055,15 @@
   "@capAt60hzBalancedSmoothnessAnd": {
     "description": "lib/features/settings/screens/interface_settings_screen.dart:224"
   },
+  "capMs": "cap {arg1} ms",
+  "@capMs": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1027",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "capabilities": "Capabilities",
   "@capabilities": {
     "description": "lib/features/settings/screens/uac2_settings_screen.dart:82"
@@ -947,6 +1091,10 @@
   "casting": "Casting",
   "@casting": {
     "description": "lib/features/settings/screens/casting_settings_screen.dart:66"
+  },
+  "castingTapToManage": "Casting — tap to manage",
+  "@castingTapToManage": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:843"
   },
   "castingTo": "Casting to {deviceName}",
   "@castingTo": {
@@ -989,6 +1137,24 @@
   "centeredWidensToFitYourControls": "Centered; widens to fit your controls",
   "@centeredWidensToFitYourControls": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:91"
+  },
+  "ch": "{channels} ch",
+  "@ch": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:621",
+    "placeholders": {
+      "channels": {
+        "type": "Object"
+      }
+    }
+  },
+  "ch2": "{ch} ch",
+  "@ch2": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:932",
+    "placeholders": {
+      "ch": {
+        "type": "Object"
+      }
+    }
   },
   "ch3": "{arg1} / {arg2}ch",
   "@ch3": {
@@ -1060,6 +1226,10 @@
   "@chooseAction": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:968"
   },
+  "chooseLocationU2026": "Choose location…",
+  "@chooseLocationU2026": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:494"
+  },
   "chooseWhichToKeep": "Choose which to keep",
   "@chooseWhichToKeep": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:1178"
@@ -1108,6 +1278,10 @@
   "@clearConvertedAudioCache": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:400"
   },
+  "clearFilters": "Clear filters",
+  "@clearFilters": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:807"
+  },
   "clearLogs": "Clear logs?",
   "@clearLogs": {
     "description": "lib/features/settings/screens/logs_screen.dart:230"
@@ -1115,6 +1289,14 @@
   "clearTheCounterAndAnyUnlocked": "Clear the counter and any unlocked streak milestones",
   "@clearTheCounterAndAnyUnlocked": {
     "description": "lib/features/settings/screens/interface_settings_screen.dart:174"
+  },
+  "clearWord": "Clear Word",
+  "@clearWord": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1594"
+  },
+  "clearWords": "Clear Words",
+  "@clearWords": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1418"
   },
   "clearing": "Clearing...",
   "@clearing": {
@@ -1152,6 +1334,10 @@
   "collapsed": "Collapsed",
   "@collapsed": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:334"
+  },
+  "color": "Color",
+  "@color": {
+    "description": "lib/features/player/widgets/share/share_template.dart:9"
   },
   "comingSoon": "Coming Soon",
   "@comingSoon": {
@@ -1295,6 +1481,10 @@
   "@contentControls": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:148"
   },
+  "contentPlacement": "Content placement",
+  "@contentPlacement": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:228"
+  },
   "contentPlacement2": "Content Placement",
   "@contentPlacement2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:271"
@@ -1390,6 +1580,14 @@
   "@couldNotConnectToListenbrainzCheck": {
     "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:609"
   },
+  "couldNotLoadAlbumSongs": "Could not load album songs",
+  "@couldNotLoadAlbumSongs": {
+    "description": "lib/features/player/widgets/player_navigation.dart:85"
+  },
+  "couldNotLoadArtistSongs": "Could not load artist songs",
+  "@couldNotLoadArtistSongs": {
+    "description": "lib/features/player/widgets/player_navigation.dart:56"
+  },
   "couldNotLoadIr": "Could not load IR: {e}",
   "@couldNotLoadIr": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:3723",
@@ -1446,6 +1644,18 @@
   "@couldNotOpenThePlayStore3": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:117"
   },
+  "couldNotReadTheSelectedLyrics": "Could not read the selected lyrics file.",
+  "@couldNotReadTheSelectedLyrics": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:129"
+  },
+  "couldNotSaveTheLyricsFile": "Could not save the lyrics file.",
+  "@couldNotSaveTheLyricsFile": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:565"
+  },
+  "couldNotUseTheSelectedLyrics": "Could not use the selected lyrics file.",
+  "@couldNotUseTheSelectedLyrics": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:142"
+  },
   "couldnTOpenTheBrowserAutomatically": "Couldn't open the browser automatically. Authorize on any device with this link — we'll finish signing in once you do:",
   "@couldnTOpenTheBrowserAutomatically": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:589"
@@ -1469,6 +1679,10 @@
   "createACustomPreset": "Create a custom preset",
   "@createACustomPreset": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:738"
+  },
+  "createLyrics": "Create Lyrics",
+  "@createLyrics": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:208"
   },
   "createOrRefreshPlaylistsFoundInside": "Create or refresh playlists found inside scanned folders",
   "@createOrRefreshPlaylistsFoundInside": {
@@ -1727,6 +1941,10 @@
   "@deactivateFallback": {
     "description": "lib/widgets/uac2/uac2_fallback_manager.dart:178"
   },
+  "decode": "Decode",
+  "@decode": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:917"
+  },
   "decodeSongsAfterScanningToCache": "Decode songs after scanning to cache waveform peaks and loudness metrics",
   "@decodeSongsAfterScanningToCache": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1899"
@@ -1805,6 +2023,10 @@
   "@developerOptionsIsDisabledEnableIt": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:173"
   },
+  "device": "Device",
+  "@device": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:641"
+  },
   "deviceCapabilities": "Device Capabilities",
   "@deviceCapabilities": {
     "description": "lib/widgets/uac2/uac2_device_capabilities.dart:38"
@@ -1837,6 +2059,10 @@
   "@devices": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:306"
   },
+  "direct": "Direct",
+  "@direct": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:657"
+  },
   "directAlsaOutputIsActiveAnd": "Direct ALSA output is active and bypassing the Android audio server.",
   "@directAlsaOutputIsActiveAnd": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1047"
@@ -1852,6 +2078,10 @@
   "directUsbDeviceManaged": "Direct USB device-managed",
   "@directUsbDeviceManaged": {
     "description": "lib/features/settings/screens/uac2_settings_screen.dart:691"
+  },
+  "directUsbExperimental": "Direct USB experimental",
+  "@directUsbExperimental": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:500"
   },
   "disableBatteryOptimization": "Disable Battery Optimization",
   "@disableBatteryOptimization": {
@@ -1876,6 +2106,18 @@
   "disabledWhileBothBitPerfectOptions": "Disabled while both bit-perfect options are off on this DAP.",
   "@disabledWhileBothBitPerfectOptions": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:760"
+  },
+  "disc": "Disc",
+  "@disc": {
+    "description": "lib/features/player/widgets/song_metadata_sheet.dart:80"
+  },
+  "discard": "Discard",
+  "@discard": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:594"
+  },
+  "discardChanges": "Discard changes?",
+  "@discardChanges": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:588"
   },
   "disconnect": "Disconnect",
   "@disconnect": {
@@ -1978,6 +2220,10 @@
   "@done": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:634"
   },
+  "dop": "DoP",
+  "@dop": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:712"
+  },
   "dots": "Dots",
   "@dots": {
     "description": "lib/features/settings/screens/visualizer_settings_screen.dart:111"
@@ -2038,6 +2284,10 @@
       }
     }
   },
+  "dragABoundaryToStretchOr": "Drag a boundary to stretch or shrink the word before it. The last boundary moves the next line.",
+  "@dragABoundaryToStretchOr": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1705"
+  },
   "dragBandsUpOrDown": "Drag bands up or down",
   "@dragBandsUpOrDown": {
     "description": "lib/widgets/equalizer/interactive_eq_graph.dart:129"
@@ -2058,13 +2308,30 @@
   "@drawTheCurvedArcBehindThe": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:180"
   },
+  "driftMs": "Drift {arg1} ms",
+  "@driftMs": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1040",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "dsdDsfPlayback": "DSD / DSF Playback",
   "@dsdDsfPlayback": {
     "description": "lib/features/settings/screens/support_flick_screen.dart:180"
   },
+  "dsdMode": "DSD mode",
+  "@dsdMode": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:713"
+  },
   "dsdOutputMode": "DSD Output Mode",
   "@dsdOutputMode": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1508"
+  },
+  "dsdStream": "DSD stream",
+  "@dsdStream": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:918"
   },
   "duckOnNotifications": "Duck on Notifications",
   "@duckOnNotifications": {
@@ -2082,6 +2349,10 @@
   "@duration": {
     "description": "lib/features/settings/screens/audio_settings_screen.dart:330"
   },
+  "durationMatch": "Duration Match",
+  "@durationMatch": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:874"
+  },
   "dynamics": "Dynamics",
   "@dynamics": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:3255"
@@ -2090,13 +2361,29 @@
   "@editCredentials": {
     "description": "lib/features/settings/widgets/lastfm_settings_tile.dart:921"
   },
+  "editMetadata": "Edit Metadata",
+  "@editMetadata": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:268"
+  },
   "editServer": "Edit Server",
   "@editServer": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:368"
   },
+  "editSync": "Edit & Sync",
+  "@editSync": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:208"
+  },
+  "editText": "Edit Text",
+  "@editText": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:770"
+  },
   "editToken": "Edit Token",
   "@editToken": {
     "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:348"
+  },
+  "emptyLine": "(Empty line)",
+  "@emptyLine": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1143"
   },
   "emptyTheLibraryFilesOnDisk": "Empty the library; files on disk are kept",
   "@emptyTheLibraryFilesOnDisk": {
@@ -2130,6 +2417,10 @@
   "@enabled": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:1200"
   },
+  "endpoint": "Endpoint",
+  "@endpoint": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:998"
+  },
   "engine": "Engine",
   "@engine": {
     "description": "lib/features/player/widgets/bit_perfect_indicator.dart:628"
@@ -2161,6 +2452,15 @@
   "enterYourSharedSecret": "Enter your shared secret",
   "@enterYourSharedSecret": {
     "description": "lib/features/settings/widgets/lastfm_settings_tile.dart:512"
+  },
+  "ep": "EP {arg1}",
+  "@ep": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1000",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "eqDynamics": "EQ & Dynamics",
   "@eqDynamics": {
@@ -2205,6 +2505,10 @@
       }
     }
   },
+  "errorLoadingPlaylists": "Error loading playlists",
+  "@errorLoadingPlaylists": {
+    "description": "lib/features/player/widgets/add_to_playlist_sheet.dart:70"
+  },
   "errorLoadingPreference": "Error loading preference",
   "@errorLoadingPreference": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1198"
@@ -2220,6 +2524,10 @@
   "everySongIsRemovedFromYour": "Every song is removed from your library. Files on disk are kept; rescan your folders to add them again.",
   "@everySongIsRemovedFromYour": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:430"
+  },
+  "exactMatch": "Exact Match",
+  "@exactMatch": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:363"
   },
   "excludeTinyClipsPreviewsAndAccidental": "Exclude tiny clips, previews, and accidental scraps",
   "@excludeTinyClipsPreviewsAndAccidental": {
@@ -2390,6 +2698,10 @@
   "@faintHueShiftFromAlbumArt": {
     "description": "lib/models/album_color_mode.dart:35"
   },
+  "fallback": "Fallback",
+  "@fallback": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:706"
+  },
   "fallbackAudio": "Fallback Audio",
   "@fallbackAudio": {
     "description": "lib/widgets/uac2/uac2_fallback_manager.dart:136"
@@ -2429,6 +2741,14 @@
   "feedback": "Feedback",
   "@feedback": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:3654"
+  },
+  "file": "File",
+  "@file": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:909"
+  },
+  "filePath": "File Path",
+  "@filePath": {
+    "description": "lib/features/player/widgets/song_metadata_sheet.dart:82"
   },
   "files": "{done} / {total} files",
   "@files": {
@@ -2516,6 +2836,10 @@
         "type": "Object"
       }
     }
+  },
+  "flac24Bit96Khz": "FLAC · 24-bit / 96 kHz",
+  "@flac24Bit96Khz": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:1200"
   },
   "flat": "Flat",
   "@flat": {
@@ -2683,6 +3007,15 @@
       }
     }
   },
+  "frPkt": "{arg1} fr/pkt",
+  "@frPkt": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:988",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "freeOpenSource": "Free & Open Source",
   "@freeOpenSource": {
     "description": "lib/features/settings/screens/support_flick_screen.dart:143"
@@ -2736,6 +3069,10 @@
   "@fullSpectrum": {
     "description": "lib/features/settings/screens/visualizer_settings_screen.dart:124"
   },
+  "fullViewCardSize": "Full-view card size",
+  "@fullViewCardSize": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:304"
+  },
   "fullViewCardSize2": "Full-view Card Size",
   "@fullViewCardSize2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:164"
@@ -2781,6 +3118,10 @@
       }
     }
   },
+  "genre": "Genre",
+  "@genre": {
+    "description": "lib/features/player/widgets/song_metadata_sheet.dart:70"
+  },
   "geometry": "Geometry",
   "@geometry": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:21"
@@ -2801,9 +3142,21 @@
   "@github": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:489"
   },
+  "goToAlbum": "Go to Album",
+  "@goToAlbum": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:324"
+  },
+  "goToArtist": "Go to Artist",
+  "@goToArtist": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:315"
+  },
   "googlePlayDeveloperFees": "Google Play Developer Fees",
   "@googlePlayDeveloperFees": {
     "description": "lib/features/settings/screens/support_flick_screen.dart:166"
+  },
+  "gotIt": "Got it",
+  "@gotIt": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:721"
   },
   "grantBluetoothAccess": "Grant Bluetooth access",
   "@grantBluetoothAccess": {
@@ -2865,6 +3218,10 @@
   "@hapticFeedback": {
     "description": "lib/features/settings/screens/interface_settings_screen.dart:100"
   },
+  "hardwareUsbDac": "Hardware (USB DAC)",
+  "@hardwareUsbDac": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1153"
+  },
   "hardwareVolumeIsDetectedButWrites": "Hardware volume is detected, but writes stay blocked while live direct USB playback is active.",
   "@hardwareVolumeIsDetectedButWrites": {
     "description": "lib/widgets/uac2/uac2_volume_control.dart:246"
@@ -2897,6 +3254,10 @@
   "@hidden": {
     "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:202"
   },
+  "hideLyrics": "Hide lyrics",
+  "@hideLyrics": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:440"
+  },
   "hideNavigationButtonsAfterBeingIdle": "Hide navigation buttons after being idle",
   "@hideNavigationButtonsAfterBeingIdle": {
     "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:79"
@@ -2916,6 +3277,14 @@
   "hideTheIndexRailAfterInactivity": "Hide the index rail after inactivity",
   "@hideTheIndexRailAfterInactivity": {
     "description": "lib/features/settings/screens/playback_display_settings_screen.dart:206"
+  },
+  "hideVisualizer": "Hide visualizer",
+  "@hideVisualizer": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:551"
+  },
+  "hideVisualizer2": "Hide Visualizer",
+  "@hideVisualizer2": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:305"
   },
   "high": "High",
   "@high": {
@@ -2984,6 +3353,15 @@
   "httpBasicNeedsItRecoverableStored": "HTTP Basic needs it recoverable; stored encoded",
   "@httpBasicNeedsItRecoverableStored": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:77"
+  },
+  "hz": "{rate} Hz",
+  "@hz": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1145",
+    "placeholders": {
+      "rate": {
+        "type": "Object"
+      }
+    }
   },
   "hz3": "{hz} Hz",
   "@hz3": {
@@ -3089,6 +3467,18 @@
   "@inputGain": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:3406"
   },
+  "inst": "Inst",
+  "@inst": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:885"
+  },
+  "instructions": "Instructions",
+  "@instructions": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:775"
+  },
+  "instrumental": "Instrumental",
+  "@instrumental": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:594"
+  },
   "integrations": "Integrations",
   "@integrations": {
     "description": "lib/features/settings/screens/integrations_settings_screen.dart:14"
@@ -3100,6 +3490,10 @@
   "interactiveTutorial": "Interactive Tutorial",
   "@interactiveTutorial": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:693"
+  },
+  "interfaceClaimed": "Interface claimed",
+  "@interfaceClaimed": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:693"
   },
   "interfaceLabel": "Interface",
   "@interfaceLabel": {
@@ -3146,6 +3540,10 @@
   "@karaokeEffect": {
     "description": "lib/features/settings/screens/lyrics_settings_screen.dart:43"
   },
+  "karaokePreview": "Karaoke Preview",
+  "@karaokePreview": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1623"
+  },
   "kb": "{arg1} KB",
   "@kb": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:22",
@@ -3158,6 +3556,10 @@
   "keepAll": "Keep all",
   "@keepAll": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:1251"
+  },
+  "keepEditing": "Keep Editing",
+  "@keepEditing": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:598"
   },
   "keepMiniPlayerAndNavVisible": "Keep mini player and nav visible",
   "@keepMiniPlayerAndNavVisible": {
@@ -3237,6 +3639,15 @@
   "khz": "{arg1}kHz",
   "@khz": {
     "description": "lib/widgets/uac2/uac2_player_status.dart:186",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "khz2": "{arg1} kHz",
+  "@khz2": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1143",
     "placeholders": {
       "arg1": {
         "type": "Object"
@@ -3378,17 +3789,38 @@
   "@left": {
     "description": "lib/features/settings/screens/lyrics_settings_screen.dart:56"
   },
+  "leftBottom": "Left (bottom)",
+  "@leftBottom": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:349"
+  },
   "leftBottomButton": "Left (Bottom) Button",
   "@leftBottomButton": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:410"
+  },
+  "leftTop": "Left (top)",
+  "@leftTop": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:337"
   },
   "leftTopButton": "Left (Top) Button",
   "@leftTopButton": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:385"
   },
+  "length": "Length:",
+  "@length": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1838"
+  },
   "lengthOfTheOverlap": "Length of the overlap",
   "@lengthOfTheOverlap": {
     "description": "lib/features/settings/screens/audio_settings_screen.dart:331"
+  },
+  "lengthS": "Length {arg1}s",
+  "@lengthS": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1799",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "letAndroidChooseTheBestCodec": "Let Android choose the best codec",
   "@letAndroidChooseTheBestCodec": {
@@ -3466,13 +3898,65 @@
   "@line": {
     "description": "lib/models/progress_bar_style.dart:18"
   },
+  "lineOf": "Line {arg1} of {arg2}",
+  "@lineOf": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1290",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "lineOfWords": "Line {arg1} of {arg2}  ·  {captured}/{segmentCount} words",
+  "@lineOfWords": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1366",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      },
+      "captured": {
+        "type": "Object"
+      },
+      "segmentCount": {
+        "type": "Object"
+      }
+    }
+  },
   "linear": "Linear",
   "@linear": {
     "description": "lib/features/player/widgets/bit_perfect_indicator.dart:919"
   },
+  "lines": "Lines",
+  "@lines": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:865"
+  },
+  "lines2": "{arg1} lines",
+  "@lines2": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:952",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "linkReady": "Link ready",
   "@linkReady": {
     "description": "lib/features/settings/screens/logs_screen.dart:170"
+  },
+  "linkedToThisSong": "Linked \"{arg1}\" to this song.",
+  "@linkedToThisSong": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:140",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "list": "List",
   "@list": {
@@ -3493,6 +3977,18 @@
   "listenbrainzConnected2": "ListenBrainz connected!",
   "@listenbrainzConnected2": {
     "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:599"
+  },
+  "listeningToByOnFlick": "Listening to {arg1} by {arg2} on Flick",
+  "@listeningToByOnFlick": {
+    "description": "lib/features/player/widgets/share/share_bottom_sheet.dart:134",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
   },
   "littleEndianSubslotLsbFirstBits": "Little-endian subslot, LSB-first bits",
   "@littleEndianSubslotLsbFirstBits": {
@@ -3616,13 +4112,59 @@
   "@lowShelf": {
     "description": "lib/providers/equalizer_provider.dart:29"
   },
+  "lrclib": "LRCLib",
+  "@lrclib": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:381"
+  },
+  "lyric": "Lyric",
+  "@lyric": {
+    "description": "lib/features/player/widgets/share/share_template.dart:5"
+  },
   "lyrics": "Lyrics",
   "@lyrics": {
     "description": "lib/features/player/widgets/song_actions_sheet.dart:295"
   },
+  "lyricsPreview": "Lyrics Preview",
+  "@lyricsPreview": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:1012"
+  },
+  "lyricsSavedFromLrclib": "Lyrics saved from LRCLib.",
+  "@lyricsSavedFromLrclib": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:162"
+  },
   "lyricsSavingBehavior": "Lyrics saving behavior",
   "@lyricsSavingBehavior": {
     "description": "lib/features/settings/screens/settings_screen.dart:172"
+  },
+  "lyricsSyncHelp": "Lyrics Sync Help",
+  "@lyricsSyncHelp": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:647"
+  },
+  "lyricsSyncStudio": "Lyrics Sync Studio",
+  "@lyricsSyncStudio": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:747"
+  },
+  "lyricsText": "Lyrics Text",
+  "@lyricsText": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:615"
+  },
+  "m": "{arg1}m",
+  "@m": {
+    "description": "lib/features/player/widgets/sleep_timer_bottom_sheet.dart:133",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "m2": "{arg1}m",
+  "@m2": {
+    "description": "lib/features/player/widgets/sleep_timer_bottom_sheet.dart:162",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "madeForYou": "Made For You",
   "@madeForYou": {
@@ -3651,6 +4193,15 @@
   "matchNavigation": "Match navigation",
   "@matchNavigation": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:82"
+  },
+  "maxB": "Max {arg1} B",
+  "@maxB": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1012",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "maximumAudioQuality": "Maximum audio quality",
   "@maximumAudioQuality": {
@@ -3697,6 +4248,15 @@
   "@metropolitan": {
     "description": "lib/models/song.dart:335"
   },
+  "mhz": "{arg1} MHz",
+  "@mhz": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1141",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "mid": "Mid",
   "@mid": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:1680"
@@ -3717,6 +4277,15 @@
   "@milestones": {
     "description": "lib/features/milestone/screens/milestones_screen.dart:122"
   },
+  "min": "{arg1} min",
+  "@min": {
+    "description": "lib/features/player/widgets/sleep_timer_bottom_sheet.dart:174",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "miniPlayer": "Mini Player",
   "@miniPlayer": {
     "description": "lib/providers/tutorial_provider.dart:38"
@@ -3736,6 +4305,10 @@
   "miniPlayerLayout": "Mini Player Layout",
   "@miniPlayerLayout": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:64"
+  },
+  "minimal": "Minimal",
+  "@minimal": {
+    "description": "lib/features/player/widgets/share/share_template.dart:13"
   },
   "minimize": "Minimize",
   "@minimize": {
@@ -3769,6 +4342,10 @@
         "type": "Object"
       }
     }
+  },
+  "mixer": "Mixer",
+  "@mixer": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:659"
   },
   "mixerManagement": "Mixer Management",
   "@mixerManagement": {
@@ -3822,9 +4399,26 @@
   "@motionArtPlaysDuringBitPerfect": {
     "description": "lib/features/settings/screens/playback_display_settings_screen.dart:66"
   },
+  "motionArtRefreshed": "Motion art refreshed",
+  "@motionArtRefreshed": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:255"
+  },
+  "moveEveryStampedLyricForwardOr": "Move every stamped lyric forward or backward together.",
+  "@moveEveryStampedLyricForwardOr": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1987"
+  },
   "movement": "Movement",
   "@movement": {
     "description": "lib/features/settings/screens/visualizer_settings_screen.dart:164"
+  },
+  "ms": "{arg1} ms",
+  "@ms": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1025",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "ms2": "{arg1} ms",
   "@ms2": {
@@ -3899,6 +4493,10 @@
         "type": "Object"
       }
     }
+  },
+  "nativeDsd": "Native DSD",
+  "@nativeDsd": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:712"
   },
   "nativeDsdExperimental": "Native DSD (Experimental)",
   "@nativeDsdExperimental": {
@@ -4030,6 +4628,14 @@
   "@noLogsYet": {
     "description": "lib/features/settings/screens/logs_screen.dart:441"
   },
+  "noLyricsFoundOnlineForThis": "No lyrics found online for this song.",
+  "@noLyricsFoundOnlineForThis": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:166"
+  },
+  "noLyricsYet": "No lyrics yet",
+  "@noLyricsYet": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:413"
+  },
   "noMatches": "No matches.",
   "@noMatches": {
     "description": "lib/features/settings/screens/logs_screen.dart:441"
@@ -4050,6 +4656,23 @@
   "@noPatchNotesAvailableYet": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:251"
   },
+  "noPlaylistsYetNcreateOneIn": "No playlists yet.\nCreate one in the Playlists tab.",
+  "@noPlaylistsYetNcreateOneIn": {
+    "description": "lib/features/player/widgets/add_to_playlist_sheet.dart:79"
+  },
+  "noResultsFoundFor": "No results found for \"{query}\".",
+  "@noResultsFoundFor": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:196",
+    "placeholders": {
+      "query": {
+        "type": "Object"
+      }
+    }
+  },
+  "noRipData": "No rip data",
+  "@noRipData": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1063"
+  },
   "noScanResultsYet": "No scan results yet",
   "@noScanResultsYet": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:229"
@@ -4066,9 +4689,17 @@
   "@noUpdateAvailable": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:165"
   },
+  "noUrbData": "No URB data",
+  "@noUrbData": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:965"
+  },
   "noUsbAudioDevicesFound": "No USB audio devices found",
   "@noUsbAudioDevicesFound": {
     "description": "lib/features/settings/screens/uac2_settings_screen.dart:289"
+  },
+  "noWordTimingYetAutoFill": "No word timing yet. Auto-fill spreads the words evenly as a starting point — or capture them in Word Sync mode.",
+  "@noWordTimingYetAutoFill": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1698"
   },
   "none": "None",
   "@none": {
@@ -4110,6 +4741,14 @@
   "@notSet": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:275"
   },
+  "notStampedYet": "Not stamped yet",
+  "@notStampedYet": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1156"
+  },
+  "notVerified": "Not verified",
+  "@notVerified": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1103"
+  },
   "notch": "Notch",
   "@notch": {
     "description": "lib/providers/equalizer_provider.dart:39"
@@ -4121,6 +4760,14 @@
   "noticeableTintingFromAlbumArt": "Noticeable tinting from album art.",
   "@noticeableTintingFromAlbumArt": {
     "description": "lib/models/album_color_mode.dart:37"
+  },
+  "now": "Now",
+  "@now": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1032"
+  },
+  "nowPlaying": "Now Playing",
+  "@nowPlaying": {
+    "description": "lib/features/player/screens/full_player_screen.dart:604"
   },
   "numberOnArt": "Number on Art",
   "@numberOnArt": {
@@ -4198,6 +4845,10 @@
   "@openThePlayStoreToInstall": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:144"
   },
+  "openedFromLocker": "Opened from Locker",
+  "@openedFromLocker": {
+    "description": "lib/features/player/screens/full_player_screen.dart:616"
+  },
   "openslEs": "OpenSL ES",
   "@openslEs": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:700"
@@ -4234,6 +4885,10 @@
   "@outputMode": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:408"
   },
+  "outputRate": "Output rate",
+  "@outputRate": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:601"
+  },
   "overlapTheEndOfATrack": "Overlap the end of a track with the next",
   "@overlapTheEndOfATrack": {
     "description": "lib/features/settings/screens/audio_settings_screen.dart:321"
@@ -4263,9 +4918,17 @@
   "@parametricEq": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:2160"
   },
+  "passthrough": "Passthrough",
+  "@passthrough": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:682"
+  },
   "password": "Password",
   "@password": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:456"
+  },
+  "pasteOrTypeTheSongLyrics": "Paste or type the song lyrics here — one line per row",
+  "@pasteOrTypeTheSongLyrics": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:623"
   },
   "pasteYourListenbrainzToken": "Paste your ListenBrainz token",
   "@pasteYourListenbrainzToken": {
@@ -4295,6 +4958,10 @@
   "@pauseOnUsbDacDetach": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:293"
   },
+  "pcmFrames": "PCM Frames",
+  "@pcmFrames": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:987"
+  },
   "peaking": "Peaking",
   "@peaking": {
     "description": "lib/providers/equalizer_provider.dart:27"
@@ -4311,13 +4978,42 @@
   "@phoneAndHeadsetVolumeAreLinked": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:400"
   },
+  "pickALineWithLyrics": "Pick a line with lyrics",
+  "@pickALineWithLyrics": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1390"
+  },
+  "pickALyricLineIn": "1. Pick a lyric line in Lines, then switch to Tools.\n2. Press play and tap the big \"Tap Word\" button as you hear each word — the first tap also stamps the line.\n3. Tap a word chip to nudge, re-time, or clear it.\n4. Lines with every word stamped save with per-word karaoke timing.",
+  "@pickALyricLineIn": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:678"
+  },
   "pinchApartNarrowerHigherQNpinch": "Pinch apart = narrower (higher Q)\nPinch together = wider (lower Q)",
   "@pinchApartNarrowerHigherQNpinch": {
     "description": "lib/widgets/equalizer/interactive_eq_graph.dart:158"
   },
+  "pitch": "Pitch",
+  "@pitch": {
+    "description": "lib/features/player/widgets/pitch_bottom_sheet.dart:37"
+  },
+  "pitchSemitones": "{semitones, plural, =1{{semitones} semitone} other{{semitones} semitones}}",
+  "@pitchSemitones": {
+    "description": "lib/features/player/widgets/pitch_bottom_sheet.dart:95",
+    "placeholders": {
+      "semitones": {
+        "type": "int"
+      }
+    }
+  },
   "pixelatedLightestOnMemory": "Pixelated — lightest on memory",
   "@pixelatedLightestOnMemory": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:143"
+  },
+  "plain": "Plain",
+  "@plain": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:581"
+  },
+  "plainText": "Plain Text",
+  "@plainText": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:379"
   },
   "play": "Play",
   "@play": {
@@ -4436,6 +5132,10 @@
   "@playbackResumesWhenADeviceReconnects": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:273"
   },
+  "playbackSpeed": "Playback Speed",
+  "@playbackSpeed": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:342"
+  },
   "playbackStopsWhenTheAppIs": "Playback stops when the app is swiped away",
   "@playbackStopsWhenTheAppIs": {
     "description": "lib/features/settings/screens/playback_display_settings_screen.dart:38"
@@ -4529,6 +5229,10 @@
   "@preview": {
     "description": "lib/features/settings/screens/audio_settings_screen.dart:686"
   },
+  "previewUse": "Preview & Use",
+  "@previewUse": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:457"
+  },
   "previousSong": "Previous song",
   "@previousSong": {
     "description": "lib/widgets/common/mini_player_bar.dart:258"
@@ -4581,6 +5285,24 @@
   "@queue": {
     "description": "lib/features/menu/screens/menu_screen.dart:1081"
   },
+  "queue2": "Queue {count}",
+  "@queue2": {
+    "description": "lib/features/player/screens/full_player_screen.dart:777",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "queued": "Queued \"{arg1}\"",
+  "@queued": {
+    "description": "lib/features/player/widgets/player_navigation.dart:25",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "quickAccess": "Quick Access",
   "@quickAccess": {
     "description": "lib/features/settings/screens/ui_customization_settings_screen.dart:29"
@@ -4617,9 +5339,17 @@
   "@rawDsdStreamToDacRequires": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1692"
   },
+  "rawPcm": "→ Raw PCM",
+  "@rawPcm": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:918"
+  },
   "reReadMetadataForEveryFile": "Re-read metadata for every file. Slower; use when tags look stale.",
   "@reReadMetadataForEveryFile": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:710"
+  },
+  "readMode": "Read Mode",
+  "@readMode": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1086"
   },
   "readyToRemoveSongKeepingIn": "Ready to remove {count, plural, =1{{count} song} other{{count} songs}} — keeping {kept} in total.",
   "@readyToRemoveSongKeepingIn": {
@@ -4669,6 +5399,10 @@
   "@reconnectionSuccessful": {
     "description": "lib/widgets/uac2/uac2_connection_manager.dart:72"
   },
+  "recorded": "Recorded",
+  "@recorded": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:869"
+  },
   "refreshDevices": "Refresh Devices",
   "@refreshDevices": {
     "description": "lib/features/settings/screens/uac2_settings_screen.dart:443"
@@ -4676,6 +5410,10 @@
   "refreshDevices2": "Refresh devices",
   "@refreshDevices2": {
     "description": "lib/widgets/uac2/uac2_device_selector.dart:179"
+  },
+  "refreshMotionArt": "Refresh Motion Art",
+  "@refreshMotionArt": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:238"
   },
   "refreshOutputs": "Refresh outputs",
   "@refreshOutputs": {
@@ -4772,6 +5510,10 @@
       }
     }
   },
+  "removedFromFavorites3": "Removed from favorites",
+  "@removedFromFavorites3": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:487"
+  },
   "removing": "Removing…",
   "@removing": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:813"
@@ -4791,6 +5533,19 @@
   "reorderFilterAndShuffleFromThis": "Reorder, filter, and shuffle from this header.",
   "@reorderFilterAndShuffleFromThis": {
     "description": "lib/providers/tutorial_provider.dart:28"
+  },
+  "repeat": "Repeat: {arg1}",
+  "@repeat": {
+    "description": "lib/features/player/widgets/player_controls.dart:218",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "repeatMode": "Repeat Mode",
+  "@repeatMode": {
+    "description": "lib/features/player/widgets/loop_mode_sheet.dart:16"
   },
   "replaceAlbumNameWithAVerified": "Replace album name with a verified bit-perfect capsule when streaming bit-perfect",
   "@replaceAlbumNameWithAVerified": {
@@ -4819,6 +5574,10 @@
   "requiredToDetectDevicesCodecsAnd": "Required to detect devices, codecs, and battery levels",
   "@requiredToDetectDevicesCodecsAnd": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:237"
+  },
+  "resampler": "Resampler",
+  "@resampler": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:669"
   },
   "rescanLibrary": "Rescan Library",
   "@rescanLibrary": {
@@ -4868,6 +5627,10 @@
   "@resetToDefaults": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:199"
   },
+  "resolution": "Resolution",
+  "@resolution": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:560"
+  },
   "resonance": "Resonance",
   "@resonance": {
     "description": "lib/providers/equalizer_provider.dart:70"
@@ -4912,21 +5675,41 @@
   "@right": {
     "description": "lib/features/settings/screens/lyrics_settings_screen.dart:80"
   },
+  "rightBottom": "Right (bottom)",
+  "@rightBottom": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:373"
+  },
   "rightBottomButton": "Right (Bottom) Button",
   "@rightBottomButton": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:460"
+  },
+  "rightTop": "Right (top)",
+  "@rightTop": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:361"
   },
   "rightTopButton": "Right (Top) Button",
   "@rightTopButton": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:435"
   },
+  "ripSource": "Rip Source",
+  "@ripSource": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1078"
+  },
   "root": "Root",
   "@root": {
     "description": "lib/services/sources/upnp_service.dart:239"
   },
+  "rotationSeek": "rotation seek",
+  "@rotationSeek": {
+    "description": "lib/features/player/widgets/album_art_box.dart:704"
+  },
   "roundedAlbumArtCardWithA": "Rounded album art card with a blurred album-art background.",
   "@roundedAlbumArtCardWithA": {
     "description": "lib/models/player_screen_mode.dart:28"
+  },
+  "route": "Route",
+  "@route": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:654"
   },
   "routesBluetoothThroughTheHiRes": "Routes Bluetooth through the hi-res Rust engine",
   "@routesBluetoothThroughTheHiRes": {
@@ -4951,6 +5734,15 @@
   "rustViaOboeHighRes": "Rust via Oboe (high-res)",
   "@rustViaOboeHighRes": {
     "description": "lib/models/audio_engine_type.dart:39"
+  },
+  "s": "{arg1}s",
+  "@s": {
+    "description": "lib/features/player/widgets/lyrics_word_timeline.dart:192",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "s2": "{arg1} s",
   "@s2": {
@@ -4981,6 +5773,10 @@
   "sampleArtist": "Sample artist",
   "@sampleArtist": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:370"
+  },
+  "samplePreview": "Sample preview",
+  "@samplePreview": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:874"
   },
   "sampleRate": "Sample rate",
   "@sampleRate": {
@@ -5014,13 +5810,33 @@
   "@saveConnect": {
     "description": "lib/features/settings/widgets/lastfm_settings_tile.dart:656"
   },
+  "saveCreatesAnLrcFileIf": "Save creates an `.lrc` file. If some lines are not stamped yet, Flick fills their times automatically so the file stays usable. Lines with fully stamped words export with per-word karaoke timing.",
+  "@saveCreatesAnLrcFileIf": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:2040"
+  },
   "saveCurrentAsPreset": "Save current as preset",
   "@saveCurrentAsPreset": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:737"
   },
+  "saveInFlick": "Save in Flick",
+  "@saveInFlick": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:503"
+  },
   "saveLogs": "Save logs",
   "@saveLogs": {
     "description": "lib/features/settings/screens/logs_screen.dart:207"
+  },
+  "saveLrcFile": "Save LRC File",
+  "@saveLrcFile": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:490"
+  },
+  "saveLrcFile2": "Save LRC file",
+  "@saveLrcFile2": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:525"
+  },
+  "saveLyrics": "Save Lyrics",
+  "@saveLyrics": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:1184"
   },
   "savePreset": "Save Preset",
   "@savePreset": {
@@ -5034,6 +5850,22 @@
   "@saved": {
     "description": "lib/features/settings/screens/logs_screen.dart:217"
   },
+  "savedLyricsAndLinkedThemTo": "Saved lyrics and linked them to this song.",
+  "@savedLyricsAndLinkedThemTo": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:557"
+  },
+  "savedLyricsBesideTheSongAs": "Saved lyrics beside the song as an `.lrc` file.",
+  "@savedLyricsBesideTheSongAs": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:556"
+  },
+  "savedLyricsToTheChosenLocation": "Saved lyrics to the chosen location.",
+  "@savedLyricsToTheChosenLocation": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:554"
+  },
+  "savedToGallery": "Saved to gallery",
+  "@savedToGallery": {
+    "description": "lib/features/player/widgets/share/share_bottom_sheet.dart:163"
+  },
   "savedToNNNshareIt": "Saved to:\n{path}\n\nShare it now?",
   "@savedToNNNshareIt": {
     "description": "lib/features/settings/screens/logs_screen.dart:218",
@@ -5042,6 +5874,10 @@
         "type": "Object"
       }
     }
+  },
+  "saving": "Saving...",
+  "@saving": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:791"
   },
   "saving2": "Saving",
   "@saving2": {
@@ -5128,6 +5964,10 @@
   "@searchAcrossSongsArtistsAndAlbums": {
     "description": "lib/providers/tutorial_provider.dart:22"
   },
+  "searchArtistTitle": "Search artist + title...",
+  "@searchArtistTitle": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:618"
+  },
   "searchHeadphones": "Search headphones…",
   "@searchHeadphones": {
     "description": "lib/features/settings/screens/widgets/autoeq_search_sheet.dart:233"
@@ -5141,9 +5981,21 @@
       }
     }
   },
+  "searchOnline": "Search Online",
+  "@searchOnline": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:219"
+  },
   "searchOnline2": "Search online",
   "@searchOnline2": {
     "description": "lib/features/settings/screens/widgets/autoeq_search_sheet.dart:414"
+  },
+  "searchOnlineCreateYourOwnSynced": "Search online, create your own synced lyrics, or import an existing file.",
+  "@searchOnlineCreateYourOwnSynced": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:424"
+  },
+  "searchOnlineLyrics": "Search Online Lyrics",
+  "@searchOnlineLyrics": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:277"
   },
   "searchPlayback": "Search Playback",
   "@searchPlayback": {
@@ -5173,6 +6025,10 @@
   "@selectAFolderToScan": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:2118"
   },
+  "selectALineAndEdit": "1. Select a line and edit its timestamp directly, or use \"Use Current Time\".\n2. In the word timeline, drag a boundary to stretch or shrink the segment before it — edits snap to 10ms.\n3. Tap letters in the inspector to split a word into separately timed syllables (slow-then-fast pacing), then drag their boundaries.\n4. Drag the last boundary (or use Length ±) to retime the next line. Use Auto-fill to seed evenly spaced words.\n5. Use the shift controls to move all stamped lyrics together.\n6. Save to generate the final `.lrc` file.",
+  "@selectALineAndEdit": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:694"
+  },
   "selectDevice": "Select Device",
   "@selectDevice": {
     "description": "lib/widgets/uac2/uac2_device_selector.dart:58"
@@ -5200,6 +6056,14 @@
   "session": "Session",
   "@session": {
     "description": "lib/features/settings/screens/casting_settings_screen.dart:107"
+  },
+  "setAlbumArt": "Set Album Art",
+  "@setAlbumArt": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:220"
+  },
+  "setToNow": "Set to Now",
+  "@setToNow": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1589"
   },
   "settings": "Settings",
   "@settings": {
@@ -5254,6 +6118,10 @@
   "@showAThinPlaybackProgressLine": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:169"
   },
+  "showAlbum": "Show album",
+  "@showAlbum": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:261"
+  },
   "showAlbum2": "Show Album",
   "@showAlbum2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:329"
@@ -5266,6 +6134,10 @@
   "@showAlbumArtworkOnTheMini": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:201"
   },
+  "showArtist": "Show artist",
+  "@showArtist": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:256"
+  },
   "showArtist2": "Show Artist",
   "@showArtist2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:192"
@@ -5274,9 +6146,17 @@
   "@showArtistBelowSongTitle": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:216"
   },
+  "showFileInfo": "Show file info",
+  "@showFileInfo": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:266"
+  },
   "showFileInfo2": "Show File Info",
   "@showFileInfo2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:204"
+  },
+  "showFrame": "Show frame",
+  "@showFrame": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:271"
   },
   "showFrame2": "Show Frame",
   "@showFrame2": {
@@ -5289,6 +6169,10 @@
   "showLabels": "Show Labels",
   "@showLabels": {
     "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:306"
+  },
+  "showLyrics": "Show lyrics",
+  "@showLyrics": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:440"
   },
   "showMore": "Show more",
   "@showMore": {
@@ -5391,6 +6275,10 @@
   "@showTheUsbVolumeBarOn2": {
     "description": "lib/features/settings/screens/ui_customization_settings_screen.dart:126"
   },
+  "showTitle": "Show title",
+  "@showTitle": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:251"
+  },
   "showTitle2": "Show Title",
   "@showTitle2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:180"
@@ -5398,6 +6286,10 @@
   "showVerboseAudioDiagnosticsAndEngine": "Show verbose audio diagnostics and engine/session trace logs.",
   "@showVerboseAudioDiagnosticsAndEngine": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:361"
+  },
+  "showVisualizer": "Show visualizer",
+  "@showVisualizer": {
+    "description": "lib/features/player/widgets/player_action_button_row.dart:551"
   },
   "showYourRecentListeningHistoryOn": "Show your recent listening history on the home screen",
   "@showYourRecentListeningHistoryOn": {
@@ -5414,6 +6306,19 @@
   "shuffle": "Shuffle",
   "@shuffle": {
     "description": "lib/widgets/common/detail_header.dart:267"
+  },
+  "shuffle2": "Shuffle: {arg1}",
+  "@shuffle2": {
+    "description": "lib/features/player/widgets/player_controls.dart:113",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "shuffleMode": "Shuffle Mode",
+  "@shuffleMode": {
+    "description": "lib/features/player/widgets/shuffle_mode_sheet.dart:18"
   },
   "shuffleSongsAndJumpBetweenCategories": "Shuffle songs and jump between categories",
   "@shuffleSongsAndJumpBetweenCategories": {
@@ -5447,6 +6352,14 @@
   "@silkySmoothBZierCurvesFluid": {
     "description": "lib/features/settings/screens/visualizer_settings_screen.dart:95"
   },
+  "simple": "Simple",
+  "@simple": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:901"
+  },
+  "simpleMode": "Simple mode",
+  "@simpleMode": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:653"
+  },
   "simplifiedChinese": "Simplified Chinese",
   "@simplifiedChinese": {
     "description": "lib/features/settings/screens/interface_settings_screen.dart:59"
@@ -5466,6 +6379,10 @@
   "skipUnsupportedFilesAndHiddenNomedia": "Skip unsupported files and hidden .nomedia directories",
   "@skipUnsupportedFilesAndHiddenNomedia": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1817"
+  },
+  "sleepTimer": "Sleep timer",
+  "@sleepTimer": {
+    "description": "lib/features/albums/screens/album_detail_screen.dart:370"
   },
   "sleepTimer2": "Sleep Timer",
   "@sleepTimer2": {
@@ -5499,6 +6416,10 @@
   "@softHighlightBehindTheSelectedSong": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:188"
   },
+  "softwareAppControlled": "Software (App-controlled)",
+  "@softwareAppControlled": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1155"
+  },
   "solid": "Solid",
   "@solid": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:187"
@@ -5511,6 +6432,10 @@
   "@someOnlineFeaturesMayNotWork": {
     "description": "lib/widgets/common/offline_notice.dart:185"
   },
+  "someWordsAreStillUntimedFinish": "Some words are still untimed. Finish capturing in Word Sync mode.",
+  "@someWordsAreStillUntimedFinish": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1702"
+  },
   "somethingWentWrong": "Something went wrong",
   "@somethingWentWrong": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:190"
@@ -5518,6 +6443,10 @@
   "songGestures": "Song Gestures",
   "@songGestures": {
     "description": "lib/providers/tutorial_provider.dart:33"
+  },
+  "songMetadata": "Song Metadata",
+  "@songMetadata": {
+    "description": "lib/features/player/widgets/song_metadata_sheet.dart:42"
   },
   "songViewList": "Song View: List",
   "@songViewList": {
@@ -5530,6 +6459,15 @@
   "songs14": "Songs",
   "@songs14": {
     "description": "lib/features/manual/data/manual_data.dart:29"
+  },
+  "songs9": "{arg1} songs",
+  "@songs9": {
+    "description": "lib/features/player/widgets/add_to_playlist_sheet.dart:124",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "songsBeforeTheTappedTrackQueue": "Songs before the tapped track queue at the end",
   "@songsBeforeTheTappedTrackQueue": {
@@ -5568,6 +6506,14 @@
   "@sortFilter": {
     "description": "lib/providers/tutorial_provider.dart:27"
   },
+  "source": "Source",
+  "@source": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:718"
+  },
+  "sourceRate": "Source rate",
+  "@sourceRate": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:568"
+  },
   "spaceBetweenTheTwoBars": "Space between the two bars",
   "@spaceBetweenTheTwoBars": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:102"
@@ -5588,6 +6534,18 @@
   "@squareRoot": {
     "description": "lib/features/settings/screens/audio_settings_screen.dart:247"
   },
+  "stampNext": "Stamp & Next",
+  "@stampNext": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1202"
+  },
+  "stampNow": "Stamp Now",
+  "@stampNow": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1202"
+  },
+  "stampThisLineFirstToEdit": "Stamp this line first to edit its word timeline.",
+  "@stampThisLineFirstToEdit": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1695"
+  },
   "standard60hz": "Standard (60Hz)",
   "@standard60hz": {
     "description": "lib/features/settings/screens/interface_settings_screen.dart:223"
@@ -5599,6 +6557,14 @@
   "starlightSerenade": "Starlight Serenade",
   "@starlightSerenade": {
     "description": "lib/models/song.dart:321"
+  },
+  "start": "Start",
+  "@start": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1816"
+  },
+  "startAtNow": "Start at Now",
+  "@startAtNow": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1871"
   },
   "startStreaming": "Start Streaming",
   "@startStreaming": {
@@ -5648,6 +6614,15 @@
   "@stopWhenTheQueueEnds": {
     "description": "lib/features/settings/screens/queue_settings_screen.dart:76"
   },
+  "stoppingIn": "Stopping in {arg1}",
+  "@stoppingIn": {
+    "description": "lib/features/player/widgets/sleep_timer_bottom_sheet.dart:113",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "storage": "Storage",
   "@storage": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:2157"
@@ -5676,9 +6651,21 @@
   "@stormChasers": {
     "description": "lib/models/song.dart:376"
   },
+  "strategy": "Strategy",
+  "@strategy": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:633"
+  },
+  "stream": "Stream",
+  "@stream": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1035"
+  },
   "streamConfigurationNotAvailable": "Stream configuration not available",
   "@streamConfigurationNotAvailable": {
     "description": "lib/widgets/uac2/uac2_stream_config.dart:57"
+  },
+  "streamStable": "Stream stable",
+  "@streamStable": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:694"
   },
   "streaming": "Streaming",
   "@streaming": {
@@ -5760,6 +6747,14 @@
   "@switchToTheExclusiveUsbPath": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:493"
   },
+  "switchedBackToTheAutomaticLyrics": "Switched back to the automatic lyrics source.",
+  "@switchedBackToTheAutomaticLyrics": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:151"
+  },
+  "syllablesTapALetterToSplit": "Syllables — tap a letter to split or merge:",
+  "@syllablesTapALetterToSplit": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1908"
+  },
   "symmetricalBarsMirroredFromTheCenter": "Symmetrical bars mirrored from the center",
   "@symmetricalBarsMirroredFromTheCenter": {
     "description": "lib/features/settings/screens/visualizer_settings_screen.dart:104"
@@ -5777,6 +6772,10 @@
   "@syncNow": {
     "description": "lib/features/settings/screens/network_sources_screen.dart:285"
   },
+  "synced": "Synced",
+  "@synced": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:568"
+  },
   "synced2": "Synced {arg1}",
   "@synced2": {
     "description": "lib/features/settings/screens/network_sources_screen.dart:318",
@@ -5785,6 +6784,10 @@
         "type": "Object"
       }
     }
+  },
+  "syncedLrc": "Synced LRC",
+  "@syncedLrc": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:377"
   },
   "syncing": "Syncing…",
   "@syncing": {
@@ -5798,13 +6801,30 @@
   "@system": {
     "description": "lib/features/settings/screens/casting_settings_screen.dart:243"
   },
+  "systemAndroidMixer": "System (Android mixer)",
+  "@systemAndroidMixer": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1151"
+  },
   "tagsWereWrittenButCouldNot": "Tags were written but could not be confirmed by re-reading the file. A library rescan will reconcile any difference.",
   "@tagsWereWrittenButCouldNot": {
     "description": "lib/services/metadata_editor_service.dart:131"
   },
+  "tap": "Tap: \"{label}\"",
+  "@tap": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1393",
+    "placeholders": {
+      "label": {
+        "type": "Object"
+      }
+    }
+  },
   "tapABandToExpandDrag": "Tap a band to expand. Drag a knob to adjust. Tap a value to type directly.",
   "@tapABandToExpandDrag": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:2242"
+  },
+  "tapEditTextTopRight": "1. Tap \"Edit Text\" (top right) and paste the lyrics — one line per row.\n2. Play the song.\n3. Pick the current line in the Lines list.\n4. Tap \"Stamp & Next\" when you hear that line.\n5. Save when done.",
+  "@tapEditTextTopRight": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:661"
   },
   "tapIconsToSwitchTabsLong": "Tap icons to switch tabs. Long-press to customize the bar.",
   "@tapIconsToSwitchTabsLong": {
@@ -5817,6 +6837,19 @@
   "tapToPlayLongPressFor": "Tap to play, long-press for options (queue, play next, info).",
   "@tapToPlayLongPressFor": {
     "description": "lib/providers/tutorial_provider.dart:34"
+  },
+  "tapToPreview": "Tap to preview",
+  "@tapToPreview": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:955"
+  },
+  "targetMs": "target {arg1} ms",
+  "@targetMs": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1028",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "tempo": "Tempo",
   "@tempo": {
@@ -5831,6 +6864,15 @@
       }
     }
   },
+  "test": "Test: {arg1}",
+  "@test": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1096",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "testConnection": "Test Connection",
   "@testConnection": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:360"
@@ -5839,9 +6881,17 @@
   "@textGestures": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:229"
   },
+  "textPlacement": "Text placement",
+  "@textPlacement": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:293"
+  },
   "textPlacement2": "Text Placement",
   "@textPlacement2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:148"
+  },
+  "textSize": "Text size",
+  "@textSize": {
+    "description": "lib/features/player/widgets/player_layout_sheet.dart:218"
   },
   "textSize2": "Text Size",
   "@textSize2": {
@@ -5916,6 +6966,22 @@
   "@time": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1030"
   },
+  "timeShift": "Time Shift",
+  "@timeShift": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1979"
+  },
+  "timestamp": "Timestamp",
+  "@timestamp": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1315"
+  },
+  "tips": "Tips",
+  "@tips": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:704"
+  },
+  "title": "Title",
+  "@title": {
+    "description": "lib/features/player/widgets/song_metadata_sheet.dart:53"
+  },
   "toRemove": "To remove",
   "@toRemove": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:636"
@@ -5928,6 +6994,10 @@
   "@toneControls": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:1632"
   },
+  "tools": "Tools",
+  "@tools": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:870"
+  },
   "total": "Total",
   "@total": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1333"
@@ -5935,6 +7005,15 @@
   "track": "Track",
   "@track": {
     "description": "lib/features/settings/screens/audio_settings_screen.dart:197"
+  },
+  "track2": "Track {arg1}",
+  "@track2": {
+    "description": "lib/features/player/widgets/share/share_cards/album_art_share_card.dart:45",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "trackBitDepth": "Track Bit Depth",
   "@trackBitDepth": {
@@ -5983,6 +7062,10 @@
   "tryAgain": "Try again",
   "@tryAgain": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:213"
+  },
+  "tryOriginalSearch": "Try original search",
+  "@tryOriginalSearch": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:782"
   },
   "turnOff432HzTuningTo": "Turn off 432 Hz tuning to use crossfade",
   "@turnOff432HzTuningTo": {
@@ -6102,6 +7185,15 @@
   "@unavailable2": {
     "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1157"
   },
+  "underruns": "{arg1} underruns",
+  "@underruns": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1037",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "undo": "Undo",
   "@undo": {
     "description": "lib/features/favorites/screens/favorites_screen.dart:63"
@@ -6130,6 +7222,10 @@
   "@unknownTitle": {
     "description": "lib/services/playlist_service.dart:688"
   },
+  "unknownTrack": "Unknown Track",
+  "@unknownTrack": {
+    "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:1051"
+  },
   "unlocked3": "{_milestonesUnlocked} / {arg1} unlocked",
   "@unlocked3": {
     "description": "lib/features/settings/screens/settings_screen.dart:255",
@@ -6149,6 +7245,10 @@
   "unreported": "Unreported",
   "@unreported": {
     "description": "lib/features/settings/screens/uac2_settings_screen.dart:678"
+  },
+  "unsavedChanges": "Unsaved Changes",
+  "@unsavedChanges": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:586"
   },
   "up": "{arg1} up",
   "@up": {
@@ -6208,6 +7308,14 @@
   "upnpDlna": "UPnP / DLNA",
   "@upnpDlna": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:81"
+  },
+  "urbPacket": "URB Packet",
+  "@urbPacket": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1010"
+  },
+  "urbTransfer": "URB Transfer",
+  "@urbTransfer": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:867"
   },
   "urbanEchoes": "Urban Echoes",
   "@urbanEchoes": {
@@ -6281,9 +7389,29 @@
   "@useAlbumArtAsBackground": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:519"
   },
+  "useAutoSource": "Use Auto Source",
+  "@useAutoSource": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:225"
+  },
+  "useCurrentTime": "Use Current Time",
+  "@useCurrentTime": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1335"
+  },
+  "useExistingFile": "Use Existing File",
+  "@useExistingFile": {
+    "description": "lib/features/player/widgets/inline_lyrics_panel.dart:214"
+  },
+  "useExistingFileInTheLyrics": "- \"Use Existing File\" in the lyrics panel links an `.lrc`, `.txt`, or `.xml` file.\n- If some lines are not stamped, Flick fills their times automatically.\n- Save writes beside the song when possible, otherwise Flick stores a linked copy.",
+  "@useExistingFileInTheLyrics": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:712"
+  },
   "useFilesystemLevelScanningInsteadOf": "Use filesystem-level scanning instead of MediaStore for full tag accuracy",
   "@useFilesystemLevelScanningInsteadOf": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1870"
+  },
+  "useMmSsCcEG": "Use mm:ss.cc, e.g. 01:23.45",
+  "@useMmSsCcEG": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:418"
   },
   "useTheCurrentAudioFileS": "Use the current audio file's name when saving lyrics internally",
   "@useTheCurrentAudioFileS": {
@@ -6359,6 +7487,10 @@
   "@verboseDartRustAndCrashLogs": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:379"
   },
+  "verified": "Verified",
+  "@verified": {
+    "description": "lib/features/player/widgets/bit_perfect_indicator.dart:704"
+  },
   "version": "Version {kAppVersion}",
   "@version": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:454",
@@ -6384,9 +7516,17 @@
   "@vibrant": {
     "description": "lib/models/album_color_mode.dart:26"
   },
+  "viewMetadata": "View Metadata",
+  "@viewMetadata": {
+    "description": "lib/features/player/widgets/song_actions_sheet.dart:286"
+  },
   "viewOnboarding": "View Onboarding",
   "@viewOnboarding": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:679"
+  },
+  "viewQueue": "View queue",
+  "@viewQueue": {
+    "description": "lib/features/albums/screens/album_detail_screen.dart:265"
   },
   "visualizer": "Visualizer",
   "@visualizer": {
@@ -6415,6 +7555,10 @@
   "volumeDipsWhileNotificationSoundsPlay": "Volume dips while notification sounds play",
   "@volumeDipsWhileNotificationSoundsPlay": {
     "description": "lib/features/settings/screens/playback_display_settings_screen.dart:245"
+  },
+  "volumeIsFixedWhileBitPerfect": "Volume is fixed while bit-perfect passthrough is active and this DAC has no hardware volume control.",
+  "@volumeIsFixedWhileBitPerfect": {
+    "description": "lib/features/player/widgets/volume_bottom_sheet.dart:112"
   },
   "volumeIsFixedWhileBitPerfect2": "Volume is fixed while bit-perfect passthrough is active: the stream is sent untouched and this DAC has no hardware volume control.",
   "@volumeIsFixedWhileBitPerfect2": {
@@ -6477,6 +7621,10 @@
   "@whenYouPlayOverBluetoothAndroid": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:529"
   },
+  "whereShouldTheLrcFileBe": "Where should the .lrc file be saved?",
+  "@whereShouldTheLrcFileBe": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:491"
+  },
   "whereTheFocalSongSitsVertically": "Where the focal song sits vertically",
   "@whereTheFocalSongSitsVertically": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:39"
@@ -6534,6 +7682,47 @@
   "@wiredOutput": {
     "description": "lib/features/settings/screens/uac2_settings_screen.dart:927"
   },
+  "word": "Word {arg1} · \"{arg2}\"",
+  "@word": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1558",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "word2": "Word {arg1} · \"{token}\"",
+  "@word2": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1788",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "token": {
+        "type": "Object"
+      }
+    }
+  },
+  "wordSync": "Word Sync",
+  "@wordSync": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:903"
+  },
+  "wordSyncModeKaraoke": "Word Sync mode (karaoke)",
+  "@wordSyncModeKaraoke": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:670"
+  },
+  "wordTimelineLine": "Word Timeline · Line {arg1}",
+  "@wordTimelineLine": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:1678",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "wrapAroundAndQueueBehavior": "Wrap-around and queue behavior",
   "@wrapAroundAndQueueBehavior": {
     "description": "lib/features/settings/screens/settings_screen.dart:116"
@@ -6541,6 +7730,37 @@
   "wrapAroundQueue": "Wrap-around Queue",
   "@wrapAroundQueue": {
     "description": "lib/features/settings/screens/queue_settings_screen.dart:48"
+  },
+  "x": "{min}x",
+  "@x": {
+    "description": "lib/features/player/widgets/speed_bottom_sheet.dart:64",
+    "placeholders": {
+      "min": {
+        "type": "Object"
+      }
+    }
+  },
+  "x2": "{max}x",
+  "@x2": {
+    "description": "lib/features/player/widgets/speed_bottom_sheet.dart:83",
+    "placeholders": {
+      "max": {
+        "type": "Object"
+      }
+    }
+  },
+  "x3": "{currentSpeed}x",
+  "@x3": {
+    "description": "lib/features/player/widgets/speed_bottom_sheet.dart:94",
+    "placeholders": {
+      "currentSpeed": {
+        "type": "Object"
+      }
+    }
+  },
+  "year": "Year",
+  "@year": {
+    "description": "lib/features/player/widgets/song_metadata_sheet.dart:72"
   },
   "yearly": "Yearly",
   "@yearly": {
@@ -6561,6 +7781,10 @@
   "youCustomizedWhichVersionsToKeep": "You customized which versions to keep. Nice — you're in control.",
   "@youCustomizedWhichVersionsToKeep": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:667"
+  },
+  "youHaveUnsavedLyricEditsLeave": "You have unsaved lyric edits. Leave the Sync Studio without saving?",
+  "@youHaveUnsavedLyricEditsLeave": {
+    "description": "lib/features/player/screens/lyrics_sync_screen.dart:590"
   },
   "youReOffline": "You're offline",
   "@youReOffline": {
