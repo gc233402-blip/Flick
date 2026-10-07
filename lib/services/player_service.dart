@@ -427,6 +427,12 @@ class PlayerService {
   // just_audio engine's config provider; refreshed from prefs on load/change.
   int _crossfadeCurveIndex = 0;
 
+  /// Rust path of the outgoing track whose end-of-track handoff was already
+  /// applied to the playlist UI when its crossfade started. The engine's later
+  /// TrackEnded event for the same path must not advance the index again; it
+  /// only queues the following successor.
+  String? _crossfadeUiHandoffFromPath;
+
   final NotificationService _notificationService = NotificationService();
   final FloatingPlayerService _floatingPlayerService = FloatingPlayerService();
   bool _floatingPlayerActive = false;
@@ -993,6 +999,16 @@ class PlayerService {
       return;
     }
 
+    // A Rust output failure can select the Standard engine for the rest of the
+    // session. Turning crossfade off is an explicit opportunity to retry the
+    // preferred Rust/Oboe route, without retrying unrelated USB/BT fallbacks.
+    if (wasEnabled &&
+        !enabled &&
+        _sessionManager.fallbackRequestedMode == AudioEngineType.rustOboe) {
+      await _restoreRustOboeAfterCrossfadeDisabled();
+      return;
+    }
+
     // just_audio (standard) engine: crossfade runs in-engine, but a track loaded
     // while crossfade was off used a ConcatenatingAudioSource (hard cut). On the
     // on-transition, reload the current track as a single source at the same
@@ -1016,6 +1032,58 @@ class PlayerService {
         _debugLog('[crossfade] reload on enable failed: $e');
       }
     }
+  }
+
+  Future<void> _restoreRustOboeAfterCrossfadeDisabled() {
+    return _enqueuePlaybackRequest(() async {
+      if (_usingRustBackend ||
+          _sessionManager.fallbackRequestedMode != AudioEngineType.rustOboe ||
+          _sessionManager.selectedMode != AudioEngineType.normalAndroid) {
+        return;
+      }
+
+      // Re-resolve the actual route: Bluetooth without the Rust output mode,
+      // bit-perfect, or a user selection of Standard must not be overridden.
+      final preferred = await _sessionManager.resolvePreferredMode(
+        refresh: true,
+      );
+      if (preferred != AudioEngineType.rustOboe) return;
+      await _sessionManager.syncRouteSelection(
+        reason: 'crossfade disabled after Rust engine fallback',
+      );
+      if (_sessionManager.selectedMode != AudioEngineType.rustOboe) return;
+
+      final song = currentSongNotifier.value;
+      if (song == null || !isPlayingNotifier.value) return;
+      final position = positionNotifier.value;
+      _debugLog(
+        '[Engine] Retrying preferred Rust/Oboe engine after crossfade disabled',
+      );
+      try {
+        await _resumeInternal();
+        _deadRustEngineRecoveryTimestamps.clear();
+      } catch (e) {
+        _debugLog('[Engine] Rust/Oboe restore failed: $e');
+        await _sessionManager.recordFallback(
+          requestedMode: AudioEngineType.rustOboe,
+          fallbackMode: AudioEngineType.normalAndroid,
+          reason: 'Rust/Oboe retry after crossfade disabled failed: $e',
+        );
+        await _sessionManager.switchMode(
+          AudioEngineType.normalAndroid,
+          initializeNewEngine: true,
+          reason: 'Rust/Oboe retry failed',
+        );
+        await _prepareImmediatePlaybackAsset(song);
+        await _runWithSuppressedSequenceStateUpdates(() async {
+          await _playbackManager.playTrack(song, initialPosition: position);
+        });
+        await _refreshAudioOutputDiagnostics(
+          reason: 'Rust/Oboe restore failed; Standard engine resumed',
+          activeSong: song,
+        );
+      }
+    });
   }
 
   /// Push the current crossfeed preference to the Rust engine.
@@ -2931,6 +2999,10 @@ class PlayerService {
     };
     _rustAudioService.onCrossfadeStarted = (fromPath, toPath) {
       _debugLog('[crossfade] ENGINE TRIGGERED: $fromPath -> $toPath');
+      if (!_usingRustBackend) return;
+      unawaited(
+        _enqueuePlaybackRequest(() => _onCrossfadeStarted(fromPath, toPath)),
+      );
     };
     _rustAudioService.onError = (message) {
       _debugLog('[PlayerService] Rust backend error: $message');
@@ -3242,6 +3314,20 @@ class PlayerService {
     _debugLog(
       '_onSongFinished: loopMode=${loopModeNotifier.value}, currentIndex=$_currentIndex, playlistLength=${_playlist.length}, usingRustBackend=$_usingRustBackend, endedPath=$endedPath',
     );
+    _debugLog(
+      '[crossfade] completion: gapless=$_isGaplessActive, '
+      'active=$_isCrossfadeActive, '
+      'preference=${_rustAudioService.crossfadeEnabledNotifier.value}, '
+      'locked=$isBitPerfectProcessingLocked, '
+      'duration=${_rustAudioService.crossfadeDurationNotifier.value}s, '
+      'handoff=${_isGaplessActive || _isCrossfadeActive ? "native" : "manual"}',
+    );
+
+    if (endedPath != null && _crossfadeUiHandoffFromPath == endedPath) {
+      _crossfadeUiHandoffFromPath = null;
+      await _finalizeCrossfadeUiHandoff(endedPath);
+      return;
+    }
 
     if (_isGaplessActive || _isCrossfadeActive) {
       await _handleGaplessTrackEnded();
@@ -3272,6 +3358,81 @@ class PlayerService {
     } else {
       _debugLog('_onSongFinished: Calling next()');
       await _nextInternal();
+    }
+  }
+
+  /// The engine has begun fading the queued successor in. Move the playlist UI
+  /// to the incoming track immediately so the app follows the audible handoff
+  /// instead of waiting for the outgoing track's TrackEnded event (which now
+  /// only queues the following successor).
+  Future<void> _onCrossfadeStarted(String fromPath, String toPath) async {
+    if (_playlist.isEmpty || _currentIndex < 0) return;
+    if (_crossfadeUiHandoffFromPath == fromPath) return;
+
+    final fromSong = currentSongNotifier.value;
+    if (fromSong == null) return;
+    final fromResolved = await _resolveRustPath(fromSong);
+    if (fromResolved != null && fromResolved != fromPath) {
+      _debugLog(
+        '[crossfade] UI handoff skipped: engine fading $fromPath while '
+        'current is ${fromSong.title}',
+      );
+      return;
+    }
+
+    // The completion path owns the pause-and-rewind behaviour; do not move the
+    // UI for a fade that is about to be stopped.
+    if (loopModeNotifier.value == LoopMode.stopAfterCurrent) return;
+
+    // The engine only fades into the successor queued by
+    // _queueNextTrackForGapless, which follows linear playlist order.
+    final isLastTrack = _currentIndex >= _playlist.length - 1;
+    if (isLastTrack && loopModeNotifier.value != LoopMode.all) return;
+    final nextIndex = isLastTrack ? 0 : _currentIndex + 1;
+    if (nextIndex == _currentIndex) return;
+    final nextSong = _playlist[nextIndex];
+
+    _crossfadeUiHandoffFromPath = fromPath;
+    _setCurrentIndex(nextIndex);
+    currentSongNotifier.value = nextSong;
+    // Keep the engine's reported track in sync so playback-state emissions
+    // cannot revert the UI to the outgoing song while the fade finishes.
+    _playbackManager.updateTrack(nextSong);
+    _consumeQueueEntryAt(_currentIndex);
+    _updatePriorityAnchor();
+    if (isPlayingNotifier.value) {
+      _updateNotificationState();
+    }
+    _debugLog(
+      '[crossfade] UI handoff at fade start: ${fromSong.title} -> '
+      '${nextSong.title}',
+    );
+  }
+
+  /// The UI already moved to the incoming track when the crossfade started.
+  /// The engine's TrackEnded for the outgoing path therefore only needs to
+  /// queue the successor for the new current track.
+  Future<void> _finalizeCrossfadeUiHandoff(String endedPath) async {
+    _debugLog(
+      '[crossfade] completion after early UI handoff: $endedPath; '
+      'current=${currentSongNotifier.value?.title}',
+    );
+    final currentSong = currentSongNotifier.value;
+    if (_usingRustBackend && currentSong != null) {
+      final expectedPath = await _resolveRustPath(currentSong);
+      final enginePath = _rustAudioService.currentPath;
+      if (expectedPath != null && enginePath != expectedPath) {
+        _debugLog(
+          '[crossfade] handoff mismatch after early UI handoff: '
+          'engineHasSource=${enginePath != null}; reloading ${currentSong.title}',
+        );
+        await _playSongAtCurrentIndex();
+        return;
+      }
+    }
+    unawaited(_queueNextTrackForGapless());
+    if (isPlayingNotifier.value && currentSong != null) {
+      _updateNotificationState();
     }
   }
 
@@ -3312,9 +3473,17 @@ class PlayerService {
       final expectedPath = await _resolveRustPath(currentSong);
       final enginePath = _rustAudioService.currentPath;
       if (expectedPath != null && enginePath != expectedPath) {
+        _debugLog(
+          '[crossfade] handoff mismatch: engineHasSource=${enginePath != null}; '
+          'reloading ${currentSong.title}',
+        );
         await _playSongAtCurrentIndex();
         return;
       }
+      _debugLog(
+        '[crossfade] handoff check: pathResolved=${expectedPath != null}, '
+        'engineMatchesExpected=${expectedPath != null && enginePath == expectedPath}',
+      );
     }
 
     unawaited(_queueNextTrackForGapless());
@@ -3326,6 +3495,7 @@ class PlayerService {
 
   void _stopPlayback() async {
     _wasPlayingBeforeAudioInterruption = false;
+    _crossfadeUiHandoffFromPath = null;
     await _savePosition();
     _positionSaveTimer?.cancel();
     _clearReplayTracking();
@@ -3996,6 +4166,13 @@ class PlayerService {
       return;
     }
 
+    _debugLog(
+      '[crossfade] policy: engine=${playbackMode.logLabel}, '
+      'preference=${_rustAudioService.crossfadeEnabledNotifier.value}, '
+      'locked=$isBitPerfectProcessingLocked, bitPerfect=$isBitPerfectModeEnabled, '
+      'duration=${_rustAudioService.crossfadeDurationNotifier.value}s',
+    );
+
     // The engine can remain in passthrough after bit-perfect is disabled.
     // Select DSP before sending software volume so the callback applies it.
     if (!isBitPerfectModeEnabled) {
@@ -4003,6 +4180,10 @@ class PlayerService {
     }
 
     if (isBitPerfectModeEnabled) {
+      await _rustAudioService.setCrossfade(
+        enabled: false,
+        durationSecs: _rustAudioService.crossfadeDurationNotifier.value,
+      );
       if (playbackMode == AudioEngineType.usbDacExperimental ||
           playbackMode == AudioEngineType.dapInternalHighRes) {
         await _rustAudioService.setPipelineModePassthrough(true);
@@ -4332,7 +4513,11 @@ class PlayerService {
       case AudioEngineType.normalAndroid:
         await _uac2Service.releaseAndroidDirectUsbRuntime();
         await _rustAudioService.setHighResMode(false);
-        _sessionManager.clearFallbackReason();
+        // Keep the failure reason visible so disabling crossfade can tell the
+        // user-initiated Standard selection apart from a Rust fallback.
+        if (_sessionManager.fallbackRequestedMode == null) {
+          _sessionManager.clearFallbackReason();
+        }
         return normalizedEngine;
       case AudioEngineType.rustOboe:
         await _uac2Service.releaseAndroidDirectUsbRuntime();
@@ -4517,6 +4702,7 @@ class PlayerService {
 
       _positionSaveTimer?.cancel();
       clearAbRepeat();
+      _crossfadeUiHandoffFromPath = null;
 
       if (playlist != null) {
         final sourcePlaylist = wrapAroundQueueNotifier.value
@@ -4642,13 +4828,30 @@ class PlayerService {
   }
 
   Future<void> _queueNextTrackForGapless() async {
-    if (!_shouldQueueNextTrack || _playlist.isEmpty) return;
+    if (!_shouldQueueNextTrack || _playlist.isEmpty) {
+      _debugLog(
+        '[crossfade] queue skipped: rust=$_usingRustBackend, '
+        'gapless=$_isGaplessActive, active=$_isCrossfadeActive, '
+        'preference=${_rustAudioService.crossfadeEnabledNotifier.value}, '
+        'locked=$isBitPerfectProcessingLocked, loop=${loopModeNotifier.value}, '
+        'playlistLength=${_playlist.length}',
+      );
+      return;
+    }
 
     final isLastTrack = _currentIndex >= _playlist.length - 1;
-    if (isLastTrack && loopModeNotifier.value != LoopMode.all) return;
+    if (isLastTrack && loopModeNotifier.value != LoopMode.all) {
+      _debugLog('[crossfade] queue skipped: end of non-repeating playlist');
+      return;
+    }
 
     final nextIndex = isLastTrack ? 0 : _currentIndex + 1;
     final nextSong = _playlist[nextIndex];
+    _debugLog(
+      '[crossfade] queue successor: index=$nextIndex, title=${nextSong.title}, '
+      'active=$_isCrossfadeActive, '
+      'duration=${_rustAudioService.crossfadeDurationNotifier.value}s',
+    );
 
     // HTTP-first: try a direct ranged stream, fall back to cache-then-play.
     if (nextSong.isNetworkSource) {
@@ -4663,6 +4866,9 @@ class PlayerService {
             url: http.url,
             headers: http.headers,
           );
+          _debugLog(
+            '[crossfade] HTTP queue request returned; readiness reported separately',
+          );
           return;
         }
       } catch (e) {
@@ -4676,6 +4882,13 @@ class PlayerService {
         await _computeReplayGainDbFor(nextSong),
       );
       await _rustAudioService.queueNext(nextPath);
+      _debugLog(
+        '[crossfade] local queue request returned; readiness reported separately',
+      );
+    } else {
+      _debugLog(
+        '[crossfade] queue skipped: no playable path for ${nextSong.title}',
+      );
     }
   }
 
@@ -4881,6 +5094,14 @@ class PlayerService {
     }
 
     _ensurePositionSaveTimer();
+    // A resume only loads the current track. Without a successor queued the
+    // first transition hard-cuts and can never crossfade, so mirror the
+    // queueing that _playInternal does when starting a track.
+    if (_shouldQueueNextTrack &&
+        _playlist.length > 1 &&
+        !_rustAudioService.hasQueuedNext) {
+      unawaited(_queueNextTrackForGapless());
+    }
     _updatePriorityAnchor();
     await _refreshAudioOutputDiagnostics(
       reason: 'playback resumed',
