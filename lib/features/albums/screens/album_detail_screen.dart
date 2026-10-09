@@ -30,6 +30,7 @@ import 'package:flick/features/player/widgets/sleep_timer_bottom_sheet.dart';
 import 'package:flick/features/songs/widgets/song_actions_button.dart';
 import 'package:flick/providers/favorites_provider.dart';
 import 'package:flick/providers/app_preferences_provider.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Album detail screen showing songs, album info, and more from the artist.
 class AlbumDetailScreen extends ConsumerStatefulWidget {
@@ -199,7 +200,7 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
     return [
       ?_albumGenre,
       if (_albumYear != null) '${_albumYear!}',
-      '${widget.songs.length} tracks',
+      l10n.tracks2(widget.songs.length),
       _formattedTotalDuration,
     ].join(' · ');
   }
@@ -260,9 +261,9 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Queued ${widget.songs.length} songs'),
+        content: Text(l10n.queuedSongs(widget.songs.length)),
         action: SnackBarAction(
-          label: 'View queue',
+          label: l10n.viewQueue,
           onPressed: () => NavigationHelper.navigateToQueue(context),
         ),
       ),
@@ -296,8 +297,8 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
       SnackBar(
         content: Text(
           isAll
-              ? 'Removed ${widget.songs.length} songs from favorites'
-              : 'Added ${widget.songs.length} songs to favorites',
+              ? l10n.removedSongsFromFavorites(widget.songs.length)
+              : l10n.addedSongsToFavorites(widget.songs.length),
         ),
       ),
     );
@@ -310,10 +311,10 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
     final current = ref.read(detailDescriptionProvider(_descriptionKey));
     final result = await FlickDialogs.input(
       context,
-      title: current.isEmpty ? 'Add Description' : 'Edit Description',
-      hintText: 'Write a description',
+      title: current.isEmpty ? l10n.addDescription : l10n.editDescription,
+      hintText: l10n.writeADescription,
       initialValue: current,
-      confirmLabel: 'Save',
+      confirmLabel: l10n.save,
       keyboardType: TextInputType.multiline,
       validator: (_) => null,
     );
@@ -335,18 +336,18 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
         DetailMoreSheetItem(
           icon: LucideIcons.alignLeft,
           label: ref.read(detailDescriptionProvider(_descriptionKey)).isEmpty
-              ? 'Add description'
-              : 'Edit description',
+              ? l10n.addDescription2
+              : l10n.editDescription2,
           onTap: _editDescription,
         ),
         DetailMoreSheetItem(
           icon: LucideIcons.listPlus,
-          label: 'Add to playlist',
+          label: l10n.addToPlaylist,
           onTap: () => AddToPlaylistSheet.showSongs(context, widget.songs),
         ),
         DetailMoreSheetItem(
           icon: LucideIcons.sparkles,
-          label: 'Identify album',
+          label: l10n.identifyAlbum,
           onTap: () => IdentifyAlbumSheet.show(
             context,
             songs: widget.songs,
@@ -357,17 +358,17 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
         if (appleMusic != null)
           DetailMoreSheetItem(
             icon: LucideIcons.externalLink,
-            label: 'Open in Apple Music',
+            label: l10n.openInAppleMusic,
             onTap: () => _openAppleMusic(_albumAppleMusicUri(appleMusic)),
           ),
         DetailMoreSheetItem(
           icon: LucideIcons.refreshCw,
-          label: 'Refresh Apple Music',
+          label: l10n.refreshAppleMusic,
           onTap: _refreshAppleMusic,
         ),
         DetailMoreSheetItem(
           icon: LucideIcons.moonStar,
-          label: 'Sleep timer',
+          label: l10n.sleepTimer,
           onTap: () =>
               SleepTimerBottomSheet.show(context, widget.playerService),
         ),
@@ -399,7 +400,7 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
   Future<void> _refreshAppleMusic() async {
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(
-      const SnackBar(content: Text('Refreshing Apple Music data')),
+      SnackBar(content: Text(l10n.refreshingAppleMusicData)),
     );
     final updated = await ref
         .read(
@@ -413,8 +414,8 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
       SnackBar(
         content: Text(
           updated
-              ? 'Apple Music data updated'
-              : 'Apple Music data unavailable',
+              ? l10n.appleMusicDataUpdated
+              : l10n.appleMusicDataUnavailable,
         ),
       ),
     );
@@ -516,18 +517,18 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
                     child: SizedBox(height: AppConstants.spacingMd),
                   ),
                   if (albumNotes != null && albumNotes.isNotEmpty)
-                    _buildSectionTitle(context, 'About this album'),
+                    _buildSectionTitle(context, l10n.aboutThisAlbum),
                  if (albumNotes != null && albumNotes.isNotEmpty)
                      SliverToBoxAdapter(
                        child: FetchedDescription(
                          text: albumNotes,
-                         sheetTitle: 'About this album',
+                         sheetTitle: l10n.aboutThisAlbum,
                        ),
                      ),
                  const SliverToBoxAdapter(
                    child: SizedBox(height: AppConstants.spacingLg),
                  ),
-                 _buildSectionTitle(context, 'Songs'),
+                 _buildSectionTitle(context, l10n.songs14),
                 SliverPadding(
                   padding: EdgeInsets.only(
                     bottom: AppConstants.navBarHeight + 80,
@@ -546,7 +547,7 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
                     ref.watch(appPreferencesProvider).showMoreFromArtist) ...[
                   _buildSectionTitle(
                     context,
-                    'More from ${widget.albumArtist}',
+                    l10n.moreFrom(widget.albumArtist),
                   ),
                   SliverToBoxAdapter(
                     child: SizedBox(
@@ -580,7 +581,7 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
                   const SliverToBoxAdapter(
                     child: SizedBox(height: AppConstants.spacingLg),
                   ),
-                  _buildSectionTitle(context, 'More Artists'),
+                  _buildSectionTitle(context, l10n.moreArtists2),
                   SliverToBoxAdapter(
                     child: SizedBox(
                       height: 160,
@@ -663,7 +664,7 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
                         ),
                       ),
                       Text(
-                        '${widget.albumArtist} • ${widget.songs.length} songs',
+                        l10n.songs(widget.albumArtist, widget.songs.length),
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall
@@ -886,7 +887,7 @@ class _AlbumCard extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              '$songCount songs',
+              l10n.songs2(songCount),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.adaptiveTextTertiary,
               ),
@@ -947,7 +948,7 @@ class _ArtistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uniqueAlbums = songs.map((s) => s.album ?? 'Unknown').toSet().length;
+    final uniqueAlbums = songs.map((s) => s.album ?? l10n.unknown).toSet().length;
 
     return GestureDetector(
       onTap: onTap,
@@ -1007,7 +1008,7 @@ class _ArtistCard extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              '${songs.length} songs • $uniqueAlbums albums',
+              l10n.songsAlbums(songs.length, uniqueAlbums),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.adaptiveTextTertiary,
               ),

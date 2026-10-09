@@ -10,6 +10,7 @@ import 'package:flick/providers/songs_provider.dart';
 import 'package:flick/services/apple_music/album_identification_service.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Batch-identifies an album against Apple Music and writes the result to the
 /// library. The main entry point for files that carry no usable tags.
@@ -55,14 +56,13 @@ class IdentifyAlbumSheet extends ConsumerStatefulWidget {
     if (!context.mounted || messenger == null || result == null) {
       return result;
     }
-    final artworkNote = result.artworkApplied ? ' and artwork' : '';
+    final artworkNote = result.artworkApplied ? l10n.andArtwork : '';
     messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           content: Text(
-            'Identified ${result.updatedSongs} '
-            '${result.updatedSongs == 1 ? 'song' : 'songs'}$artworkNote.',
+            l10n.identified(result.updatedSongs, artworkNote),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -138,7 +138,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
       if (!mounted || token != _searchToken) return;
       setState(() {
         _candidates = const [];
-        _error = 'Apple Music lookup failed. Check your connection.';
+        _error = l10n.appleMusicLookupFailedCheckYour;
       });
     } finally {
       if (mounted && token == _searchToken) {
@@ -212,7 +212,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Identify Album',
+                l10n.identifyAlbum2,
                 style: TextStyle(
                   fontFamily: 'ProductSans',
                   fontSize: 20,
@@ -222,9 +222,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Match ${widget.songs.length} '
-                '${widget.songs.length == 1 ? 'file' : 'files'} by artist, '
-                'album and track length',
+                l10n.matchByArtistAlbumAndTrack(widget.songs.length),
                 style: TextStyle(
                   fontFamily: 'ProductSans',
                   fontSize: 14,
@@ -238,7 +236,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
           onPressed: _isSearching || _isApplying ? null : _search,
           icon: const Icon(LucideIcons.refreshCw, size: 18),
           color: context.adaptiveTextSecondary,
-          tooltip: 'Search Again',
+          tooltip: l10n.searchAgain,
         ),
       ],
     );
@@ -251,7 +249,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
           child: _buildField(
             context,
             controller: _artistController,
-            label: 'Artist',
+            label: l10n.artist,
             icon: LucideIcons.user,
           ),
         ),
@@ -260,7 +258,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
           child: _buildField(
             context,
             controller: _albumController,
-            label: 'Album',
+            label: l10n.album,
             icon: LucideIcons.disc3,
             onSubmitted: (_) => _search(),
           ),
@@ -336,8 +334,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSm),
         child: Text(
-          'No Apple Music release found. Try editing the artist or album '
-          'name and searching again.',
+          l10n.noAppleMusicReleaseFoundTry,
           style: TextStyle(
             fontFamily: 'ProductSans',
             fontSize: 14,
@@ -351,7 +348,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Matches',
+          l10n.matches,
           style: TextStyle(
             fontFamily: 'ProductSans',
             fontSize: 16,
@@ -455,7 +452,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
       candidate.match.artistName,
       if (year != null) '$year',
       if (candidate.match.trackCount != null)
-        '${candidate.match.trackCount} tracks',
+        l10n.tracks8(candidate.match.trackCount!),
     ];
     return parts.where((part) => part.isNotEmpty).join(' • ');
   }
@@ -521,7 +518,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  track?.trackName ?? 'No match found',
+                  track?.trackName ?? l10n.noMatchFound,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -534,7 +531,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
                 ),
                 if (track != null && track.trackName != suggestion.song.title)
                   Text(
-                    'was: ${suggestion.song.title}',
+                    l10n.was(suggestion.song.title),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -577,9 +574,8 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
         icon: const Icon(LucideIcons.check, size: 18),
         label: Text(
           selected == null
-              ? 'Select a release'
-              : 'Apply to ${selected.suggestions.length} '
-                    '${selected.suggestions.length == 1 ? 'song' : 'songs'}',
+              ? l10n.selectARelease
+              : l10n.applyTo(selected.suggestions.length),
         ),
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.accent,

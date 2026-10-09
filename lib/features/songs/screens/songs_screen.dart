@@ -36,6 +36,7 @@ import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/utils/dev_log.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum _AlbumGridSortOption { name, artist, tracks }
 
@@ -203,7 +204,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                         ),
                         child: GlassSearchBar(
                           controller: _searchController,
-                          hintText: 'Search songs, artists...',
+                          hintText: l10n.searchSongsArtists,
                           showBackground: false,
                           onChanged: (value) {
                             setState(() {
@@ -859,7 +860,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
       case SongSortOption.fileType:
         return song.fileType.toUpperCase();
       case SongSortOption.album:
-        text = song.album ?? 'Unknown Album';
+        text = song.album ?? l10n.unknownAlbum;
       case SongSortOption.year:
         final year = song.year;
         if (year == null || year == 0) return '#';
@@ -1273,7 +1274,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
     final index = await ref.read(playerProvider.notifier).addToQueue(song);
     if (!mounted) return;
     _showSongActionSnackBar(
-      'Queued "${song.title}"',
+      l10n.queued(song.title),
       onUndo: () => ref.read(playerProvider.notifier).removeFromQueue(index),
     );
   }
@@ -1286,7 +1287,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
         devLog('Failed to add favorite for ${song.id}: $error');
         debugPrintStack(stackTrace: stackTrace);
         if (!mounted) return;
-        _showSongActionSnackBar('Failed to add "${song.title}" to favorites');
+        _showSongActionSnackBar(l10n.failedToAddToFavorites(song.title));
         return;
       }
 
@@ -1294,7 +1295,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
       PlayerService().refreshNotificationState();
     }());
     _showSongActionSnackBar(
-      'Added "${song.title}" to favorites',
+      l10n.addedToFavorites2(song.title),
       onUndo: () =>
           ref.read(favoritesServiceProvider).removeFavorite(song.id).then((_) {
             ref.invalidate(favoritesProvider);
@@ -1342,7 +1343,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
       await ref.read(playerProvider.notifier).addToQueue(song);
     }
     if (mounted) {
-      _showSongActionSnackBar('Queued ${toQueue.length} songs');
+      _showSongActionSnackBar(l10n.queuedSongs3(toQueue.length));
       _exitSelectionMode();
     }
   }
@@ -1360,7 +1361,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
     PlayerService().refreshNotificationState();
     if (mounted) {
       _showSongActionSnackBar(
-        'Added ${toFavorite.length} songs to favorites',
+        l10n.addedSongsToFavorites3(toFavorite.length),
         onUndo: () async {
           for (final song in toFavorite) {
             await ref.read(favoritesServiceProvider).removeFavorite(song.id);
@@ -1404,7 +1405,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                 const SizedBox(width: AppConstants.spacingSm),
                 Expanded(
                   child: Text(
-                    'Add ${songs.length} songs to playlist',
+                    l10n.addSongsToPlaylist(songs.length),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -1432,14 +1433,14 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                     ),
                     error: (error, _) => Padding(
                       padding: const EdgeInsets.all(AppConstants.spacingXl),
-                      child: Text('Error loading playlists: $error'),
+                      child: Text(l10n.errorLoadingPlaylists2(error)),
                     ),
                     data: (state) => ListView(
                       shrinkWrap: true,
                       children: [
                         _selectionSheetTile(
                           icon: LucideIcons.plus,
-                          label: 'Create new playlist',
+                          label: l10n.createNewPlaylist,
                           onTap: () {
                             Navigator.pop(context);
                             _createPlaylistWithSelected();
@@ -1486,7 +1487,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
       await notifier.addSongToPlaylist(playlistId, song.id);
     }
     if (!mounted) return;
-    _showSongActionSnackBar('Added ${songs.length} songs to $playlistName');
+    _showSongActionSnackBar(l10n.addedSongsTo2(songs.length, playlistName));
     _exitSelectionMode();
   }
 
@@ -1496,9 +1497,9 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
 
     final name = await FlickDialogs.input(
       context,
-      title: 'Create Playlist',
-      hintText: 'Playlist name',
-      confirmLabel: 'Create',
+      title: l10n.createPlaylist,
+      hintText: l10n.playlistName,
+      confirmLabel: l10n.create,
     );
     if (name == null || name.isEmpty || !mounted) return;
 
@@ -1508,7 +1509,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
 
     if (playlist == null) {
       if (!mounted) return;
-      _showSongActionSnackBar('A playlist with this name already exists');
+      _showSongActionSnackBar(l10n.aPlaylistWithThisNameAlready);
       return;
     }
 
@@ -1520,7 +1521,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
 
     if (mounted) {
       _showSongActionSnackBar(
-        'Created $name and added ${songs.length} songs',
+        l10n.createdAndAddedSongs(name, songs.length),
       );
       _exitSelectionMode();
     }
@@ -1553,7 +1554,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                 ),
                 const SizedBox(width: AppConstants.spacingSm),
                 Text(
-                  'More actions',
+                  l10n.moreActions,
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 18,
@@ -1571,7 +1572,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                 children: [
                   _selectionSheetTile(
                     icon: allSelected ? LucideIcons.x : LucideIcons.checkCheck,
-                    label: allSelected ? 'Deselect all' : 'Select all',
+                    label: allSelected ? l10n.deselectAll : l10n.selectAll2,
                     onTap: () {
                       Navigator.pop(sheetContext);
                       if (allSelected) {
@@ -1583,7 +1584,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                   ),
                   _selectionSheetTile(
                     icon: LucideIcons.circlePlus,
-                    label: 'Create playlist from selected',
+                    label: l10n.createPlaylistFromSelected,
                     onTap: () {
                       Navigator.pop(sheetContext);
                       _createPlaylistWithSelected();
@@ -1591,7 +1592,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                   ),
                   _selectionSheetTile(
                     icon: LucideIcons.trash2,
-                    label: 'Delete selected',
+                    label: l10n.deleteSelected,
                     onTap: () {
                       Navigator.pop(sheetContext);
                       _deleteSelected();
@@ -1619,29 +1620,29 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
 
     final action = await showFlickDialog<String>(
       context: context,
-      barrierLabel: 'Delete songs',
+      barrierLabel: l10n.deleteSongs2,
       builder: (dialogContext) => FlickDialog(
-        title: 'Delete ${songs.length} songs?',
+        title: l10n.deleteSongs(songs.length),
         icon: Icons.warning_amber_rounded,
         destructive: true,
         content: Text(
           canDeleteFiles
-              ? 'Remove the database entries or delete the files from your device. This cannot be undone.'
-              : 'Remove these songs from your library. The files on your device will not be affected.',
+              ? l10n.removeTheDatabaseEntriesOrDelete
+              : l10n.removeTheseSongsFromYourLibrary,
           style: TextStyle(color: AppColors.textSecondary, height: 1.45),
         ),
         actions: [
           FlickDialogButton(
-            label: 'Cancel',
+            label: l10n.cancel,
             onPressed: () => Navigator.pop(dialogContext, null),
           ),
           FlickDialogButton(
-            label: 'Remove from Library',
+            label: l10n.removeFromLibrary,
             onPressed: () => Navigator.pop(dialogContext, 'remove'),
           ),
           if (canDeleteFiles)
             FlickDialogButton(
-              label: 'Delete Files',
+              label: l10n.deleteFiles,
               style: FlickDialogButtonStyle.destructive,
               onPressed: () => Navigator.pop(dialogContext, 'files'),
             ),
@@ -1711,8 +1712,8 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
       _exitSelectionMode();
       _showSongActionSnackBar(
         deleteFiles
-            ? 'Deleted ${songs.length} songs'
-            : 'Removed ${songs.length} songs from library',
+            ? l10n.deletedSongs(songs.length)
+            : l10n.removedSongsFromLibrary(songs.length),
       );
     }
   }
@@ -1802,7 +1803,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                 TextButton(
                   onPressed: onUndo,
                   child: Text(
-                    'Undo',
+                    l10n.undo,
                     style: TextStyle(
                       color: AppColors.accentDim,
                       fontWeight: FontWeight.w600,
@@ -1831,28 +1832,28 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
   Widget _buildErrorState(Object error) {
     return _ContentStateWidget(
       icon: LucideIcons.circleX,
-      title: 'Error loading songs',
+      title: l10n.errorLoadingSongs,
       subtitle: error.toString(),
       action: TextButton(
         onPressed: () => ref.invalidate(songsProvider),
-        child: const Text('Retry'),
+        child: Text(l10n.retry),
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    return const _ContentStateWidget(
+    return _ContentStateWidget(
       icon: LucideIcons.music4,
-      title: 'No Music Yet',
-      subtitle: 'Add a music folder in Settings',
+      title: l10n.noMusicYet,
+      subtitle: l10n.addAMusicFolderInSettings,
     );
   }
 
   Widget _buildNoSearchResultsState() {
-    return const _ContentStateWidget(
+    return _ContentStateWidget(
       icon: LucideIcons.searchX,
-      title: 'No matches found',
-      subtitle: 'Try adjusting your search query',
+      title: l10n.noMatchesFound,
+      subtitle: l10n.tryAdjustingYourSearchQuery,
     );
   }
 
@@ -1880,7 +1881,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your Library',
+                  l10n.yourLibrary,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
@@ -1888,7 +1889,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                 ),
                 const SizedBox(height: AppConstants.spacingXxs),
                 Text(
-                  '$songCount songs',
+                  l10n.songs2(songCount),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextSecondary,
                   ),
@@ -1982,7 +1983,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
           ),
           Expanded(
             child: Text(
-              '$count selected',
+              l10n.selected(count),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -1997,7 +1998,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
               color: AppColors.accent.withValues(alpha: 0.8),
             ),
             onPressed: count > 0 ? () => _queueSelected() : null,
-            tooltip: 'Add to queue',
+            tooltip: l10n.addToQueue2,
           ),
           IconButton(
             icon: Icon(
@@ -2005,7 +2006,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
               color: Colors.red.withValues(alpha: 0.8),
             ),
             onPressed: count > 0 ? () => _favoriteSelected() : null,
-            tooltip: 'Add to favorites',
+            tooltip: l10n.addToFavorites,
           ),
           IconButton(
             icon: Icon(
@@ -2013,7 +2014,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
               color: AppColors.accent.withValues(alpha: 0.8),
             ),
             onPressed: count > 0 ? _addSelectedToPlaylist : null,
-            tooltip: 'Add to playlist',
+            tooltip: l10n.addToPlaylist,
           ),
           IconButton(
             icon: Icon(
@@ -2021,7 +2022,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
               color: context.adaptiveTextPrimary,
             ),
             onPressed: count > 0 ? _showMoreActions : null,
-            tooltip: 'More actions',
+            tooltip: l10n.moreActions,
           ),
         ],
       ),
@@ -2319,7 +2320,7 @@ class _QueueSwipeListItemState extends State<_QueueSwipeListItem> {
                   const Spacer(),
                   Opacity(
                     opacity: queueRevealProgress,
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
@@ -2329,7 +2330,7 @@ class _QueueSwipeListItemState extends State<_QueueSwipeListItem> {
                         ),
                         SizedBox(width: 8),
                         Text(
-                          'Add to queue',
+                          l10n.addToQueue2,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
@@ -2605,7 +2606,7 @@ class _AlbumCardState extends State<_AlbumCard>
                                         ),
                                       ),
                                       child: Text(
-                                        '${widget.album.songs.length} tracks',
+                                        l10n.tracks6(widget.album.songs.length),
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 11,
@@ -2781,7 +2782,7 @@ class _AlbumListTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$trackCount tracks • ${album.albumArtist}',
+                      l10n.tracks7(trackCount, album.albumArtist),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -2875,7 +2876,7 @@ class _AlbumFilterSheetState extends State<_AlbumFilterSheet> {
               ),
             ),
             Text(
-              'SORT BY',
+              l10n.sortBy,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -2891,7 +2892,7 @@ class _AlbumFilterSheetState extends State<_AlbumFilterSheet> {
             const Divider(color: AppColors.glassBorder, height: 1),
             const SizedBox(height: AppConstants.spacingMd),
             Text(
-              'FILTER BY FORMAT',
+              l10n.filterByFormat,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -2955,7 +2956,7 @@ class _AlbumFilterSheetState extends State<_AlbumFilterSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ALBUM LIMIT',
+                        l10n.albumLimit,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -2965,7 +2966,7 @@ class _AlbumFilterSheetState extends State<_AlbumFilterSheet> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Albums shown per page',
+                        l10n.albumsShownPerPage,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: context.adaptiveTextTertiary,
                         ),
@@ -3094,11 +3095,11 @@ class _AlbumFilterSheetState extends State<_AlbumFilterSheet> {
   String _albumSortLabel(_AlbumGridSortOption option) {
     switch (option) {
       case _AlbumGridSortOption.name:
-        return 'Album Name';
+        return l10n.albumName;
       case _AlbumGridSortOption.artist:
-        return 'Album Artist';
+        return l10n.albumArtist;
       case _AlbumGridSortOption.tracks:
-        return 'Track Count';
+        return l10n.trackCount;
     }
   }
 }
@@ -3119,8 +3120,8 @@ class _AlbumLoadMoreIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = isComplete
-        ? 'Showing all $totalCount albums'
-        : 'Showing $visibleCount of $totalCount albums';
+        ? l10n.showingAllAlbums(totalCount)
+        : l10n.showingOfAlbums(visibleCount, totalCount);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -3160,7 +3161,7 @@ class _AlbumLoadMoreIndicator extends StatelessWidget {
           ),
           if (isComplete || onLoadMore == null)
             Text(
-              isComplete ? 'Done' : 'Scroll for more',
+              isComplete ? l10n.done : l10n.scrollForMore,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.adaptiveTextTertiary,
               ),
@@ -3176,8 +3177,8 @@ class _AlbumLoadMoreIndicator extends StatelessWidget {
                 minimumSize: const Size(0, 36),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text(
-                'Show more',
+              child: Text(
+                l10n.showMore,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

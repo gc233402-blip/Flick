@@ -10,6 +10,7 @@ import 'package:flick/services/player_service.dart';
 import 'package:flick/src/rust/api/metadata_editor.dart' as rust_metadata;
 import 'package:flick/providers/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Deprecated: use [MetadataEditorBottomSheet] (`lib/features/songs/widgets/metadata_editor_bottom_sheet.dart:12`).
 ///
@@ -112,7 +113,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
     final t = _yearController.text.trim();
     if (t.isEmpty) return null;
     final n = int.tryParse(t);
-    if (n == null || n < 1 || n > 9999) return 'Enter a year (1–9999)';
+    if (n == null || n < 1 || n > 9999) return l10n.enterAYear19999;
     return null;
   }
 
@@ -123,7 +124,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
     final t = c.text.trim();
     if (t.isEmpty) return null;
     final n = int.tryParse(t);
-    if (n == null || n < 0) return 'Enter a valid $label number';
+    if (n == null || n < 0) return l10n.enterAValidNumber(label);
     return null;
   }
 
@@ -183,8 +184,8 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
       Navigator.of(context).pop(true);
       if (result.verified) {
         messenger.showSnackBar(
-          const SnackBar(
-            content: Text('Saved and verified'),
+          SnackBar(
+            content: Text(l10n.savedAndVerified),
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -192,7 +193,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
       } else {
         messenger.showSnackBar(
           SnackBar(
-            content: Text(result.message ?? 'Saved (verification pending)'),
+            content: Text(result.message ?? l10n.savedVerificationPending),
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 4),
           ),
@@ -201,7 +202,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
     } else {
       setState(() {
         _isSaving = false;
-        _error = result.message ?? 'Failed to save metadata.';
+        _error = result.message ?? l10n.failedToSaveMetadata2;
       });
     }
   }
@@ -235,7 +236,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
             },
           ),
           title: Text(
-            'Edit Metadata',
+            l10n.editMetadata,
             style: TextStyle(
               fontFamily: 'ProductSans',
               fontSize: 18,
@@ -266,26 +267,26 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
                   _buildErrorBanner(context),
                   const SizedBox(height: AppConstants.spacingMd),
                 ],
-                _buildField(context, 'Title', _titleController,
+                _buildField(context, l10n.title, _titleController,
                     focusNode: _titleFocus,
                     enabled: _isEditable && !_isSaving),
-                _buildField(context, 'Artist', _artistController,
+                _buildField(context, l10n.artist, _artistController,
                     enabled: _isEditable && !_isSaving),
-                _buildField(context, 'Album', _albumController,
+                _buildField(context, l10n.album, _albumController,
                     enabled: _isEditable && !_isSaving),
-                _buildField(context, 'Album Artist', _albumArtistController,
+                _buildField(context, l10n.albumArtist, _albumArtistController,
                     enabled: _isEditable && !_isSaving),
-                _buildField(context, 'Genre', _genreController,
+                _buildField(context, l10n.genre, _genreController,
                     enabled: _isEditable && !_isSaving),
-                _buildField(context, 'Year', _yearController,
+                _buildField(context, l10n.year, _yearController,
                     enabled: _isEditable && !_isSaving,
                     keyboardType: TextInputType.number,
                     errorText: _yearError()),
-                _buildField(context, 'Track #', _trackNumberController,
+                _buildField(context, l10n.track3, _trackNumberController,
                     enabled: _isEditable && !_isSaving,
                     keyboardType: TextInputType.number,
                     errorText: _trackError()),
-                _buildField(context, 'Disc #', _discNumberController,
+                _buildField(context, l10n.disc2, _discNumberController,
                     enabled: _isEditable && !_isSaving,
                     keyboardType: TextInputType.number,
                     errorText: _discError()),
@@ -315,8 +316,8 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
           Expanded(
             child: Text(
               widget.song.isExternal
-                  ? 'External songs cannot be edited'
-                  : 'CUE sheet tracks cannot be edited',
+                  ? l10n.externalSongsCannotBeEdited2
+                  : l10n.cueSheetTracksCannotBeEdited2,
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 fontSize: 13,
@@ -441,7 +442,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
         Divider(height: 1, color: AppColors.glassBorderStrong),
         const SizedBox(height: AppConstants.spacingLg),
         Text(
-          'File Information',
+          l10n.fileInformation,
           style: TextStyle(
             fontFamily: 'ProductSans',
             fontSize: 14,
@@ -450,13 +451,13 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
           ),
         ),
         const SizedBox(height: AppConstants.spacingSm),
-        _buildInfoRow(context, 'Duration', widget.song.formattedDuration),
+        _buildInfoRow(context, l10n.duration, widget.song.formattedDuration),
         _buildInfoRow(
-            context, 'Format', widget.song.fileType.toUpperCase()),
+            context, l10n.format, widget.song.fileType.toUpperCase()),
         if (widget.song.resolution != null)
-          _buildInfoRow(context, 'Resolution', widget.song.resolution!),
+          _buildInfoRow(context, l10n.resolution, widget.song.resolution!),
         if (widget.song.filePath != null)
-          _buildInfoRow(context, 'File Path', widget.song.filePath!),
+          _buildInfoRow(context, l10n.filePath, widget.song.filePath!),
       ],
     );
   }
@@ -542,7 +543,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
                       ),
                     )
                   : Text(
-                      'Save Changes',
+                      l10n.saveChanges,
                       style: TextStyle(
                         fontFamily: 'ProductSans',
                         fontSize: 15,
@@ -559,10 +560,10 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
   Future<void> _showDiscardDialog(BuildContext context) async {
     final confirmed = await FlickDialogs.confirm(
       context,
-      title: 'Discard Changes?',
+      title: l10n.discardChanges2,
       message:
-          'You have unsaved changes. Are you sure you want to discard them?',
-      confirmLabel: 'Discard',
+          l10n.youHaveUnsavedChangesAreYou,
+      confirmLabel: l10n.discard,
       destructive: true,
     );
     if (confirmed && context.mounted) {

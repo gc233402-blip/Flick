@@ -16,6 +16,7 @@ import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/flick_dialog.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Number of history entries fetched per page.
 const int _kPageSize = 50;
@@ -193,10 +194,10 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
   Future<void> _clearHistory() async {
     final confirmed = await FlickDialogs.confirm(
       context,
-      title: 'Clear History',
+      title: l10n.clearHistory,
       message:
-          'Are you sure you want to clear your entire listening history? This cannot be undone.',
-      confirmLabel: 'Clear',
+          l10n.areYouSureYouWantTo2,
+      confirmLabel: l10n.clear,
       destructive: true,
     );
 
@@ -205,7 +206,7 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('History cleared')));
+        ).showSnackBar(SnackBar(content: Text(l10n.historyCleared)));
       }
     }
   }
@@ -258,14 +259,14 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Recently Played',
+                  l10n.recentlyPlayed,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
                   ),
                 ),
                 Text(
-                  '$_totalCount ${_totalCount == 1 ? 'song' : 'songs'} played',
+                  l10n.played(_totalCount),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),
@@ -343,7 +344,7 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
             ),
             const SizedBox(height: AppConstants.spacingLg),
             Text(
-              'No History Yet',
+              l10n.noHistoryYet,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: context.adaptiveTextSecondary,
                 fontWeight: FontWeight.w600,
@@ -351,7 +352,7 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
             ),
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              'Songs you play will appear here',
+              l10n.songsYouPlayWillAppearHere,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.adaptiveTextTertiary,
@@ -362,6 +363,25 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
         ),
       ),
     );
+  }
+
+  String _localizedSectionTitle(String key) {
+    switch (key) {
+      case 'Today':
+        return l10n.today;
+      case 'Yesterday':
+        return l10n.yesterday;
+      case 'This Week':
+        return l10n.thisWeek;
+      case 'Last Week':
+        return l10n.lastWeek;
+      case 'This Month':
+        return l10n.thisMonth;
+      case 'Earlier':
+        return l10n.earlier;
+      default:
+        return key;
+    }
   }
 
   Widget _buildHistoryList() {
@@ -383,7 +403,12 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
 
     final rows = <_RecentlyPlayedRow>[];
     for (final section in sortedSections) {
-      rows.add(_RecentlyPlayedRow.header(section.key, section.value.length));
+      rows.add(
+        _RecentlyPlayedRow.header(
+          _localizedSectionTitle(section.key),
+          section.value.length,
+        ),
+      );
       for (final entry in section.value) {
         rows.add(_RecentlyPlayedRow.entry(entry));
       }
@@ -457,7 +482,7 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
           ),
           const Spacer(),
           Text(
-            '$count ${count == 1 ? 'song' : 'songs'}',
+            l10n.song2(count),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -529,13 +554,13 @@ class _RecentlyPlayedTileState extends State<_RecentlyPlayedTile>
     final diff = now.difference(time);
 
     if (diff.inMinutes < 1) {
-      return 'Just now';
+      return l10n.justNow;
     } else if (diff.inMinutes < 60) {
-      return '${diff.inMinutes}m ago';
+      return l10n.mAgo(diff.inMinutes);
     } else if (diff.inHours < 24) {
-      return '${diff.inHours}h ago';
+      return l10n.hAgo(diff.inHours);
     } else if (diff.inDays < 7) {
-      return '${diff.inDays}d ago';
+      return l10n.dAgo2(diff.inDays);
     } else {
       return '${time.day.toString().padLeft(2, '0')}/'
           '${time.month.toString().padLeft(2, '0')}/'

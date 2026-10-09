@@ -15,6 +15,7 @@ import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Number of songs fetched per page.
 const int _kPageSize = 50;
@@ -239,14 +240,14 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Recently Added',
+                  l10n.recentlyAdded,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
                   ),
                 ),
                 Text(
-                  '$_totalCount ${_totalCount == 1 ? 'song' : 'songs'} in your library',
+                  l10n.inYourLibrary(_totalCount),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),
@@ -315,7 +316,7 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
             ),
             const SizedBox(height: AppConstants.spacingLg),
             Text(
-              'No New Additions Yet',
+              l10n.noNewAdditionsYet,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: context.adaptiveTextSecondary,
                 fontWeight: FontWeight.w600,
@@ -323,7 +324,7 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
             ),
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              'Songs you scan into your library will show up here',
+              l10n.songsYouScanIntoYourLibrary,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.adaptiveTextTertiary,
@@ -334,6 +335,25 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
         ),
       ),
     );
+  }
+
+  String _localizedSectionTitle(String key) {
+    switch (key) {
+      case 'Today':
+        return l10n.today;
+      case 'Yesterday':
+        return l10n.yesterday;
+      case 'This Week':
+        return l10n.thisWeek;
+      case 'Last Week':
+        return l10n.lastWeek;
+      case 'This Month':
+        return l10n.thisMonth;
+      case 'Earlier':
+        return l10n.earlier;
+      default:
+        return key;
+    }
   }
 
   Widget _buildList() {
@@ -355,7 +375,12 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
 
     final rows = <_RecentlyAddedRow>[];
     for (final section in sortedSections) {
-      rows.add(_RecentlyAddedRow.header(section.key, section.value.length));
+      rows.add(
+        _RecentlyAddedRow.header(
+          _localizedSectionTitle(section.key),
+          section.value.length,
+        ),
+      );
       for (final song in section.value) {
         rows.add(_RecentlyAddedRow.song(song));
       }
@@ -425,7 +450,7 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
           ),
           const Spacer(),
           Text(
-            '$count ${count == 1 ? 'song' : 'songs'}',
+            l10n.song2(count),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -488,27 +513,27 @@ class _RecentlyAddedTileState extends State<_RecentlyAddedTile>
 
   String _formatTime(DateTime time) {
     final diff = DateTime.now().difference(time);
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    if (diff.inMinutes < 1) return l10n.justNow;
+    if (diff.inMinutes < 60) return l10n.mAgo(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.hAgo(diff.inHours);
+    if (diff.inDays < 7) return l10n.dAgo2(diff.inDays);
     return _formatDate(time);
   }
 
   String _formatDate(DateTime time) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+    final months = [
+      l10n.jan,
+      l10n.feb,
+      l10n.mar,
+      l10n.apr,
+      l10n.may,
+      l10n.jun,
+      l10n.jul,
+      l10n.aug,
+      l10n.sep,
+      l10n.oct,
+      l10n.nov,
+      l10n.dec,
     ];
     return '${time.day} ${months[time.month - 1]} ${time.year}';
   }

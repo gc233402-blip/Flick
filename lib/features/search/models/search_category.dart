@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum SearchCategory {
   songs,
@@ -15,19 +16,19 @@ extension SearchCategoryX on SearchCategory {
   String get label {
     switch (this) {
       case SearchCategory.songs:
-        return 'Songs';
+        return l10n.songs14;
       case SearchCategory.artists:
-        return 'Artists';
+        return l10n.artists;
       case SearchCategory.albums:
-        return 'Albums';
+        return l10n.albums;
       case SearchCategory.albumArtists:
-        return 'Album Artists';
+        return l10n.albumArtists;
       case SearchCategory.folders:
-        return 'Folders';
+        return l10n.folders;
       case SearchCategory.year:
-        return 'Year';
+        return l10n.year;
       case SearchCategory.playlists:
-        return 'Playlists';
+        return l10n.playlists;
     }
   }
 

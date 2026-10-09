@@ -20,6 +20,7 @@ import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Bottom sheet with actions for a song (add to playlist, favorites, view metadata, etc.)
 class SongActionsBottomSheet extends ConsumerWidget {
@@ -75,7 +76,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             _buildActionTile(
               context: context,
               icon: LucideIcons.listMinus,
-              label: 'Remove from Playlist',
+              label: l10n.removeFromPlaylist,
               onTap: () {
                 Navigator.pop(context);
                 onRemoveFromPlaylist!.call();
@@ -85,7 +86,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             context: context,
             icon: LucideIcons.heart,
             highlighted: isFavorite,
-            label: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+            label: isFavorite ? l10n.removeFromFavorites : l10n.addToFavorites2,
             onTap: () async {
               await ref
                   .read(favoritesProvider.notifier)
@@ -100,7 +101,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             _buildActionTile(
               context: context,
               icon: LucideIcons.checkCheck,
-              label: 'Select',
+              label: l10n.select,
               onTap: () {
                 Navigator.pop(context);
                 onSelect?.call();
@@ -109,14 +110,14 @@ class SongActionsBottomSheet extends ConsumerWidget {
           _buildActionTile(
             context: context,
             icon: LucideIcons.listPlus,
-            label: 'Add to Queue',
+            label: l10n.addToQueue,
             onTap: () async {
               await ref.read(playerProvider.notifier).addToQueue(song);
               if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Queued "${song.title}"'),
+                    content: Text(l10n.queued(song.title)),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -126,7 +127,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
           _buildActionTile(
             context: context,
             icon: LucideIcons.listMusic,
-            label: 'Add to Playlist',
+            label: l10n.addToPlaylist2,
             onTap: () {
               Navigator.pop(context);
               _showAddToPlaylistSheet(context);
@@ -135,7 +136,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
           _buildActionTile(
             context: context,
             icon: LucideIcons.image,
-            label: 'Set Album Art',
+            label: l10n.setAlbumArt,
             onTap: () {
               Navigator.pop(context);
               Future.delayed(Duration.zero, () async {
@@ -155,7 +156,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             _buildActionTile(
               context: context,
               icon: LucideIcons.pencil,
-              label: 'Edit Metadata',
+              label: l10n.editMetadata,
               onTap: () {
                 Navigator.pop(context);
                 Future.delayed(Duration.zero, () async {
@@ -172,7 +173,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
           _buildActionTile(
             context: context,
             icon: LucideIcons.info,
-            label: 'View Metadata',
+            label: l10n.viewMetadata,
             onTap: () {
               Navigator.pop(context);
               _showMetadataSheet(context);
@@ -182,7 +183,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             _buildActionTile(
               context: context,
               icon: LucideIcons.share2,
-              label: 'Share',
+              label: l10n.share,
               onTap: () {
                 Navigator.pop(context);
                 unawaited(Share.shareXFiles([XFile(song.filePath!)]));
@@ -194,7 +195,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
           _buildActionTile(
             context: context,
             icon: LucideIcons.trash2,
-            label: 'Delete Song',
+            label: l10n.deleteSong,
             onTap: () => _showDeleteWarning(context, ref),
             highlighted: true,
           ),
@@ -387,7 +388,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                   ),
                   const SizedBox(width: AppConstants.spacingSm),
                   Text(
-                    'Add to Playlist',
+                    l10n.addToPlaylist2,
                     style: TextStyle(
                       fontFamily: 'ProductSans',
                       fontSize: 18,
@@ -412,7 +413,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                       ),
                       error: (error, _) => Padding(
                         padding: const EdgeInsets.all(AppConstants.spacingXl),
-                        child: Text('Error loading playlists: $error'),
+                        child: Text(l10n.errorLoadingPlaylists2(error)),
                       ),
                       data: (state) {
                         if (state.playlists.isEmpty) {
@@ -431,7 +432,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: AppConstants.spacingMd),
                                 Text(
-                                  'No playlists yet',
+                                  l10n.noPlaylistsYet,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(
                 color: sheetContext.adaptiveTextSecondary,
@@ -448,7 +449,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                                     _showCreatePlaylistDialog(rootContext);
                                   },
                                   icon: const Icon(LucideIcons.plus),
-                                  label: const Text('Create Playlist'),
+                                  label: Text(l10n.createPlaylist),
                                 ),
                               ],
                             ),
@@ -461,7 +462,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                             _buildActionTile(
                               context: context,
                               icon: LucideIcons.plus,
-                              label: 'Create New Playlist',
+                              label: l10n.createNewPlaylist2,
                               onTap: () {
                                 final rootContext = Navigator.of(
                                   context,
@@ -490,7 +491,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          'Added to ${playlist.name}',
+                                          l10n.addedTo(playlist.name),
                                         ),
                                       ),
                                     );
@@ -519,9 +520,9 @@ class SongActionsBottomSheet extends ConsumerWidget {
     unawaited(
       FlickDialogs.input(
         context,
-        title: 'Create Playlist',
-        hintText: 'Playlist name',
-        confirmLabel: 'Create',
+        title: l10n.createPlaylist,
+        hintText: l10n.playlistName,
+        confirmLabel: l10n.create,
       ).then((name) async {
         if (name == null || name.isEmpty) return;
 
@@ -531,8 +532,8 @@ class SongActionsBottomSheet extends ConsumerWidget {
 
         if (playlist == null) {
           messenger.showSnackBar(
-            const SnackBar(
-              content: Text('A playlist with this name already exists'),
+            SnackBar(
+              content: Text(l10n.aPlaylistWithThisNameAlready),
             ),
           );
           return;
@@ -543,7 +544,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             .addSongToPlaylist(playlist.id, song.id, song: song);
 
         messenger.showSnackBar(
-          SnackBar(content: Text('Created ${playlist.name} and added song')),
+          SnackBar(content: Text(l10n.createdAndAddedSong(playlist.name))),
         );
       }),
     );
@@ -572,7 +573,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                   ),
                   const SizedBox(width: AppConstants.spacingSm),
                   Text(
-                    'Song Metadata',
+                    l10n.songMetadata,
                     style: TextStyle(
                       fontFamily: 'ProductSans',
                       fontSize: 18,
@@ -589,67 +590,67 @@ class SongActionsBottomSheet extends ConsumerWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _buildMetadataRow(sheetContext, 'Title', song.title),
-                      _buildMetadataRow(sheetContext, 'Artist', song.artist),
+                      _buildMetadataRow(sheetContext, l10n.title, song.title),
+                      _buildMetadataRow(sheetContext, l10n.artist, song.artist),
                       if (song.album != null)
-                        _buildMetadataRow(sheetContext, 'Album', song.album!),
+                        _buildMetadataRow(sheetContext, l10n.album, song.album!),
                       if (song.albumArtist != null)
                         _buildMetadataRow(
                           sheetContext,
-                          'Album Artist',
+                          l10n.albumArtist,
                           song.albumArtist!,
                         ),
                       if (song.genre != null)
                         _buildMetadataRow(
                           sheetContext,
-                          'Genre',
+                          l10n.genre,
                           song.genre!,
                         ),
                       if (song.year != null)
                         _buildMetadataRow(
                           sheetContext,
-                          'Year',
+                          l10n.year,
                           song.year!.toString(),
                         ),
                       if (song.trackNumber != null)
                         _buildMetadataRow(
                           sheetContext,
-                          'Track',
+                          l10n.track,
                           song.trackNumber!.toString(),
                         ),
                       if (song.discNumber != null)
                         _buildMetadataRow(
                           sheetContext,
-                          'Disc',
+                          l10n.disc,
                           song.discNumber!.toString(),
                         ),
                       _buildFileTagExtras(sheetContext),
                       _buildMetadataRow(
                         sheetContext,
-                        'Duration',
+                        l10n.duration,
                         song.formattedDuration,
                       ),
                       _buildMetadataRow(
                         sheetContext,
-                        'Format',
+                        l10n.format,
                         song.fileType.toUpperCase(),
                       ),
                       if (song.resolution != null)
                         _buildMetadataRow(
                           sheetContext,
-                          'Resolution',
+                          l10n.resolution,
                           song.resolution!,
                         ),
                       if (song.filePath != null)
                         _buildMetadataRow(
                           sheetContext,
-                          'File Path',
+                          l10n.filePath,
                           song.filePath!,
                         ),
                       if (song.dateAdded != null)
                         _buildMetadataRow(
                           sheetContext,
-                          'Date Added',
+                          l10n.dateAdded,
                           '${song.dateAdded!.year}-${song.dateAdded!.month.toString().padLeft(2, '0')}-${song.dateAdded!.day.toString().padLeft(2, '0')}',
                         ),
                     ],
@@ -694,9 +695,9 @@ class SongActionsBottomSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (hasFullDate) _buildMetadataRow(context, 'Date', date),
-            if (hasCopyright) _buildMetadataRow(context, 'Copyright', copyright),
-            if (hasLabel) _buildMetadataRow(context, 'Label / Organization', label),
+            if (hasFullDate) _buildMetadataRow(context, l10n.date, date),
+            if (hasCopyright) _buildMetadataRow(context, l10n.copyright, copyright),
+            if (hasLabel) _buildMetadataRow(context, l10n.labelOrganization, label),
           ],
         );
       },
@@ -713,9 +714,9 @@ class SongActionsBottomSheet extends ConsumerWidget {
 
     final action = await showFlickDialog<String>(
       context: sheetContext,
-      barrierLabel: 'Delete song',
+      barrierLabel: l10n.deleteSong3,
       builder: (dialogContext) => FlickDialog(
-        title: 'Delete Song?',
+        title: l10n.deleteSong2,
         icon: Icons.warning_amber_rounded,
         destructive: true,
         content: Column(
@@ -723,7 +724,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '"${song.title}" by ${song.artist}',
+              l10n.by(song.title, song.artist),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -733,24 +734,24 @@ class SongActionsBottomSheet extends ConsumerWidget {
             const SizedBox(height: AppConstants.spacingSm),
             Text(
               canDeleteFile
-                  ? 'Remove the database entry or delete the file from your device. This cannot be undone.'
-                  : 'Remove this song from your library. The file on your device will not be affected.',
+                  ? l10n.removeTheDatabaseEntryOrDelete
+                  : l10n.removeThisSongFromYourLibrary,
               style: TextStyle(color: AppColors.textSecondary, height: 1.45),
             ),
           ],
         ),
         actions: [
           FlickDialogButton(
-            label: 'Cancel',
+            label: l10n.cancel,
             onPressed: () => Navigator.pop(dialogContext, null),
           ),
           FlickDialogButton(
-            label: 'Remove from Library',
+            label: l10n.removeFromLibrary,
             onPressed: () => Navigator.pop(dialogContext, 'remove'),
           ),
           if (canDeleteFile)
             FlickDialogButton(
-              label: 'Delete File',
+              label: l10n.deleteFile,
               style: FlickDialogButtonStyle.destructive,
               onPressed: () => Navigator.pop(dialogContext, 'files'),
             ),
@@ -826,8 +827,8 @@ class SongActionsBottomSheet extends ConsumerWidget {
         SnackBar(
           content: Text(
             deleteFile
-                ? 'Deleted "${song.title}"'
-                : 'Removed "${song.title}" from library',
+                ? l10n.deleted(song.title)
+                : l10n.removedFromLibrary(song.title),
           ),
         ),
       );

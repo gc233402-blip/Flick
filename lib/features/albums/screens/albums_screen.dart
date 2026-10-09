@@ -20,6 +20,7 @@ import 'package:flick/services/motion_art/animated_artwork_service.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/widgets/common/display_mode_wrapper.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum AlbumSortOption { name, artist, tracks }
 
@@ -249,7 +250,7 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Albums',
+                      l10n.albums,
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
                             fontWeight: FontWeight.w700,
@@ -257,7 +258,7 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
                           ),
                     ),
                     Text(
-                      '${_albums.length} albums',
+                      l10n.albums2(_albums.length),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextTertiary,
                       ),
@@ -330,7 +331,7 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Your collection at a glance',
+                      l10n.yourCollectionAtAGlance,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: context.adaptiveTextPrimary,
                         fontWeight: FontWeight.w700,
@@ -345,7 +346,7 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
                 ),
                 const SizedBox(height: AppConstants.spacingXs),
                 Text(
-                  'Browse by artwork, open any album, and jump straight into the tracklist.',
+                  l10n.browseByArtworkOpenAnyAlbum,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextSecondary,
                   ),
@@ -358,12 +359,12 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
                     _buildInfoChip(
                       context,
                       icon: LucideIcons.disc3,
-                      label: '${_albums.length} albums',
+                      label: l10n.albums2(_albums.length),
                     ),
                     _buildInfoChip(
                       context,
                       icon: LucideIcons.music4,
-                      label: '$_totalTracks tracks',
+                      label: l10n.tracks(_totalTracks),
                     ),
                   ],
                 ),
@@ -373,7 +374,7 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Your collection at a glance',
+                  l10n.yourCollectionAtAGlance,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
                     fontWeight: FontWeight.w700,
@@ -439,7 +440,7 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
           ),
           const SizedBox(height: AppConstants.spacingLg),
           Text(
-            'No Albums Found',
+            l10n.noAlbumsFound,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: context.adaptiveTextSecondary,
               fontWeight: FontWeight.w600,
@@ -447,7 +448,7 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
           ),
           const SizedBox(height: AppConstants.spacingSm),
           Text(
-            'Add music with album tags to see them here',
+            l10n.addMusicWithAlbumTagsTo,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: context.adaptiveTextTertiary,
             ),
@@ -487,7 +488,7 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
             AppConstants.spacingMd,
           ),
           child: Text(
-            'Collection',
+            l10n.collection,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: context.adaptiveTextSecondary,
               fontWeight: FontWeight.w700,
@@ -701,7 +702,7 @@ class _AlbumCardState extends State<_AlbumCard>
                                       ),
                                     ),
                                     child: Text(
-                                      '${widget.songs.length} tracks',
+                                      l10n.tracks2(widget.songs.length),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 11,
@@ -800,7 +801,7 @@ class _AlbumSortSheet extends StatelessWidget {
             children: [
               _buildHandle(),
               const SizedBox(height: 16),
-              _buildSectionHeader(context, 'SORT BY'),
+              _buildSectionHeader(context, l10n.sortBy),
               const SizedBox(height: 8),
               ...AlbumSortOption.values.map(
                 (option) => _buildSortTile(context, option),
@@ -913,11 +914,11 @@ class _AlbumSortSheet extends StatelessWidget {
   String _labelFor(AlbumSortOption option) {
     switch (option) {
       case AlbumSortOption.name:
-        return 'Album Name';
+        return l10n.albumName;
       case AlbumSortOption.artist:
-        return 'Artist';
+        return l10n.artist;
       case AlbumSortOption.tracks:
-        return 'Track Count';
+        return l10n.trackCount;
     }
   }
 }
