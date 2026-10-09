@@ -337,14 +337,33 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
     );
   }
 
+  String _localizedSectionTitle(String key) {
+    switch (key) {
+      case 'Today':
+        return l10n.today;
+      case 'Yesterday':
+        return l10n.yesterday;
+      case 'This Week':
+        return l10n.thisWeek;
+      case 'Last Week':
+        return l10n.lastWeek;
+      case 'This Month':
+        return l10n.thisMonth;
+      case 'Earlier':
+        return l10n.earlier;
+      default:
+        return key;
+    }
+  }
+
   Widget _buildList() {
-    final sectionOrder = [
-      l10n.today,
-      l10n.yesterday,
-      l10n.thisWeek,
-      l10n.lastWeek,
-      l10n.thisMonth,
-      l10n.earlier,
+    const sectionOrder = [
+      'Today',
+      'Yesterday',
+      'This Week',
+      'Last Week',
+      'This Month',
+      'Earlier',
     ];
 
     final sortedSections = _groupedSongs.entries.toList()
@@ -356,7 +375,12 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
 
     final rows = <_RecentlyAddedRow>[];
     for (final section in sortedSections) {
-      rows.add(_RecentlyAddedRow.header(section.key, section.value.length));
+      rows.add(
+        _RecentlyAddedRow.header(
+          _localizedSectionTitle(section.key),
+          section.value.length,
+        ),
+      );
       for (final song in section.value) {
         rows.add(_RecentlyAddedRow.song(song));
       }
