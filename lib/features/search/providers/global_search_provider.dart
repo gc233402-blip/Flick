@@ -6,6 +6,7 @@ import 'package:flick/models/song.dart';
 import 'package:flick/providers/playlist_provider.dart';
 import 'package:flick/providers/songs_provider.dart';
 import '../models/global_search_results.dart';
+import 'package:flick/l10n/l10n.dart';
 
 final globalSearchResultsProvider =
     FutureProvider.autoDispose.family<GlobalSearchResults, String>((ref, rawQuery) async {
@@ -68,7 +69,7 @@ final globalSearchResultsProvider =
   for (final s in allSongs) {
     final albumName = s.album?.trim().isNotEmpty == true
         ? s.album!.trim()
-        : 'Unknown Album';
+        : l10n.unknownAlbum;
     if (!albumName.toLowerCase().contains(lower)) continue;
     final key = albumName;
     albumGroupsRaw.putIfAbsent(key, () => []).add(s);
@@ -81,7 +82,7 @@ final globalSearchResultsProvider =
     final list = List<Song>.from(entry.value)..sort(_compareAlbumSongs);
     return AlbumGroup(
       key: entry.key,
-      albumName: albumNames[entry.key] ?? 'Unknown Album',
+      albumName: albumNames[entry.key] ?? l10n.unknownAlbum,
       albumArtist: SongRepository.resolveGroupArtist(
         albumArtistsByKey[entry.key] ?? const {},
       ),
@@ -105,7 +106,7 @@ final globalSearchResultsProvider =
     String key;
     if (rel.isEmpty) {
       name = SongsState.folderDisplayName(s.folderUri, s.filePath);
-      if (name.isEmpty) name = 'Unknown Folder';
+      if (name.isEmpty) name = l10n.unknownFolder;
       key = folderUri.isEmpty ? 'unknown::$name' : folderUri;
     } else {
       final parts = rel.split('/');

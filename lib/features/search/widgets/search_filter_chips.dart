@@ -4,6 +4,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/utils/app_haptics.dart';
 import '../models/search_category.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class SearchFilterChips extends StatelessWidget {
   final Set<SearchCategory> enabled;
@@ -57,7 +58,7 @@ class SearchFilterChips extends StatelessWidget {
     );
   }
 
-  String _labelForAll(bool hasQuery) => 'All';
+  String _labelForAll(bool hasQuery) => l10n.all;
 }
 
 class _Chip extends StatelessWidget {

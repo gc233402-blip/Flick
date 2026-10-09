@@ -3,6 +3,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/providers/songs_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class SortFilterBottomSheet extends StatelessWidget {
   final SongSortOption currentSort;
@@ -59,7 +60,7 @@ class SortFilterBottomSheet extends StatelessWidget {
             children: [
               _buildHandle(),
               const SizedBox(height: 16),
-              _buildSectionHeader(context, 'SORT BY'),
+              _buildSectionHeader(context, l10n.sortBy),
               const SizedBox(height: 8),
               ...SongSortOption.values.map(
                 (option) => _buildSortTile(context, option),
@@ -67,7 +68,7 @@ class SortFilterBottomSheet extends StatelessWidget {
               const SizedBox(height: 16),
               const Divider(color: AppColors.glassBorder, height: 1),
               const SizedBox(height: 12),
-              _buildSectionHeader(context, 'FILTER BY FORMAT'),
+              _buildSectionHeader(context, l10n.filterByFormat),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -228,21 +229,21 @@ class SortFilterBottomSheet extends StatelessWidget {
   String _sortLabel(SongSortOption option) {
     switch (option) {
       case SongSortOption.albumArtist:
-        return 'Album Artist';
+        return l10n.albumArtist;
       case SongSortOption.title:
-        return 'Title';
+        return l10n.title;
       case SongSortOption.artist:
-        return 'Artist';
+        return l10n.artist;
       case SongSortOption.dateAdded:
-        return 'Date Added';
+        return l10n.dateAdded;
       case SongSortOption.fileType:
-        return 'Format';
+        return l10n.format;
       case SongSortOption.album:
-        return 'Album';
+        return l10n.album;
       case SongSortOption.year:
-        return 'Year';
+        return l10n.year;
       case SongSortOption.genre:
-        return 'Genre';
+        return l10n.genre;
     }
   }
 }

@@ -15,6 +15,7 @@ import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -58,9 +59,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Removed "${song.title}" from favorites'),
+          content: Text(l10n.removedFromFavorites(song.title)),
           action: SnackBarAction(
-            label: 'Undo',
+            label: l10n.undo,
             onPressed: () async {
               await _favoritesService.addFavorite(song.id);
               setState(() {
@@ -123,9 +124,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Removed ${removedSongs.length} from favorites'),
+          content: Text(l10n.removedFromFavorites2(removedSongs.length)),
           action: SnackBarAction(
-            label: 'Undo',
+            label: l10n.undo,
             onPressed: () async {
               for (final song in removedSongs) {
                 await _favoritesService.addFavorite(song.id);
@@ -170,7 +171,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             const SizedBox(height: AppConstants.spacingMd),
             ListTile(
               leading: const Icon(LucideIcons.heartOff, color: Colors.red),
-              title: const Text('Unfavorite'),
+              title: Text(l10n.unfavorite),
               onTap: () {
                 Navigator.of(context).pop();
                 _removeFavorite(song);
@@ -179,7 +180,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             ListTile(
               leading: Icon(LucideIcons.checkCheck,
                   color: context.adaptiveTextSecondary),
-              title: const Text('Select'),
+              title: Text(l10n.select),
               onTap: () {
                 Navigator.of(context).pop();
                 _enterSelectionMode(song.id);
@@ -249,7 +250,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           const SizedBox(width: AppConstants.spacingSm),
           Expanded(
             child: Text(
-              '$count selected',
+              l10n.selected(count),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
@@ -260,7 +261,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             TextButton(
               onPressed: _selectAll,
               child: Text(
-                'Select All',
+                l10n.selectAll,
                 style: TextStyle(color: context.adaptiveTextSecondary),
               ),
             ),
@@ -270,7 +271,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               color: Colors.red.withValues(alpha: 0.8),
             ),
             onPressed: count > 0 ? _removeSelected : null,
-            tooltip: 'Unfavorite selected',
+            tooltip: l10n.unfavoriteSelected,
           ),
         ],
       ),
@@ -298,14 +299,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Favorites',
+                  l10n.favorites,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: context.adaptiveTextPrimary,
                       ),
                 ),
                 Text(
-                  '${_favorites.length} liked songs',
+                  l10n.likedSongs(_favorites.length),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextTertiary,
                       ),
@@ -350,7 +351,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             _HeartIllustration(),
             const SizedBox(height: AppConstants.spacingXl),
             Text(
-              'No Favorites Yet',
+              l10n.noFavoritesYet,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: context.adaptiveTextSecondary,
                     fontWeight: FontWeight.w600,
@@ -358,7 +359,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             ),
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              'Tap the heart icon on any song\nto add it to your favorites',
+              l10n.tapTheHeartIconOnAny,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextTertiary,

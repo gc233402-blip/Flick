@@ -3,6 +3,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/models/song.dart';
 import 'package:flick/features/songs/widgets/song_actions_bottom_sheet.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Compact trailing button that opens [SongActionsBottomSheet], mirroring the
 /// library screen's long-press gesture on a song.
@@ -26,7 +27,7 @@ class SongActionsButton extends StatelessWidget {
         color: color ?? context.adaptiveTextTertiary,
         size: 20,
       ),
-      tooltip: 'Song actions',
+      tooltip: l10n.songActions,
       visualDensity: VisualDensity.compact,
       onPressed: () => SongActionsBottomSheet.show(
         context,

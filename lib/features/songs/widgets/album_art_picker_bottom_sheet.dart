@@ -12,6 +12,7 @@ import 'package:flick/services/player_service.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class AlbumArtPickerBottomSheet extends StatefulWidget {
   const AlbumArtPickerBottomSheet({super.key, required this.song});
@@ -147,8 +148,8 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
             ? _service.applyImageBytes(song: widget.song, bytes: bytes)
             : _service.applyImageBytesToSong(song: widget.song, bytes: bytes),
         successMessage: (result) => _scope == AlbumArtScope.wholeAlbum
-            ? 'Updated album art for "${result.albumName}".'
-            : 'Updated album art for "${widget.song.title}".',
+            ? l10n.updatedAlbumArtFor(result.albumName)
+            : l10n.updatedAlbumArtFor2(widget.song.title),
       );
     } catch (error) {
       if (!mounted) {
@@ -175,8 +176,8 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
               candidate: candidate,
             ),
       successMessage: (result) => _scope == AlbumArtScope.wholeAlbum
-          ? 'Updated album art for "${result.albumName}".'
-          : 'Updated album art for "${widget.song.title}".',
+          ? l10n.updatedAlbumArtFor(result.albumName)
+          : l10n.updatedAlbumArtFor2(widget.song.title),
     );
   }
 
@@ -190,8 +191,8 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
           ? _service.removeCustomArtwork(widget.song)
           : _service.removeCustomArtworkForSong(widget.song),
       successMessage: (result) => _scope == AlbumArtScope.wholeAlbum
-          ? 'Removed custom album art for "${result.albumName}".'
-          : 'Removed custom album art for "${widget.song.title}".',
+          ? l10n.removedCustomAlbumArtFor(result.albumName)
+          : l10n.removedCustomAlbumArtFor2(widget.song.title),
     );
   }
 
@@ -280,7 +281,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Set Album Art',
+                          l10n.setAlbumArt,
                           style: TextStyle(
                             fontFamily: 'ProductSans',
                             fontSize: 20,
@@ -310,7 +311,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                         : _searchOnlineCandidates,
                     icon: const Icon(LucideIcons.refreshCw, size: 18),
                     color: context.adaptiveTextSecondary,
-                    tooltip: 'Search Again',
+                    tooltip: l10n.searchAgain,
                   ),
                 ],
               ),
@@ -323,8 +324,8 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                 audioSourcePath: previewSourcePath,
                 title: selectedCandidate == null
                     ? (_hasCustomArtwork
-                          ? 'Current custom art'
-                          : 'Current artwork')
+                          ? l10n.currentCustomArt
+                          : l10n.currentArtwork)
                     : selectedCandidate.title,
                 subtitle: selectedCandidate == null
                     ? effectiveAlbumArtist
@@ -338,7 +339,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                   FilledButton.icon(
                     onPressed: _isWorking ? null : _pickLocalImage,
                     icon: const Icon(LucideIcons.folderOpen, size: 18),
-                    label: const Text('Pick Image'),
+                    label: Text(l10n.pickImage),
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.accent,
                       foregroundColor: Colors.black,
@@ -348,13 +349,13 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                     OutlinedButton.icon(
                       onPressed: _isWorking ? null : _applySelectedCandidate,
                       icon: const Icon(LucideIcons.check, size: 18),
-                      label: const Text('Apply Selected'),
+                      label: Text(l10n.applySelected),
                     ),
                   if (_hasCustomArtwork)
                     OutlinedButton.icon(
                       onPressed: _isWorking ? null : _removeCustomArtwork,
                       icon: const Icon(LucideIcons.trash2, size: 18),
-                      label: const Text('Remove Custom Art'),
+                      label: Text(l10n.removeCustomArt),
                     ),
                 ],
               ),
@@ -362,7 +363,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
               Row(
                 children: [
                   Text(
-                    'Online Results',
+                    l10n.onlineResults,
                     style: TextStyle(
                       fontFamily: 'ProductSans',
                       fontSize: 16,
@@ -401,7 +402,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
       children: [
         _buildScopeChip(
           context,
-          label: 'Whole album',
+          label: l10n.wholeAlbum,
           icon: LucideIcons.disc3,
           selected: _scope == AlbumArtScope.wholeAlbum,
           onTap: () => setState(() => _scope = AlbumArtScope.wholeAlbum),
@@ -409,7 +410,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
         const SizedBox(width: AppConstants.spacingSm),
         _buildScopeChip(
           context,
-          label: 'This song only',
+          label: l10n.thisSongOnly,
           icon: LucideIcons.music,
           selected: _scope == AlbumArtScope.songOnly,
           onTap: () => setState(() => _scope = AlbumArtScope.songOnly),
@@ -466,9 +467,9 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
       return _buildInfoCard(
         context,
         icon: LucideIcons.search,
-        title: 'Searching online',
+        title: l10n.searchingOnline,
         subtitle:
-            'Looking for cover art from MusicBrainz and Cover Art Archive.',
+            l10n.lookingForCoverArtFromMusicbrainz,
       );
     }
 
@@ -476,7 +477,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
       return _buildInfoCard(
         context,
         icon: LucideIcons.wifiOff,
-        title: 'Search failed',
+        title: l10n.searchFailed,
         subtitle: _searchError!,
       );
     }
@@ -486,10 +487,10 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
       return _buildInfoCard(
         context,
         icon: LucideIcons.imageOff,
-        title: 'No online artwork found',
+        title: l10n.noOnlineArtworkFound,
         subtitle: albumName == null || albumName.isEmpty
-            ? 'This song is missing album metadata, so online matching is limited.'
-            : 'Try picking a local image if the release metadata is uncommon.',
+            ? l10n.thisSongIsMissingAlbumMetadata
+            : l10n.tryPickingALocalImageIf,
       );
     }
 
@@ -666,8 +667,8 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                 const SizedBox(height: 12),
                 Text(
                   _scope == AlbumArtScope.wholeAlbum
-                      ? 'Imported art is saved inside the app and synced to every song in this album.'
-                      : 'Imported art is saved inside the app for this song only.',
+                      ? l10n.importedArtIsSavedInsideThe
+                      : l10n.importedArtIsSavedInsideThe2,
                   style: TextStyle(
                     fontFamily: 'ProductSans',
                     fontSize: 12,

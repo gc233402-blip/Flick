@@ -7,6 +7,7 @@ import 'package:flick/core/utils/app_haptics.dart';
 import 'package:flick/models/song.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Song card widget for displaying in the orbit scroll.
 class SongCard extends StatefulWidget {
@@ -283,13 +284,13 @@ class _SongCardState extends State<SongCard> {
                   const Spacer(),
                   Opacity(
                     opacity: queueProgress,
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.queue_music_rounded,
                             color: AppColors.accent, size: 20),
                         SizedBox(width: 8),
-                        Text('Add to queue',
+                        Text(l10n.addToQueue2,
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700)),

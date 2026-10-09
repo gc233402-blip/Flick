@@ -38,6 +38,7 @@ import 'package:flick/features/songs/widgets/song_actions_button.dart';
 import 'package:flick/providers/favorites_provider.dart';
 import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/providers/app_preferences_provider.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Artist detail screen showing songs, albums, and most played tracks.
 class ArtistDetailScreen extends ConsumerStatefulWidget {
@@ -229,7 +230,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
   void _buildAlbumGroups() {
     final groups = <String, List<Song>>{};
     for (final song in widget.songs) {
-      final album = song.album ?? 'Unknown Album';
+      final album = song.album ?? l10n.unknownAlbum;
       groups.putIfAbsent(album, () => []).add(song);
     }
     for (final entry in groups.entries) {
@@ -363,9 +364,9 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Queued ${widget.songs.length} songs'),
+        content: Text(l10n.queuedSongs(widget.songs.length)),
         action: SnackBarAction(
-          label: 'View queue',
+          label: l10n.viewQueue,
           onPressed: () => NavigationHelper.navigateToQueue(context),
         ),
       ),
@@ -399,8 +400,8 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
       SnackBar(
         content: Text(
           isAll
-              ? 'Removed ${widget.songs.length} songs from favorites'
-              : 'Added ${widget.songs.length} songs to favorites',
+              ? l10n.removedSongsFromFavorites(widget.songs.length)
+              : l10n.addedSongsToFavorites(widget.songs.length),
         ),
       ),
     );
@@ -412,10 +413,10 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
     final current = ref.read(detailDescriptionProvider(_descriptionKey));
     final result = await FlickDialogs.input(
       context,
-      title: current.isEmpty ? 'Add Description' : 'Edit Description',
-      hintText: 'Write a description',
+      title: current.isEmpty ? l10n.addDescription : l10n.editDescription,
+      hintText: l10n.writeADescription,
       initialValue: current,
-      confirmLabel: 'Save',
+      confirmLabel: l10n.save,
       keyboardType: TextInputType.multiline,
       validator: (_) => null,
     );
@@ -435,29 +436,29 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
         DetailMoreSheetItem(
           icon: LucideIcons.alignLeft,
           label: ref.read(detailDescriptionProvider(_descriptionKey)).isEmpty
-              ? 'Add description'
-              : 'Edit description',
+              ? l10n.addDescription2
+              : l10n.editDescription2,
           onTap: _editDescription,
         ),
         DetailMoreSheetItem(
           icon: LucideIcons.listPlus,
-          label: 'Add to playlist',
+          label: l10n.addToPlaylist,
           onTap: () => AddToPlaylistSheet.showSongs(context, widget.songs),
         ),
         if (appleMusic != null)
           DetailMoreSheetItem(
             icon: LucideIcons.externalLink,
-            label: 'Open in Apple Music',
+            label: l10n.openInAppleMusic,
             onTap: () => _openAppleMusic(_artistAppleMusicUri(appleMusic)),
           ),
         DetailMoreSheetItem(
           icon: LucideIcons.refreshCw,
-          label: 'Refresh Apple Music',
+          label: l10n.refreshAppleMusic,
           onTap: _refreshAppleMusic,
         ),
         DetailMoreSheetItem(
           icon: LucideIcons.moonStar,
-          label: 'Sleep timer',
+          label: l10n.sleepTimer,
           onTap: () =>
               SleepTimerBottomSheet.show(context, widget.playerService),
         ),
@@ -489,7 +490,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
   Future<void> _refreshAppleMusic() async {
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(
-      const SnackBar(content: Text('Refreshing Apple Music data')),
+      SnackBar(content: Text(l10n.refreshingAppleMusicData)),
     );
     final updated = await ref
         .read(appleMusicArtistProvider(widget.artistName).notifier)
@@ -500,8 +501,8 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
       SnackBar(
         content: Text(
           updated
-              ? 'Apple Music data updated'
-              : 'Apple Music data unavailable',
+              ? l10n.appleMusicDataUpdated
+              : l10n.appleMusicDataUnavailable,
         ),
       ),
     );
@@ -617,7 +618,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
                           artBuilder: _buildArtLayer,
                           title: widget.artistName,
                           subtitle:
-                              '${_albumGroups.length} albums • ${widget.songs.length} songs',
+                              l10n.albumsSongs(_albumGroups.length, widget.songs.length),
                           meta: _metaLine,
                           lossless: _hasLossless,
                           fadeTo: resolvedBg,
@@ -651,19 +652,19 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
                             child: SizedBox(height: AppConstants.spacingMd),
                           ),
                           if (appleBio != null && appleBio.isNotEmpty)
-                            _buildSectionTitle(context, 'About'),
+                            _buildSectionTitle(context, l10n.about),
                          if (appleBio != null && appleBio.isNotEmpty)
                            SliverToBoxAdapter(
                              child: FetchedDescription(
                                text: appleBio,
-                               sheetTitle: 'About',
+                               sheetTitle: l10n.about,
                              ),
                            ),
                          const SliverToBoxAdapter(
                            child: SizedBox(height: AppConstants.spacingLg),
                          ),
                          if (_artistAlbums.length > 1)
-                           _buildSectionTitle(context, 'Albums'),
+                           _buildSectionTitle(context, l10n.albums),
                         if (_artistAlbums.length > 1)
                           SliverToBoxAdapter(
                             child: SizedBox(
@@ -698,7 +699,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
                             child: SizedBox(height: AppConstants.spacingLg),
                           ),
                         if (!_isLoadingExtras && _mostPlayedSongs.isNotEmpty)
-                          _buildSectionTitle(context, 'Most Played'),
+                          _buildSectionTitle(context, l10n.mostPlayed),
                         if (!_isLoadingExtras && _mostPlayedSongs.isNotEmpty)
                           SliverToBoxAdapter(
                             child: SizedBox(
@@ -727,7 +728,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
                             child: SizedBox(height: AppConstants.spacingLg),
                           ),
                         if (similarArtists.isNotEmpty)
-                          _buildSectionTitle(context, 'Similar Artists'),
+                          _buildSectionTitle(context, l10n.similarArtists),
                         if (similarArtists.isNotEmpty)
                           SliverToBoxAdapter(
                             child: Padding(
@@ -753,7 +754,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
                             child: SizedBox(height: AppConstants.spacingLg),
                           ),
                         if (topSongs.isNotEmpty)
-                          _buildSectionTitle(context, 'Top Songs'),
+                          _buildSectionTitle(context, l10n.topSongs),
                         if (topSongs.isNotEmpty)
                           SliverToBoxAdapter(
                             child: SizedBox(
@@ -786,7 +787,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
                           const SliverToBoxAdapter(
                             child: SizedBox(height: AppConstants.spacingLg),
                           ),
-                        _buildSectionTitle(context, 'Songs'),
+                        _buildSectionTitle(context, l10n.songs14),
                         SliverPadding(
                           padding: EdgeInsets.only(
                             bottom: AppConstants.navBarHeight + 120,
@@ -861,7 +862,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
                         ),
                       ),
                       Text(
-                        '${_albumGroups.length} albums • ${widget.songs.length} songs',
+                        l10n.albumsSongs(_albumGroups.length, widget.songs.length),
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall
@@ -1055,7 +1056,7 @@ class _AlbumCardState extends State<_AlbumCard>
               ),
               const SizedBox(height: 2),
               Text(
-                '${widget.songCount} songs',
+                l10n.songs3(widget.songCount),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.adaptiveTextTertiary,
                 ),
