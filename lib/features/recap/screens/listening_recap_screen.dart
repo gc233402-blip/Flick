@@ -13,6 +13,7 @@ import '../widgets/replay_reveal.dart';
 import '../widgets/replay_sections.dart';
 import '../widgets/replay_style.dart';
 import 'replay_studio_screen.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// An artwork-led retrospective; poster-making lives in Replay Studio.
 class ListeningRecapScreen extends ConsumerStatefulWidget {
@@ -198,7 +199,7 @@ class _ListeningRecapScreenState extends ConsumerState<ListeningRecapScreen>
       child: Row(
         children: [
           IconButton(
-            tooltip: 'Back',
+            tooltip: l10n.back,
             onPressed: () => Navigator.maybePop(context),
             icon: const Icon(
               Icons.arrow_back_rounded,
@@ -206,9 +207,9 @@ class _ListeningRecapScreenState extends ConsumerState<ListeningRecapScreen>
             ),
           ),
           const SizedBox(width: 4),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Flick Replay',
+              l10n.flickReplay,
               style: TextStyle(
                 fontSize: 22,
                 letterSpacing: -0.5,
@@ -218,7 +219,7 @@ class _ListeningRecapScreenState extends ConsumerState<ListeningRecapScreen>
             ),
           ),
           IconButton(
-            tooltip: 'Save / customize Replay',
+            tooltip: l10n.saveCustomizeReplay,
             onPressed: _loading || !_recap.hasData ? null : _openExport,
             icon: const Icon(Icons.ios_share_rounded),
             color: ReplayStyle.silver,
@@ -232,7 +233,7 @@ class _ListeningRecapScreenState extends ConsumerState<ListeningRecapScreen>
     if (_loading) {
       return Center(
         child: Semantics(
-          label: 'Loading Replay',
+          label: l10n.loadingReplay,
           child: SizedBox.square(
             dimension: 28,
             child: CircularProgressIndicator(
@@ -245,12 +246,12 @@ class _ListeningRecapScreenState extends ConsumerState<ListeningRecapScreen>
     }
     if (_failed && _recaps.isEmpty) {
       return _message(
-        title: 'Replay couldn’t load.',
-        detail: 'Your listening history is still yours. Try loading it again.',
+        title: l10n.replayCouldnTLoad,
+        detail: l10n.yourListeningHistoryIsStillYours,
         action: TextButton.icon(
           onPressed: () => _loadRecaps(),
           icon: const Icon(Icons.refresh_rounded),
-          label: const Text('Try again'),
+          label: Text(l10n.tryAgain),
         ),
       );
     }
@@ -292,7 +293,7 @@ class _ListeningRecapScreenState extends ConsumerState<ListeningRecapScreen>
           : KeyedSubtree(
               key: ValueKey(_period),
               child: _message(
-                title: 'Your next favorite\nis waiting.',
+                title: l10n.yourNextFavoriteNisWaiting,
                 detail: _period.emptyMessage,
               ),
             ),
@@ -381,13 +382,13 @@ class _ReplayScrollContentState extends State<_ReplayScrollContent> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Showing your last loaded Replay.',
+                  l10n.showingYourLastLoadedReplay,
                   style: TextStyle(color: ReplayStyle.muted),
                 ),
               ),
-              TextButton(onPressed: widget.onRetry, child: const Text('Retry')),
+              TextButton(onPressed: widget.onRetry, child: Text(l10n.retry)),
             ],
           ),
         ),
@@ -461,8 +462,8 @@ class _ReplayScrollContentState extends State<_ReplayScrollContent> {
       children: [
         const Divider(height: 1, color: ReplayStyle.rule),
         const SizedBox(height: 28),
-        const Text(
-          'Keep your Replay.',
+        Text(
+          l10n.keepYourReplay,
           style: TextStyle(
             fontSize: 32,
             height: 1.1,
@@ -472,8 +473,8 @@ class _ReplayScrollContentState extends State<_ReplayScrollContent> {
           ),
         ),
         const SizedBox(height: 12),
-        const Text(
-          'A little record of what stayed on repeat.',
+        Text(
+          l10n.aLittleRecordOfWhatStayed,
           style: TextStyle(color: ReplayStyle.muted, fontSize: 15),
         ),
         const SizedBox(height: 28),
@@ -502,7 +503,7 @@ class _ReplayScrollContentState extends State<_ReplayScrollContent> {
             ),
             onPressed: widget.onExport,
             icon: const Icon(Icons.tune_rounded, size: 20),
-            label: const Text('Save / customize Replay'),
+            label: Text(l10n.saveCustomizeReplay),
           ),
         ),
       ],

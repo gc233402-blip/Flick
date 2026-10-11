@@ -7,15 +7,16 @@ import 'replay_card_surface.dart';
 import 'replay_graphics.dart';
 import 'replay_sections.dart';
 import 'replay_style.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum ReplayPosterType { overview, songs, artists, album }
 
 extension ReplayPosterTypeX on ReplayPosterType {
   String get label => switch (this) {
-    ReplayPosterType.overview => 'Replay',
-    ReplayPosterType.songs => 'Top songs',
-    ReplayPosterType.artists => 'Top artists',
-    ReplayPosterType.album => 'Top album',
+    ReplayPosterType.overview => l10n.replay,
+    ReplayPosterType.songs => l10n.topSongs2,
+    ReplayPosterType.artists => l10n.topArtists,
+    ReplayPosterType.album => l10n.topAlbum,
   };
 
   ReplayCardKind get kind => switch (this) {
@@ -105,8 +106,8 @@ class ReplayPoster extends StatelessWidget {
                     Expanded(
                       child: Text(
                         options.tagline
-                            ? 'Your music. On repeat.'
-                            : 'Flick Replay',
+                            ? l10n.yourMusicOnRepeat
+                            : l10n.flickReplay,
                         style: TextStyle(
                           fontSize: 12,
                           color: palette.secondary,
@@ -144,7 +145,7 @@ class ReplayPoster extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'plays in rotation',
+          l10n.playsInRotation,
           style: TextStyle(fontSize: 17, color: palette.secondary),
         ),
         const SizedBox(height: 12),
@@ -171,7 +172,7 @@ class ReplayPoster extends StatelessWidget {
                   ornaments: options.ornaments,
                   color: palette.dark ? palette.accent : ReplayStyle.acid,
                   badge: options.badges && top != null
-                      ? 'Most replayed · ${ReplayStyle.plays(top.plays)}'
+                      ? l10n.mostReplayed(ReplayStyle.plays(top.plays))
                       : null,
                 ),
               ),
@@ -180,7 +181,7 @@ class ReplayPoster extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          top?.song.title ?? 'Your next favorite is waiting.',
+          top?.song.title ?? l10n.yourNextFavoriteIsWaiting,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -192,7 +193,7 @@ class ReplayPoster extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          top?.song.artist ?? 'Keep listening with Flick',
+          top?.song.artist ?? l10n.keepListeningWithFlick,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(fontSize: 14, color: palette.secondary),
@@ -225,7 +226,7 @@ class ReplayPoster extends StatelessWidget {
             child: Align(
               alignment: Alignment.topLeft,
               child: Text(
-                'No album data yet',
+                l10n.noAlbumDataYet,
                 style: TextStyle(color: palette.secondary, fontSize: 18),
               ),
             ),
@@ -276,7 +277,7 @@ class ReplayPoster extends StatelessWidget {
           Divider(height: 1, color: palette.rule),
           const SizedBox(height: 14),
           Text(
-            '${album.uniqueSongs} ${album.uniqueSongs == 1 ? 'song' : 'songs'} · ${ReplayStyle.plays(album.plays)}',
+            '${l10n.songsCount(album.uniqueSongs)} · ${ReplayStyle.plays(album.plays)}',
             style: TextStyle(fontSize: 13, color: palette.secondary),
           ),
         ],
@@ -320,7 +321,7 @@ class ReplayPoster extends StatelessWidget {
                   children: [
                     if (count == 0)
                       Text(
-                        'No ranking data yet',
+                        l10n.noRankingDataYet,
                         style: TextStyle(
                           color: palette.secondary,
                           fontSize: 18,
@@ -400,7 +401,7 @@ class ReplayPoster extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     artists
-                        ? '${recap.topArtists[index].uniqueSongs} ${recap.topArtists[index].uniqueSongs == 1 ? 'song' : 'songs'}'
+                        ? l10n.songsCount(recap.topArtists[index].uniqueSongs)
                         : recap.topSongs[index].song.artist,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

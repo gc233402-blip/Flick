@@ -19,6 +19,7 @@ import '../../../widgets/common/display_mode_wrapper.dart';
 import '../widgets/replay_card_options.dart';
 import '../widgets/replay_poster.dart';
 import '../widgets/replay_style.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum _Background { original, album, camera, gallery }
 
@@ -100,7 +101,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
       _setOptions(_options.copyWith(look: ReplayLook.signal));
       setState(
         () => _error =
-            'Could not read the cover colors. Signal is still available.',
+            l10n.couldNotReadTheCoverColors,
       );
     } else {
       _setOptions(_options.copyWith(artworkColor: color));
@@ -143,7 +144,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
         if (!permission.isGranted) {
           setState(
             () => _error =
-                'Camera access is needed. You can enable it in Android settings.',
+                l10n.cameraAccessIsNeededYouCan,
           );
           return;
         }
@@ -167,7 +168,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
     } catch (_) {
       if (mounted) {
         setState(
-          () => _error = 'Could not open that photo. Try another image.',
+          () => _error = l10n.couldNotOpenThatPhotoTry,
         );
       }
     } finally {
@@ -241,8 +242,8 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
         SnackBar(
           content: Text(
             format == null
-                ? '${_type.label} saved to your gallery'
-                : 'Recap saved as $format',
+                ? l10n.savedToYourGallery(_type.label)
+                : l10n.recapSavedAs(format),
           ),
         ),
       );
@@ -295,13 +296,13 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    tooltip: 'Back to Replay',
+                    tooltip: l10n.backToReplay,
                     onPressed: _close,
                     icon: const Icon(Icons.arrow_back_rounded),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Replay Studio',
+                      l10n.replayStudio,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
@@ -311,7 +312,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Reset card design',
+                    tooltip: l10n.resetCardDesign,
                     onPressed: _busy ? null : _resetDesign,
                     icon: const Icon(Icons.restart_alt_rounded),
                   ),
@@ -404,7 +405,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
                       if (_error!.startsWith('Camera'))
                         TextButton(
                           onPressed: openAppSettings,
-                          child: const Text('Open Android settings'),
+                          child: Text(l10n.openAndroidSettings),
                         ),
                     ],
                   ),
@@ -420,7 +421,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
   Widget _preview() => Padding(
     padding: const EdgeInsets.fromLTRB(24, 10, 24, 8),
     child: Semantics(
-      label: '${_type.label} poster preview. ${widget.recap.totalPlays} plays.',
+      label: l10n.posterPreviewPlays(_type.label, widget.recap.totalPlays),
       button: true,
       child: GestureDetector(
         onTap: _inspect,
@@ -446,8 +447,8 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tap to inspect · 1260 × 2280 PNG',
+            Text(
+              l10n.tapToInspect12602280Png,
               style: TextStyle(fontSize: 11, color: ReplayStyle.muted),
             ),
           ],
@@ -470,7 +471,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
-                  tooltip: 'Close preview',
+                  tooltip: l10n.closePreview,
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close_rounded),
                 ),
@@ -517,9 +518,9 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
               setState(() => _panel = panel);
             },
             child: Text(switch (panel) {
-              _Panel.look => 'Look',
-              _Panel.background => 'Background',
-              _Panel.details => 'Details',
+              _Panel.look => l10n.look,
+              _Panel.background => l10n.background,
+              _Panel.details => l10n.details,
             }),
           ),
       ],
@@ -558,13 +559,13 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
             ],
           ),
           if (_sampling)
-            const Text(
-              'Reading the cover colors…',
+            Text(
+              l10n.readingTheCoverColors,
               style: TextStyle(color: ReplayStyle.silver),
             ),
           const SizedBox(height: 12),
-          const Text(
-            'Sleeves',
+          Text(
+            l10n.sleeves,
             style: TextStyle(color: ReplayStyle.silver, fontSize: 13),
           ),
           const SizedBox(height: 4),
@@ -572,12 +573,12 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
             spacing: 8,
             children: [
               _choice(
-                'Single',
+                l10n.single,
                 !_options.layered,
                 () => _setOptions(_options.copyWith(layered: false)),
               ),
               _choice(
-                'Layered',
+                l10n.layered,
                 _options.layered,
                 () => _setOptions(_options.copyWith(layered: true)),
               ),
@@ -590,24 +591,24 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
             runSpacing: 4,
             children: [
               _choice(
-                'Designed',
+                l10n.designed,
                 _background == _Background.original,
                 () => _change(() => _background = _Background.original),
               ),
               _choice(
-                'Album art',
+                l10n.albumArt2,
                 _background == _Background.album,
                 _albumPath == null
                     ? null
                     : () => _change(() => _background = _Background.album),
               ),
               _choice(
-                _cameraPath == null ? 'Camera' : 'Retake photo',
+                _cameraPath == null ? l10n.camera : l10n.retakePhoto,
                 _background == _Background.camera,
                 () => _pick(ImageSource.camera),
               ),
               _choice(
-                _galleryPath == null ? 'Gallery' : 'Pick again',
+                _galleryPath == null ? l10n.gallery : l10n.pickAgain,
                 _background == _Background.gallery,
                 () => _pick(ImageSource.gallery),
               ),
@@ -615,17 +616,17 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
           ),
           if (_backgroundPath != null) ...[
             const SizedBox(height: 12),
-            const Text(
-              'Photo framing',
+            Text(
+              l10n.photoFraming,
               style: TextStyle(color: ReplayStyle.silver, fontSize: 13),
             ),
             Wrap(
               spacing: 8,
               children: [
                 for (final preset in [
-                  ('Top', Alignment.topCenter),
-                  ('Center', Alignment.center),
-                  ('Bottom', Alignment.bottomCenter),
+                  (l10n.top, Alignment.topCenter),
+                  (l10n.center, Alignment.center),
+                  (l10n.bottom, Alignment.bottomCenter),
                 ])
                   _choice(
                     preset.$1,
@@ -639,8 +640,8 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
           ],
         ],
         if (_panel == _Panel.details) ...[
-          const Text(
-            'Overview metrics · choose up to 3',
+          Text(
+            l10n.overviewMetricsChooseUpTo3,
             style: TextStyle(color: ReplayStyle.silver, fontSize: 13),
           ),
           const SizedBox(height: 8),
@@ -666,27 +667,27 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
             ],
           ),
           _toggle(
-            'Living ornament',
+            l10n.livingOrnament,
             _options.ornaments,
             (value) => _options.copyWith(ornaments: value),
           ),
           _toggle(
-            'Surface shading',
+            l10n.surfaceShading,
             _options.surfaceDetail,
             (value) => _options.copyWith(surfaceDetail: value),
           ),
           _toggle(
-            'Play badges',
+            l10n.playBadges,
             _options.badges,
             (value) => _options.copyWith(badges: value),
           ),
           _toggle(
-            'Extra covers',
+            l10n.extraCovers,
             _options.secondaryArtwork,
             (value) => _options.copyWith(secondaryArtwork: value),
           ),
           _toggle(
-            'Footer line',
+            l10n.footerLine,
             _options.tagline,
             (value) => _options.copyWith(tagline: value),
           ),
@@ -750,16 +751,16 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
                 ),
                 label: Text(
                   _busy
-                      ? 'Preparing…'
+                      ? l10n.preparing
                       : _saved
-                      ? 'Saved · again'
-                      : 'Save PNG',
+                      ? l10n.savedAgain
+                      : l10n.savePng,
                 ),
               ),
             ),
             const SizedBox(width: 8),
             PopupMenuButton<String>(
-              tooltip: 'More export options',
+              tooltip: l10n.moreExportOptions,
               enabled: !_busy,
               icon: const Icon(
                 Icons.more_horiz_rounded,
@@ -767,12 +768,12 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
               ),
               onSelected: (value) =>
                   value == 'support' ? _support() : _save(format: value),
-              itemBuilder: (context) => const [
-                PopupMenuItem(value: 'CSV', child: Text('Export CSV')),
-                PopupMenuItem(value: 'TXT', child: Text('Export TXT')),
+              itemBuilder: (context) => [
+                PopupMenuItem(value: 'CSV', child: Text(l10n.exportCsv)),
+                PopupMenuItem(value: 'TXT', child: Text(l10n.exportTxt)),
                 PopupMenuItem(
                   value: 'support',
-                  child: Text('Support Flick on Ko-fi'),
+                  child: Text(l10n.supportFlickOnKoFi),
                 ),
               ],
             ),
@@ -792,8 +793,8 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not open Ko-fi. Please try again.'),
+          SnackBar(
+            content: Text(l10n.couldNotOpenKoFiPlease),
           ),
         );
       }
