@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'A draggable overlay shows while using other apps'**
   String get aDraggableOverlayShowsWhileUsing;
 
+  /// lib/features/menu/screens/menu_screen.dart:1234
+  ///
+  /// In en, this message translates to:
+  /// **'A newer Flick build is on the Play Store.'**
+  String get aNewerFlickBuildIsOn;
+
   /// lib/features/playlists/screens/playlists_screen.dart:444
   ///
   /// In en, this message translates to:
@@ -127,6 +133,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A song with a long title to preview'**
   String get aSongWithALongTitle;
+
+  /// lib/features/menu/screens/menu_screen.dart:1768
+  ///
+  /// In en, this message translates to:
+  /// **'A tighter mix of favorites and the songs you keep circling back to.'**
+  String get aTighterMixOfFavoritesAnd;
 
   /// lib/features/settings/screens/uac2_preferences_screen.dart:680
   ///
@@ -283,6 +295,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Server'**
   String get addServer;
+
+  /// lib/features/playlists/screens/playlist_detail_screen.dart:530
+  ///
+  /// In en, this message translates to:
+  /// **'Add songs from the player menu'**
+  String get addSongsFromThePlayerMenu;
+
+  /// lib/features/queue/screens/queue_screen.dart:467
+  ///
+  /// In en, this message translates to:
+  /// **'Add songs from the player or song actions menu.'**
+  String get addSongsFromThePlayerOr;
 
   /// lib/features/songs/screens/songs_screen.dart:1407
   ///
@@ -457,6 +481,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Advanced mode'**
   String get advancedMode;
+
+  /// lib/features/menu/screens/menu_screen.dart:1782
+  ///
+  /// In en, this message translates to:
+  /// **'After Hours'**
+  String get afterHours;
 
   /// lib/features/settings/widgets/apple_music_settings_tile.dart:40
   ///
@@ -728,6 +758,12 @@ abstract class AppLocalizations {
   /// **' and artwork'**
   String get andArtwork;
 
+  /// lib/features/menu/screens/menu_screen.dart:1439
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1} and more in rotation'**
+  String andMoreInRotation(Object arg1);
+
   /// lib/features/settings/screens/uac2_preferences_screen.dart:346
   ///
   /// In en, this message translates to:
@@ -878,6 +914,12 @@ abstract class AppLocalizations {
   /// **'Apply to {count, plural, =1{{count} song} other{{count} songs}}'**
   String applyTo(int count);
 
+  /// lib/features/menu/screens/restarting_screen.dart:11
+  ///
+  /// In en, this message translates to:
+  /// **'Applying new audio engine…'**
+  String get applyingNewAudioEngine;
+
   /// lib/features/milestone/screens/milestones_screen.dart:505
   ///
   /// In en, this message translates to:
@@ -895,6 +937,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'aptX HD'**
   String get aptxHd;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:329
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this playlist?'**
+  String get areYouSureYouWantTo;
 
   /// lib/features/recently_played/screens/recently_played_screen.dart:198
   ///
@@ -1598,6 +1646,12 @@ abstract class AppLocalizations {
   /// **'Browse the full controls guide'**
   String get browseTheFullControlsGuide;
 
+  /// lib/features/menu/screens/menu_screen.dart:1438
+  ///
+  /// In en, this message translates to:
+  /// **'Browse your artist library'**
+  String get browseYourArtistLibrary;
+
   /// lib/features/artists/screens/artists_screen.dart:378
   ///
   /// In en, this message translates to:
@@ -1615,6 +1669,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{kAppVersion} (build {kAppBuild})'**
   String build(Object kAppVersion, Object kAppBuild);
+
+  /// lib/features/menu/screens/menu_screen.dart:2252
+  ///
+  /// In en, this message translates to:
+  /// **'Building your music home'**
+  String get buildingYourMusicHome;
 
   /// lib/features/settings/screens/equalizer_screen.dart:766
   ///
@@ -1904,6 +1964,12 @@ abstract class AppLocalizations {
   /// **'Choose Action'**
   String get chooseAction;
 
+  /// lib/features/menu/screens/menu_screen.dart:464
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Audio Engine'**
+  String get chooseAudioEngine;
+
   /// lib/features/player/screens/lyrics_sync_screen.dart:494
   ///
   /// In en, this message translates to:
@@ -1951,6 +2017,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get clear;
+
+  /// lib/features/queue/screens/queue_screen.dart:434
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearAll;
 
   /// lib/features/settings/screens/uac2_preferences_screen.dart:558
   ///
@@ -2450,6 +2522,12 @@ abstract class AppLocalizations {
   /// **'Could not open the link: {e}'**
   String couldNotOpenTheLink2(Object e);
 
+  /// lib/features/menu/screens/menu_screen.dart:229
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the Play Store.'**
+  String get couldNotOpenThePlayStore;
+
   /// lib/features/menu/screens/menu_screen.dart:237
   ///
   /// In en, this message translates to:
@@ -2504,11 +2582,23 @@ abstract class AppLocalizations {
   /// **'Create'**
   String get create;
 
+  /// lib/features/menu/screens/menu_screen.dart:1448
+  ///
+  /// In en, this message translates to:
+  /// **'Create a collection'**
+  String get createACollection;
+
   /// lib/features/settings/screens/equalizer_screen.dart:738
   ///
   /// In en, this message translates to:
   /// **'Create a custom preset'**
   String get createACustomPreset;
+
+  /// lib/features/menu/screens/menu_screen.dart:991
+  ///
+  /// In en, this message translates to:
+  /// **'Create a playlist, import an M3U, or let the mixes above carry the session.'**
+  String get createAPlaylistImportAnM3u;
 
   /// lib/features/player/widgets/inline_lyrics_panel.dart:208
   ///
@@ -2545,6 +2635,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create playlist from selected'**
   String get createPlaylistFromSelected;
+
+  /// lib/features/menu/screens/menu_screen.dart:974
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first playlist or jump into your saved collections.'**
+  String get createYourFirstPlaylistOrJump;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:242
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first playlist to organize\nyour favorite songs'**
+  String get createYourFirstPlaylistToOrganize;
+
+  /// lib/features/playlists/screens/playlist_detail_screen.dart:435
+  ///
+  /// In en, this message translates to:
+  /// **'Created {arg1}'**
+  String created(Object arg1);
 
   /// lib/features/songs/widgets/song_actions_bottom_sheet.dart:546
   ///
@@ -2772,6 +2880,12 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{arg1}d ago'**
+  String dAgo(Object arg1);
+
+  /// lib/features/recently_added/screens/recently_added_screen.dart:494
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1}d ago'**
   String dAgo2(Object arg1);
 
   /// lib/features/settings/screens/uac2_settings_screen.dart:700
@@ -2833,6 +2947,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Date Added'**
   String get dateAdded;
+
+  /// lib/features/playlists/widgets/playlist_sort_bottom_sheet.dart:23
+  ///
+  /// In en, this message translates to:
+  /// **'Date Added (Newest)'**
+  String get dateAddedNewest;
+
+  /// lib/features/playlists/widgets/playlist_sort_bottom_sheet.dart:25
+  ///
+  /// In en, this message translates to:
+  /// **'Date Added (Oldest)'**
+  String get dateAddedOldest;
 
   /// lib/features/settings/screens/interface_settings_screen.dart:161
   ///
@@ -2936,6 +3062,12 @@ abstract class AppLocalizations {
   /// **'Default Android playback engine used by Flick right now.'**
   String get defaultAndroidPlaybackEngineUsedBy;
 
+  /// lib/features/menu/screens/menu_screen.dart:484
+  ///
+  /// In en, this message translates to:
+  /// **'Default Android player — plays everything reliably. The safest choice for most listeners.'**
+  String get defaultAndroidPlayerPlaysEverything;
+
   /// lib/features/recap/screens/listening_recap_screen.dart:859
   ///
   /// In en, this message translates to:
@@ -2977,6 +3109,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete Files'**
   String get deleteFiles;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:328
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Playlist'**
+  String get deletePlaylist;
 
   /// lib/features/settings/screens/equalizer_screen.dart:704
   ///
@@ -3542,6 +3680,12 @@ abstract class AppLocalizations {
   /// **'Earlier'**
   String get earlier;
 
+  /// lib/features/menu/screens/menu_screen.dart:1759
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier standouts pulled back into view from your listening history.'**
+  String get earlierStandoutsPulledBackIntoView;
+
   /// lib/features/settings/widgets/lastfm_settings_tile.dart:921
   ///
   /// In en, this message translates to:
@@ -3860,6 +4004,18 @@ abstract class AppLocalizations {
   /// **'Experimental — down-tune playback by 432/440. This disables bit-perfect passthrough and runs the DSP path.'**
   String get experimentalDownTunePlaybackBy432;
 
+  /// lib/features/playlists/screens/playlists_screen.dart:628
+  ///
+  /// In en, this message translates to:
+  /// **'Export as .m3u'**
+  String get exportAsM3u;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:638
+  ///
+  /// In en, this message translates to:
+  /// **'Export as .m3u8'**
+  String get exportAsM3u8;
+
   /// lib/features/settings/screens/equalizer_screen.dart:751
   ///
   /// In en, this message translates to:
@@ -3871,6 +4027,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export equalizer preset'**
   String get exportEqualizerPreset;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:533
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {e}'**
+  String exportFailed(Object e);
 
   /// lib/features/settings/screens/equalizer_screen.dart:652
   ///
@@ -3889,6 +4051,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exported preset to {fallbackPath}'**
   String exportedPresetTo2(Object fallbackPath);
+
+  /// lib/features/playlists/screens/playlists_screen.dart:525
+  ///
+  /// In en, this message translates to:
+  /// **'Exported {arg1} songs to \"{arg2}\".'**
+  String exportedSongsTo(Object arg1, Object arg2);
 
   /// lib/features/settings/screens/audio_settings_screen.dart:120
   ///
@@ -4058,11 +4226,23 @@ abstract class AppLocalizations {
   /// **'Favorite Removal'**
   String get favoriteRemoval;
 
+  /// lib/features/menu/screens/menu_screen.dart:1408
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite Songs'**
+  String get favoriteSongs;
+
   /// lib/features/favorites/screens/favorites_screen.dart:301
   ///
   /// In en, this message translates to:
   /// **'Favorites'**
   String get favorites;
+
+  /// lib/features/menu/screens/menu_screen.dart:1757
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites you have not revisited lately'**
+  String get favoritesYouHaveNotRevisitedLately;
 
   /// lib/features/milestone/screens/milestones_screen.dart:503
   ///
@@ -4274,6 +4454,12 @@ abstract class AppLocalizations {
   /// **'Flick Preview'**
   String get flickPreview;
 
+  /// lib/features/menu/screens/menu_screen.dart:1089
+  ///
+  /// In en, this message translates to:
+  /// **'Flick Replay'**
+  String get flickReplay;
+
   /// lib/features/settings/screens/app_info_settings_screen.dart:175
   ///
   /// In en, this message translates to:
@@ -4472,6 +4658,12 @@ abstract class AppLocalizations {
   /// **'Frequency Focus'**
   String get frequencyFocus;
 
+  /// lib/features/menu/screens/menu_screen.dart:1774
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh Additions'**
+  String get freshAdditions;
+
   /// lib/widgets/common/fetched_description.dart:41
   ///
   /// In en, this message translates to:
@@ -4586,6 +4778,12 @@ abstract class AppLocalizations {
   /// **'{arg1} GB'**
   String gb(Object arg1);
 
+  /// lib/features/menu/screens/menu_screen.dart:846
+  ///
+  /// In en, this message translates to:
+  /// **'Generated from your listening habits, favorites, and newest additions.'**
+  String get generatedFromYourListeningHabitsFavorites;
+
   /// lib/features/player/widgets/song_metadata_sheet.dart:70
   ///
   /// In en, this message translates to:
@@ -4633,6 +4831,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go to Artist'**
   String get goToArtist;
+
+  /// lib/features/menu/screens/menu_screen.dart:275
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get goodAfternoon;
+
+  /// lib/features/menu/screens/menu_screen.dart:276
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get goodEvening;
+
+  /// lib/features/menu/screens/menu_screen.dart:274
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get goodMorning;
 
   /// lib/features/settings/screens/support_flick_screen.dart:166
   ///
@@ -4742,6 +4958,12 @@ abstract class AppLocalizations {
   /// **'Having more than 4 buttons may cause text labels to compress. Consider reducing the button spacing below.'**
   String get havingMoreThan4ButtonsMay;
 
+  /// lib/features/menu/screens/menu_screen.dart:1765
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy Rotation'**
+  String get heavyRotation;
+
   /// lib/features/settings/screens/uac2_settings_screen.dart:715
   ///
   /// In en, this message translates to:
@@ -4843,6 +5065,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'High Pass'**
   String get highPass;
+
+  /// lib/features/menu/screens/menu_screen.dart:497
+  ///
+  /// In en, this message translates to:
+  /// **'High Quality'**
+  String get highQuality;
+
+  /// lib/features/menu/screens/menu_screen.dart:390
+  ///
+  /// In en, this message translates to:
+  /// **'High Quality Engine'**
+  String get highQualityEngine;
 
   /// lib/features/settings/screens/bluetooth_settings_screen.dart:487
   ///
@@ -5024,6 +5258,18 @@ abstract class AppLocalizations {
   /// **'Immersive Full View Timer'**
   String get immersiveFullViewTimer;
 
+  /// lib/features/playlists/screens/playlists_screen.dart:506
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {e}'**
+  String importFailed(Object e);
+
+  /// lib/features/playlists/screens/playlists_screen.dart:134
+  ///
+  /// In en, this message translates to:
+  /// **'Import M3U/M3U8'**
+  String get importM3uM3u8;
+
   /// lib/features/settings/screens/library_settings_screen.dart:1854
   ///
   /// In en, this message translates to:
@@ -5053,6 +5299,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Imported art is saved inside the app for this song only.'**
   String get importedArtIsSavedInsideThe2;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:498
+  ///
+  /// In en, this message translates to:
+  /// **'Imported \"{arg1}\" with {arg2} songs.{unmatchedText}'**
+  String importedWithSongs(Object arg1, Object arg2, Object unmatchedText);
 
   /// lib/features/settings/screens/equalizer_screen.dart:3762
   ///
@@ -5192,6 +5444,12 @@ abstract class AppLocalizations {
   /// **'Jul'**
   String get jul;
 
+  /// lib/features/menu/screens/menu_screen.dart:1310
+  ///
+  /// In en, this message translates to:
+  /// **'Jump Back In'**
+  String get jumpBackIn;
+
   /// lib/features/settings/screens/app_info_settings_screen.dart:632
   ///
   /// In en, this message translates to:
@@ -5275,6 +5533,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep relative levels inside each album'**
   String get keepRelativeLevelsInsideEachAlbum;
+
+  /// lib/features/menu/screens/menu_screen.dart:1313
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the session moving or head straight back to the player.'**
+  String get keepTheSessionMovingOrHead;
 
   /// lib/features/settings/screens/duplicate_cleaner_screen.dart:1016
   ///
@@ -5420,6 +5684,12 @@ abstract class AppLocalizations {
   /// **'Last.fm Scrobbling'**
   String get lastFmScrobbling;
 
+  /// lib/features/menu/screens/menu_screen.dart:1361
+  ///
+  /// In en, this message translates to:
+  /// **'Last pick'**
+  String get lastPick;
+
   /// lib/features/settings/screens/privacy_policy_screen.dart:98
   ///
   /// In en, this message translates to:
@@ -5437,6 +5707,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Late Night Sessions'**
   String get lateNightSessions;
+
+  /// lib/features/menu/screens/menu_screen.dart:1775
+  ///
+  /// In en, this message translates to:
+  /// **'Latest arrivals from your library'**
+  String get latestArrivalsFromYourLibrary;
 
   /// lib/features/settings/screens/app_info_settings_screen.dart:250
   ///
@@ -5636,6 +5912,18 @@ abstract class AppLocalizations {
   /// **'{arg1} liked songs'**
   String likedSongs(Object arg1);
 
+  /// lib/features/menu/screens/menu_screen.dart:1410
+  ///
+  /// In en, this message translates to:
+  /// **'Liked songs live here'**
+  String get likedSongsLiveHere;
+
+  /// lib/features/menu/screens/menu_screen.dart:1766
+  ///
+  /// In en, this message translates to:
+  /// **'Likes and replays blended together'**
+  String get likesAndReplaysBlendedTogether;
+
   /// lib/features/settings/screens/equalizer_screen.dart:3016
   ///
   /// In en, this message translates to:
@@ -5808,6 +6096,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading artwork…'**
   String get loadingArtwork2;
+
+  /// lib/features/menu/screens/menu_screen.dart:2260
+  ///
+  /// In en, this message translates to:
+  /// **'Loading favorites, recent sessions, generated mixes, and playlists.'**
+  String get loadingFavoritesRecentSessionsGenerated;
 
   /// lib/features/settings/screens/app_info_settings_screen.dart:276
   ///
@@ -6018,6 +6312,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Makeup'**
   String get makeup;
+
+  /// lib/features/manual/screens/manual_screen.dart:133
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get manual;
+
+  /// lib/features/playlists/widgets/playlist_sort_bottom_sheet.dart:21
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Order'**
+  String get manualOrder;
+
+  /// lib/features/queue/screens/queue_screen.dart:221
+  ///
+  /// In en, this message translates to:
+  /// **'Manual queue'**
+  String get manualQueue;
 
   /// lib/features/settings/screens/uac2_settings_screen.dart:468
   ///
@@ -6271,6 +6583,12 @@ abstract class AppLocalizations {
   /// **'Mixer Management'**
   String get mixerManagement;
 
+  /// lib/features/menu/screens/menu_screen.dart:3203
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1}mo ago'**
+  String moAgo(Object arg1);
+
   /// lib/features/settings/screens/library_settings_screen.dart:1014
   ///
   /// In en, this message translates to:
@@ -6300,6 +6618,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More'**
   String get more;
+
+  /// lib/features/menu/screens/menu_screen.dart:1842
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1} + {arg2} more'**
+  String more2(Object arg1, Object arg2);
 
   /// lib/features/songs/screens/songs_screen.dart:1556
   ///
@@ -6655,6 +6979,12 @@ abstract class AppLocalizations {
   /// **'No categories selected'**
   String get noCategoriesSelected;
 
+  /// lib/features/whats_new/widgets/whats_new_bottom_sheet.dart:56
+  ///
+  /// In en, this message translates to:
+  /// **'No changelog notes for this version yet.'**
+  String get noChangelogNotesForThisVersion;
+
   /// lib/features/settings/screens/equalizer_screen.dart:788
   ///
   /// In en, this message translates to:
@@ -6672,6 +7002,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Favorites Yet'**
   String get noFavoritesYet;
+
+  /// lib/features/menu/screens/menu_screen.dart:2329
+  ///
+  /// In en, this message translates to:
+  /// **'No featured track yet'**
+  String get noFeaturedTrackYet;
 
   /// lib/features/folders/screens/folders_screen.dart:368
   ///
@@ -6721,6 +7057,12 @@ abstract class AppLocalizations {
   /// **'No matches.'**
   String get noMatches;
 
+  /// lib/features/manual/screens/manual_screen.dart:224
+  ///
+  /// In en, this message translates to:
+  /// **'No matches for \"{_query}\"'**
+  String noMatchesFor(Object _query);
+
   /// lib/features/songs/screens/songs_screen.dart:1854
   ///
   /// In en, this message translates to:
@@ -6769,11 +7111,23 @@ abstract class AppLocalizations {
   /// **'No patch notes available yet.'**
   String get noPatchNotesAvailableYet;
 
+  /// lib/features/menu/screens/menu_screen.dart:1362
+  ///
+  /// In en, this message translates to:
+  /// **'No playback yet'**
+  String get noPlaybackYet;
+
   /// lib/features/menu/screens/menu_screen.dart:989
   ///
   /// In en, this message translates to:
   /// **'No playlists yet'**
   String get noPlaylistsYet;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:234
+  ///
+  /// In en, this message translates to:
+  /// **'No Playlists Yet'**
+  String get noPlaylistsYet2;
 
   /// lib/features/player/widgets/add_to_playlist_sheet.dart:79
   ///
@@ -6805,6 +7159,12 @@ abstract class AppLocalizations {
   /// **'No scan results yet'**
   String get noScanResultsYet;
 
+  /// lib/features/playlists/screens/playlists_screen.dart:472
+  ///
+  /// In en, this message translates to:
+  /// **'No server playlists found'**
+  String get noServerPlaylistsFound;
+
   /// lib/features/settings/screens/network_sources_screen.dart:190
   ///
   /// In en, this message translates to:
@@ -6822,6 +7182,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Songs Found'**
   String get noSongsFound;
+
+  /// lib/features/playlists/screens/playlist_detail_screen.dart:522
+  ///
+  /// In en, this message translates to:
+  /// **'No songs in this playlist'**
+  String get noSongsInThisPlaylist;
+
+  /// lib/features/queue/screens/queue_screen.dart:507
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming queue items yet.'**
+  String get noUpcomingQueueItemsYet;
 
   /// lib/features/settings/screens/app_info_settings_screen.dart:165
   ///
@@ -6955,6 +7327,12 @@ abstract class AppLocalizations {
   /// **'Now Playing'**
   String get nowPlaying;
 
+  /// lib/features/queue/screens/queue_screen.dart:550
+  ///
+  /// In en, this message translates to:
+  /// **'Now playing'**
+  String get nowPlaying2;
+
   /// lib/models/song_tile_thumbnail_mode.dart:22
   ///
   /// In en, this message translates to:
@@ -7002,6 +7380,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On Android, the standard just_audio playback path now applies native counterparts for EQ, dynamics, balance, and spatial FX on supported devices. The Rust engine still delivers the most exact version of these controls, so some Android results are approximate.'**
   String get onAndroidTheStandardJustAudio;
+
+  /// lib/features/menu/screens/menu_screen.dart:1748
+  ///
+  /// In en, this message translates to:
+  /// **'On Repeat'**
+  String get onRepeat;
 
   /// lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:365
   ///
@@ -7057,6 +7441,12 @@ abstract class AppLocalizations {
   /// **'Open in Play Store'**
   String get openInPlayStore;
 
+  /// lib/features/menu/screens/menu_screen.dart:1322
+  ///
+  /// In en, this message translates to:
+  /// **'Open Library'**
+  String get openLibrary;
+
   /// lib/features/settings/widgets/listenbrainz_settings_tile.dart:717
   ///
   /// In en, this message translates to:
@@ -7068,6 +7458,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open Manual'**
   String get openManual;
+
+  /// lib/features/menu/screens/menu_screen.dart:1319
+  ///
+  /// In en, this message translates to:
+  /// **'Open Player'**
+  String get openPlayer;
 
   /// lib/features/settings/screens/app_info_settings_screen.dart:312
   ///
@@ -7122,6 +7518,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Orbital settings reset'**
   String get orbitalSettingsReset;
+
+  /// lib/features/playlists/screens/playlist_detail_screen.dart:604
+  ///
+  /// In en, this message translates to:
+  /// **'Other Playlists'**
+  String get otherPlaylists;
+
+  /// lib/features/menu/screens/menu_screen.dart:499
+  ///
+  /// In en, this message translates to:
+  /// **'Our Rust-powered engine. Cleaner sound and smoother playback — recommended for daily listening.'**
+  String get ourRustPoweredEngineCleanerSound;
 
   /// lib/features/settings/widgets/mini_player_customization.dart:209
   ///
@@ -7267,6 +7675,12 @@ abstract class AppLocalizations {
   /// **'Permission'**
   String get permission;
 
+  /// lib/features/menu/screens/menu_screen.dart:1837
+  ///
+  /// In en, this message translates to:
+  /// **'Personal playlist'**
+  String get personalPlaylist;
+
   /// lib/features/settings/screens/bluetooth_settings_screen.dart:401
   ///
   /// In en, this message translates to:
@@ -7296,6 +7710,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick Image'**
   String get pickImage;
+
+  /// lib/features/menu/screens/menu_screen.dart:933
+  ///
+  /// In en, this message translates to:
+  /// **'Pick up exactly where your last sessions left off.'**
+  String get pickUpExactlyWhereYourLast;
 
   /// lib/widgets/equalizer/interactive_eq_graph.dart:158
   ///
@@ -7339,6 +7759,12 @@ abstract class AppLocalizations {
   /// **'Play'**
   String get play;
 
+  /// lib/features/menu/screens/menu_screen.dart:1316
+  ///
+  /// In en, this message translates to:
+  /// **'Play a few songs and this page will start filling with mixes, artists, and shortcuts.'**
+  String get playAFewSongsAndThis;
+
   /// lib/data/repositories/recently_played_repository.dart:33
   ///
   /// In en, this message translates to:
@@ -7350,6 +7776,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play a random library song when the queue ends'**
   String get playARandomLibrarySongWhen;
+
+  /// lib/features/menu/screens/menu_screen.dart:1321
+  ///
+  /// In en, this message translates to:
+  /// **'Play Again'**
+  String get playAgain;
 
   /// lib/features/settings/screens/audio_settings_screen.dart:190
   ///
@@ -7368,6 +7800,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play in order'**
   String get playInOrder;
+
+  /// lib/features/queue/screens/queue_screen.dart:843
+  ///
+  /// In en, this message translates to:
+  /// **'Play next'**
+  String get playNext;
 
   /// lib/features/settings/screens/privacy_policy_screen.dart:76
   ///
@@ -7525,11 +7963,23 @@ abstract class AppLocalizations {
   /// **'Player Layout'**
   String get playerLayout;
 
+  /// lib/features/playlists/screens/playlists_screen.dart:92
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} playlist} other{{count} playlists}}'**
+  String playlist(int count);
+
   /// lib/models/playback_context.dart:14
   ///
   /// In en, this message translates to:
   /// **'Playlist'**
   String get playlist2;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:457
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist \"{arg1}\" created'**
+  String playlistCreated(Object arg1);
 
   /// lib/features/playlists/screens/playlists_screen.dart:356
   ///
@@ -7542,6 +7992,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Playlists'**
   String get playlists;
+
+  /// lib/features/menu/screens/menu_screen.dart:2699
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1} plays'**
+  String plays(Object arg1);
+
+  /// lib/features/playlists/screens/playlists_screen.dart:430
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a playlist name'**
+  String get pleaseEnterAPlaylistName;
 
   /// lib/features/settings/widgets/listenbrainz_settings_tile.dart:584
   ///
@@ -7711,6 +8173,12 @@ abstract class AppLocalizations {
   /// **'Protocol'**
   String get protocol;
 
+  /// lib/features/menu/screens/menu_screen.dart:1783
+  ///
+  /// In en, this message translates to:
+  /// **'Pulled from your late-session plays'**
+  String get pulledFromYourLateSessionPlays;
+
   /// lib/features/settings/screens/widget_settings_screen.dart:299
   ///
   /// In en, this message translates to:
@@ -7728,6 +8196,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Queue {count}'**
   String queue2(Object count);
+
+  /// lib/features/queue/screens/queue_screen.dart:459
+  ///
+  /// In en, this message translates to:
+  /// **'Queue is empty'**
+  String get queueIsEmpty;
 
   /// lib/features/player/widgets/player_navigation.dart:25
   ///
@@ -7825,11 +8299,23 @@ abstract class AppLocalizations {
   /// **'Ready to remove {count, plural, =1{{count} song} other{{count} songs}} — keeping {kept} in total.'**
   String readyToRemoveSongKeepingIn(int count, Object kept);
 
+  /// lib/features/menu/screens/menu_screen.dart:1421
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1} recent picks on hand'**
+  String recentPicksOnHand(Object arg1);
+
   /// lib/features/menu/screens/menu_screen.dart:1428
   ///
   /// In en, this message translates to:
   /// **'Recently Added'**
   String get recentlyAdded;
+
+  /// lib/features/menu/screens/menu_screen.dart:1776
+  ///
+  /// In en, this message translates to:
+  /// **'Recently added tracks waiting for more play time.'**
+  String get recentlyAddedTracksWaitingForMore;
 
   /// lib/features/menu/screens/menu_screen.dart:931
   ///
@@ -7939,6 +8425,12 @@ abstract class AppLocalizations {
   /// **'Registered, not claimed'**
   String get registeredNotClaimed;
 
+  /// lib/features/menu/screens/restarting_screen.dart:12
+  ///
+  /// In en, this message translates to:
+  /// **'Reinitializing playback…'**
+  String get reinitializingPlayback;
+
   /// lib/features/settings/screens/equalizer_screen.dart:3358
   ///
   /// In en, this message translates to:
@@ -8034,6 +8526,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove from Playlist'**
   String get removeFromPlaylist;
+
+  /// lib/features/queue/screens/queue_screen.dart:371
+  ///
+  /// In en, this message translates to:
+  /// **'Remove selected'**
+  String get removeSelected;
 
   /// lib/features/settings/screens/network_server_edit_screen.dart:327
   ///
@@ -8166,6 +8664,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Repeat Mode'**
   String get repeatMode;
+
+  /// lib/features/menu/screens/menu_screen.dart:1756
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Rewind'**
+  String get repeatRewind;
 
   /// lib/features/settings/screens/player_layout_settings_screen.dart:368
   ///
@@ -8323,6 +8827,12 @@ abstract class AppLocalizations {
   /// **'Restart your device to apply output format changes.'**
   String get restartYourDeviceToApplyOutput;
 
+  /// lib/features/menu/screens/restarting_screen.dart:126
+  ///
+  /// In en, this message translates to:
+  /// **'Restarting Flick'**
+  String get restartingFlick;
+
   /// lib/features/settings/screens/orbit_settings_screen.dart:200
   ///
   /// In en, this message translates to:
@@ -8334,6 +8844,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Results ({arg1})'**
   String results(Object arg1);
+
+  /// lib/features/menu/screens/menu_screen.dart:1315
+  ///
+  /// In en, this message translates to:
+  /// **'Resume a familiar favorite or shuffle one of the mixes made from your listening.'**
+  String get resumeAFamiliarFavoriteOrShuffle;
 
   /// lib/features/settings/screens/bluetooth_settings_screen.dart:271
   ///
@@ -8617,6 +9133,12 @@ abstract class AppLocalizations {
   /// **'Saved and verified'**
   String get savedAndVerified;
 
+  /// lib/features/menu/screens/menu_screen.dart:1449
+  ///
+  /// In en, this message translates to:
+  /// **'{playlistCount} saved collections'**
+  String savedCollections(Object playlistCount);
+
   /// lib/features/player/screens/lyrics_sync_screen.dart:557
   ///
   /// In en, this message translates to:
@@ -8634,6 +9156,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved lyrics to the chosen location.'**
   String get savedLyricsToTheChosenLocation;
+
+  /// lib/features/menu/screens/menu_screen.dart:975
+  ///
+  /// In en, this message translates to:
+  /// **'Saved playlists and quick jumps into your library organization.'**
+  String get savedPlaylistsAndQuickJumpsInto;
 
   /// lib/features/player/widgets/share/share_bottom_sheet.dart:163
   ///
@@ -8875,6 +9403,12 @@ abstract class AppLocalizations {
   /// **'Search songs, artists, albums...'**
   String get searchSongsArtistsAlbums;
 
+  /// lib/features/manual/screens/manual_screen.dart:198
+  ///
+  /// In en, this message translates to:
+  /// **'Search the manual...'**
+  String get searchTheManual;
+
   /// lib/features/search/screens/search_screen.dart:240
   ///
   /// In en, this message translates to:
@@ -8971,6 +9505,12 @@ abstract class AppLocalizations {
   /// **'{count} selected'**
   String selected(Object count);
 
+  /// lib/features/queue/screens/queue_screen.dart:349
+  ///
+  /// In en, this message translates to:
+  /// **'{selected} selected of {count, plural, =1{{count} song} other{{count} songs}}'**
+  String selectedOfSong(Object selected, int count);
+
   /// lib/features/settings/screens/orbit_settings_screen.dart:113
   ///
   /// In en, this message translates to:
@@ -9000,6 +9540,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Serial Number'**
   String get serialNumber;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:481
+  ///
+  /// In en, this message translates to:
+  /// **'Server playlist sync failed: {e}'**
+  String serverPlaylistSyncFailed(Object e);
 
   /// lib/features/settings/screens/network_server_edit_screen.dart:442
   ///
@@ -9397,6 +9943,12 @@ abstract class AppLocalizations {
   /// **'Shuffle: {arg1}'**
   String shuffle2(Object arg1);
 
+  /// lib/features/menu/screens/menu_screen.dart:1325
+  ///
+  /// In en, this message translates to:
+  /// **'Shuffle Favorites'**
+  String get shuffleFavorites;
+
   /// lib/features/player/widgets/shuffle_mode_sheet.dart:18
   ///
   /// In en, this message translates to:
@@ -9751,6 +10303,12 @@ abstract class AppLocalizations {
   /// **'Skip unsupported files and hidden .nomedia directories'**
   String get skipUnsupportedFilesAndHiddenNomedia;
 
+  /// lib/features/playlists/screens/playlists_screen.dart:493
+  ///
+  /// In en, this message translates to:
+  /// **' Skipped {count, plural, =1{{count} unmatched entry} other{{count} unmatched entries}}.'**
+  String skippedUnmatchedEntr(int count);
+
   /// lib/features/albums/screens/album_detail_screen.dart:370
   ///
   /// In en, this message translates to:
@@ -9846,6 +10404,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{{count} song} other{{count} songs}}'**
   String song2(int count);
+
+  /// lib/features/playlists/screens/playlists_screen.dart:593
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} song} other{{count} songs}} · {server}'**
+  String song3(int count, Object server);
 
   /// lib/features/songs/widgets/song_actions_button.dart:29
   ///
@@ -10027,6 +10591,12 @@ abstract class AppLocalizations {
   /// **'Sort & Filter'**
   String get sortFilter;
 
+  /// lib/features/playlists/screens/playlist_detail_screen.dart:399
+  ///
+  /// In en, this message translates to:
+  /// **'Sort songs'**
+  String get sortSongs;
+
   /// lib/features/player/widgets/bit_perfect_indicator.dart:718
   ///
   /// In en, this message translates to:
@@ -10087,6 +10657,12 @@ abstract class AppLocalizations {
   /// **'Stamp this line first to edit its word timeline.'**
   String get stampThisLineFirstToEdit;
 
+  /// lib/features/menu/screens/menu_screen.dart:482
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get standard;
+
   /// lib/features/settings/screens/interface_settings_screen.dart:223
   ///
   /// In en, this message translates to:
@@ -10098,6 +10674,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Standard Bluetooth routing via Android'**
   String get standardBluetoothRoutingViaAndroid;
+
+  /// lib/features/menu/screens/menu_screen.dart:386
+  ///
+  /// In en, this message translates to:
+  /// **'Standard Engine'**
+  String get standardEngine;
 
   /// lib/models/song.dart:321
   ///
@@ -10116,6 +10698,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start at Now'**
   String get startAtNow;
+
+  /// lib/features/menu/screens/menu_screen.dart:1311
+  ///
+  /// In en, this message translates to:
+  /// **'Start Building Your Home'**
+  String get startBuildingYourHome;
+
+  /// lib/features/menu/screens/menu_screen.dart:2339
+  ///
+  /// In en, this message translates to:
+  /// **'Start playing to populate this space'**
+  String get startPlayingToPopulateThisSpace;
 
   /// lib/widgets/uac2/uac2_stream_config.dart:207
   ///
@@ -10219,6 +10813,12 @@ abstract class AppLocalizations {
   /// **'Storage Permissions'**
   String get storagePermissions;
 
+  /// lib/features/playlists/screens/playlists_screen.dart:372
+  ///
+  /// In en, this message translates to:
+  /// **'Store on'**
+  String get storeOn;
+
   /// lib/features/settings/screens/network_server_edit_screen.dart:61
   ///
   /// In en, this message translates to:
@@ -10267,6 +10867,12 @@ abstract class AppLocalizations {
   /// **'Streaming'**
   String get streaming;
 
+  /// lib/features/menu/screens/menu_screen.dart:1359
+  ///
+  /// In en, this message translates to:
+  /// **'Streaming from queue'**
+  String get streamingFromQueue;
+
   /// lib/features/settings/screens/library_settings_screen.dart:2195
   ///
   /// In en, this message translates to:
@@ -10278,6 +10884,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Strong'**
   String get strong;
+
+  /// lib/features/menu/screens/menu_screen.dart:514
+  ///
+  /// In en, this message translates to:
+  /// **'Studio-grade output for external DACs and headphone amps. Bypasses Android\'s audio processing for pure sound.'**
+  String get studioGradeOutputForExternalDacs;
 
   /// lib/features/settings/screens/equalizer_screen.dart:1887
   ///
@@ -10417,6 +11029,12 @@ abstract class AppLocalizations {
   /// **'Sync now'**
   String get syncNow;
 
+  /// lib/features/playlists/screens/playlists_screen.dart:144
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Server Playlists'**
+  String get syncServerPlaylists;
+
   /// lib/features/player/widgets/online_lyrics_search_sheet.dart:568
   ///
   /// In en, this message translates to:
@@ -10434,6 +11052,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Synced LRC'**
   String get syncedLrc;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:473
+  ///
+  /// In en, this message translates to:
+  /// **'Synced {count, plural, =1{{count} playlist} other{{count} playlists}} from servers'**
+  String syncedPlaylistFromServers(int count);
 
   /// lib/features/settings/screens/network_sources_screen.dart:365
   ///
@@ -10603,6 +11227,12 @@ abstract class AppLocalizations {
   /// **'The app queries public APIs (MusicBrainz/Cover Art Archive, iTunes, Deezer) to find matching album art. Search queries use local music metadata. Downloaded images are cached locally.'**
   String get theAppQueriesPublicApisMusicbrainz;
 
+  /// lib/features/menu/screens/menu_screen.dart:473
+  ///
+  /// In en, this message translates to:
+  /// **'The audio engine determines how your music is played back. Each option balances reliability, quality, and compatibility differently.'**
+  String get theAudioEngineDeterminesHowYour;
+
   /// lib/features/settings/screens/uac2_preferences_screen.dart:541
   ///
   /// In en, this message translates to:
@@ -10615,11 +11245,35 @@ abstract class AppLocalizations {
   /// **'The Isochronous USB engine will stay alive when the app quits.'**
   String get theIsochronousUsbEngineWillStay;
 
+  /// lib/features/menu/screens/menu_screen.dart:889
+  ///
+  /// In en, this message translates to:
+  /// **'The names showing up again and again in your recent queue.'**
+  String get theNamesShowingUpAgainAnd;
+
+  /// lib/features/menu/screens/menu_screen.dart:1750
+  ///
+  /// In en, this message translates to:
+  /// **'The tracks dominating your weekly and monthly recap.'**
+  String get theTracksDominatingYourWeeklyAnd;
+
+  /// lib/features/menu/screens/menu_screen.dart:313
+  ///
+  /// In en, this message translates to:
+  /// **'This app is built by a solo developer with zero budget. If you love high-fidelity audio, consider supporting its development on Ko-fi.'**
+  String get thisAppIsBuiltByA;
+
   /// lib/features/settings/screens/interface_settings_screen.dart:22
   ///
   /// In en, this message translates to:
   /// **'This clears your current day streak and any unlocked streak milestones. This cannot be undone.'**
   String get thisClearsYourCurrentDayStreak;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:383
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get thisDevice;
 
   /// lib/features/folders/screens/folders_screen.dart:1370
   ///
@@ -10890,6 +11544,28 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{arg1} tracks'**
   String tracks8(Object arg1);
+
+  /// lib/features/menu/screens/menu_screen.dart:1156
+  ///
+  /// In en, this message translates to:
+  /// **'{songCount} tracks, {favoriteCount} liked songs, {playlistCount} playlists'**
+  String tracksLikedSongsPlaylists(
+    Object songCount,
+    Object favoriteCount,
+    Object playlistCount,
+  );
+
+  /// lib/features/menu/screens/menu_screen.dart:1411
+  ///
+  /// In en, this message translates to:
+  /// **'{favoritesCount} tracks ready to revisit'**
+  String tracksReadyToRevisit(Object favoritesCount);
+
+  /// lib/features/menu/screens/menu_screen.dart:1785
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks that fit the quieter side of your listening habits.'**
+  String get tracksThatFitTheQuieterSide;
 
   /// lib/features/settings/screens/widget_settings_screen.dart:159
   ///
@@ -11185,6 +11861,24 @@ abstract class AppLocalizations {
   /// **'{arg1} up'**
   String up(Object arg1);
 
+  /// lib/features/queue/screens/queue_screen.dart:141
+  ///
+  /// In en, this message translates to:
+  /// **'Up next'**
+  String get upNext;
+
+  /// lib/features/queue/screens/queue_screen.dart:419
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{{count} upcoming song} other{{count} upcoming songs}}'**
+  String upcomingSong(int count);
+
+  /// lib/features/menu/screens/menu_screen.dart:1247
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
   /// lib/features/menu/screens/menu_screen.dart:1226
   ///
   /// In en, this message translates to:
@@ -11202,6 +11896,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update available on the Play Store.'**
   String get updateAvailableOnThePlayStore;
+
+  /// lib/features/menu/screens/menu_screen.dart:1269
+  ///
+  /// In en, this message translates to:
+  /// **'Update notice hidden.'**
+  String get updateNoticeHidden;
+
+  /// lib/features/playlists/screens/playlist_detail_screen.dart:438
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {arg1}'**
+  String updated(Object arg1);
 
   /// lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:150
   ///
@@ -11521,6 +12227,12 @@ abstract class AppLocalizations {
   /// **'Version {kAppVersion}'**
   String version(Object kAppVersion);
 
+  /// lib/features/whats_new/widgets/whats_new_bottom_sheet.dart:126
+  ///
+  /// In en, this message translates to:
+  /// **'Version {arg1}'**
+  String version2(Object arg1);
+
   /// lib/features/settings/screens/visualizer_settings_screen.dart:71
   ///
   /// In en, this message translates to:
@@ -11665,6 +12377,12 @@ abstract class AppLocalizations {
   /// **'Volume is fixed while bit-perfect passthrough is active: the stream is sent untouched and this DAC has no hardware volume control.'**
   String get volumeIsFixedWhileBitPerfect2;
 
+  /// lib/features/menu/screens/menu_screen.dart:3200
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1}w ago'**
+  String wAgo(Object arg1);
+
   /// lib/features/settings/widgets/lastfm_settings_tile.dart:978
   ///
   /// In en, this message translates to:
@@ -11725,11 +12443,23 @@ abstract class AppLocalizations {
   /// **'Weekly'**
   String get weekly;
 
+  /// lib/features/menu/screens/menu_screen.dart:305
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Flick!'**
+  String get welcomeToFlick;
+
   /// lib/providers/tutorial_provider.dart:7
   ///
   /// In en, this message translates to:
   /// **'Welcome to Flick'**
   String get welcomeToFlick2;
+
+  /// lib/features/whats_new/widgets/whats_new_bottom_sheet.dart:22
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s New'**
+  String get whatSNew;
 
   /// lib/features/settings/screens/bluetooth_settings_screen.dart:529
   ///
@@ -11893,6 +12623,12 @@ abstract class AppLocalizations {
   /// **'{currentSpeed}x'**
   String x3(Object currentSpeed);
 
+  /// lib/features/menu/screens/menu_screen.dart:3205
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1}y ago'**
+  String yAgo(Object arg1);
+
   /// lib/features/player/widgets/song_metadata_sheet.dart:72
   ///
   /// In en, this message translates to:
@@ -11965,6 +12701,24 @@ abstract class AppLocalizations {
   /// **'Your collection at a glance'**
   String get yourCollectionAtAGlance;
 
+  /// lib/features/playlists/screens/playlists_screen.dart:91
+  ///
+  /// In en, this message translates to:
+  /// **'Your custom collections'**
+  String get yourCustomCollections;
+
+  /// lib/features/menu/screens/menu_screen.dart:1749
+  ///
+  /// In en, this message translates to:
+  /// **'Your heaviest rotation right now'**
+  String get yourHeaviestRotationRightNow;
+
+  /// lib/features/menu/screens/menu_screen.dart:1429
+  ///
+  /// In en, this message translates to:
+  /// **'Your latest library scans'**
+  String get yourLatestLibraryScans;
+
   /// lib/features/songs/screens/songs_screen.dart:1883
   ///
   /// In en, this message translates to:
@@ -12030,6 +12784,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your scrobbling history will remain on Last.fm, but Flick will stop sending scrobbles.'**
   String get yourScrobblingHistoryWillRemainOn;
+
+  /// lib/features/menu/screens/menu_screen.dart:1420
+  ///
+  /// In en, this message translates to:
+  /// **'Your session history'**
+  String get yourSessionHistory;
 
   /// lib/data/repositories/recently_played_repository.dart:35
   ///

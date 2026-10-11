@@ -10,6 +10,7 @@ import 'package:flick/widgets/common/blurred_song_background.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class QueueScreen extends ConsumerStatefulWidget {
   const QueueScreen({super.key});
@@ -138,7 +139,7 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
                               AppConstants.spacingSm,
                             ),
                             child: Text(
-                              'Up next',
+                              l10n.upNext,
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     color: context.adaptiveTextSecondary,
@@ -218,7 +219,7 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
                                 AppConstants.spacingSm,
                               ),
                               child: Text(
-                                'Manual queue',
+                                l10n.manualQueue,
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(
                                       color: context.adaptiveTextSecondary,
@@ -339,14 +340,14 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Queue',
+                  l10n.queue,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: context.adaptiveTextPrimary,
                       ),
                 ),
                 Text(
-                  '$count selected of $queueCount song${queueCount == 1 ? '' : 's'}',
+                  l10n.selectedOfSong(count, queueCount),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextTertiary,
                       ),
@@ -358,7 +359,7 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
             TextButton(
               onPressed: _selectAll,
               child: Text(
-                'Select All',
+                l10n.selectAll,
                 style: TextStyle(color: context.adaptiveTextSecondary),
               ),
             ),
@@ -368,7 +369,7 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
               color: Colors.redAccent.withValues(alpha: 0.8),
             ),
             onPressed: count > 0 ? _removeSelected : null,
-            tooltip: 'Remove selected',
+            tooltip: l10n.removeSelected,
           ),
         ],
       ),
@@ -409,14 +410,14 @@ class _Header extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Queue',
+                  l10n.queue,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: context.adaptiveTextPrimary,
                       ),
                 ),
                 Text(
-                  '$queueCount upcoming song${queueCount == 1 ? '' : 's'}',
+                  l10n.upcomingSong(queueCount),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextTertiary,
                       ),
@@ -431,7 +432,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(width: AppConstants.spacingSm),
           if (canClear)
-            TextButton(onPressed: onClear, child: const Text('Clear All')),
+            TextButton(onPressed: onClear, child: Text(l10n.clearAll)),
         ],
       ),
     );
@@ -456,7 +457,7 @@ class _EmptyQueue extends StatelessWidget {
             ),
             const SizedBox(height: AppConstants.spacingLg),
             Text(
-              'Queue is empty',
+              l10n.queueIsEmpty,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: context.adaptiveTextSecondary,
                     fontWeight: FontWeight.w600,
@@ -464,7 +465,7 @@ class _EmptyQueue extends StatelessWidget {
             ),
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              'Add songs from the player or song actions menu.',
+              l10n.addSongsFromThePlayerOr,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextTertiary,
@@ -504,7 +505,7 @@ class _EmptyUpcomingState extends StatelessWidget {
             const SizedBox(width: AppConstants.spacingSm),
             Expanded(
               child: Text(
-                'No upcoming queue items yet.',
+                l10n.noUpcomingQueueItemsYet,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.adaptiveTextSecondary,
                     ),
@@ -547,7 +548,7 @@ class _NowPlayingCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Now playing',
+                  l10n.nowPlaying2,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: AppColors.accent,
                         fontWeight: FontWeight.w700,
@@ -838,13 +839,13 @@ class _QueueTile extends StatelessWidget {
                     },
                     itemBuilder: (context) => [
                       if (onMoveToNext != null)
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: _QueueAction.playNext,
-                          child: Text('Play next'),
+                          child: Text(l10n.playNext),
                         ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: _QueueAction.remove,
-                        child: Text('Remove'),
+                        child: Text(l10n.remove),
                       ),
                     ],
                     icon: Icon(
