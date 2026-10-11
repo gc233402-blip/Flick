@@ -196,9 +196,47 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
     );
   }
 
+  Future<void> _resetArtwork() async {
+    if (_isWorking) {
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.resetArtwork),
+        content: Text(l10n.resetArtworkDescription),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.reset),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    await _runMutation(
+      syncPlayer: false,
+      action: () => _scope == AlbumArtScope.wholeAlbum
+          ? _service.resetArtwork(widget.song)
+          : _service.resetArtworkForSong(widget.song),
+      successMessage: (result) => _scope == AlbumArtScope.wholeAlbum
+          ? l10n.resetArtworkFor(result.albumName)
+          : l10n.resetArtworkFor2(widget.song.title),
+    );
+  }
+
   Future<void> _runMutation({
     required Future<AlbumArtUpdateResult> Function() action,
     required String Function(AlbumArtUpdateResult result) successMessage,
+    bool syncPlayer = true,
   }) async {
     setState(() {
       _isWorking = true;
@@ -206,10 +244,12 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
 
     try {
       final result = await action();
-      _playerService.syncAlbumArtPaths(
-        filePaths: result.filePaths,
-        albumArtPath: result.albumArtPath,
-      );
+      if (syncPlayer) {
+        _playerService.syncAlbumArtPaths(
+          filePaths: result.filePaths,
+          albumArtPath: result.albumArtPath,
+        );
+      }
       if (!mounted) {
         return;
       }
@@ -356,6 +396,12 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                       onPressed: _isWorking ? null : _removeCustomArtwork,
                       icon: const Icon(LucideIcons.trash2, size: 18),
                       label: Text(l10n.removeCustomArt),
+                    ),
+                  if (!_hasCustomArtwork)
+                    OutlinedButton.icon(
+                      onPressed: _isWorking ? null : _resetArtwork,
+                      icon: const Icon(LucideIcons.rotateCcw, size: 18),
+                      label: Text(l10n.resetArtwork),
                     ),
                 ],
               ),
