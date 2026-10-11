@@ -182,6 +182,83 @@ void main() {
       expect(art!.albumId, '555');
     });
 
+    test('rejects an id probe that names another album', () async {
+      final client = MockClient((request) async {
+        final url = request.url;
+        if (url.host == 'itunes.apple.com') {
+          if (url.queryParameters['entity'] == 'song') {
+            return _json({'resultCount': 0, 'results': []});
+          }
+          return _json({
+            'resultCount': 1,
+            'results': [
+              {
+                'collectionId': 555,
+                'collectionName': 'DRIVE',
+                'artistName': 'Tiësto',
+              },
+            ],
+          });
+        }
+        if (url.host == 'artwork.boidu.dev') {
+          final id = url.queryParameters['id'];
+          if (id == '555') {
+            // The proxy echoes the requested id for an unrelated album.
+            return _motion(id!, 'Wrong Album', 'Other Artist');
+          }
+          // The text search finds the real collection.
+          return _motion('1652508659', 'DRIVE', 'Tiësto');
+        }
+        return _json({'error': 'unexpected $url'}, 500);
+      });
+
+      final service = AnimatedArtworkService.create(client: client);
+      final art = await service.getAnimatedArtworkForAlbum(
+        albumName: 'DRIVE',
+        artist: 'Tiësto',
+        representativeSongTitle: '10:35',
+      );
+
+      expect(art, isNotNull);
+      expect(art!.name, 'DRIVE');
+      expect(art.albumId, '1652508659');
+    });
+
+    test('accepts an id probe that matches the album', () async {
+      final boiduIds = <String?>[];
+      final client = MockClient((request) async {
+        final url = request.url;
+        if (url.host == 'itunes.apple.com') {
+          return _json({
+            'resultCount': 1,
+            'results': [
+              {
+                'collectionId': 555,
+                'collectionName': 'DRIVE',
+                'artistName': 'Tiësto',
+              },
+            ],
+          });
+        }
+        if (url.host == 'artwork.boidu.dev') {
+          boiduIds.add(url.queryParameters['id']);
+          return _motion('555', 'DRIVE', 'Tiësto');
+        }
+        return _json({'error': 'unexpected $url'}, 500);
+      });
+
+      final service = AnimatedArtworkService.create(client: client);
+      final art = await service.getAnimatedArtworkForAlbum(
+        albumName: 'DRIVE',
+        artist: 'Tiësto',
+        representativeSongTitle: '10:35',
+      );
+
+      expect(boiduIds, ['555']);
+      expect(art, isNotNull);
+      expect(art!.albumId, '555');
+    });
+
     test('rejects a text result whose canonical id is another album', () async {
       final client = MockClient((request) async {
         final url = request.url;
