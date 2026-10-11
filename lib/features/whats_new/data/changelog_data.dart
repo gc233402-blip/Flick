@@ -44,7 +44,7 @@ class ChangelogSubsection {
 /// automatically surface the entry whose `version` equals `kAppVersion`.
 const List<ChangelogEntry> kChangelogEntries = [
   ChangelogEntry(
-    version: '0.22.1-beta.4',
+    version: '0.22.2-beta.4',
     date: '2026-10-11',
     sections: [
       ChangelogSection(

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.22.1-beta.4 (2026-10-11)
+## 0.22.2-beta.4 (2026-10-11)
 
 ### Display Modes
 - **New installs follow the system refresh rate by default**: a fresh installation now starts on the Adaptive refresh-rate mode instead of forcing the highest rate. Existing installations keep the mode they already use, and Settings → Interface → Refresh Rate still offers Adaptive, 60 Hz, and maximum.
