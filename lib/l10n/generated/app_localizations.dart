@@ -1670,6 +1670,24 @@ abstract class AppLocalizations {
   /// **'{kAppVersion} (build {kAppBuild})'**
   String build(Object kAppVersion, Object kAppBuild);
 
+  /// lib/features/settings/screens/app_info_settings_screen.dart:655
+  ///
+  /// In en, this message translates to:
+  /// **'Build Flavor'**
+  String get buildFlavor;
+
+  /// lib/features/settings/screens/app_info_settings_screen.dart:83
+  ///
+  /// In en, this message translates to:
+  /// **'full — direct download build'**
+  String get buildFlavorFull;
+
+  /// lib/features/settings/screens/app_info_settings_screen.dart:84
+  ///
+  /// In en, this message translates to:
+  /// **'play — Google Play build'**
+  String get buildFlavorPlay;
+
   /// lib/features/menu/screens/menu_screen.dart:2252
   ///
   /// In en, this message translates to:

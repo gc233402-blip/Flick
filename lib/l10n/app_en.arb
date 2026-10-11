@@ -1247,6 +1247,18 @@
       }
     }
   },
+  "buildFlavor": "Build Flavor",
+  "@buildFlavor": {
+    "description": "lib/features/settings/screens/app_info_settings_screen.dart:655"
+  },
+  "buildFlavorFull": "full — direct download build",
+  "@buildFlavorFull": {
+    "description": "lib/features/settings/screens/app_info_settings_screen.dart:83"
+  },
+  "buildFlavorPlay": "play — Google Play build",
+  "@buildFlavorPlay": {
+    "description": "lib/features/settings/screens/app_info_settings_screen.dart:84"
+  },
   "buildingYourMusicHome": "Building your music home",
   "@buildingYourMusicHome": {
     "description": "lib/features/menu/screens/menu_screen.dart:2252"

@@ -878,6 +878,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get buildFlavor => '发行渠道';
+
+  @override
+  String get buildFlavorFull => 'full — 直接下载版本';
+
+  @override
+  String get buildFlavorPlay => 'play — Google Play 版本';
+
+  @override
   String get buildingYourMusicHome => '正在构建你的音乐主页';
 
   @override

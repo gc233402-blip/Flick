@@ -924,6 +924,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get buildFlavor => 'Build Flavor';
+
+  @override
+  String get buildFlavorFull => 'full — direct download build';
+
+  @override
+  String get buildFlavorPlay => 'play — Google Play build';
+
+  @override
   String get buildingYourMusicHome => 'Building your music home';
 
   @override
