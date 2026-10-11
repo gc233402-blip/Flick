@@ -44,6 +44,20 @@ class ChangelogSubsection {
 /// automatically surface the entry whose `version` equals `kAppVersion`.
 const List<ChangelogEntry> kChangelogEntries = [
   ChangelogEntry(
+    version: '0.22.1-beta.4',
+    date: '2026-10-11',
+    sections: [
+      ChangelogSection(
+        title: 'Display Modes',
+        bullets: [
+          '**New installs follow the system refresh rate by default** — a fresh installation starts on the Adaptive refresh-rate mode instead of forcing the highest rate. Existing installations keep the mode they already use; Settings → Interface → Refresh Rate still offers Adaptive, 60 Hz, and maximum.',
+          '**Forced refresh rates are verified after they are applied** — if the system ignores or downgrades the request (seen on some Fairphone 6 firmware), Flick returns to the system default and stops re-forcing for the session.',
+          'Refresh-rate requests are no longer re-sent on every screen mount and resume; redundant applies are skipped.',
+        ],
+      ),
+    ],
+  ),
+  ChangelogEntry(
     version: '0.22.1-beta.3',
     date: '2026-09-30',
     sections: [
