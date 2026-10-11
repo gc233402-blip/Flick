@@ -1219,6 +1219,7 @@ class MainActivity: FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, DIAGNOSTICS_CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "getProcessExitInfo" -> result.success(getProcessExitInfo())
+                "getBuildFlavor" -> result.success(BuildConfig.FLAVOR)
                 else -> result.notImplemented()
             }
         }
