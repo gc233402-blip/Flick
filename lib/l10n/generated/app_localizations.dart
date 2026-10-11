@@ -1712,10 +1712,10 @@ abstract class AppLocalizations {
   /// **'Buttons'**
   String get buttons;
 
-  /// lib/features/settings/screens/support_flick_screen.dart:212
+  /// Buy Me a Coffee donation option label on the Support Flick screen.
   ///
   /// In en, this message translates to:
-  /// **'Buy me a coffee'**
+  /// **'Buy Me a Coffee'**
   String get buyMeACoffee;
 
   /// lib/features/songs/widgets/song_actions_bottom_sheet.dart:726
@@ -5567,7 +5567,7 @@ abstract class AppLocalizations {
   /// lib/features/settings/screens/support_flick_screen.dart:168
   ///
   /// In en, this message translates to:
-  /// **'Keeping Flick on the Play Store costs \$25/year in developer registration fees.'**
+  /// **'One-time \$25 developer registration fee to publish Flick on the Play Store.'**
   String get keepingFlickOnThePlayStore;
 
   /// lib/features/settings/screens/duplicate_cleaner_screen.dart:1019
@@ -5635,6 +5635,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{arg1}kHz / {arg2}bit / {arg3}ch'**
   String khzBitCh(Object arg1, Object arg2, Object arg3);
+
+  /// Ko-fi donation option label on the Support Flick screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Ko-fi'**
+  String get koFi;
 
   /// lib/features/settings/screens/network_server_edit_screen.dart:434
   ///
@@ -10968,6 +10974,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Support'**
   String get support;
+
+  /// Buy Me a Coffee donation option subtitle on the Support Flick screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Support development on Buy Me a Coffee'**
+  String get supportDevelopmentOnBuyMeACoffee;
 
   /// lib/features/settings/screens/support_flick_screen.dart:213
   ///

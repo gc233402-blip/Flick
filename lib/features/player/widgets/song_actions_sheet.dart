@@ -19,6 +19,7 @@ import 'package:flick/features/player/widgets/add_to_playlist_sheet.dart';
 import 'package:flick/features/player/widgets/speed_bottom_sheet.dart';
 import 'package:flick/features/player/widgets/pitch_bottom_sheet.dart';
 import 'package:flick/features/player/widgets/sleep_timer_bottom_sheet.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 class SongActionsSheet extends ConsumerWidget {
@@ -85,13 +86,7 @@ class SongActionsSheet extends ConsumerWidget {
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(sheetContext).size.height * 0.5,
               ),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
-                ),
-                border: Border.all(color: AppColors.glassBorder),
-              ),
+              decoration: AppBottomSheetSurface.decoration,
               padding: EdgeInsets.fromLTRB(
                 context.responsive(16.0, 18.0, 20.0),
                 context.responsive(10.0, 11.0, 12.0),

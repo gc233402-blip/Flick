@@ -20,6 +20,7 @@ class SupportFlickScreen extends ConsumerStatefulWidget {
 class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
     with SingleTickerProviderStateMixin {
   static const _kofiUrl = 'https://ko-fi.com/ultraelectronica';
+  static const _buyMeACoffeeUrl = 'https://buymeacoffee.com/heiminrei2q';
 
   late final AnimationController _pulseController;
   late final Animation<double> _pulseAnimation;
@@ -100,8 +101,8 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
     super.dispose();
   }
 
-  Future<void> _launchKoFi() async {
-    final uri = Uri.parse(_kofiUrl);
+  Future<void> _launchDonationPage(String url) async {
+    final uri = Uri.parse(url);
     try {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {
@@ -210,9 +211,16 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
                         children: [
                           NavigationSetting(
                             icon: LucideIcons.heart,
-                            title: l10n.buyMeACoffee,
+                            title: l10n.koFi,
                             subtitle: l10n.supportDevelopmentOnKoFi,
-                            onTap: _launchKoFi,
+                            onTap: () => _launchDonationPage(_kofiUrl),
+                          ),
+                          const SettingsDivider(),
+                          NavigationSetting(
+                            icon: LucideIcons.coffee,
+                            title: l10n.buyMeACoffee,
+                            subtitle: l10n.supportDevelopmentOnBuyMeACoffee,
+                            onTap: () => _launchDonationPage(_buyMeACoffeeUrl),
                           ),
                         ],
                       );

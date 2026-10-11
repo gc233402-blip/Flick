@@ -7,6 +7,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/providers/listenbrainz_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 /// Self-contained ListenBrainz connect/disconnect tile.
@@ -53,12 +54,7 @@ class _ListenBrainzSettingsTileState
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(ctx).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppConstants.radiusLg),
-          ),
-        ),
+        decoration: AppBottomSheetSurface.decoration,
         padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -218,12 +214,7 @@ class _ListenBrainzSettingsTileState
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(ctx).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppConstants.radiusLg),
-          ),
-        ),
+        decoration: AppBottomSheetSurface.decoration,
         padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -625,12 +616,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppConstants.radiusLg),
-          ),
-        ),
+        decoration: AppBottomSheetSurface.decoration,
         padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,

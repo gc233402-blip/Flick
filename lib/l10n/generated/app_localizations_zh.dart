@@ -3049,7 +3049,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get keepingFlickOnThePlayStore =>
-      '让 Flick 留在 Play 商店，每年需支付 25 美元的开发者注册费。';
+      '在 Play 商店发布 Flick 的一次性 25 美元开发者注册费。';
 
   @override
   String keepingOfToRemove(Object keptCount, Object arg1, Object removeCount) {
@@ -3097,6 +3097,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String khzBitCh(Object arg1, Object arg2, Object arg3) {
     return '${arg1}kHz / ${arg2}bit / ${arg3}ch';
   }
+
+  @override
+  String get koFi => 'Ko-fi';
 
   @override
   String get label => '标签';
@@ -5996,6 +5999,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get support => '支持';
+
+  @override
+  String get supportDevelopmentOnBuyMeACoffee => '在 Buy Me a Coffee 上支持开发';
 
   @override
   String get supportDevelopmentOnKoFi => '在 Ko-fi 上支持开发';

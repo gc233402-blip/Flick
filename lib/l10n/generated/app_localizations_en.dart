@@ -945,7 +945,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buttons => 'Buttons';
 
   @override
-  String get buyMeACoffee => 'Buy me a coffee';
+  String get buyMeACoffee => 'Buy Me a Coffee';
 
   @override
   String by(Object arg1, Object arg2) {
@@ -3216,7 +3216,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keepingFlickOnThePlayStore =>
-      'Keeping Flick on the Play Store costs \$25/year in developer registration fees.';
+      'One-time \$25 developer registration fee to publish Flick on the Play Store.';
 
   @override
   String keepingOfToRemove(Object keptCount, Object arg1, Object removeCount) {
@@ -3267,6 +3267,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String khzBitCh(Object arg1, Object arg2, Object arg3) {
     return '${arg1}kHz / ${arg2}bit / ${arg3}ch';
   }
+
+  @override
+  String get koFi => 'Ko-fi';
 
   @override
   String get label => 'Label';
@@ -6398,6 +6401,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get support => 'Support';
+
+  @override
+  String get supportDevelopmentOnBuyMeACoffee =>
+      'Support development on Buy Me a Coffee';
 
   @override
   String get supportDevelopmentOnKoFi => 'Support development on Ko-fi';

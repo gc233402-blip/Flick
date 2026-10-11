@@ -19,6 +19,7 @@ import 'package:flick/features/settings/screens/widget_settings_screen.dart';
 import 'package:flick/features/settings/screens/support_flick_screen.dart';
 import 'package:flick/core/utils/navigation_helper.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
+import 'package:flick/features/settings/widgets/donation_coffee_icon.dart';
 import 'package:flick/features/milestone/screens/milestones_screen.dart';
 import 'package:flick/features/manual/screens/manual_screen.dart';
 import 'package:flick/services/milestone_service.dart';
@@ -327,8 +328,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               );
             },
-            icon: _PulsingHeartIcon(),
-            visualDensity: VisualDensity.compact,
+            icon: const DonationCoffeeIcon(),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+            visualDensity: VisualDensity.standard,
+            tooltip: l10n.supportFlick,
           ),
         ],
       ),
@@ -422,51 +425,6 @@ class _CategoryTile extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _PulsingHeartIcon extends StatefulWidget {
-  const _PulsingHeartIcon();
-
-  @override
-  State<_PulsingHeartIcon> createState() => _PulsingHeartIconState();
-}
-
-class _PulsingHeartIconState extends State<_PulsingHeartIcon>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-    _scale = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.15), weight: 30),
-      TweenSequenceItem(tween: Tween(begin: 1.15, end: 1.0), weight: 70),
-    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-    _controller.repeat(reverse: false);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scale,
-      child: Icon(
-        LucideIcons.heart,
-        color: context.adaptiveTextTertiary,
-        size: 22,
       ),
     );
   }

@@ -14,6 +14,7 @@ import 'package:flick/providers/providers.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 class PlayerLayoutSheet extends ConsumerStatefulWidget {
   final PlayerService playerService;
@@ -69,13 +70,7 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.9,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(24),
-          ),
-          border: Border.all(color: AppColors.glassBorder),
-        ),
+        decoration: AppBottomSheetSurface.decoration,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

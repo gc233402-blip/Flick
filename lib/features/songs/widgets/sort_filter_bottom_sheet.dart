@@ -3,6 +3,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/providers/songs_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 class SortFilterBottomSheet extends StatelessWidget {
@@ -43,10 +44,7 @@ class SortFilterBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      decoration: AppBottomSheetSurface.decoration,
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),

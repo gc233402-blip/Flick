@@ -1275,9 +1275,9 @@
   "@buttons": {
     "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:110"
   },
-  "buyMeACoffee": "Buy me a coffee",
+  "buyMeACoffee": "Buy Me a Coffee",
   "@buyMeACoffee": {
-    "description": "lib/features/settings/screens/support_flick_screen.dart:212"
+    "description": "Buy Me a Coffee donation option label on the Support Flick screen."
   },
   "by": "\"{arg1}\" by {arg2}",
   "@by": {
@@ -4369,7 +4369,7 @@
       }
     }
   },
-  "keepingFlickOnThePlayStore": "Keeping Flick on the Play Store costs $25/year in developer registration fees.",
+  "keepingFlickOnThePlayStore": "One-time $25 developer registration fee to publish Flick on the Play Store.",
   "@keepingFlickOnThePlayStore": {
     "description": "lib/features/settings/screens/support_flick_screen.dart:168"
   },
@@ -4472,6 +4472,10 @@
         "type": "Object"
       }
     }
+  },
+  "koFi": "Ko-fi",
+  "@koFi": {
+    "description": "Ko-fi donation option label on the Support Flick screen."
   },
   "label": "Label",
   "@label": {
@@ -8584,6 +8588,10 @@
   "support": "Support",
   "@support": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:703"
+  },
+  "supportDevelopmentOnBuyMeACoffee": "Support development on Buy Me a Coffee",
+  "@supportDevelopmentOnBuyMeACoffee": {
+    "description": "Buy Me a Coffee donation option subtitle on the Support Flick screen."
   },
   "supportDevelopmentOnKoFi": "Support development on Ko-fi",
   "@supportDevelopmentOnKoFi": {

@@ -1,5 +1,7 @@
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/app_theme.dart';
+import 'package:flick/features/songs/widgets/sort_filter_bottom_sheet.dart';
+import 'package:flick/providers/songs_provider.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -76,6 +78,23 @@ void main() {
       final container = _surfaceContainer(tester);
       final padding = container.padding! as EdgeInsets;
       expect(padding.bottom, AppConstants.spacingLg + _systemInset.bottom);
+    });
+  });
+
+  group('standalone sheets', () {
+    testWidgets('use the shared bottom sheet material', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SortFilterBottomSheet(
+            currentSort: SongSortOption.title,
+            currentFilter: SongFileTypeFilter.all,
+            onSortChanged: (_) {},
+            onFilterChanged: (_) {},
+          ),
+        ),
+      );
+
+      _surfaceContainer(tester);
     });
   });
 }

@@ -4,6 +4,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/models/playlist.dart';
 import 'package:flick/models/song.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 /// Sort modes available inside a playlist detail view.
@@ -167,10 +168,7 @@ class PlaylistSortBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      decoration: AppBottomSheetSurface.decoration,
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
