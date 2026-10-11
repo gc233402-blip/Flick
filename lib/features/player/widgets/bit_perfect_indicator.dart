@@ -13,6 +13,7 @@ import 'package:flick/services/uac2_service.dart';
 import 'package:flick/features/player/widgets/audio_visualizer.dart';
 import 'package:flick/features/player/widgets/audio_signal_report.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 /// Compact bit-perfect indicator capsule for the player file-info row.
@@ -265,15 +266,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
             : null;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(
-          top: BorderSide(color: AppColors.glassBorder),
-          left: BorderSide(color: AppColors.glassBorder),
-          right: BorderSide(color: AppColors.glassBorder),
-        ),
-      ),
+      decoration: AppBottomSheetSurface.decoration,
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

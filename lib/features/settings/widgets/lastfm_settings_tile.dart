@@ -8,6 +8,7 @@ import 'package:flick/core/theme/app_colors.dart';
 import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/providers/lastfm_provider.dart';
 import 'package:flick/core/utils/dev_log.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 /// Self-contained Last.fm connect/disconnect tile.
@@ -111,12 +112,8 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(ctx).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppConstants.radiusLg),
-          ),
-        ),
+        decoration: AppBottomSheetSurface.decoration,
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -302,11 +299,9 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                 bottom: MediaQuery.of(ctx).viewInsets.bottom,
               ),
               child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(ctx).scaffoldBackgroundColor,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(AppConstants.radiusLg),
-                  ),
+                decoration: AppBottomSheetSurface.decoration,
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.paddingOf(ctx).bottom,
                 ),
                 child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -784,12 +779,8 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(ctx).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppConstants.radiusLg),
-          ),
-        ),
+        decoration: AppBottomSheetSurface.decoration,
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

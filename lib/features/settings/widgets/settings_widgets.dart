@@ -219,6 +219,53 @@ class NavigationSetting extends StatelessWidget {
   }
 }
 
+/// Read-only row that displays information without a navigation affordance.
+class InfoSetting extends StatelessWidget {
+  const InfoSetting({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppConstants.spacingLg),
+      child: Row(
+        children: [
+          _SettingsIcon(icon: icon),
+          const SizedBox(width: AppConstants.spacingMd),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: context.adaptiveTextPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: context.adaptiveTextTertiary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Row with a radio-like selection indicator. Disabled when [onTap] is null.
 class SelectionSetting extends StatelessWidget {
   const SelectionSetting({

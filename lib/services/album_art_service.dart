@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 
+import '../core/utils/dev_log.dart';
 import '../data/database.dart';
 import '../data/repositories/song_repository.dart';
 import '../src/rust/api/scanner.dart' as rust_scanner;
@@ -249,27 +250,7 @@ class AlbumArtService {
 
   Future<Uint8List?> _loadEmbeddedArtworkBytes(String audioSourcePath) async {
     if (Platform.isAndroid && audioSourcePath.startsWith('content://')) {
-      // MediaMetadataRetriever cannot decode WavPack/DSD covers on any
-      // device; route those through the Rust parser via the shared staging
-      // cache. Other content URIs keep the direct retriever path.
-      if (_isRustOnlyAudioUri(audioSourcePath)) {
-        final staged = await _musicFolderService.cacheUriForPlayback(
-          audioSourcePath,
-          extensionHint: _extensionOf(audioSourcePath),
-          maxSizeBytes: _artworkStagingMaxBytes,
-        );
-        if (staged != null) {
-          try {
-            final bytes = await rust_scanner.extractEmbeddedArtwork(
-              path: staged,
-            );
-            if (bytes != null && bytes.isNotEmpty) return bytes;
-          } catch (_) {
-            // Fall through to the retriever attempt below.
-          }
-        }
-      }
-      return _musicFolderService.fetchEmbeddedArtwork(audioSourcePath);
+      return _loadContentUriArtworkBytes(audioSourcePath);
     }
 
     // Synthesized scan rows are keyed `file:///storage/...`; Rust needs the
@@ -279,6 +260,54 @@ class AlbumArtService {
       return await rust_scanner.extractEmbeddedArtwork(
         path: _plainPathOf(audioSourcePath),
       );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Embedded-art lookup for SAF `content://` rows. WavPack/DSD skip the
+  /// retriever (it cannot decode their covers anywhere); everything else
+  /// tries the retriever first and falls back to the Rust tag parser when it
+  /// comes up empty (hi-res containers with non-standard tags, for example).
+  Future<Uint8List?> _loadContentUriArtworkBytes(String audioSourcePath) async {
+    final rustOnly = _isRustOnlyAudioUri(audioSourcePath);
+    if (!rustOnly) {
+      try {
+        final direct = await _musicFolderService.fetchEmbeddedArtwork(
+          audioSourcePath,
+        );
+        if (direct != null && direct.isNotEmpty) return direct;
+      } catch (_) {
+        // Retriever errors fall through to the Rust parser.
+      }
+      final staged = await _loadStagedRustArtworkBytes(audioSourcePath);
+      if (staged != null && staged.isNotEmpty) return staged;
+      devLog(
+        '[Artwork] no embedded cover for $audioSourcePath '
+        '(retriever + Rust parser)',
+      );
+      return null;
+    }
+
+    final staged = await _loadStagedRustArtworkBytes(audioSourcePath);
+    if (staged != null && staged.isNotEmpty) return staged;
+    // WavPack/DSD: the retriever is the only remaining option. It usually
+    // yields nothing for those containers, but keep it as a last resort.
+    return _musicFolderService.fetchEmbeddedArtwork(audioSourcePath);
+  }
+
+  /// Stages [audioSourcePath] into the shared playback cache and parses its
+  /// embedded art with the Rust tag reader. Null when staging is refused
+  /// (size cap) or the parser finds nothing.
+  Future<Uint8List?> _loadStagedRustArtworkBytes(String audioSourcePath) async {
+    final staged = await _musicFolderService.cacheUriForPlayback(
+      audioSourcePath,
+      extensionHint: _extensionOf(audioSourcePath),
+      maxSizeBytes: _artworkStagingMaxBytes,
+    );
+    if (staged == null) return null;
+    try {
+      return await rust_scanner.extractEmbeddedArtwork(path: staged);
     } catch (_) {
       return null;
     }
@@ -316,6 +345,14 @@ class AlbumArtService {
       _rememberFolderCover(dir, bytes);
     }
     return bytes;
+  }
+
+  /// Drops cached sibling-cover bytes for [audioSourcePath]'s folder so a
+  /// reset re-reads a replaced `cover.jpg`. SAF rows are not cached here, so
+  /// this only matters for filesystem paths.
+  void evictFolderCoverCache(String audioSourcePath) {
+    if (audioSourcePath.startsWith('content://')) return;
+    _folderCoverCache.remove(File(_plainPathOf(audioSourcePath)).parent.path);
   }
 
   void _rememberFolderCover(String dir, Uint8List? bytes) {

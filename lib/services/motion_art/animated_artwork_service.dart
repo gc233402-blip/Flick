@@ -179,7 +179,7 @@ class AnimatedArtworkService {
 
   /// Bump when resolution logic changes: the version is part of the cache key
   /// so stale negative entries stop hiding a now-resolvable album.
-  static const String _cacheVersion = 'v4';
+  static const String _cacheVersion = 'v5';
 
   /// boidu rate-limits its upstream, so cap concurrent requests.
   static const int _boiduMaxConcurrent = 2;
@@ -359,7 +359,9 @@ class AnimatedArtworkService {
     final albumIds = await _albumCollectionIds(album, artist, storefront);
     for (final id in albumIds) {
       final art = await _fetchBoiduById(id);
-      if (art != null && art.hasMotion) return art;
+      if (art != null && art.hasMotion && _boiduArtMatches(art, album, artist)) {
+        return art;
+      }
     }
     if (albumIds.length < _maxCollectionCandidates) {
       final songIds = await _songCollectionIds(
@@ -371,10 +373,35 @@ class AnimatedArtworkService {
       );
       for (final id in songIds) {
         final art = await _fetchBoiduById(id);
-        if (art != null && art.hasMotion) return art;
+        if (art != null &&
+            art.hasMotion &&
+            _boiduArtMatches(art, album, artist)) {
+          return art;
+        }
       }
     }
     return _fetchBoiduAlbumText(album, artist, storefront);
+  }
+
+  /// Whether a boidu `?id=` response is trustworthy for [album]/[artist].
+  ///
+  /// The proxy echoes whatever collection id it was given, so an unvalidated
+  /// response can belong to a different edition or album entirely. The text
+  /// search path validates its matches; this brings the id probes to the same
+  /// standard without rejecting responses that simply omit a field.
+  bool _boiduArtMatches(AnimatedArtwork art, String album, String artist) {
+    if (art.name.isNotEmpty &&
+        !MotionArtAlbumMatcher.nameMatchesAlbum(
+          requested: album,
+          candidate: art.name,
+        )) {
+      return false;
+    }
+    if (art.artist.isNotEmpty &&
+        !MotionArtAlbumMatcher.artistMatches(artist, art.artist)) {
+      return false;
+    }
+    return true;
   }
 
   /// Ranked album-entity candidates, best edition first.

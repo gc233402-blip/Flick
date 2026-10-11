@@ -924,6 +924,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get buildFlavor => 'Build Flavor';
+
+  @override
+  String get buildFlavorFull => 'full — direct download build';
+
+  @override
+  String get buildFlavorPlay => 'play — Google Play build';
+
+  @override
   String get buildingYourMusicHome => 'Building your music home';
 
   @override
@@ -936,7 +945,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buttons => 'Buttons';
 
   @override
-  String get buyMeACoffee => 'Buy me a coffee';
+  String get buyMeACoffee => 'Buy Me a Coffee';
 
   @override
   String by(Object arg1, Object arg2) {
@@ -2793,9 +2802,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goodMorning => 'Good morning';
 
   @override
-  String get googlePlayDeveloperFees => 'Google Play Developer Fees';
-
-  @override
   String get gotIt => 'Got it';
 
   @override
@@ -3206,10 +3212,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get keepingFlickOnThePlayStore =>
-      'Keeping Flick on the Play Store costs \$25/year in developer registration fees.';
-
-  @override
   String keepingOfToRemove(Object keptCount, Object arg1, Object removeCount) {
     return 'Keeping $keptCount of $arg1 • $removeCount to remove';
   }
@@ -3258,6 +3260,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String khzBitCh(Object arg1, Object arg2, Object arg3) {
     return '${arg1}kHz / ${arg2}bit / ${arg3}ch';
   }
+
+  @override
+  String get koFi => 'Ko-fi';
 
   @override
   String get label => 'Label';
@@ -5076,6 +5081,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reset => 'Reset';
 
   @override
+  String get resetArtwork => 'Reset artwork';
+
+  @override
+  String get resetArtworkDescription =>
+      'Re-detect artwork from this album\'s files? Auto-detected covers are replaced with artwork read from the files; custom artwork is kept.';
+
+  @override
+  String resetArtworkFor(Object arg1) {
+    return 'Reset artwork for \"$arg1\".';
+  }
+
+  @override
+  String resetArtworkFor2(Object arg1) {
+    return 'Reset artwork for \"$arg1\".';
+  }
+
+  @override
   String get resetDeclinedUsbDacs => 'Reset Declined USB DACs';
 
   @override
@@ -6372,6 +6394,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get support => 'Support';
+
+  @override
+  String get supportDevelopmentOnBuyMeACoffee =>
+      'Support development on Buy Me a Coffee';
 
   @override
   String get supportDevelopmentOnKoFi => 'Support development on Ko-fi';

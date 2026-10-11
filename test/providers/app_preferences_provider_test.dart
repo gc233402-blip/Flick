@@ -100,4 +100,24 @@ void main() {
       expect(preferences.getBool('app_connection_notices_enabled'), isTrue);
     },
   );
+
+  test('refresh rate defaults to adaptive on new installations', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    container.read(appPreferencesProvider);
+    await pumpEventQueue();
+    expect(container.read(appPreferencesProvider).refreshRateMode, 'adaptive');
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('app_refresh_rate_mode'), 'adaptive');
+  });
+
+  test('refresh rate keeps the previous default on existing installations', () async {
+    SharedPreferences.setMockInitialValues({'onboarding_completed': true});
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    container.read(appPreferencesProvider);
+    await pumpEventQueue();
+    expect(container.read(appPreferencesProvider).refreshRateMode, 'high');
+  });
 }

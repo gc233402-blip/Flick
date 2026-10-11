@@ -6,6 +6,7 @@ import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/adaptive_colors.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 /// Shared detail-screen header: full-bleed art fading into the page
@@ -333,11 +334,15 @@ class DetailMoreSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: AppBottomSheetSurface.decoration,
+      // Surface reaches the bottom edge; content clears the system
+      // gesture/navigation inset.
+      padding: EdgeInsets.fromLTRB(
+        24,
+        24,
+        24,
+        24 + MediaQuery.paddingOf(context).bottom,
       ),
-      padding: const EdgeInsets.symmetric(vertical: 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

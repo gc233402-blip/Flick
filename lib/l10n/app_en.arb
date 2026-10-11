@@ -1247,6 +1247,18 @@
       }
     }
   },
+  "buildFlavor": "Build Flavor",
+  "@buildFlavor": {
+    "description": "lib/features/settings/screens/app_info_settings_screen.dart:655"
+  },
+  "buildFlavorFull": "full — direct download build",
+  "@buildFlavorFull": {
+    "description": "lib/features/settings/screens/app_info_settings_screen.dart:83"
+  },
+  "buildFlavorPlay": "play — Google Play build",
+  "@buildFlavorPlay": {
+    "description": "lib/features/settings/screens/app_info_settings_screen.dart:84"
+  },
   "buildingYourMusicHome": "Building your music home",
   "@buildingYourMusicHome": {
     "description": "lib/features/menu/screens/menu_screen.dart:2252"
@@ -1263,9 +1275,9 @@
   "@buttons": {
     "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:110"
   },
-  "buyMeACoffee": "Buy me a coffee",
+  "buyMeACoffee": "Buy Me a Coffee",
   "@buyMeACoffee": {
-    "description": "lib/features/settings/screens/support_flick_screen.dart:212"
+    "description": "Buy Me a Coffee donation option label on the Support Flick screen."
   },
   "by": "\"{arg1}\" by {arg2}",
   "@by": {
@@ -3795,10 +3807,6 @@
   "@goodMorning": {
     "description": "lib/features/menu/screens/menu_screen.dart:274"
   },
-  "googlePlayDeveloperFees": "Google Play Developer Fees",
-  "@googlePlayDeveloperFees": {
-    "description": "lib/features/settings/screens/support_flick_screen.dart:166"
-  },
   "gotIt": "Got it",
   "@gotIt": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:721"
@@ -4357,10 +4365,6 @@
       }
     }
   },
-  "keepingFlickOnThePlayStore": "Keeping Flick on the Play Store costs $25/year in developer registration fees.",
-  "@keepingFlickOnThePlayStore": {
-    "description": "lib/features/settings/screens/support_flick_screen.dart:168"
-  },
   "keepingOfToRemove": "Keeping {keptCount} of {arg1} • {removeCount} to remove",
   "@keepingOfToRemove": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:1019",
@@ -4460,6 +4464,10 @@
         "type": "Object"
       }
     }
+  },
+  "koFi": "Ko-fi",
+  "@koFi": {
+    "description": "Ko-fi donation option label on the Support Flick screen."
   },
   "label": "Label",
   "@label": {
@@ -6874,6 +6882,32 @@
   "@reset": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:339"
   },
+  "resetArtwork": "Reset artwork",
+  "@resetArtwork": {
+    "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:207"
+  },
+  "resetArtworkDescription": "Re-detect artwork from this album's files? Auto-detected covers are replaced with artwork read from the files; custom artwork is kept.",
+  "@resetArtworkDescription": {
+    "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:208"
+  },
+  "resetArtworkFor": "Reset artwork for \"{arg1}\".",
+  "@resetArtworkFor": {
+    "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:231",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "resetArtworkFor2": "Reset artwork for \"{arg1}\".",
+  "@resetArtworkFor2": {
+    "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:232",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "resetDeclinedUsbDacs": "Reset Declined USB DACs",
   "@resetDeclinedUsbDacs": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:512"
@@ -8546,6 +8580,10 @@
   "support": "Support",
   "@support": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:703"
+  },
+  "supportDevelopmentOnBuyMeACoffee": "Support development on Buy Me a Coffee",
+  "@supportDevelopmentOnBuyMeACoffee": {
+    "description": "Buy Me a Coffee donation option subtitle on the Support Flick screen."
   },
   "supportDevelopmentOnKoFi": "Support development on Ko-fi",
   "@supportDevelopmentOnKoFi": {

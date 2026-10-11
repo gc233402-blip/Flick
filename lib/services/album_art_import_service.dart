@@ -9,6 +9,9 @@ import 'package:path_provider/path_provider.dart';
 import '../core/utils/string_sort_utils.dart';
 import '../data/repositories/song_repository.dart';
 import '../models/song.dart';
+import 'album_art_service.dart';
+import 'player_service.dart';
+import 'sources/network_source_service.dart';
 
 class AlbumArtImportException implements Exception {
   const AlbumArtImportException(this.message);
@@ -289,6 +292,74 @@ class AlbumArtImportService {
       albumArtist: song.albumArtist ?? song.artist,
       albumArtPath: null,
       filePaths: [filePath],
+    );
+  }
+
+  /// Clears auto-resolved artwork for an album and re-derives it from the
+  /// files themselves. Custom (user-picked) artwork is left untouched.
+  Future<AlbumArtUpdateResult> resetArtwork(Song song) async {
+    final group = await _resolveAlbumGroup(song);
+    return _resetArtworkEntries(
+      albumName: group.albumName,
+      albumArtist: group.albumArtist,
+      songs: group.songs,
+    );
+  }
+
+  /// Like [resetArtwork] but only for [song].
+  Future<AlbumArtUpdateResult> resetArtworkForSong(Song song) async {
+    return _resetArtworkEntries(
+      albumName: song.album ?? song.title,
+      albumArtist: song.albumArtist ?? song.artist,
+      songs: [song],
+    );
+  }
+
+  Future<AlbumArtUpdateResult> _resetArtworkEntries({
+    required String albumName,
+    required String albumArtist,
+    required List<Song> songs,
+  }) async {
+    final filePaths = <String>[];
+    for (final entry in songs) {
+      final path = entry.filePath;
+      if (path == null || path.isEmpty) continue;
+      if (isCustomArtworkPath(entry.albumArt)) continue;
+      // Network songs keep their server cover marker in the DB; re-resolving
+      // without it would drop the artwork instead of refreshing it.
+      if (isSupportedNetworkProtocol(Uri.tryParse(path)?.scheme)) continue;
+      filePaths.add(path);
+    }
+
+    if (filePaths.isEmpty) {
+      throw const AlbumArtImportException(
+        'No library files were found for this album.',
+      );
+    }
+
+    for (final path in filePaths) {
+      await _songRepository.updateAlbumArtPath(path, null);
+    }
+
+    // Drop stale in-memory artwork first so a reset is visible immediately,
+    // then re-derive per file (a successful resolve syncs on its own).
+    PlayerService().syncAlbumArtPaths(filePaths: filePaths, albumArtPath: null);
+
+    final artService = AlbumArtService.instance;
+    for (final path in filePaths) {
+      artService.evictFolderCoverCache(path);
+      try {
+        await artService.resolveArtworkPath(audioSourcePath: path);
+      } catch (_) {
+        // Best effort: CachedImageWidget retries on the next build.
+      }
+    }
+
+    return AlbumArtUpdateResult(
+      albumName: albumName,
+      albumArtist: albumArtist,
+      albumArtPath: null,
+      filePaths: filePaths,
     );
   }
 

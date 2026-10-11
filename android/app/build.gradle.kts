@@ -27,6 +27,9 @@ android {
 
     buildFeatures {
         compose = true
+        // BuildConfig.FLAVOR is surfaced in App Info so users can tell the
+        // `full` and `play` builds apart.
+        buildConfig = true
     }
 
     signingConfigs {

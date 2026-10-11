@@ -19,6 +19,7 @@ import 'package:flick/services/gallery_save_service.dart';
 import 'package:flick/services/lyrics_service.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 class ShareBottomSheet extends ConsumerStatefulWidget {
@@ -216,12 +217,13 @@ class _ShareBottomSheetState extends ConsumerState<ShareBottomSheet> {
     final templates = ShareTemplate.values;
 
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border.all(color: AppColors.glassBorder),
+      decoration: AppBottomSheetSurface.decoration,
+      padding: EdgeInsets.fromLTRB(
+        20,
+        16,
+        20,
+        24 + MediaQuery.paddingOf(context).bottom,
       ),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

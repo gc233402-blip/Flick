@@ -14,6 +14,7 @@ import 'package:flick/providers/providers.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 class PlayerLayoutSheet extends ConsumerStatefulWidget {
   final PlayerService playerService;
@@ -64,17 +65,12 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
     final prefsNotifier = ref.read(appPreferencesProvider.notifier);
     return SafeArea(
       top: false,
+      bottom: false,
       child: Container(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.9,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(24),
-          ),
-          border: Border.all(color: AppColors.glassBorder),
-        ),
+        decoration: AppBottomSheetSurface.decoration,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -173,7 +169,14 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
             ),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                // Surface reaches the bottom edge; content clears the system
+                // gesture/navigation inset.
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  12,
+                  20,
+                  24 + MediaQuery.paddingOf(context).bottom,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,

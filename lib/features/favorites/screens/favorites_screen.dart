@@ -15,6 +15,7 @@ import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
@@ -147,14 +148,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppConstants.radiusXl),
-          ),
-        ),
-        padding: const EdgeInsets.only(
-          bottom: AppConstants.spacingLg,
+        decoration: AppBottomSheetSurface.decoration,
+        padding: EdgeInsets.only(
+          bottom: AppConstants.spacingLg + MediaQuery.paddingOf(context).bottom,
           top: AppConstants.spacingSm,
         ),
         child: Column(

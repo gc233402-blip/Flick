@@ -209,7 +209,7 @@ class AppPreferences {
     this.floatingIslandEnabled = false,
     this.autoFocusSearch = false,
     this.searchPlaybackMode = 'results',
-    this.refreshRateMode = 'high',
+    this.refreshRateMode = 'adaptive',
     this.visualizerEnabled = true,
     this.orbitRadiusRatio = 1.0,
     this.orbitCenterOffsetRatio = -0.5,
@@ -800,7 +800,7 @@ class AppPreferencesService {
       autoFocusSearch: prefs.getBool(_autoFocusSearchKey) ?? false,
       searchPlaybackMode:
           prefs.getString(_searchPlaybackModeKey) ?? 'results',
-      refreshRateMode: prefs.getString(_refreshRateModeKey) ?? 'high',
+      refreshRateMode: await _resolveRefreshRateMode(prefs),
       visualizerEnabled: prefs.getBool(_visualizerEnabledKey) ?? true,
       orbitRadiusRatio: prefs.getDouble(_orbitRadiusRatioKey) ?? 1.0,
       orbitCenterOffsetRatio:
@@ -1775,9 +1775,37 @@ class AppPreferencesService {
     await prefs.setString(_searchPlaybackModeKey, value);
   }
 
+  /// Whether the preference store was found empty by
+  /// [captureInstallFreshness] during startup. Distinguishes new
+  /// installations from ones that predate the adaptive refresh-rate default.
+  static bool? _freshInstallAtStartup;
+
+  /// Snapshots whether this is a brand-new installation. Call once from
+  /// `main()` before any other service can write to the preference store.
+  static Future<void> captureInstallFreshness() async {
+    final prefs = await SharedPreferences.getInstance();
+    _freshInstallAtStartup = prefs.getKeys().isEmpty;
+  }
+
+  /// Resolves the refresh-rate mode, choosing the right default for new
+  /// versus existing installations and persisting it on first read.
+  ///
+  /// New installations start on `adaptive` so Flick follows the system
+  /// refresh rate (moss-apps/Flick#210); installations that already have a
+  /// preference store keep the previous `high` default. Persisting the
+  /// result keeps the choice stable across later launches and updates.
+  Future<String> _resolveRefreshRateMode(SharedPreferences prefs) async {
+    final stored = prefs.getString(_refreshRateModeKey);
+    if (stored != null) return stored;
+    final isFreshInstall = _freshInstallAtStartup ?? prefs.getKeys().isEmpty;
+    final resolved = isFreshInstall ? 'adaptive' : 'high';
+    await prefs.setString(_refreshRateModeKey, resolved);
+    return resolved;
+  }
+
   Future<String> getRefreshRateMode() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_refreshRateModeKey) ?? 'high';
+    return _resolveRefreshRateMode(prefs);
   }
 
   Future<void> setRefreshRateMode(String value) async {

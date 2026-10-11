@@ -20,6 +20,7 @@ import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
+import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
 /// Groups songs by immediate subfolder relative to [prefix] within [folderUri].
@@ -2229,94 +2230,95 @@ class _FolderRootSortSheetState extends State<_FolderRootSortSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    return Container(
+      decoration: AppBottomSheetSurface.decoration,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      child: SingleChildScrollView(
+        // Surface reaches the bottom edge; content clears the system
+        // gesture/navigation inset.
+        padding: EdgeInsets.fromLTRB(
+          16,
+          12,
+          16,
+          24 + MediaQuery.paddingOf(context).bottom,
         ),
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7,
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHandle(),
-              const SizedBox(height: 16),
-              _buildSectionHeader(context, l10n.sortBy),
-              const SizedBox(height: 8),
-              ...FolderRootSortOption.values.map(
-                (option) => _buildSortTile(context, option),
-              ),
-              const SizedBox(height: 16),
-              const Divider(color: AppColors.glassBorder, height: 1),
-              const SizedBox(height: 12),
-              _buildSectionHeader(context, l10n.folderLimit),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.foldersShownPerPage,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: context.adaptiveTextTertiary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.glassBackgroundStrong,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      '${_pageSize.round()}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: context.adaptiveTextSecondary,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHandle(),
+            const SizedBox(height: 16),
+            _buildSectionHeader(context, l10n.sortBy),
+            const SizedBox(height: 8),
+            ...FolderRootSortOption.values.map(
+              (option) => _buildSortTile(context, option),
+            ),
+            const SizedBox(height: 16),
+            const Divider(color: AppColors.glassBorder, height: 1),
+            const SizedBox(height: 12),
+            _buildSectionHeader(context, l10n.folderLimit),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.foldersShownPerPage,
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: context.adaptiveTextTertiary),
                       ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.glassBackgroundStrong,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '${_pageSize.round()}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: context.adaptiveTextSecondary,
                     ),
                   ),
-                ],
-              ),
-              SliderTheme(
-                data: SliderThemeData(
-                  activeTrackColor: AppColors.textPrimary.withValues(
-                    alpha: 0.9,
-                  ),
-                  inactiveTrackColor: AppColors.glassBackgroundStrong,
-                  thumbColor: AppColors.textPrimary,
-                  overlayColor: AppColors.textPrimary.withValues(alpha: 0.15),
-                  trackHeight: 4,
-                  thumbShape: const RoundSliderThumbShape(
-                    enabledThumbRadius: 10,
-                  ),
                 ),
-                child: Slider(
-                  value: _pageSize,
-                  min: _minPageSize,
-                  max: _maxPageSize,
-                  divisions: (_maxPageSize - _minPageSize).round(),
-                  onChanged: (value) {
-                    setState(() => _pageSize = value);
-                    widget.onPageSizeChanged(value.round());
-                  },
+              ],
+            ),
+            SliderTheme(
+              data: SliderThemeData(
+                activeTrackColor: AppColors.textPrimary.withValues(
+                  alpha: 0.9,
+                ),
+                inactiveTrackColor: AppColors.glassBackgroundStrong,
+                thumbColor: AppColors.textPrimary,
+                overlayColor: AppColors.textPrimary.withValues(alpha: 0.15),
+                trackHeight: 4,
+                thumbShape: const RoundSliderThumbShape(
+                  enabledThumbRadius: 10,
                 ),
               ),
-            ],
-          ),
+              child: Slider(
+                value: _pageSize,
+                min: _minPageSize,
+                max: _maxPageSize,
+                divisions: (_maxPageSize - _minPageSize).round(),
+                onChanged: (value) {
+                  setState(() => _pageSize = value);
+                  widget.onPageSizeChanged(value.round());
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -2440,44 +2442,45 @@ class _FolderBrowserSortSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    return Container(
+      decoration: AppBottomSheetSurface.decoration,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      child: SingleChildScrollView(
+        // Surface reaches the bottom edge; content clears the system
+        // gesture/navigation inset.
+        padding: EdgeInsets.fromLTRB(
+          16,
+          12,
+          16,
+          24 + MediaQuery.paddingOf(context).bottom,
         ),
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7,
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHandle(),
-              const SizedBox(height: 16),
-              _buildSectionHeader(context, l10n.sortBy),
-              const SizedBox(height: 8),
-              ...FolderBrowserSortOption.values.map(
-                (option) => _buildSortTile(context, option),
-              ),
-              const SizedBox(height: 16),
-              const Divider(color: AppColors.glassBorder, height: 1),
-              const SizedBox(height: 12),
-              _buildSectionHeader(context, l10n.filterByFormat),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: SongFileTypeFilter.values
-                    .map((filter) => _buildFilterChip(context, filter))
-                    .toList(),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHandle(),
+            const SizedBox(height: 16),
+            _buildSectionHeader(context, l10n.sortBy),
+            const SizedBox(height: 8),
+            ...FolderBrowserSortOption.values.map(
+              (option) => _buildSortTile(context, option),
+            ),
+            const SizedBox(height: 16),
+            const Divider(color: AppColors.glassBorder, height: 1),
+            const SizedBox(height: 12),
+            _buildSectionHeader(context, l10n.filterByFormat),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: SongFileTypeFilter.values
+                  .map((filter) => _buildFilterChip(context, filter))
+                  .toList(),
+            ),
+            const SizedBox(height: 8),
+          ],
         ),
       ),
     );

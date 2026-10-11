@@ -878,6 +878,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get buildFlavor => '发行渠道';
+
+  @override
+  String get buildFlavorFull => 'full — 直接下载版本';
+
+  @override
+  String get buildFlavorPlay => 'play — Google Play 版本';
+
+  @override
   String get buildingYourMusicHome => '正在构建你的音乐主页';
 
   @override
@@ -2656,9 +2665,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get goodMorning => '早上好';
 
   @override
-  String get googlePlayDeveloperFees => 'Google Play 开发者费用';
-
-  @override
   String get gotIt => '知道了';
 
   @override
@@ -3039,10 +3045,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get keepingFlickOnThePlayStore =>
-      '让 Flick 留在 Play 商店，每年需支付 25 美元的开发者注册费。';
-
-  @override
   String keepingOfToRemove(Object keptCount, Object arg1, Object removeCount) {
     return '保留 $keptCount/$arg1 • 待移除 $removeCount';
   }
@@ -3088,6 +3090,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String khzBitCh(Object arg1, Object arg2, Object arg3) {
     return '${arg1}kHz / ${arg2}bit / ${arg3}ch';
   }
+
+  @override
+  String get koFi => 'Ko-fi';
 
   @override
   String get label => '标签';
@@ -4791,6 +4796,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reset => '重置';
 
   @override
+  String get resetArtwork => '重置专辑封面';
+
+  @override
+  String get resetArtworkDescription =>
+      '重新从该专辑的文件中检测封面？自动识别的封面将被替换为从文件中读取的封面；自定义封面将保留。';
+
+  @override
+  String resetArtworkFor(Object arg1) {
+    return '已重置“$arg1”的专辑封面。';
+  }
+
+  @override
+  String resetArtworkFor2(Object arg1) {
+    return '已重置“$arg1”的专辑封面。';
+  }
+
+  @override
   String get resetDeclinedUsbDacs => '重置已拒绝的 USB DAC';
 
   @override
@@ -5970,6 +5992,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get support => '支持';
+
+  @override
+  String get supportDevelopmentOnBuyMeACoffee => '在 Buy Me a Coffee 上支持开发';
 
   @override
   String get supportDevelopmentOnKoFi => '在 Ko-fi 上支持开发';

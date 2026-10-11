@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.22.2-beta.4 (2026-10-11)
+
+### Display Modes
+- **New installs follow the system refresh rate by default**: a fresh installation now starts on the Adaptive refresh-rate mode instead of forcing the highest rate. Existing installations keep the mode they already use, and Settings → Interface → Refresh Rate still offers Adaptive, 60 Hz, and maximum.
+- **Forced refresh rates are verified after they are applied**: if the system ignores or downgrades the request (seen on some Fairphone 6 firmware), Flick returns to the system default, logs the mismatch in the developer log, and stops re-forcing for the session.
+- Refresh-rate requests are no longer re-sent on every screen mount and resume; redundant applies are skipped.
+
 ## 0.22.1-beta.3 (2026-09-30)
 
 ### Audio Reliability

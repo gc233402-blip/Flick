@@ -17,6 +17,7 @@ import 'package:flick/features/settings/screens/privacy_policy_screen.dart';
 import 'package:flick/features/settings/screens/support_flick_screen.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/providers/providers.dart';
+import 'package:flick/services/build_info_service.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
@@ -39,9 +40,12 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
   late final AnimationController _donationPulseController;
   late final Animation<double> _donationPulseAnimation;
 
+  String? _buildFlavor;
+
   @override
   void initState() {
     super.initState();
+    _loadBuildFlavor();
     _donationPulseController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -68,6 +72,18 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
       SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
+
+  Future<void> _loadBuildFlavor() async {
+    final flavor = await BuildInfoService().getBuildFlavor();
+    if (!mounted || flavor == null) return;
+    setState(() => _buildFlavor = flavor);
+  }
+
+  String _buildFlavorSubtitle(String flavor) => switch (flavor) {
+        'full' => l10n.buildFlavorFull,
+        'play' => l10n.buildFlavorPlay,
+        _ => flavor,
+      };
 
   Future<void> _checkForUpdatesManually() async {
     await ref.read(updateCheckProvider.notifier).refreshIfOnline(force: true);
@@ -632,6 +648,14 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                 subtitle: l10n.version(kAppVersion),
                 onTap: _showAboutBottomSheet,
               ),
+              if (_buildFlavor != null) ...[
+                const SettingsDivider(),
+                InfoSetting(
+                  icon: LucideIcons.package,
+                  title: l10n.buildFlavor,
+                  subtitle: _buildFlavorSubtitle(_buildFlavor!),
+                ),
+              ],
               const SettingsDivider(),
               NavigationSetting(
                 icon: LucideIcons.fileText,
