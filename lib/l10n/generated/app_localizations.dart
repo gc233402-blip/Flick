@@ -4868,12 +4868,6 @@ abstract class AppLocalizations {
   /// **'Good morning'**
   String get goodMorning;
 
-  /// lib/features/settings/screens/support_flick_screen.dart:166
-  ///
-  /// In en, this message translates to:
-  /// **'Google Play Developer Fees'**
-  String get googlePlayDeveloperFees;
-
   /// lib/features/player/screens/lyrics_sync_screen.dart:721
   ///
   /// In en, this message translates to:
@@ -5563,12 +5557,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keeping • {type} • {br}'**
   String keeping(Object type, Object br);
-
-  /// lib/features/settings/screens/support_flick_screen.dart:168
-  ///
-  /// In en, this message translates to:
-  /// **'One-time \$25 developer registration fee to publish Flick on the Play Store.'**
-  String get keepingFlickOnThePlayStore;
 
   /// lib/features/settings/screens/duplicate_cleaner_screen.dart:1019
   ///

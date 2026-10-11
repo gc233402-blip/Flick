@@ -3807,10 +3807,6 @@
   "@goodMorning": {
     "description": "lib/features/menu/screens/menu_screen.dart:274"
   },
-  "googlePlayDeveloperFees": "Google Play Developer Fees",
-  "@googlePlayDeveloperFees": {
-    "description": "lib/features/settings/screens/support_flick_screen.dart:166"
-  },
   "gotIt": "Got it",
   "@gotIt": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:721"
@@ -4368,10 +4364,6 @@
         "type": "Object"
       }
     }
-  },
-  "keepingFlickOnThePlayStore": "One-time $25 developer registration fee to publish Flick on the Play Store.",
-  "@keepingFlickOnThePlayStore": {
-    "description": "lib/features/settings/screens/support_flick_screen.dart:168"
   },
   "keepingOfToRemove": "Keeping {keptCount} of {arg1} • {removeCount} to remove",
   "@keepingOfToRemove": {

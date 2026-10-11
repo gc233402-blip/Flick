@@ -164,13 +164,6 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
                   SettingsCard(
                     children: [
                       _InfoTile(
-                        icon: LucideIcons.smartphone,
-                        title: l10n.googlePlayDeveloperFees,
-                        subtitle:
-                            l10n.keepingFlickOnThePlayStore,
-                      ),
-                      const SettingsDivider(),
-                      _InfoTile(
                         icon: LucideIcons.headphones,
                         title: l10n.audioTestingEquipment,
                         subtitle:

@@ -2802,9 +2802,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goodMorning => 'Good morning';
 
   @override
-  String get googlePlayDeveloperFees => 'Google Play Developer Fees';
-
-  @override
   String get gotIt => 'Got it';
 
   @override
@@ -3213,10 +3210,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String keeping(Object type, Object br) {
     return 'Keeping • $type • $br';
   }
-
-  @override
-  String get keepingFlickOnThePlayStore =>
-      'One-time \$25 developer registration fee to publish Flick on the Play Store.';
 
   @override
   String keepingOfToRemove(Object keptCount, Object arg1, Object removeCount) {

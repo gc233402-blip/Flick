@@ -2665,9 +2665,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get goodMorning => '早上好';
 
   @override
-  String get googlePlayDeveloperFees => 'Google Play 开发者费用';
-
-  @override
   String get gotIt => '知道了';
 
   @override
@@ -3046,10 +3043,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String keeping(Object type, Object br) {
     return '保留 • $type • $br';
   }
-
-  @override
-  String get keepingFlickOnThePlayStore =>
-      '在 Play 商店发布 Flick 的一次性 25 美元开发者注册费。';
 
   @override
   String keepingOfToRemove(Object keptCount, Object arg1, Object removeCount) {
