@@ -15,6 +15,7 @@ import '../services/fingerprint_cache_service.dart';
 import '../services/uac2_preferences_service.dart';
 import '../services/audio_preload_service.dart';
 import '../services/album_art_service.dart';
+import '../services/album_art_import_service.dart';
 import '../services/apple_music/apple_music_settings.dart';
 import '../services/apple_music/auto_metadata_enricher.dart';
 import '../services/artwork_backfill_tracker.dart';
@@ -764,7 +765,11 @@ class LibraryScannerService {
         ..lastModified = DateTime.fromMillisecondsSinceEpoch(file.lastModified)
         ..folderUri = folderUri
         ..fileSize = file.size
-        ..albumArtPath = existing?.albumArtPath
+        ..albumArtPath = _carriedArtworkPath(
+          existing,
+          lastModified: DateTime.fromMillisecondsSinceEpoch(file.lastModified),
+          fileSize: file.size,
+        )
         ..bitrate = file.bitrate != null
             ? AudioMetadataUtils.bitrateFromBitsPerSecond(
                 int.tryParse(file.bitrate!),
@@ -1698,7 +1703,13 @@ class LibraryScannerService {
           ..folderUri = folderUri
           ..relativeFolderPath = basic.relativeFolderPath
           ..fileSize = basic.size
-          ..albumArtPath = existingMap[basic.uri]?.albumArtPath
+          ..albumArtPath = _carriedArtworkPath(
+            existing,
+            lastModified: DateTime.fromMillisecondsSinceEpoch(
+              basic.lastModified,
+            ),
+            fileSize: basic.size,
+          )
           ..bitrate = meta?.bitrate != null
               ? AudioMetadataUtils.bitrateFromBitsPerSecond(
                   int.tryParse(meta!.bitrate!),
@@ -1971,7 +1982,13 @@ class LibraryScannerService {
             )
             ..folderUri = folderUri
             ..fileSize = metadata.fileSize.toInt()
-            ..albumArtPath = existing?.albumArtPath
+            ..albumArtPath = _carriedArtworkPath(
+              existing,
+              lastModified: DateTime.fromMillisecondsSinceEpoch(
+                metadata.lastModified,
+              ),
+              fileSize: metadata.fileSize.toInt(),
+            )
             ..bitrate = AudioMetadataUtils.normalizeStoredBitrateKbps(
               metadata.bitrate,
               sampleRate: metadata.sampleRate,
@@ -2216,6 +2233,7 @@ class LibraryScannerService {
               final ripLog = logMap[audioPath];
               final lastModified =
                   rawEntity?.lastModified ??
+                  fallbackSource?.lastModified ??
                   DateTime.fromMillisecondsSinceEpoch(
                     DateTime.now().millisecondsSinceEpoch,
                   );
@@ -3212,6 +3230,50 @@ class LibraryScannerService {
     song.hasLocalEdits = true;
   }
 
+  /// Whether an existing artwork pointer can safely move to a rebuilt row.
+  /// User-picked overrides always survive; auto-resolved art only while the
+  /// source file is unchanged, so a re-tagged file drops the pointer and the
+  /// post-scan backfill re-derives its cover from the current tags.
+  @visibleForTesting
+  static bool canCarryArtworkPointer({
+    required String? albumArtPath,
+    required bool isCustom,
+    required DateTime? existingLastModified,
+    required int? existingFileSize,
+    required DateTime? lastModified,
+    required int? fileSize,
+  }) {
+    if (albumArtPath == null || albumArtPath.isEmpty) return false;
+    if (isCustom) return true;
+    final sameTimestamp = existingLastModified == lastModified;
+    final sameSize = fileSize == null || existingFileSize == fileSize;
+    return sameTimestamp && sameSize;
+  }
+
+  String? _carriedArtworkPath(
+    SongEntity? existing, {
+    required DateTime? lastModified,
+    required int? fileSize,
+  }) {
+    final path = existing?.albumArtPath;
+    if (existing == null || path == null || path.isEmpty) return null;
+    final carried = canCarryArtworkPointer(
+      albumArtPath: path,
+      isCustom: AlbumArtImportService.instance.isCustomArtworkPath(path),
+      existingLastModified: existing.lastModified,
+      existingFileSize: existing.fileSize,
+      lastModified: lastModified,
+      fileSize: fileSize,
+    );
+    if (!carried) {
+      devLog(
+        '[LibraryScanner] dropped stale artwork pointer for '
+        '${existing.filePath}',
+      );
+    }
+    return carried ? path : null;
+  }
+
   List<SongEntity> _buildCueTrackEntities({
     required String audioUri,
     required CueSheet cueSheet,
@@ -3268,7 +3330,11 @@ class LibraryScannerService {
         ..folderUri = folderUri
         ..relativeFolderPath = relativeFolderPath
         ..fileSize = meta?.size ?? 0
-        ..albumArtPath = existing?.albumArtPath ?? meta?.albumArtPath
+        ..albumArtPath = _carriedArtworkPath(
+          existing,
+          lastModified: lastModified,
+          fileSize: meta?.size,
+        )
         ..bitrate = meta?.bitrate != null
             ? AudioMetadataUtils.bitrateFromBitsPerSecond(
                 int.tryParse(meta!.bitrate!),
