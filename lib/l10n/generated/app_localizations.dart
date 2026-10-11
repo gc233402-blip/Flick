@@ -8731,6 +8731,30 @@ abstract class AppLocalizations {
   /// **'Reset'**
   String get reset;
 
+  /// lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:207
+  ///
+  /// In en, this message translates to:
+  /// **'Reset artwork'**
+  String get resetArtwork;
+
+  /// lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:208
+  ///
+  /// In en, this message translates to:
+  /// **'Re-detect artwork from this album\'s files? Auto-detected covers are replaced with artwork read from the files; custom artwork is kept.'**
+  String get resetArtworkDescription;
+
+  /// lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:231
+  ///
+  /// In en, this message translates to:
+  /// **'Reset artwork for \"{arg1}\".'**
+  String resetArtworkFor(Object arg1);
+
+  /// lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:232
+  ///
+  /// In en, this message translates to:
+  /// **'Reset artwork for \"{arg1}\".'**
+  String resetArtworkFor2(Object arg1);
+
   /// lib/features/settings/screens/uac2_preferences_screen.dart:512
   ///
   /// In en, this message translates to:

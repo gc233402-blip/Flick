@@ -5076,6 +5076,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reset => 'Reset';
 
   @override
+  String get resetArtwork => 'Reset artwork';
+
+  @override
+  String get resetArtworkDescription =>
+      'Re-detect artwork from this album\'s files? Auto-detected covers are replaced with artwork read from the files; custom artwork is kept.';
+
+  @override
+  String resetArtworkFor(Object arg1) {
+    return 'Reset artwork for \"$arg1\".';
+  }
+
+  @override
+  String resetArtworkFor2(Object arg1) {
+    return 'Reset artwork for \"$arg1\".';
+  }
+
+  @override
   String get resetDeclinedUsbDacs => 'Reset Declined USB DACs';
 
   @override

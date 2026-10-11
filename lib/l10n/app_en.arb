@@ -6874,6 +6874,32 @@
   "@reset": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:339"
   },
+  "resetArtwork": "Reset artwork",
+  "@resetArtwork": {
+    "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:207"
+  },
+  "resetArtworkDescription": "Re-detect artwork from this album's files? Auto-detected covers are replaced with artwork read from the files; custom artwork is kept.",
+  "@resetArtworkDescription": {
+    "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:208"
+  },
+  "resetArtworkFor": "Reset artwork for \"{arg1}\".",
+  "@resetArtworkFor": {
+    "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:231",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "resetArtworkFor2": "Reset artwork for \"{arg1}\".",
+  "@resetArtworkFor2": {
+    "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:232",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
   "resetDeclinedUsbDacs": "Reset Declined USB DACs",
   "@resetDeclinedUsbDacs": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:512"

@@ -4791,6 +4791,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reset => '重置';
 
   @override
+  String get resetArtwork => '重置专辑封面';
+
+  @override
+  String get resetArtworkDescription =>
+      '重新从该专辑的文件中检测封面？自动识别的封面将被替换为从文件中读取的封面；自定义封面将保留。';
+
+  @override
+  String resetArtworkFor(Object arg1) {
+    return '已重置“$arg1”的专辑封面。';
+  }
+
+  @override
+  String resetArtworkFor2(Object arg1) {
+    return '已重置“$arg1”的专辑封面。';
+  }
+
+  @override
   String get resetDeclinedUsbDacs => '重置已拒绝的 USB DAC';
 
   @override
