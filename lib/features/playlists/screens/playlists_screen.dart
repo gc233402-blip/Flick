@@ -17,6 +17,7 @@ import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/features/playlists/screens/playlist_detail_screen.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/providers/player_provider.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class PlaylistsScreen extends ConsumerWidget {
   const PlaylistsScreen({super.key});
@@ -80,7 +81,7 @@ class PlaylistsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Playlists',
+                  l10n.playlists,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
@@ -88,8 +89,8 @@ class PlaylistsScreen extends ConsumerWidget {
                 ),
                 Text(
                   count == 0
-                      ? 'Your custom collections'
-                      : '$count playlist${count == 1 ? '' : 's'}',
+                      ? l10n.yourCustomCollections
+                      : l10n.playlist(count),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),
@@ -115,33 +116,33 @@ class PlaylistsScreen extends ConsumerWidget {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'create',
                   child: Row(
                     children: [
                       Icon(LucideIcons.plus, size: 18),
                       SizedBox(width: 8),
-                      Text('Create Playlist'),
+                      Text(l10n.createPlaylist),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'import_m3u',
                   child: Row(
                     children: [
                       Icon(LucideIcons.fileUp, size: 18),
                       SizedBox(width: 8),
-                      Text('Import M3U/M3U8'),
+                      Text(l10n.importM3uM3u8),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'sync_servers',
                   child: Row(
                     children: [
                       Icon(LucideIcons.refreshCw, size: 18),
                       SizedBox(width: 8),
-                      Text('Sync Server Playlists'),
+                      Text(l10n.syncServerPlaylists),
                     ],
                   ),
                 ),
@@ -173,7 +174,7 @@ class PlaylistsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppConstants.spacingMd),
             Text(
-              'Error loading playlists',
+              l10n.errorLoadingPlaylists,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: context.adaptiveTextSecondary,
               ),
@@ -231,7 +232,7 @@ class PlaylistsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppConstants.spacingXl),
             Text(
-              'No Playlists Yet',
+              l10n.noPlaylistsYet2,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: context.adaptiveTextSecondary,
                 fontWeight: FontWeight.w600,
@@ -239,7 +240,7 @@ class PlaylistsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppConstants.spacingSm),
             Text(
-              'Create your first playlist to organize\nyour favorite songs',
+              l10n.createYourFirstPlaylistToOrganize,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.adaptiveTextTertiary,
@@ -325,9 +326,9 @@ class PlaylistsScreen extends ConsumerWidget {
   Future<bool> _showDeleteDialog(BuildContext context, WidgetRef ref) {
     return FlickDialogs.confirm(
       context,
-      title: 'Delete Playlist',
-      message: 'Are you sure you want to delete this playlist?',
-      confirmLabel: 'Delete',
+      title: l10n.deletePlaylist,
+      message: l10n.areYouSureYouWantTo,
+      confirmLabel: l10n.delete,
       destructive: true,
     );
   }
@@ -344,16 +345,16 @@ class PlaylistsScreen extends ConsumerWidget {
 
     showFlickDialog(
       context: context,
-      barrierLabel: 'Create Playlist',
+      barrierLabel: l10n.createPlaylist,
       builder: (dialogContext) => StatefulBuilder(
         builder: (innerContext, setDialogState) => FlickDialog(
-          title: 'Create Playlist',
+          title: l10n.createPlaylist,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               FlickTextField(
                 controller: controller,
-                hint: 'Playlist name',
+                hint: l10n.playlistName,
                 autofocus: true,
                 onSubmitted: (_) => _createPlaylist(
                   context,
@@ -369,7 +370,7 @@ class PlaylistsScreen extends ConsumerWidget {
                 DropdownButtonFormField<int>(
                   initialValue: serverId,
                   decoration: InputDecoration(
-                    labelText: 'Store on',
+                    labelText: l10n.storeOn,
                     labelStyle: TextStyle(color: context.adaptiveTextTertiary),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: AppColors.glassBorder),
@@ -378,9 +379,9 @@ class PlaylistsScreen extends ConsumerWidget {
                   style: TextStyle(color: context.adaptiveTextPrimary),
                   dropdownColor: AppColors.surface,
                   items: [
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: 0,
-                      child: Text('This device'),
+                      child: Text(l10n.thisDevice),
                     ),
                     for (final server in servers)
                       DropdownMenuItem(
@@ -396,11 +397,11 @@ class PlaylistsScreen extends ConsumerWidget {
           ),
           actions: [
             FlickDialogButton(
-              label: 'Cancel',
+              label: l10n.cancel,
               onPressed: () => Navigator.pop(dialogContext),
             ),
             FlickDialogButton(
-              label: 'Create',
+              label: l10n.create,
               style: FlickDialogButtonStyle.primary,
               onPressed: () => _createPlaylist(
                 context,
@@ -427,7 +428,7 @@ class PlaylistsScreen extends ConsumerWidget {
   }) async {
     if (name.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a playlist name')),
+        SnackBar(content: Text(l10n.pleaseEnterAPlaylistName)),
       );
       return;
     }
@@ -440,8 +441,8 @@ class PlaylistsScreen extends ConsumerWidget {
     if (playlist == null) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('A playlist with this name already exists'),
+          SnackBar(
+            content: Text(l10n.aPlaylistWithThisNameAlready),
           ),
         );
       }
@@ -454,7 +455,7 @@ class PlaylistsScreen extends ConsumerWidget {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Playlist "${playlist.name}" created')),
+        SnackBar(content: Text(l10n.playlistCreated(playlist.name))),
       );
     }
   }
@@ -469,8 +470,8 @@ class PlaylistsScreen extends ConsumerWidget {
         SnackBar(
           content: Text(
             synced == 0
-                ? 'No server playlists found'
-                : 'Synced $synced playlist${synced == 1 ? '' : 's'} from servers',
+                ? l10n.noServerPlaylistsFound
+                : l10n.syncedPlaylistFromServers(synced),
           ),
         ),
       );
@@ -478,7 +479,7 @@ class PlaylistsScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Server playlist sync failed: $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.serverPlaylistSyncFailed(e))));
     }
   }
 
@@ -490,12 +491,12 @@ class PlaylistsScreen extends ConsumerWidget {
       if (result == null || !context.mounted) return;
 
       final unmatchedText = result.unmatchedEntries > 0
-          ? ' Skipped ${result.unmatchedEntries} unmatched entr${result.unmatchedEntries == 1 ? 'y' : 'ies'}.'
+          ? l10n.skippedUnmatchedEntr(result.unmatchedEntries)
           : '';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Imported "${result.playlist.name}" with ${result.importedSongs} songs.$unmatchedText',
+            l10n.importedWithSongs(result.playlist.name, result.importedSongs, unmatchedText),
           ),
         ),
       );
@@ -503,7 +504,7 @@ class PlaylistsScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Import failed: $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.importFailed(e))));
     }
   }
 
@@ -522,7 +523,7 @@ class PlaylistsScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Exported ${result.exportedSongs} songs to "${result.fileName}".',
+            l10n.exportedSongsTo(result.exportedSongs, result.fileName),
           ),
         ),
       );
@@ -530,7 +531,7 @@ class PlaylistsScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Export failed: $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.exportFailed(e))));
     }
   }
 }
@@ -589,8 +590,8 @@ class _PlaylistCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         serverLabel == null
-                            ? '${playlist.songIds.length} song${playlist.songIds.length == 1 ? '' : 's'}'
-                            : '${playlist.songIds.length} song${playlist.songIds.length == 1 ? '' : 's'} · $serverLabel',
+                            ? l10n.song2(playlist.songIds.length)
+                            : l10n.song3(playlist.songIds.length, serverLabel!),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: context.adaptiveTextTertiary,
                         ),
@@ -619,23 +620,23 @@ class _PlaylistCard extends StatelessWidget {
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'export_m3u',
                       child: Row(
                         children: [
                           Icon(LucideIcons.fileDown, size: 18),
                           SizedBox(width: 8),
-                          Text('Export as .m3u'),
+                          Text(l10n.exportAsM3u),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'export_m3u8',
                       child: Row(
                         children: [
                           Icon(LucideIcons.fileDown, size: 18),
                           SizedBox(width: 8),
-                          Text('Export as .m3u8'),
+                          Text(l10n.exportAsM3u8),
                         ],
                       ),
                     ),
@@ -646,7 +647,7 @@ class _PlaylistCard extends StatelessWidget {
                         children: [
                           Icon(LucideIcons.trash2, color: Colors.red, size: 18),
                           const SizedBox(width: 8),
-                          Text('Delete', style: TextStyle(color: Colors.red)),
+                          Text(l10n.delete, style: TextStyle(color: Colors.red)),
                         ],
                       ),
                     ),

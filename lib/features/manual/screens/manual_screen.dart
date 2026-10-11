@@ -7,6 +7,7 @@ import 'package:flick/features/manual/data/manual_data.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/widgets/common/glass_search_bar.dart';
+import 'package:flick/l10n/l10n.dart';
 
 class ManualScreen extends ConsumerStatefulWidget {
   final String? initialSection;
@@ -128,9 +129,9 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
           : Stack(
               alignment: Alignment.center,
               children: [
-                const Center(
+                Center(
                   child: Text(
-                    'Manual',
+                    l10n.manual,
                     style: TextStyle(
                       fontFamily: 'ProductSans',
                       fontSize: 22,
@@ -195,7 +196,7 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
               controller: _searchController,
               autofocus: true,
               textInputAction: TextInputAction.search,
-              hintText: 'Search the manual...',
+              hintText: l10n.searchTheManual,
               showBackground: false,
               onChanged: (v) => setState(() => _query = v),
             ),
@@ -221,7 +222,7 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
               ),
               const SizedBox(height: AppConstants.spacingMd),
               Text(
-                'No matches for "$_query"',
+                l10n.noMatchesFor(_query),
                 style: const TextStyle(
                   fontFamily: 'ProductSans',
                   color: AppColors.textSecondary,

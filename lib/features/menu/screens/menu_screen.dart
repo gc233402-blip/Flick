@@ -38,6 +38,7 @@ import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/engine_restart_notice.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/widgets/uac2/uac2_volume_control.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Music-home menu screen inspired by streaming app landing pages.
 class MenuScreen extends ConsumerStatefulWidget {
@@ -226,7 +227,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
       }
       if (!launched && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open the Play Store.')),
+          SnackBar(content: Text(l10n.couldNotOpenThePlayStore)),
         );
       }
     } catch (error) {
@@ -234,7 +235,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open the Play Store: $error')),
+        SnackBar(content: Text(l10n.couldNotOpenThePlayStore2(error))),
       );
     }
   }
@@ -271,9 +272,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
 
   String _greetingForNow() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return l10n.goodMorning;
+    if (hour < 18) return l10n.goodAfternoon;
+    return l10n.goodEvening;
   }
 
   Widget _buildWelcomeCard(BuildContext context, WidgetRef ref) {
@@ -302,7 +303,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome to Flick!',
+                      l10n.welcomeToFlick,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: context.adaptiveTextPrimary,
                         fontWeight: FontWeight.w700,
@@ -310,7 +311,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                     ),
                     const SizedBox(height: AppConstants.spacingSm),
                     Text(
-                      'This app is built by a solo developer with zero budget. If you love high-fidelity audio, consider supporting its development on Ko-fi.',
+                      l10n.thisAppIsBuiltByA,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.adaptiveTextSecondary,
                         height: 1.4,
@@ -364,7 +365,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                 backgroundColor: AppColors.glassBackgroundStrong,
               ),
               child: Text(
-                'Support Flick',
+                l10n.supportFlick,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: context.adaptiveTextPrimary,
                 ),
@@ -383,15 +384,15 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
   }) {
     final (title, icon) = switch (engine) {
       AudioEnginePreference.exoPlayer => (
-        'Standard Engine',
+        l10n.standardEngine,
         LucideIcons.smartphone,
       ),
       AudioEnginePreference.rustOboe => (
-        'High Quality Engine',
+        l10n.highQualityEngine,
         LucideIcons.audioLines,
       ),
       AudioEnginePreference.isochronousUsb => (
-        'Bit-perfect (USB DAC)',
+        l10n.bitPerfectUsbDac,
         LucideIcons.usb,
       ),
     };
@@ -461,7 +462,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
 
     await GlassBottomSheet.show<void>(
       context: context,
-      title: 'Choose Audio Engine',
+      title: l10n.chooseAudioEngine,
       // Pop via the sheet's own context; the caller's context would pop the
       // nested tab navigator and wipe every tab.
       content: Builder(
@@ -470,7 +471,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'The audio engine determines how your music is played back. Each option balances reliability, quality, and compatibility differently.',
+              l10n.theAudioEngineDeterminesHowYour,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.adaptiveTextTertiary,
                 height: 1.45,
@@ -479,9 +480,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
             const SizedBox(height: AppConstants.spacingMd),
             _buildEngineOption(
               context,
-              title: 'Standard',
+              title: l10n.standard,
               subtitle:
-                  'Default Android player — plays everything reliably. The safest choice for most listeners.',
+                  l10n.defaultAndroidPlayerPlaysEverything,
               icon: LucideIcons.smartphone,
               selected: current == AudioEnginePreference.exoPlayer,
               onTap: () => _selectEngine(
@@ -494,9 +495,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
             const SizedBox(height: AppConstants.spacingSm),
             _buildEngineOption(
               context,
-              title: 'High Quality',
+              title: l10n.highQuality,
               subtitle:
-                  'Our Rust-powered engine. Cleaner sound and smoother playback — recommended for daily listening.',
+                  l10n.ourRustPoweredEngineCleanerSound,
               icon: LucideIcons.audioLines,
               selected: current == AudioEnginePreference.rustOboe,
               onTap: () => _selectEngine(
@@ -509,9 +510,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
             const SizedBox(height: AppConstants.spacingSm),
             _buildEngineOption(
               context,
-              title: 'Bit-perfect (USB DAC)',
+              title: l10n.bitPerfectUsbDac,
               subtitle:
-                  "Studio-grade output for external DACs and headphone amps. Bypasses Android's audio processing for pure sound.",
+                  l10n.studioGradeOutputForExternalDacs,
               icon: LucideIcons.usb,
               selected: current == AudioEnginePreference.isochronousUsb,
               onTap: () => _selectEngine(
@@ -850,9 +851,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                         SliverToBoxAdapter(
                           child: _buildSection(
                             context,
-                            title: 'Made For You',
+                            title: l10n.madeForYou,
                             subtitle:
-                                'Generated from your listening habits, favorites, and newest additions.',
+                                l10n.generatedFromYourListeningHabitsFavorites,
                             child: SizedBox(
                               height: 222,
                               child: ListView.separated(
@@ -893,9 +894,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                         SliverToBoxAdapter(
                           child: _buildSection(
                             context,
-                            title: 'Artists In Rotation',
+                            title: l10n.artistsInRotation,
                             subtitle:
-                                'The names showing up again and again in your recent queue.',
+                                l10n.theNamesShowingUpAgainAnd,
                             child: SizedBox(
                               height: 172,
                               child: ListView.separated(
@@ -937,15 +938,15 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                         SliverToBoxAdapter(
                           child: _buildSection(
                             context,
-                            title: 'Recently Played',
+                            title: l10n.recentlyPlayed,
                             subtitle:
-                                'Pick up exactly where your last sessions left off.',
+                                l10n.pickUpExactlyWhereYourLast,
                             trailing: TextButton(
                               onPressed: () => _navigateTo(
                                 context,
                                 const RecentlyPlayedScreen(),
                               ),
-                              child: const Text('See all'),
+                              child: Text(l10n.seeAll),
                             ),
                             child: SizedBox(
                               height: 212,
@@ -978,15 +979,15 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                         SliverToBoxAdapter(
                           child: _buildSection(
                             context,
-                            title: 'Your Playlists',
+                            title: l10n.yourPlaylists,
                             subtitle: playlists.isEmpty
-                                ? 'Create your first playlist or jump into your saved collections.'
-                                : 'Saved playlists and quick jumps into your library organization.',
+                                ? l10n.createYourFirstPlaylistOrJump
+                                : l10n.savedPlaylistsAndQuickJumpsInto,
                             trailing: TextButton(
                               onPressed: () =>
                                   _navigateTo(context, const PlaylistsScreen()),
                               child: Text(
-                                playlists.isEmpty ? 'Create' : 'See all',
+                                playlists.isEmpty ? l10n.create : l10n.seeAll,
                               ),
                             ),
                             child: playlists.isEmpty
@@ -995,9 +996,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                                         horizontal: AppConstants.spacingLg,
                                       ),
                                       child: _EmptyShelfCard(
-                                        title: 'No playlists yet',
+                                        title: l10n.noPlaylistsYet,
                                         subtitle:
-                                            'Create a playlist, import an M3U, or let the mixes above carry the session.',
+                                            l10n.createAPlaylistImportAnM3u,
                                         icon: LucideIcons.listMusic,
                                         onTap: () => _navigateTo(
                                           context,
@@ -1068,7 +1069,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
           return switch (index) {
             0 => _BrowseChip(
               icon: LucideIcons.library,
-              label: 'Library',
+              label: l10n.libraryLabel,
               onTap: () {
                 if (widget.onNavigateToTab != null) {
                   widget.onNavigateToTab!(1);
@@ -1079,28 +1080,28 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
             ),
             1 => _BrowseChip(
               icon: LucideIcons.disc,
-              label: 'Albums',
+              label: l10n.albums,
               onTap: () => _navigateTo(context, const AlbumsScreen()),
             ),
             2 => _BrowseChip(
               icon: LucideIcons.folder,
-              label: 'Folders',
+              label: l10n.folders,
               onTap: () => _navigateTo(context, const FoldersScreen()),
             ),
             3 => _BrowseChip(
               icon: LucideIcons.list,
-              label: 'Queue',
+              label: l10n.queue,
               onTap: () => _navigateTo(context, const QueueScreen()),
             ),
             4 => _BrowseChip(
               icon: Icons.auto_graph_rounded,
-              label: 'Flick Replay',
+              label: l10n.flickReplay,
               highlighted: true,
               onTap: () => _navigateTo(context, const ListeningRecapScreen()),
             ),
             _ => _BrowseChip(
               icon: LucideIcons.users,
-              label: 'Artists',
+              label: l10n.artists,
               onTap: () => _navigateTo(context, const ArtistsScreen()),
             ),
           };
@@ -1138,7 +1139,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                 ),
                 const SizedBox(height: AppConstants.spacingXs),
                 Text(
-                  '$songCount tracks, $favoriteCount liked songs, $playlistCount playlists',
+                  l10n.tracksLikedSongsPlaylists(songCount, favoriteCount, playlistCount),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextSecondary,
                     height: 1.45,
@@ -1208,7 +1209,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Update Available',
+                  l10n.updateAvailable,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -1216,7 +1217,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                 ),
                 const SizedBox(height: AppConstants.spacingXxs),
                 Text(
-                  'A newer Flick build is on the Play Store.',
+                  l10n.aNewerFlickBuildIsOn,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.white.withValues(alpha: 0.8),
                     height: 1.35,
@@ -1229,7 +1230,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
           FilledButton.icon(
             onPressed: _openPlayStoreListing,
             icon: const Icon(LucideIcons.externalLink, size: 14),
-            label: const Text('Update'),
+            label: Text(l10n.update),
             style: FilledButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF0F1720),
@@ -1250,13 +1251,13 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
                 ..removeCurrentSnackBar()
                 ..showSnackBar(
                   SnackBar(
-                    content: const Text(
-                      'Update notice hidden.',
+                    content: Text(
+                      l10n.updateNoticeHidden,
                     ),
                     behavior: SnackBarBehavior.floating,
                     duration: const Duration(seconds: 4),
                     action: SnackBarAction(
-                      label: 'Undo',
+                      label: l10n.undo,
                       onPressed: () =>
                           setState(() => _showUpdateNotice = true),
                     ),
@@ -1290,24 +1291,24 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
     final hasNowPlaying = currentSong != null;
 
     final title = hasNowPlaying
-        ? 'Now Playing'
+        ? l10n.nowPlaying
         : featuredSong != null
-        ? 'Jump Back In'
-        : 'Start Building Your Home';
+        ? l10n.jumpBackIn
+        : l10n.startBuildingYourHome;
     final subtitle = hasNowPlaying
-        ? 'Keep the session moving or head straight back to the player.'
+        ? l10n.keepTheSessionMovingOrHead
         : featuredSong != null
-        ? 'Resume a familiar favorite or shuffle one of the mixes made from your listening.'
-        : 'Play a few songs and this page will start filling with mixes, artists, and shortcuts.';
+        ? l10n.resumeAFamiliarFavoriteOrShuffle
+        : l10n.playAFewSongsAndThis;
 
     final primaryLabel = hasNowPlaying
-        ? 'Open Player'
+        ? l10n.openPlayer
         : featuredSong != null
-        ? 'Play Again'
-        : 'Open Library';
+        ? l10n.playAgain
+        : l10n.openLibrary;
 
     final secondaryLabel = favoriteSongs.isNotEmpty
-        ? 'Shuffle Favorites'
+        ? l10n.shuffleFavorites
         : null;
 
     Future<void> handlePrimaryTap() async {
@@ -1341,10 +1342,10 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
     final featureTile = _HeroFeatureTile(
       song: featuredSong,
       eyebrow: hasNowPlaying
-          ? 'Streaming from queue'
+          ? l10n.streamingFromQueue
           : featuredSong != null
-          ? 'Last pick'
-          : 'No playback yet',
+          ? l10n.lastPick
+          : l10n.noPlaybackYet,
     );
 
     final primaryButton = _HeroActionButton(
@@ -1390,48 +1391,48 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
   }) {
     final cards = [
       _QuickAccessItem(
-        title: 'Favorite Songs',
+        title: l10n.favoriteSongs,
         subtitle: favoritesCount == 0
-            ? 'Liked songs live here'
-            : '$favoritesCount tracks ready to revisit',
+            ? l10n.likedSongsLiveHere
+            : l10n.tracksReadyToRevisit(favoritesCount),
         icon: LucideIcons.heart,
         gradient: const [Color(0xFF4B153D), Color(0xFF862A62)],
         artPath: homeData.favoriteArtPath,
         onTap: () => _navigateTo(context, const FavoritesScreen()),
       ),
       _QuickAccessItem(
-        title: 'Recently Played',
+        title: l10n.recentlyPlayed,
         subtitle: homeData.recentTracks.isEmpty
-            ? 'Your session history'
-            : '${homeData.recentTracks.length} recent picks on hand',
+            ? l10n.yourSessionHistory
+            : l10n.recentPicksOnHand(homeData.recentTracks.length),
         icon: LucideIcons.clock3,
         gradient: const [Color(0xFF133858), Color(0xFF175F80)],
         artPath: homeData.recentTracks.firstOrNull?.albumArt,
         onTap: () => _navigateTo(context, const RecentlyPlayedScreen()),
       ),
       _QuickAccessItem(
-        title: 'Recently Added',
-        subtitle: 'Your latest library scans',
+        title: l10n.recentlyAdded,
+        subtitle: l10n.yourLatestLibraryScans,
         icon: LucideIcons.sparkles,
         gradient: const [Color(0xFF3B1B6B), Color(0xFF6D28D9)],
         artPath: null,
         onTap: () => _navigateTo(context, const RecentlyAddedScreen()),
       ),
       _QuickAccessItem(
-        title: 'Artists',
+        title: l10n.artists,
         subtitle: homeData.recentArtists.isEmpty
-            ? 'Browse your artist library'
-            : '${homeData.recentArtists.first.name} and more in rotation',
+            ? l10n.browseYourArtistLibrary
+            : l10n.andMoreInRotation(homeData.recentArtists.first.name),
         icon: LucideIcons.users,
         gradient: const [Color(0xFF1E4223), Color(0xFF416A2A)],
         artPath: homeData.recentArtists.firstOrNull?.artPath,
         onTap: () => _navigateTo(context, const ArtistsScreen()),
       ),
       _QuickAccessItem(
-        title: 'Playlists',
+        title: l10n.playlists,
         subtitle: playlistCount == 0
-            ? 'Create a collection'
-            : '$playlistCount saved collections',
+            ? l10n.createACollection
+            : l10n.savedCollections(playlistCount),
         icon: LucideIcons.listMusic,
         gradient: const [Color(0xFF533116), Color(0xFF875214)],
         artPath: homeData.playlistPreviews.firstOrNull?.coverArtPath,
@@ -1730,44 +1731,44 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
 
     final mixes = <_SmartMix>[
       _SmartMix(
-        title: 'On Repeat',
-        subtitle: 'Your heaviest rotation right now',
-        description: 'The tracks dominating your weekly and monthly recap.',
+        title: l10n.onRepeat,
+        subtitle: l10n.yourHeaviestRotationRightNow,
+        description: l10n.theTracksDominatingYourWeeklyAnd,
         icon: LucideIcons.repeat,
         colors: const [Color(0xFF5B1FA6), Color(0xFFB33EF5)],
         songs: onRepeatSongs,
       ),
       _SmartMix(
-        title: 'Repeat Rewind',
-        subtitle: 'Favorites you have not revisited lately',
+        title: l10n.repeatRewind,
+        subtitle: l10n.favoritesYouHaveNotRevisitedLately,
         description:
-            'Earlier standouts pulled back into view from your listening history.',
+            l10n.earlierStandoutsPulledBackIntoView,
         icon: LucideIcons.history,
         colors: const [Color(0xFF15466A), Color(0xFF3BA6D6)],
         songs: rewindSongs,
       ),
       _SmartMix(
-        title: 'Heavy Rotation',
-        subtitle: 'Likes and replays blended together',
+        title: l10n.heavyRotation,
+        subtitle: l10n.likesAndReplaysBlendedTogether,
         description:
-            'A tighter mix of favorites and the songs you keep circling back to.',
+            l10n.aTighterMixOfFavoritesAnd,
         icon: LucideIcons.radio,
         colors: const [Color(0xFF194F36), Color(0xFF66C56A)],
         songs: heavyRotationSongs,
       ),
       _SmartMix(
-        title: 'Fresh Additions',
-        subtitle: 'Latest arrivals from your library',
-        description: 'Recently added tracks waiting for more play time.',
+        title: l10n.freshAdditions,
+        subtitle: l10n.latestArrivalsFromYourLibrary,
+        description: l10n.recentlyAddedTracksWaitingForMore,
         icon: LucideIcons.sparkles,
         colors: const [Color(0xFF845114), Color(0xFFE1A53D)],
         songs: freshAdditionsSongs,
       ),
       _SmartMix(
-        title: 'After Hours',
-        subtitle: 'Pulled from your late-session plays',
+        title: l10n.afterHours,
+        subtitle: l10n.pulledFromYourLateSessionPlays,
         description:
-            'Tracks that fit the quieter side of your listening habits.',
+            l10n.tracksThatFitTheQuieterSide,
         icon: LucideIcons.moonStar,
         colors: const [Color(0xFF172145), Color(0xFF5561D6)],
         songs: afterHoursSongs,
@@ -1819,17 +1820,17 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
         .toList();
 
     if (uniqueArtists.isEmpty) {
-      return 'Personal playlist';
+      return l10n.personalPlaylist;
     }
     if (uniqueArtists.length == 1) {
       return uniqueArtists.first;
     }
-    return '${uniqueArtists.first} + ${uniqueArtists.length - 1} more';
+    return l10n.more2(uniqueArtists.first, uniqueArtists.length - 1);
   }
 
   String _normalizeArtist(String rawArtist) {
     final trimmed = rawArtist.trim();
-    return trimmed.isEmpty ? 'Unknown Artist' : trimmed;
+    return trimmed.isEmpty ? l10n.unknownArtist : trimmed;
   }
 
   List<Song> _dedupeSongs(Iterable<Song> songs) {
@@ -2234,7 +2235,7 @@ class _MenuLoadingState extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingLg),
           Text(
-            'Building your music home',
+            l10n.buildingYourMusicHome,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: context.adaptiveTextPrimary,
               fontWeight: FontWeight.w700,
@@ -2242,7 +2243,7 @@ class _MenuLoadingState extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingXs),
           Text(
-            'Loading favorites, recent sessions, generated mixes, and playlists.',
+            l10n.loadingFavoritesRecentSessionsGenerated,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: context.adaptiveTextTertiary,
@@ -2311,7 +2312,7 @@ class _HeroFeatureTile extends StatelessWidget {
                 ),
                 const SizedBox(height: AppConstants.spacingXxs),
                 Text(
-                  song?.title ?? 'No featured track yet',
+                  song?.title ?? l10n.noFeaturedTrackYet,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -2321,7 +2322,7 @@ class _HeroFeatureTile extends StatelessWidget {
                 ),
                 const SizedBox(height: AppConstants.spacingXxs),
                 Text(
-                  song?.artist ?? 'Start playing to populate this space',
+                  song?.artist ?? l10n.startPlayingToPopulateThisSpace,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -2590,7 +2591,7 @@ class _SmartMixCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      '${mix.songs.length} songs',
+                      l10n.songs3(mix.songs.length),
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: Colors.white.withValues(alpha: 0.72),
                       ),
@@ -2682,7 +2683,7 @@ class _ArtistShelfCard extends StatelessWidget {
               ),
               const SizedBox(height: AppConstants.spacingXxs),
               Text(
-                '${artist.plays} plays',
+                l10n.plays(artist.plays),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
@@ -2862,7 +2863,7 @@ class _PlaylistPreviewCard extends StatelessWidget {
                       border: Border.all(color: AppColors.glassBorder),
                     ),
                     child: Text(
-                      '${preview.songCount} songs',
+                      l10n.songs3(preview.songCount),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: context.adaptiveTextSecondary,
                         fontWeight: FontWeight.w700,
@@ -3174,21 +3175,21 @@ class _PlaylistPreview {
     final difference = now.difference(updatedAt);
 
     if (difference.inDays <= 0) {
-      return 'Today';
+      return l10n.today;
     }
     if (difference.inDays == 1) {
-      return 'Yesterday';
+      return l10n.yesterday;
     }
     if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
+      return l10n.dAgo(difference.inDays);
     }
     if (difference.inDays < 30) {
-      return '${(difference.inDays / 7).floor()}w ago';
+      return l10n.wAgo((difference.inDays / 7).floor());
     }
     if (difference.inDays < 365) {
-      return '${(difference.inDays / 30).floor()}mo ago';
+      return l10n.moAgo((difference.inDays / 30).floor());
     }
-    return '${(difference.inDays / 365).floor()}y ago';
+    return l10n.yAgo((difference.inDays / 365).floor());
   }
 }
 
