@@ -783,31 +783,35 @@ class _AlbumSortSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      child: SingleChildScrollView(
+        // Surface reaches the bottom edge; content clears the system
+        // gesture/navigation inset.
+        padding: EdgeInsets.fromLTRB(
+          16,
+          12,
+          16,
+          24 + MediaQuery.paddingOf(context).bottom,
         ),
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7,
-        ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHandle(),
-              const SizedBox(height: 16),
-              _buildSectionHeader(context, l10n.sortBy),
-              const SizedBox(height: 8),
-              ...AlbumSortOption.values.map(
-                (option) => _buildSortTile(context, option),
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHandle(),
+            const SizedBox(height: 16),
+            _buildSectionHeader(context, l10n.sortBy),
+            const SizedBox(height: 8),
+            ...AlbumSortOption.values.map(
+              (option) => _buildSortTile(context, option),
+            ),
+          ],
         ),
       ),
     );

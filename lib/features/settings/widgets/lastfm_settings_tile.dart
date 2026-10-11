@@ -117,6 +117,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
             top: Radius.circular(AppConstants.radiusLg),
           ),
         ),
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -307,6 +308,9 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(AppConstants.radiusLg),
                   ),
+                ),
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.paddingOf(ctx).bottom,
                 ),
                 child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -790,6 +794,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
             top: Radius.circular(AppConstants.radiusLg),
           ),
         ),
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

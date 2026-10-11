@@ -64,6 +64,7 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
     final prefsNotifier = ref.read(appPreferencesProvider.notifier);
     return SafeArea(
       top: false,
+      bottom: false,
       child: Container(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.9,
@@ -173,7 +174,14 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
             ),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                // Surface reaches the bottom edge; content clears the system
+                // gesture/navigation inset.
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  12,
+                  20,
+                  24 + MediaQuery.paddingOf(context).bottom,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,

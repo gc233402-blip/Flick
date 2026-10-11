@@ -153,8 +153,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             top: Radius.circular(AppConstants.radiusXl),
           ),
         ),
-        padding: const EdgeInsets.only(
-          bottom: AppConstants.spacingLg,
+        padding: EdgeInsets.only(
+          bottom: AppConstants.spacingLg + MediaQuery.paddingOf(context).bottom,
           top: AppConstants.spacingSm,
         ),
         child: Column(

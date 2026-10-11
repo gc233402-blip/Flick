@@ -43,9 +43,23 @@ class AppBottomSheetSurface extends StatelessWidget {
         ? mediaQuery.size.height * maxHeightRatio!
         : mediaQuery.size.height * 0.85;
 
+    // The sheet surface paints all the way to the bottom edge of the screen.
+    // The system gesture/navigation inset is handled by bottom padding so
+    // content stays clear of the system bars without lifting the surface.
+    final effectivePadding =
+        (padding ??
+                const EdgeInsets.fromLTRB(
+                  AppConstants.spacingLg,
+                  AppConstants.spacingSm,
+                  AppConstants.spacingLg,
+                  AppConstants.spacingLg,
+                ))
+            .add(EdgeInsets.only(bottom: mediaQuery.padding.bottom));
+
     return RepaintBoundary(
       child: SafeArea(
         top: false,
+        bottom: false,
         child: GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           behavior: HitTestBehavior.opaque,
@@ -57,14 +71,7 @@ class AppBottomSheetSurface extends StatelessWidget {
                 constraints: BoxConstraints(maxHeight: maxHeight),
                 child: Container(
                   decoration: decoration,
-                  padding:
-                      padding ??
-                      EdgeInsets.fromLTRB(
-                        AppConstants.spacingLg,
-                        AppConstants.spacingSm,
-                        AppConstants.spacingLg,
-                        mediaQuery.padding.bottom + AppConstants.spacingLg,
-                      ),
+                  padding: effectivePadding,
                   child: child,
                 ),
               ),
@@ -163,13 +170,10 @@ class GlassBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-
     return AppBottomSheetSurface(
       maxHeightRatio: maxHeightRatio,
-      padding: EdgeInsets.only(
-        bottom: mediaQuery.padding.bottom + AppConstants.spacingLg,
-      ),
+      // The surface adds the bottom system inset automatically.
+      padding: const EdgeInsets.only(bottom: AppConstants.spacingLg),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

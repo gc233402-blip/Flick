@@ -59,6 +59,7 @@ class _ListenBrainzSettingsTileState
             top: Radius.circular(AppConstants.radiusLg),
           ),
         ),
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -223,6 +224,7 @@ class _ListenBrainzSettingsTileState
             top: Radius.circular(AppConstants.radiusLg),
           ),
         ),
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -629,6 +631,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
             top: Radius.circular(AppConstants.radiusLg),
           ),
         ),
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

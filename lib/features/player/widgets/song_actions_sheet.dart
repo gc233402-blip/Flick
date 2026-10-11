@@ -80,6 +80,7 @@ class SongActionsSheet extends ConsumerWidget {
           final activeSong = currentSong ?? song;
           return SafeArea(
             top: false,
+            bottom: false,
             child: Container(
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(sheetContext).size.height * 0.5,
@@ -95,7 +96,10 @@ class SongActionsSheet extends ConsumerWidget {
                 context.responsive(16.0, 18.0, 20.0),
                 context.responsive(10.0, 11.0, 12.0),
                 context.responsive(16.0, 18.0, 20.0),
-                context.responsive(20.0, 22.0, 24.0),
+                // Surface reaches the bottom edge; content clears the system
+                // gesture/navigation inset.
+                context.responsive(20.0, 22.0, 24.0) +
+                    MediaQuery.paddingOf(sheetContext).bottom,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
