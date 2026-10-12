@@ -704,7 +704,24 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
     final isDop = widget.deviceStatus?.currentFormat?.isDop ?? false;
     final isNativeDsd = widget.deviceStatus?.currentFormat?.isNativeDsd ?? false;
     if (isDop || isNativeDsd || widget.song.isDsd) {
-      final dsdLabel = isNativeDsd ? l10n.nativeDsd : isDop ? l10n.dop : 'DSD';
+      // The device-status format is derived from the DSD preference, not from
+      // what the engine actually negotiated (e.g. an Auto multichannel source
+      // converts to PCM). Prefer the runtime mode when diagnostics carry it.
+      final actualDsdMode = d?.dsdEffectiveMode;
+      final String dsdLabel;
+      if (actualDsdMode == 'native') {
+        dsdLabel = l10n.nativeDsd;
+      } else if (actualDsdMode == 'dop') {
+        dsdLabel = l10n.dop;
+      } else if (actualDsdMode == 'pcm') {
+        dsdLabel = 'PCM conversion';
+      } else {
+        dsdLabel = isNativeDsd
+            ? l10n.nativeDsd
+            : isDop
+                ? l10n.dop
+                : 'DSD';
+      }
       rows.add(_buildRow(context, label: l10n.dsdMode, value: dsdLabel));
     }
 
