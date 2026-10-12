@@ -47,6 +47,17 @@ import 'package:flick/services/casting/casting_service.dart';
 import 'package:flick/core/utils/app_log.dart';
 import 'package:flick/core/utils/dev_log.dart';
 
+/// Coalesce progress updates without indefinitely postponing diagnostics.
+@visibleForTesting
+Timer coalescePlaybackDiagnosticsRefresh({
+  required Timer? pending,
+  required Duration interval,
+  required VoidCallback refresh,
+}) {
+  if (pending != null && pending.isActive) return pending;
+  return Timer(interval, refresh);
+}
+
 /// Volume Control State Machine:
 ///
 /// Tier evaluation: [determineVolumeTier] — for the direct USB / DAP
@@ -62,8 +73,8 @@ enum VolumeTier { hardware, software, system, unavailable }
 /// Pure tier decision for [PlayerService._determineCurrentTier].
 ///
 /// - Outside the bit-perfect volume path: Rust → software, else system.
-/// - DoP: only DAC hardware volume (or the opt-in PCM-decimation switch)
-///   can change level — software gain corrupts DoP markers.
+/// - Wire DSD (DoP or USB native): only DAC hardware volume, or the opt-in
+///   PCM-decimation switch, can change level. Software gain corrupts the data.
 /// - Hardware mode trusted → hardware tier.
 /// - Otherwise engine gain only works on the DSP path; bit-perfect
 ///   passthrough must never be scaled → unavailable.
@@ -76,15 +87,17 @@ VolumeTier determineVolumeTier({
   required bool isPassthrough,
   required bool usingRustBackend,
 }) {
-  if (!isBitPerfectVolumePath) {
-    return usingRustBackend ? VolumeTier.software : VolumeTier.system;
-  }
   final hwTrusted = volumeMode == Uac2VolumeMode.hardware && !hwVolumeFailed;
+  // Wire DSD is protected even when the user's PCM bit-perfect toggle is off.
+  // `isDoP` also covers USB native DSD: neither may enter the gain path.
   if (isDoP) {
     if (hwTrusted) return VolumeTier.hardware;
     return autoSwitchDsdForVolume
         ? VolumeTier.software
         : VolumeTier.unavailable;
+  }
+  if (!isBitPerfectVolumePath) {
+    return usingRustBackend ? VolumeTier.software : VolumeTier.system;
   }
   if (hwTrusted) return VolumeTier.hardware;
   return isPassthrough ? VolumeTier.unavailable : VolumeTier.software;
@@ -554,6 +567,10 @@ class PlayerService {
   /// Lie-detector: set when a DAC that claimed hardware volume rejects
   /// writes or fails the GET_CUR health check.
   bool _hwVolumeFailed = false;
+  int? _hardwareVolumeGeneration;
+  String? _activeUsbDsdMode;
+  String? _activeUsbDsdSongId;
+  bool _switchingDsdForVolume = false;
   VolumeTier _activeTier = VolumeTier.system;
 
   // Timer to periodically save position
@@ -881,6 +898,9 @@ class PlayerService {
   void _mirrorUsbVolumeFromUac2Status(Uac2DeviceStatus? status) {
     if (status == null) {
       _hwVolumeFailed = false;
+      _hardwareVolumeGeneration = null;
+      _activeUsbDsdMode = null;
+      _activeUsbDsdSongId = null;
       unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
       return;
     }
@@ -889,16 +909,13 @@ class PlayerService {
     if (!status.hasVolumeControl) return;
 
     if (status.volumeMode == Uac2VolumeMode.hardware) {
-      if (!isBitPerfectModeEnabled) return;
+      if (!isHardwareVolumeAuthority) return;
       final v = status.volume;
-      if (v == null) return;
-      if ((v - _currentVolume).abs() <= 0.01) return;
+      if (v == null || !v.isFinite) return;
+      if ((v - _currentVolume).abs() <= 0.000001) return;
       _currentVolume = v.clamp(0.0, 1.0);
       unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
-    } else if (status.volumeMode == Uac2VolumeMode.software) {
-      if (_usingRustBackend && _rustAudioService.isInitialized) {
-        unawaited(_rustAudioService.setVolume(_currentVolume));
-      }
+    } else {
       unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
     }
   }
@@ -2235,11 +2252,11 @@ class PlayerService {
   /// ignores engine volume entirely (bit-perfect guarantee). EQ/tuning,
   /// crossfade and pitch force the DSP path, where engine gain works.
   bool get _isPassthroughActive {
+    if (_usbDsdWireActive) return true;
     final passthrough =
         audioOutputDiagnosticsNotifier.value?.passthroughAllowed ?? false;
     if (!passthrough) return false;
     if (Uac2PreferencesService.is432HzTuningEnabledSync) return false;
-    if (gaplessPlaybackEnabledNotifier.value) return false;
     if ((playbackSpeedNotifier.value - 1.0).abs() > 0.001) return false;
     return true;
   }
@@ -2247,8 +2264,18 @@ class PlayerService {
   /// Bit-perfect volume path: direct USB DAC or DAP internal hi-res engine.
   bool get _isBitPerfectVolumePath =>
       isBitPerfectModeEnabled &&
+      !(_isDirectUsbPath && _currentUsbDsdMode == 'pcm') &&
       (currentEngineType == AudioEngineType.usbDacExperimental ||
           currentEngineType == AudioEngineType.dapInternalHighRes);
+
+  String? get _currentUsbDsdMode =>
+      _activeUsbDsdSongId == currentSongNotifier.value?.id ? _activeUsbDsdMode : null;
+
+  bool get _usbDsdWireActive => _isDirectUsbPath &&
+      (_currentUsbDsdMode == 'dop' || _currentUsbDsdMode == 'native' ||
+          (_currentUsbDsdMode == null &&
+              currentSongNotifier.value?.isDsd == true &&
+              Uac2PreferencesService.dsdOutputModeSync != DsdOutputMode.forcePcm));
 
   /// Whether the user can change volume right now. False in bit-perfect
   /// passthrough when the DAC has no hardware (UAC2 Feature Unit) volume —
@@ -2319,7 +2346,7 @@ class PlayerService {
     isBitPerfectVolumePath: _isBitPerfectVolumePath,
     volumeMode: _uac2Service.currentDeviceStatus?.volumeMode,
     hwVolumeFailed: _hwVolumeFailed,
-    isDoP: isCurrentTrackDoP && _isDirectUsbPath,
+    isDoP: _usbDsdWireActive,
     autoSwitchDsdForVolume: Uac2PreferencesService.autoSwitchDsdForVolumeSync,
     isPassthrough: _isPassthroughActive,
     usingRustBackend: _usingRustBackend,
@@ -2333,6 +2360,13 @@ class PlayerService {
       _stopHwVolumeHealthTimer();
     }
     if (!_rustAudioService.isInitialized) return;
+    if (_switchingDsdForVolume) return;
+    if (_usbDsdWireActive) {
+      // The software tier here means opt-in conversion is available, not
+      // permission to scale the still-active DSD stream.
+      await _rustAudioService.setVolume(1.0);
+      return;
+    }
     switch (tier) {
       case VolumeTier.hardware:
         // DAC Feature Unit is the only volume authority — engine at unity.
@@ -2345,6 +2379,7 @@ class PlayerService {
         await _rustAudioService.setVolume(_currentVolume);
         break;
       case VolumeTier.unavailable:
+        await _rustAudioService.setVolume(1.0);
         break;
     }
   }
@@ -2399,6 +2434,7 @@ class PlayerService {
     final rustAudioState = _mapValue(debugState?['rustAudioState']);
     final engineState = _mapValue(rustAudioState?['engine']);
     final directUsbState = _mapValue(rustAudioState?['direct_usb']);
+    final dsdCallbackState = _mapValue(rustAudioState?['dsd_callback']);
     final deviceProfile = _mapValue(rustAudioState?['device_profile']);
     final detectedDap = _isDetectedDapProfile(deviceProfile);
     final detectedDapBrand = _detectedDapBrand(deviceProfile);
@@ -2432,6 +2468,9 @@ class PlayerService {
     final enginePassthroughAllowed =
         engineState?['passthrough_allowed'] == true ||
         engineState?['passthroughAllowed'] == true;
+    final directUsbActive = usesRustDiagnostics &&
+        (engineState?['direct_usb_active'] == true ||
+            engineState?['directUsbActive'] == true);
     final dsdEffectiveMode = _stringValue(
       engineState?['dsd_effective_mode'] ?? engineState?['dsdEffectiveMode'],
     );
@@ -2492,14 +2531,12 @@ class PlayerService {
         ? AudioPathManagement.androidManagedShared
         : !usesRustDiagnostics
         ? AudioPathManagement.androidManagedShared
+        : directUsbActive
+        ? AudioPathManagement.directUsbExperimental
         : outputSignature?.startsWith('android-alsa:') == true
         ? AudioPathManagement.alsaDirectDap
         : outputSignature?.startsWith('android-direct:') == true
         ? AudioPathManagement.managedDirectExclusive
-        : (outputStrategy == 'usb_direct' &&
-                  outputSignature?.startsWith('android-uac2:') == true) ||
-              outputStrategy == 'usb_dsd_native'
-        ? AudioPathManagement.directUsbExperimental
         : AudioPathManagement.androidManagedLowLatency;
 
     final isMixerManaged =
@@ -2512,12 +2549,9 @@ class PlayerService {
         (pathManagement == AudioPathManagement.directUsbExperimental
             ? directUsbConfiguredSampleRate
             : engineConfiguredSampleRate ?? trackFormat?.sampleRate);
-    final reportedOutputSampleRate =
-        (!usesRustDiagnostics ? null : null) ??
-        engineActualSampleRate ??
-        (pathManagement == AudioPathManagement.directUsbExperimental
-            ? directUsbClockReportedSampleRate
-            : engineConfiguredSampleRate);
+    final reportedOutputSampleRate = !usesRustDiagnostics ? null
+        : directUsbActive ? directUsbClockReportedSampleRate
+        : engineActualSampleRate ?? engineConfiguredSampleRate;
     final resamplerActive =
         (usesRustDiagnostics && engineResamplerActive) ||
         (requestedOutputSampleRate != null &&
@@ -2526,13 +2560,13 @@ class PlayerService {
             requestedOutputSampleRate != reportedOutputSampleRate);
     final passthroughAllowed =
         usesRustDiagnostics &&
-        (enginePassthroughAllowed || directUsbBitPerfectVerified);
-    // bitPerfect on USB paths comes from direct USB verification; on internal
-    // DAP paths it means passthrough (no DSP) with no resampling — the DSD
-    // bitstream or PCM stream reaches the DAC intact.
+        enginePassthroughAllowed;
+    // These checks describe the active configuration, clock and framing.
+    // They are not an independent byte-for-byte comparison against the source.
     final effectiveBitPerfect =
-        (outputStrategy == 'usb_direct' || outputStrategy == 'usb_dsd_native')
-        ? directUsbBitPerfectVerified
+        directUsbActive
+        ? (directUsbBitPerfectVerified && passthroughAllowed &&
+            directUsbClockVerificationPassed && usbStreamStable && !resamplerActive)
         : (usesRustDiagnostics && passthroughAllowed && !resamplerActive);
     final verificationReason =
         (!usesRustDiagnostics ? null : engineVerificationReason) ??
@@ -2560,15 +2594,13 @@ class PlayerService {
     final backendDescription = !usesRustDiagnostics
         ? 'just_audio / ExoPlayer'
         : switch (outputStrategy) {
-            'usb_dsd_native' when passthroughAllowed =>
-              'Rust engine via USB direct native DSD (verified)',
             'usb_dsd_native' => 'Rust engine via USB direct native DSD',
-            'usb_direct' when passthroughAllowed =>
-              'Rust engine via libusb direct USB (verified)',
             'usb_direct' => 'Rust engine via libusb direct USB',
             'dsd_native' when passthroughAllowed =>
               'Rust engine via ENCODING_DSD AudioTrack (native DSD)',
             'dsd_native' => 'Rust engine via ENCODING_DSD AudioTrack',
+            'dsd_dop' when directUsbActive =>
+              'Rust engine via libusb direct USB DoP',
             'dsd_dop' when passthroughAllowed =>
               'Rust engine via DoP over PCM carrier (verified)',
             'dsd_dop' => 'Rust engine via DoP over PCM carrier',
@@ -2598,13 +2630,16 @@ class PlayerService {
               ? 'Android shared (USB route)'
               : 'Android shared')
         : switch (outputStrategy) {
-            'usb_dsd_native' when passthroughAllowed =>
-              'Verified USB DSD native',
+            'usb_dsd_native' when effectiveBitPerfect =>
+              'USB DSD native (clock/framing checked)',
             'usb_dsd_native' => 'USB DSD native',
-            'usb_direct' when passthroughAllowed => 'Verified USB direct',
+            'usb_direct' when effectiveBitPerfect => 'USB direct (clock/payload checked)',
             'usb_direct' => 'USB direct',
             'dsd_native' when passthroughAllowed => 'Verified DSD native',
             'dsd_native' => 'DSD native',
+            'dsd_dop' when directUsbActive && effectiveBitPerfect =>
+              'USB DoP (clock/framing checked)',
+            'dsd_dop' when directUsbActive => 'USB DoP (checks pending)',
             'dsd_dop' when passthroughAllowed => 'Verified DSD DoP',
             'dsd_dop' => 'DSD DoP',
             'dap_native' when passthroughAllowed => 'Verified DAP native',
@@ -2624,11 +2659,12 @@ class PlayerService {
     final effectiveClockOk =
         pathManagement == AudioPathManagement.directUsbExperimental
         ? directUsbClockControlSucceeded
-        : true;
+        : usesRustDiagnostics && engineActualSampleRate != null;
     final effectiveRateVerified =
         pathManagement == AudioPathManagement.directUsbExperimental
         ? directUsbClockVerificationPassed
-        : true;
+        : usesRustDiagnostics && engineRequestedSampleRate != null &&
+            engineRequestedSampleRate == engineActualSampleRate && !resamplerActive;
 
     final capabilityFlags = AudioCapabilityFlags(
       supportsExclusiveUsbOwnership:
@@ -2642,7 +2678,7 @@ class PlayerService {
           directUsbClockVerificationPassed,
       supportsVerifiedBitPerfect:
           usesRustDiagnostics &&
-          passthroughAllowed &&
+          effectiveBitPerfect &&
           (pathManagement == AudioPathManagement.directUsbExperimental ||
               outputStrategy == 'mixer_bit_perfect' ||
               outputStrategy == 'dap_native' ||
@@ -2749,6 +2785,14 @@ class PlayerService {
       return;
     }
 
+    _activeUsbDsdMode = directUsbActive ? dsdEffectiveMode : null;
+    _activeUsbDsdSongId = directUsbActive ? song?.id : null;
+    final hardwareGeneration = _intValue(directUsbState?['hardware_volume_generation']);
+    if (hardwareGeneration != _hardwareVolumeGeneration) {
+      _hardwareVolumeGeneration = hardwareGeneration;
+      _hwVolumeFailed = false;
+    }
+
     audioOutputDiagnosticsNotifier.value = AudioOutputDiagnostics(
       selectedMode: _sessionManager.selectedMode,
       initializedMode: _sessionManager.initializedMode,
@@ -2781,7 +2825,10 @@ class PlayerService {
       fallbackReason: _sessionManager.fallbackReason,
       capabilityFlags: capabilityFlags,
       urbTransport: urbTransport,
+      dsdEffectiveMode: dsdEffectiveMode,
+      dsdTransport: dsdTransport,
     );
+    unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
 
     _debugLog(
       '[Diagnostics] $reason: mode=${mode.logLabel}, '
@@ -2798,10 +2845,12 @@ class PlayerService {
       'refresh=${activeRefresh ?? -1}, '
       'clockOk=$effectiveClockOk, rateVerified=$effectiveRateVerified, '
       'dacPolicy=${effectiveDirectUsbDacClockPolicy ?? 'none'}, '
-      'bitPerfect=$effectiveBitPerfect, '
+      'bitPerfectConfigured=$effectiveBitPerfect, byteIdentityVerified=false, '
       'serviceUs=${activeServiceIntervalUs ?? -1}, maxPacket=${activeMaxPacketBytes ?? -1}, '
       'bufferMs=${bufferFillMs ?? -1}/${bufferTargetMs ?? -1}/${bufferCapacityMs ?? -1}, '
       'framesPerPacket=${framesPerPacket ?? -1}, underruns=${underrunCount ?? -1}, '
+      'dsdStarvedSamples=${_intValue(dsdCallbackState?['starved_samples']) ?? -1}, '
+      'dsdLockMisses=${_intValue(dsdCallbackState?['lock_misses']) ?? -1}, '
       'producerFrames=${producerFrames ?? -1}, consumerFrames=${consumerFrames ?? -1}, '
       'driftMs=${driftMsFromTarget ?? -999}, '
       'resampler=$resamplerActive, passthrough=$passthroughAllowed, '
@@ -2811,7 +2860,10 @@ class PlayerService {
       'lastError=${directUsbLastError ?? 'none'}, '
       'fallback=${_sessionManager.fallbackReason ?? 'none'}, '
       'dsdMode=${dsdEffectiveMode ?? 'none'}, '
-      'dsdTransport=${dsdTransport ?? 'none'}',
+      'dsdTransport=${dsdTransport ?? 'none'}, '
+      'volumeMode=${_uac2Service.currentDeviceStatus?.volumeMode.name ?? 'unknown'}, '
+      'hardwareVolume=${directUsbState?['hardware_volume_normalized'] ?? 'unknown'}, '
+      'volumeError=${directUsbState?['hardware_volume_error'] ?? 'none'}',
     );
 
     _logAudioPathTransition(reason);
@@ -3210,10 +3262,12 @@ class PlayerService {
           ),
         );
       } else {
-        _playbackDiagnosticsDebounceTimer?.cancel();
-        _playbackDiagnosticsDebounceTimer = Timer(
-          _playbackDiagnosticsDebounce,
-          () {
+        // A 50 ms progress stream must not continually reset this deadline:
+        // USB stability/payload checks become ready after the startup snapshot.
+        _playbackDiagnosticsDebounceTimer = coalescePlaybackDiagnosticsRefresh(
+          pending: _playbackDiagnosticsDebounceTimer,
+          interval: _playbackDiagnosticsDebounce,
+          refresh: () {
             _playbackDiagnosticsDebounceTimer = null;
             final snap = _lastPlaybackState;
             unawaited(
@@ -4181,7 +4235,10 @@ class PlayerService {
 
     // The engine can remain in passthrough after bit-perfect is disabled.
     // Select DSP before sending software volume so the callback applies it.
-    if (!isBitPerfectModeEnabled) {
+    final convertedUsbDsd = playbackMode == AudioEngineType.usbDacExperimental &&
+        currentSongNotifier.value?.isDsd == true &&
+        Uac2PreferencesService.dsdOutputModeSync == DsdOutputMode.forcePcm;
+    if (!isBitPerfectModeEnabled || convertedUsbDsd) {
       await _rustAudioService.setPipelineModePassthrough(false);
     }
 
@@ -4190,15 +4247,15 @@ class PlayerService {
         enabled: false,
         durationSecs: _rustAudioService.crossfadeDurationNotifier.value,
       );
-      if (playbackMode == AudioEngineType.usbDacExperimental ||
-          playbackMode == AudioEngineType.dapInternalHighRes) {
+      if (!convertedUsbDsd && (playbackMode == AudioEngineType.usbDacExperimental ||
+          playbackMode == AudioEngineType.dapInternalHighRes)) {
         await _rustAudioService.setPipelineModePassthrough(true);
       }
       await _reconcileVolumeForTier(_determineCurrentTier());
       await _rustAudioService.setPlaybackSpeed(1.0);
       await _rustAudioService.setPitchShiftSemitones(0.0);
     } else if (playbackMode == AudioEngineType.usbDacExperimental) {
-      await _rustAudioService.setVolume(_currentVolume);
+      await _reconcileVolumeForTier(_determineCurrentTier());
       await _rustAudioService.setPlaybackSpeed(1.0);
       await _rustAudioService.setPitchShiftSemitones(0.0);
       await _rustAudioService.setCrossfade(
@@ -5863,6 +5920,7 @@ class PlayerService {
   // ==================== Volume ====================
 
   Future<void> setVolume(double volume) async {
+    if (!volume.isFinite || _switchingDsdForVolume) return;
     final tier = _determineCurrentTier();
     final tierSupportsBoost = _extendedVolumeEnabled &&
         (tier == VolumeTier.software || tier == VolumeTier.system);
@@ -5876,33 +5934,24 @@ class PlayerService {
       await _reconcileSystemVolumeBoost(0.0);
       return;
     }
-    _currentVolume = clampedVolume;
-    if (currentEngineType == AudioEngineType.usbDacExperimental ||
-        currentEngineType == AudioEngineType.dapInternalHighRes) {
-      unawaited(_preferencesService.setUsbSoftwareVolume(clampedVolume));
-    }
-
-    // DoP: software gain corrupts DoP markers (0x05/0xFA).
-    // Volume must go through DAC hardware exclusively.
-    if (isCurrentTrackDoP && _isDirectUsbPath) {
-      final mode = _uac2Service.currentDeviceStatus?.volumeMode;
-      if (mode == Uac2VolumeMode.hardware && !_hwVolumeFailed) {
-        _debugLog('[VolFlow] DoP HW path: uac2 setVolume($clampedVolume)');
+    // The active transport, not the PCM bit-perfect preference, protects both
+    // DoP and native DSD. Never update the UI for an ignored/failed request.
+    if (_usbDsdWireActive) {
+      if (tier == VolumeTier.hardware) {
+        _debugLog('[VolFlow] DSD HW path: uac2 setVolume($clampedVolume)');
         final hwOk = await _uac2Service.setVolume(clampedVolume);
+        if (hwOk) {
+          _currentVolume = _uac2Service.currentDeviceStatus?.volume ?? _currentVolume;
+        }
         _onHwVolumeResult(hwOk);
       } else if (Uac2PreferencesService.autoSwitchDsdForVolumeSync &&
           clampedVolume < 1.0 &&
           _usingRustBackend &&
           _rustAudioService.isInitialized) {
-        // Auto-switch to PCM for software volume control.
-        // Pure DoP cannot apply software gain: it corrupts DoP markers
-        // and produces silence/hiss at any level other than 100 %.
-        // The only correct path is to restart the decoder in PCM decimation
-        // mode, where volume works via the normal audio-callback gain loop.
         await _switchDoPForVolumeTrack(clampedVolume);
       } else {
         _debugLog(
-          '[VolFlow] DoP: no hardware volume available — volume unchanged',
+          '[VolFlow] DSD: no verified hardware volume — volume unchanged',
         );
       }
       await _reconcileSystemVolumeBoost(0.0);
@@ -5914,12 +5963,16 @@ class PlayerService {
       case VolumeTier.hardware:
         _debugLog('[VolFlow] HW path: uac2 setVolume($clampedVolume)');
         final hwOk = await _uac2Service.setVolume(clampedVolume);
+        if (hwOk) {
+          _currentVolume = _uac2Service.currentDeviceStatus?.volume ?? _currentVolume;
+        }
         _onHwVolumeResult(hwOk);
         if (!hwOk && !_isPassthroughActive && _usingRustBackend) {
           // Lie-detector fallback: DAC claimed hardware volume but rejected
           // the write — engine gain still works on the DSP path.
           _debugLog('[VolFlow] HW write failed — falling back to engine gain');
           await _rustAudioService.setVolume(clampedVolume);
+          _rememberSoftwareVolume(clampedVolume);
         }
         await _reconcileSystemVolumeBoost(0.0);
         break;
@@ -5928,6 +5981,7 @@ class PlayerService {
           _debugLog('[VolFlow] SW path: engine setVolume($clampedVolume)');
           await _rustAudioService.setVolume(clampedVolume);
         }
+        _rememberSoftwareVolume(clampedVolume);
         // No native effect on the Rust path; ensure any stale boost is released.
         await _reconcileSystemVolumeBoost(0.0);
         break;
@@ -5940,6 +5994,7 @@ class PlayerService {
           // volume and/or ReplayGain) is applied via Android LoudnessEnhancer.
           await player.setVolume(math.min(effective, 1.0));
         }
+        _rememberSoftwareVolume(clampedVolume);
         await _reconcileSystemVolumeBoost(effective);
         break;
       case VolumeTier.unavailable:
@@ -5948,6 +6003,14 @@ class PlayerService {
         );
         await _reconcileSystemVolumeBoost(0.0);
         break;
+    }
+  }
+
+  void _rememberSoftwareVolume(double volume) {
+    _currentVolume = volume;
+    if (currentEngineType == AudioEngineType.usbDacExperimental ||
+        currentEngineType == AudioEngineType.dapInternalHighRes) {
+      unawaited(_preferencesService.setUsbSoftwareVolume(volume));
     }
   }
 
@@ -6042,32 +6105,55 @@ class PlayerService {
     }
   }
 
-  /// Switch from pure DoP to PCM decimation so software volume works.
-  ///
-  /// Pure DoP cannot apply software gain (it corrupts DoP markers).
-  /// This restarts the active DSD track's decoder in PCM decimation mode,
-  /// where the normal audio-callback gain-loop handles volume cleanly.
+  /// Opt-in DSD-to-PCM conversion must renegotiate the USB transport as well
+  /// as the decoder. Seeking alone can feed PCM into the old DoP endpoint.
   Future<void> _switchDoPForVolumeTrack(double volume) async {
-    _debugLog('[VolFlow] DoP → PCM auto-switch for volume=$volume');
-
-    // Persist the mode change so new DSD tracks also use PCM.
-    await Uac2PreferencesService().setDsdOutputMode(DsdOutputMode.forcePcm);
-
-    // Sync the Rust global so the next decoder spawn picks up PCM mode.
-    rust_audio.audioSetDsdOutputMode(mode: 0);
-
-    // Get current position for gapless restart.
+    final path = _rustAudioService.currentPath;
+    if (path == null || _switchingDsdForVolume) return;
+    final previousMode = Uac2PreferencesService.dsdOutputModeSync;
+    final wasPlaying = _rustAudioService.isPlaying;
     final progress = rust_audio.audioGetProgress();
     final posSecs = progress?.positionSecs ?? 0.0;
-
-    // Seek restarts the decoder in the new (PCM) mode.
-    await _rustAudioService.seek(
-      Duration(milliseconds: (posSecs * 1000).round()),
-    );
-
-    // Volume now works via normal callback gain.
-    await _rustAudioService.setVolume(volume);
-    _debugLog('[VolFlow] DoP → PCM switch complete');
+    _switchingDsdForVolume = true;
+    try {
+      _debugLog('[VolFlow] DSD → PCM opt-in conversion for volume=$volume');
+      await _rustAudioService.stop();
+      await Uac2PreferencesService().setDsdOutputMode(DsdOutputMode.forcePcm);
+      rust_audio.audioSetDsdOutputMode(mode: 0);
+      // Stage the replacement engine's gain before its first PCM callback,
+      // avoiding an initial full-scale playback burst.
+      await _rustAudioService.setVolume(volume);
+      await _rustAudioService.play(path);
+      if (!wasPlaying) await _rustAudioService.pause();
+      await _rustAudioService.seek(Duration(milliseconds: (posSecs * 1000).round()));
+      await _refreshAudioOutputDiagnostics(reason: 'DSD volume PCM conversion');
+      if (_currentUsbDsdMode != 'pcm') {
+        throw StateError('DSD volume conversion did not activate direct USB PCM');
+      }
+      _rememberSoftwareVolume(volume);
+      _debugLog('[VolFlow] DSD → PCM transport and decoder reconfigured');
+    } catch (error) {
+      // Fail stopped: never resume packed DSD through an uncertain format.
+      await _rustAudioService.stop();
+      await Uac2PreferencesService().setDsdOutputMode(previousMode);
+      rust_audio.audioSetDsdOutputMode(mode: switch (previousMode) {
+        DsdOutputMode.auto => 3,
+        DsdOutputMode.forcePcm => 0,
+        DsdOutputMode.forceDop => 1,
+        DsdOutputMode.native => 2,
+      });
+      await _rustAudioService.setVolume(1.0);
+      _activeUsbDsdMode = null;
+      _activeUsbDsdSongId = null;
+      await _syncUac2PlaybackStatus(currentSongNotifier.value, isPlaying: false);
+      _debugLog('[VolFlow] DSD → PCM conversion refused: $error');
+      rethrow;
+    } finally {
+      _switchingDsdForVolume = false;
+    }
+    await _syncUac2PlaybackStatus(currentSongNotifier.value, isPlaying: wasPlaying);
+    await _reconcileVolumeForTier(_determineCurrentTier());
+    unawaited(_queueNextTrackForGapless());
   }
 
   Future<int> addToQueue(Song song) async {
@@ -6473,7 +6559,7 @@ class PlayerService {
     final healthy = await _uac2Service.verifyHardwareVolumeHealth();
     if (healthy == false) {
       _debugLog(
-        '[VolFlow] HW volume health check failed — falling back to software tier',
+        '[VolFlow] HW volume readback failed — reevaluating volume authority',
       );
       _onHwVolumeResult(false);
     }
