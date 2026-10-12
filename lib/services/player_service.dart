@@ -19,6 +19,7 @@ import 'package:flick/services/android_audio_device_service.dart';
 import 'package:flick/services/bluetooth_service.dart';
 import 'package:flick/services/audio_engine_manager.dart';
 import 'package:flick/services/audio_session_manager.dart';
+import 'package:flick/services/song_engine_routing.dart';
 import 'package:flick/services/equalizer_service.dart';
 import 'package:flick/services/android_audio_processing_service.dart';
 import 'package:flick/services/last_played_service.dart';
@@ -2015,6 +2016,7 @@ class PlayerService {
       },
       onNextSong: _resolveAndroidCrossfadeNext,
       onTrackAdvanced: _onAndroidTrackAdvanced,
+      onTrackError: _onAndroidTrackError,
     );
     engine.onTrackEnded = () {
       if (_usingRustBackend) return;
@@ -3167,6 +3169,10 @@ class PlayerService {
           unawaited(_updateNotificationState());
           unawaited(
             _savePosition(song: state.currentTrack, position: state.position),
+          );
+          _maybeRerouteTrackToRustDecoder(
+            state.currentTrack!,
+            position: state.position,
           );
         } else {
           _clearReplayTracking();
@@ -4509,7 +4515,9 @@ class PlayerService {
       return normalizedEngine;
     }
 
-    switch (normalizedEngine) {
+    final engineForSong = _routeEngineForSong(normalizedEngine, song);
+
+    switch (engineForSong) {
       case AudioEngineType.normalAndroid:
         await _uac2Service.releaseAndroidDirectUsbRuntime();
         await _rustAudioService.setHighResMode(false);
@@ -4518,17 +4526,17 @@ class PlayerService {
         if (_sessionManager.fallbackRequestedMode == null) {
           _sessionManager.clearFallbackReason();
         }
-        return normalizedEngine;
+        return engineForSong;
       case AudioEngineType.rustOboe:
         await _uac2Service.releaseAndroidDirectUsbRuntime();
         await _rustAudioService.setHighResMode(false);
         _sessionManager.clearFallbackReason();
-        return normalizedEngine;
+        return engineForSong;
       case AudioEngineType.dapInternalHighRes:
         await _uac2Service.releaseAndroidDirectUsbRuntime();
         await _rustAudioService.setHighResMode(true);
         _sessionManager.clearFallbackReason();
-        return normalizedEngine;
+        return engineForSong;
       case AudioEngineType.usbDacExperimental:
         await _releaseAndroidManagedAudioResources(
           reason: 'before direct USB initialization',
@@ -4642,6 +4650,90 @@ class PlayerService {
         await _rustAudioService.setHighResMode(false);
         _sessionManager.clearFallbackReason();
         return normalizedEngine;
+    }
+  }
+
+  /// The Android system tier cannot decode DSD or WavPack containers: route
+  /// those tracks to the Rust shared output (PCM on non-bit-perfect routes)
+  /// regardless of what the current audio route prefers.
+  AudioEngineType _routeEngineForSong(
+    AudioEngineType desiredEngine,
+    Song song,
+  ) {
+    final routed = resolveEngineForSong(
+      preferred: desiredEngine,
+      requiresRustDecoder: song.requiresRustDecoder,
+    );
+    if (routed != desiredEngine) {
+      _debugLog(
+        '[Engine] ${song.title} needs the Rust decoder '
+        '(${song.fileType.toUpperCase()}); routing '
+        '${desiredEngine.logLabel} -> ${routed.logLabel}',
+      );
+    }
+    return routed;
+  }
+
+  /// Track ids already rerouted (or attempted) from the system tier to the
+  /// Rust engine because ExoPlayer cannot decode their container.
+  final Set<String> _rustDecoderRerouteAttempts = <String>{};
+
+  /// Auto-advance and crossfade swaps inside a just_audio playlist never pass
+  /// through [_playInternal]; restart a DSF/DFF/WavPack track the system tier
+  /// cannot decode on the Rust engine.
+  void _maybeRerouteTrackToRustDecoder(
+    Song song, {
+    required Duration position,
+  }) {
+    if (_usingRustBackend || !song.requiresRustDecoder) return;
+    if (song.filePath == null || _castingService.isActive) return;
+    if (!_rustDecoderRerouteAttempts.add(song.id)) return;
+    _debugLog(
+      '[Engine] ${song.title} needs the Rust decoder; rerouting from '
+      '${currentEngineType.logLabel}',
+    );
+    unawaited(
+      _enqueuePlaybackRequest(
+        () => _rerouteTrackToRustDecoder(song, position),
+      ),
+    );
+  }
+
+  Future<void> _rerouteTrackToRustDecoder(
+    Song song,
+    Duration position,
+  ) async {
+    try {
+      await initAudio();
+      final activeEngine = await _ensureEngineReady(
+        AudioEngineType.rustOboe,
+        song: song,
+        reason: 'container requires the Rust decoder',
+      );
+      if (!_usingRustBackend) return;
+      final index = _playlist.indexWhere((entry) => entry.id == song.id);
+      if (index != -1) {
+        _setCurrentIndex(index);
+      }
+      await _prepareImmediatePlaybackAsset(song);
+      await _applyRustPlaybackProcessingPolicy(activeEngine);
+      await _refreshReplayGainForSong(song, pushSpawnDefault: true);
+      await _runWithSuppressedSequenceStateUpdates(() async {
+        await _playbackManager.playTrack(song, initialPosition: position);
+      });
+      _ensurePositionSaveTimer();
+      _updatePriorityAnchor();
+      if (_shouldQueueNextTrack && _playlist.length > 1) {
+        unawaited(_queueNextTrackForGapless());
+      }
+      await _refreshAudioOutputDiagnostics(
+        reason: 'track rerouted to Rust decoder',
+        activeSong: song,
+      );
+    } catch (e) {
+      _debugLog(
+        '[Engine] Rust decoder reroute failed for ${song.title}: $e',
+      );
     }
   }
 
@@ -4918,6 +5010,18 @@ class PlayerService {
     }
     _consumeQueueEntryAt(_currentIndex);
     _updatePriorityAnchor();
+  }
+
+  /// Called when the system tier errors while a track is loaded. DSD and
+  /// WavPack containers are not decodable by ExoPlayer, so retry them on the
+  /// Rust decoder instead of leaving playback stalled on the failed track.
+  void _onAndroidTrackError(Song song) {
+    if (!song.requiresRustDecoder) return;
+    _debugLog(
+      '[Playback] System tier failed to decode ${song.title}; '
+      'retrying on the Rust decoder',
+    );
+    _maybeRerouteTrackToRustDecoder(song, position: positionNotifier.value);
   }
 
   Future<void> _savePosition({Song? song, Duration? position}) async {
