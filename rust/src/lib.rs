@@ -415,7 +415,10 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeVerifyRustDire
     match crate::uac2::android_direct_verify_hardware_volume_health() {
         Ok(true) => 1,
         Ok(false) => 0,
-        Err(_) => -1,
+        Err(error) => {
+            dev_eprintln!("Failed to read Android direct USB hardware volume: {}", error);
+            if crate::uac2::android_direct_has_hardware_volume_control() { 0 } else { -1 }
+        }
     }
 }
 
@@ -450,6 +453,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustAudioDe
         "engine": engine_state,
         "device_profile": crate::audio::device::current_device_profile(),
         "direct_usb": direct_usb_state,
+        "dsd_callback": crate::api::audio_api::dsd_callback_debug_json(),
     });
     let json = serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string());
     env.with_env(|env| -> jni::errors::Result<jstring> {
@@ -475,6 +479,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustAudioDe
             "idle_lock_held": false,
             "stream_active": false,
         },
+        "dsd_callback": crate::api::audio_api::dsd_callback_debug_json(),
     });
     let json = serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string());
     env.with_env(|env| -> jni::errors::Result<jstring> {

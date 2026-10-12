@@ -30,7 +30,7 @@ import 'package:flick/features/player/widgets/inline_lyrics_panel.dart';
 import 'package:flick/features/player/widgets/lyrics_mode_waveform_strip.dart';
 import 'package:flick/l10n/l10n.dart';
 
-class AnimatedSongScene extends StatelessWidget {
+class AnimatedSongScene extends ConsumerWidget {
   static const double _shortHeightThreshold = 620.0;
 
   final Song song;
@@ -135,7 +135,8 @@ class AnimatedSongScene extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(uac2BitPerfectIndicatorProvider);
     final direction = transitionDirection >= 0 ? 1.0 : -1.0;
     final sceneKey = ValueKey('${song.id}_${playerScreenMode.storageValue}');
     final isShortHeight =

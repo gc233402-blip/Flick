@@ -316,11 +316,8 @@ impl AudioCallbackData {
             output.fill(f32::from_bits(0x69));
         } else if self.dop_wire_silence.load(Ordering::Relaxed) {
             let mut marker_is_fa = self.dop_marker_phase.load(Ordering::Relaxed);
-            for sample in output.iter_mut() {
-                let marker = if marker_is_fa { 0xFA } else { 0x05 };
-                *sample = f32::from_bits((marker as u32) << 24 | 0x69 << 16 | 0x96 << 8);
-                marker_is_fa = !marker_is_fa;
-            }
+            output.fill(f32::from_bits(0x00696900));
+            crate::audio::dsd_engine::dsd::dop::frame_dop_f32(output, self.channels, &mut marker_is_fa);
             self.dop_marker_phase.store(marker_is_fa, Ordering::Relaxed);
         } else {
             output.fill(0.0);
@@ -891,6 +888,10 @@ impl AudioEngineHandle {
         &self.output_runtime
     }
 
+    pub(crate) fn dsd_starve_stats(&self) -> (u64, u64) {
+        self.callback_data.dsd_starve_stats()
+    }
+
     pub fn audio_api_pref(&self) -> AudioApiPreference {
         self.audio_api_pref
     }
@@ -1103,6 +1104,12 @@ const ANDROID_DIRECT_SCRATCH_SAMPLES: usize = 32_768;
 pub fn desired_output_signature(preferred_sample_rate: Option<u32>) -> String {
     #[cfg(feature = "uac2")]
     if let Some(signature) = android_direct_output_signature(preferred_sample_rate) {
+        if let Some(rate) = crate::api::audio_api::current_dsd_track_rate() {
+            let mode = crate::api::audio_api::effective_dsd_output_mode(
+                crate::api::audio_api::current_dsd_output_mode(),
+            );
+            return format!("{}:dsd-{:?}:{}", signature, mode, rate);
+        }
         return signature;
     }
 
@@ -1204,14 +1211,10 @@ fn build_output_runtime_state(
 ) -> AudioOutputRuntimeState {
     let dsd_source_rate = crate::api::audio_api::current_dsd_track_rate();
     let dsd_effective_mode = dsd_source_rate.map(|_| {
-        let mode = crate::api::audio_api::effective_dsd_output_mode(
-            crate::api::audio_api::current_dsd_output_mode(),
-        );
-        match mode {
-            crate::audio::dsd_engine::dsd::DsdOutputMode::PcmDecimation => "pcm".to_string(),
-            crate::audio::dsd_engine::dsd::DsdOutputMode::Dop => "dop".to_string(),
-            crate::audio::dsd_engine::dsd::DsdOutputMode::Native => "native".to_string(),
-            crate::audio::dsd_engine::dsd::DsdOutputMode::Auto => "auto".to_string(),
+        match strategy {
+            OutputStrategy::DsdDoP => "dop".to_string(),
+            OutputStrategy::DsdNative | OutputStrategy::UsbDsdNative => "native".to_string(),
+            _ => "pcm".to_string(),
         }
     });
     let (dsd_wire_rate, dsd_transport) = if dsd_source_rate.is_some() {
@@ -1517,9 +1520,16 @@ pub fn create_audio_engine(
     let supports_native_dsd = device_profile
         .as_ref()
         .is_some_and(|p| p.supports_native_dsd);
+    let effective_dsd_mode = crate::api::audio_api::effective_dsd_output_mode(
+        crate::api::audio_api::current_dsd_output_mode(),
+    );
+    let usb_dsd_pcm = will_attempt_usb && dsd_rate.is_some()
+        && effective_dsd_mode == crate::audio::dsd_engine::dsd::DsdOutputMode::PcmDecimation;
 
     let desired_strategy = if will_attempt_usb {
-        let track_info = if let Some(rate) = dsd_rate {
+        let track_info = if usb_dsd_pcm {
+            TrackInfo::pcm(requested_sample_rate, ANDROID_DIRECT_CHANNELS)
+        } else if let Some(rate) = dsd_rate {
             TrackInfo::dsd(rate.sample_rate(), ANDROID_DIRECT_CHANNELS)
         } else {
             TrackInfo::pcm(requested_sample_rate, ANDROID_DIRECT_CHANNELS)
@@ -1528,7 +1538,8 @@ pub fn create_audio_engine(
         let usb_dsd_native_available = {
             let debug = android_direct_debug_state();
             debug.available_alt_settings.iter().any(|alt| {
-                alt.format_tag == "DSD"
+                !usb_dsd_pcm && effective_dsd_mode != crate::audio::dsd_engine::dsd::DsdOutputMode::Dop
+                    && alt.format_tag == "DSD"
                     && alt.subslot_size > 0
                     && dsd_rate.is_some_and(|r| {
                         let wire = r.sample_rate() / (8 * u32::from(alt.subslot_size));
@@ -1622,9 +1633,6 @@ pub fn create_audio_engine(
     // rate, regardless of ENCODING_DSD. The strategy scorer ties DoP capability to
     // supports_native_dsd, which incorrectly excludes DAPs that lack ENCODING_DSD
     // but can still pass DoP markers through their HAL/DAC.
-    let effective_dsd_mode = crate::api::audio_api::effective_dsd_output_mode(
-        crate::api::audio_api::current_dsd_output_mode(),
-    );
     let desired_strategy = if dsd_rate.is_some()
         && !will_attempt_usb
         && effective_dsd_mode == crate::audio::dsd_engine::dsd::DsdOutputMode::Dop
@@ -1638,6 +1646,11 @@ pub fn create_audio_engine(
     } else {
         desired_strategy
     };
+
+    if will_attempt_usb && dsd_rate.is_some() && !usb_dsd_pcm
+        && !matches!(desired_strategy, OutputStrategy::DsdDoP | OutputStrategy::UsbDsdNative) {
+        return Err("USB DAC has no supported DSD transport at the required rate; select PCM Decimation explicitly".to_string());
+    }
 
     // Override the sample rate for DSD strategies: the DSD Native
     // backend needs the byte rate (e.g. 705 600 Hz for DSD128),
@@ -1739,6 +1752,9 @@ pub fn create_audio_engine(
     // - UsbDirect / DapNative → Passthrough (verified below; downgraded on failure)
     // - All other strategies   → Dsp (full processing chain)
     let initial_pipeline_mode = match desired_strategy {
+        // Set the base as well as the active mode: clearing the raw DSD
+        // override after conversion must not restore PCM passthrough.
+        OutputStrategy::UsbDirect if usb_dsd_pcm => PipelineMode::Dsp,
         OutputStrategy::UsbDirect
         | OutputStrategy::DapNative
         | OutputStrategy::DsdNative
@@ -1800,28 +1816,40 @@ pub fn create_audio_engine(
         android_output_signature_for_strategy(desired_strategy, requested_sample_rate);
 
     #[cfg(feature = "uac2")]
-    if desired_strategy == OutputStrategy::UsbDirect
-        || desired_strategy == OutputStrategy::UsbDsdNative
-        || desired_strategy == OutputStrategy::DsdDoP
+    if will_attempt_usb
+        && matches!(desired_strategy, OutputStrategy::UsbDirect | OutputStrategy::UsbDsdNative | OutputStrategy::DsdDoP)
     {
         if desired_strategy == OutputStrategy::UsbDsdNative {
             if let Some(rate) = dsd_rate {
-                let _ = crate::uac2::set_android_usb_dsd_native_mode(rate.sample_rate());
+                crate::uac2::set_android_usb_dsd_native_mode(rate.sample_rate())?;
             }
         } else if desired_strategy == OutputStrategy::DsdDoP {
             if let Some(rate) = dsd_rate {
                 let carrier = rate.dop_carrier_rate();
                 let dop_bits = rate.dop_bits_per_frame();
-                let _ = crate::uac2::set_android_usb_dop_mode(true, carrier, dop_bits);
+                crate::uac2::set_android_usb_dop_mode(true, carrier, dop_bits)?;
             }
+        } else if will_attempt_usb {
+            // Clear a previous DSD transport before delivering PCM, including
+            // an explicitly requested DSD-to-PCM volume transition.
+            crate::uac2::set_android_usb_dop_mode(false, requested_sample_rate, 32)?;
         }
         match create_android_usb_backend(
             Arc::clone(&callback_data_clone),
             event_tx_clone.clone(),
             requested_sample_rate,
         ) {
-            Ok(Some(mut backend)) => {
+            Ok(Some(backend)) => {
                 let debug_state = android_direct_debug_state();
+                if desired_strategy == OutputStrategy::UsbDsdNative {
+                    let subslot = debug_state.transport_subslot_size.unwrap_or(0);
+                    if !matches!(subslot, 1 | 2 | 4) {
+                        return Err("USB native DSD refused: negotiated subslot is invalid".to_string());
+                    }
+                    if let Some(rate) = dsd_rate {
+                        requested_sample_rate = rate.sample_rate() / (8 * u32::from(subslot));
+                    }
+                }
                 let actual_sample_rate = debug_state
                     .clock_reported_sample_rate
                     .filter(|&rate| rate > 0)
@@ -1836,6 +1864,10 @@ pub fn create_audio_engine(
                     true,
                     debug_state.clock_verification_passed,
                 );
+                if matches!(desired_strategy, OutputStrategy::DsdDoP | OutputStrategy::UsbDsdNative)
+                    && !verification.bit_perfect {
+                    return Err(format!("USB DSD refused: {}", verification.reason.as_deref().unwrap_or("carrier/clock not verified")));
+                }
 
                 // ponytail: keep the direct-USB backend even when verification
                 // fails or bit-perfect is off. The Pixel USB audio HAL stutters
@@ -1847,7 +1879,7 @@ pub fn create_audio_engine(
                 final_sample_rate = actual_sample_rate;
                 callback_data.reconfigure_sample_rate(final_sample_rate);
                 let bit_perfect_pipeline =
-                    dap_bit_perfect_enabled && verification.bit_perfect;
+                    dap_bit_perfect_enabled && verification.bit_perfect && !usb_dsd_pcm;
                 if desired_strategy == OutputStrategy::UsbDsdNative
                     || desired_strategy == OutputStrategy::DsdDoP
                 {
@@ -1873,13 +1905,23 @@ pub fn create_audio_engine(
                     true,
                     debug_state.clock_verification_passed,
                 );
-                output_signature = android_output_signature_for_strategy(
-                    desired_strategy,
-                    requested_sample_rate,
-                );
+                if usb_dsd_pcm {
+                    output_runtime.passthrough_allowed = false;
+                    let fold_down = crate::api::audio_api::current_dsd_source_channels()
+                        .is_some_and(|channels| channels > 2);
+                    output_runtime.verification_reason = Some(if fold_down {
+                        "Multichannel DSD converted to PCM stereo fold-down; software volume available".to_string()
+                    } else {
+                        "DSD explicitly converted to PCM; software volume available".to_string()
+                    });
+                }
+                output_signature = desired_output_signature(Some(requested_sample_rate));
                 direct_usb_backend = Some(backend);
             }
             Ok(None) => {
+                if dsd_rate.is_some() && will_attempt_usb {
+                    return Err("USB DSD output unavailable; refusing Android-managed carrier fallback".to_string());
+                }
                 log::warn!(
                     "[ENGINE] Android direct USB was selected for {} Hz but no backend was created; falling back to Android-managed output",
                     requested_sample_rate
@@ -1895,6 +1937,9 @@ pub fn create_audio_engine(
                 );
             }
             Err(error) => {
+                if dsd_rate.is_some() && will_attempt_usb {
+                    return Err(format!("USB DSD output refused (no managed fallback): {}", error));
+                }
                 log::warn!(
                     "[ENGINE] Android direct USB init failed: {}. Falling back to Android-managed output.",
                     error
@@ -3361,6 +3406,7 @@ pub(crate) fn audio_callback(
 
     // Passthrough path: raw samples from decoder straight to output.
     if data.pipeline_mode.load(Ordering::Relaxed) == PipelineMode::Dop as u8 {
+        let mut marker_is_fa = data.dop_marker_phase.load(Ordering::Relaxed);
         let mut sources = match data.lock_sources_rt() {
             Some(s) => s,
             None => {
@@ -3377,6 +3423,10 @@ pub(crate) fn audio_callback(
             data.dsd_starved_samples
                 .fetch_add((output.len() - read) as u64, Ordering::Relaxed);
             data.fill_silence(&mut output[read..]);
+        }
+        if data.dop_wire_silence.load(Ordering::Relaxed) {
+            crate::audio::dsd_engine::dsd::dop::frame_dop_f32(output, data.channels, &mut marker_is_fa);
+            data.dop_marker_phase.store(marker_is_fa, Ordering::Relaxed);
         }
         return;
     }

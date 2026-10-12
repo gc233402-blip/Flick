@@ -48,15 +48,14 @@ impl DsdRate {
             Self::Dsd64 => 176_400,
             Self::Dsd128 => 352_800,
             Self::Dsd256 => 705_600,
-            Self::Dsd512 => 705_600,
+            Self::Dsd512 => 1_411_200,
         }
     }
 
     pub fn dop_bits_per_frame(&self) -> u8 {
-        match self {
-            Self::Dsd64 | Self::Dsd128 | Self::Dsd256 => 24,
-            Self::Dsd512 => 32,
-        }
+        // Standard DoP always carries 16 DSD bits plus an eight-bit marker.
+        // A 32-bit PCM container adds padding, not another DSD byte.
+        24
     }
 
     pub fn dsd_bytes_per_channel_per_dop_frame(&self) -> usize {
@@ -120,6 +119,10 @@ pub struct DsdDecimationPipeline {
     dsd_rate: DsdRate,
     target_pcm_rate: u32,
     channels: usize,
+    /// Reverse each byte before the MSB-first bit walk. DSF stores
+    /// LSB-first by default; the decimator consumes MSB-first, so the
+    /// bytes must be flipped to read the stream in its original order.
+    reverse_bits: bool,
     cic_decimation: usize,
     cic_int_c: Vec<i64>,
     cic_int_f: Vec<f64>,
@@ -135,7 +138,12 @@ impl DsdDecimationPipeline {
     const MAX_CIC_DECIMATION: usize = 4;
     const AUDIO_BAND_HZ: u32 = 18_000;
 
-    pub fn new(dsd_rate: DsdRate, target_pcm_rate: u32, channels: usize) -> Self {
+    pub fn new(
+        dsd_rate: DsdRate,
+        target_pcm_rate: u32,
+        channels: usize,
+        reverse_bits: bool,
+    ) -> Self {
         let total_decimation = dsd_rate.sample_rate() / target_pcm_rate.max(1);
         let cic_decimation = Self::compute_cic_decimation(total_decimation);
 
@@ -143,6 +151,7 @@ impl DsdDecimationPipeline {
             dsd_rate,
             target_pcm_rate,
             channels,
+            reverse_bits,
             cic_decimation,
             cic_int_c: vec![0; channels * Self::CIC_ORDER],
             cic_int_f: vec![0.0; channels * Self::CIC_ORDER],
@@ -306,7 +315,12 @@ impl DsdDecimationPipeline {
         let dec = self.cic_decimation;
         let mut bit_idx = 0usize;
 
-        for &byte in bytes.iter() {
+        for &raw_byte in bytes.iter() {
+            let byte = if self.reverse_bits {
+                raw_byte.reverse_bits()
+            } else {
+                raw_byte
+            };
             for shift in (0..8).rev() {
                 let bit_val = if (byte >> shift) & 1 == 1 {
                     1.0f64
@@ -364,5 +378,32 @@ impl DsdDecimationPipeline {
         for state in &mut self.fir_state {
             state.fill(0.0);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn reverse_bits_reads_lsb_first_stream_msb_first() {
+        // 0x80 walked MSB-first and 0x01 walked with per-byte reversal
+        // produce the same bit sequence, so both pipelines must agree
+        // sample-for-sample.
+        let msb_source = vec![0x80u8; 4096];
+        let lsb_source = vec![0x01u8; 4096];
+
+        let mut msb_pipeline =
+            DsdDecimationPipeline::new(DsdRate::Dsd64, 44_100, 1, false);
+        let mut lsb_pipeline =
+            DsdDecimationPipeline::new(DsdRate::Dsd64, 44_100, 1, true);
+
+        let mut msb_out = Vec::new();
+        let mut lsb_out = Vec::new();
+        msb_pipeline.process_bytes(&msb_source, &[0], &mut msb_out);
+        lsb_pipeline.process_bytes(&lsb_source, &[0], &mut lsb_out);
+
+        assert!(!msb_out.is_empty());
+        assert_eq!(msb_out, lsb_out);
     }
 }

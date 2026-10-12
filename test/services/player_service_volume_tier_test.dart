@@ -66,5 +66,18 @@ void main() {
         VolumeTier.software,
       );
     });
+
+    test('wire DSD stays protected with PCM bit-perfect disabled', () {
+      expect(tier(bitPerfectPath: false, dop: true), VolumeTier.unavailable);
+      expect(
+        tier(bitPerfectPath: false, dop: true, mode: Uac2VolumeMode.hardware),
+        VolumeTier.hardware,
+      );
+      expect(
+        tier(bitPerfectPath: false, dop: true, mode: Uac2VolumeMode.hardware,
+            hwFailed: true),
+        VolumeTier.unavailable,
+      );
+    });
   });
 }

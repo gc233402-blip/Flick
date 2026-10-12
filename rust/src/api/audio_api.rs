@@ -31,6 +31,10 @@ static ENGINE_MANAGER: Lazy<EngineManager> = Lazy::new(EngineManager::new);
 // Dart-side sync can race the first audio_play. Never decimate DSD to PCM.
 static DSD_OUTPUT_MODE: AtomicU8 = AtomicU8::new(3);
 static CURRENT_DSD_TRACK_RATE: AtomicU32 = AtomicU32::new(0);
+/// Source channel count of the DSD track currently being negotiated; 0 =
+/// unknown. Keeps the engine's mode decision and `audio_play` in agreement
+/// for multichannel sources without changing any exported signature.
+static CURRENT_DSD_SOURCE_CHANNELS: AtomicU32 = AtomicU32::new(0);
 static PENDING_VOLUME: AtomicU32 = AtomicU32::new(0);
 
 const PENDING_VOLUME_NONE: u32 = 0xFFFF_FFFF;
@@ -75,12 +79,26 @@ pub fn current_dsd_output_mode() -> DsdOutputMode {
 
 pub fn effective_dsd_output_mode(requested: DsdOutputMode) -> DsdOutputMode {
     let dsd_rate = current_dsd_track_rate().and_then(DsdRate::from_sample_rate);
-    effective_dsd_output_mode_for_rate(requested, dsd_rate)
+    effective_dsd_output_mode_for_rate_and_channels(
+        requested,
+        dsd_rate,
+        current_dsd_source_channels(),
+    )
 }
 
+/// FRB-exported wrapper kept signature-stable. Callers that know the source
+/// channel count should use `effective_dsd_output_mode_for_rate_and_channels`.
 pub fn effective_dsd_output_mode_for_rate(
     requested: DsdOutputMode,
     dsd_rate: Option<DsdRate>,
+) -> DsdOutputMode {
+    effective_dsd_output_mode_for_rate_and_channels(requested, dsd_rate, None)
+}
+
+pub(crate) fn effective_dsd_output_mode_for_rate_and_channels(
+    requested: DsdOutputMode,
+    dsd_rate: Option<DsdRate>,
+    source_channels: Option<u16>,
 ) -> DsdOutputMode {
     let is_dsd256_plus = dsd_rate.is_some_and(|r| matches!(r, DsdRate::Dsd256 | DsdRate::Dsd512));
 
@@ -91,13 +109,14 @@ pub fn effective_dsd_output_mode_for_rate(
     // checks in engine.rs so the DSD-engine output mode and the chosen USB
     // transport always agree — preventing DSD-as-PCM corruption.
     #[cfg(all(feature = "uac2", target_os = "android"))]
-    let (usb_native_capable, usb_dop_capable) = {
+    let (usb_registered, usb_native_capable, usb_dop_capable) = {
         let debug = crate::uac2::android_direct_debug_state();
         let carrier = dsd_rate.map(|r| r.dop_carrier_rate()).unwrap_or(0);
         let native = debug.registered
             && debug.available_alt_settings.iter().any(|alt| {
                 alt.format_tag == "DSD"
                     && alt.subslot_size > 0
+                    && source_channels.map_or(true, |channels| alt.channels == channels)
                     && dsd_rate.is_some_and(|r| {
                         let wire = r.sample_rate() / (8 * u32::from(alt.subslot_size));
                         alt.sample_rates.is_empty()
@@ -109,12 +128,41 @@ pub fn effective_dsd_output_mode_for_rate(
             && debug.available_alt_settings.iter().any(|alt| {
                 alt.format_tag == "PCM"
                     && alt.bit_resolution >= 24
+                    && source_channels.map_or(true, |channels| alt.channels == channels)
                     && alt.sample_rates.iter().any(|&sr| sr == carrier)
             });
-        (native, dop)
+        (debug.registered, native, dop)
     };
     #[cfg(not(all(feature = "uac2", target_os = "android")))]
-    let (_usb_native_capable, usb_dop_capable) = (false, false);
+    let (_usb_registered, _usb_native_capable, usb_dop_capable) = (false, false, false);
+    #[cfg(not(all(feature = "uac2", target_os = "android")))]
+    let _ = source_channels;
+
+    // A direct USB request never silently becomes PCM. Let stream negotiation
+    // refuse unsupported native/DoP, with an explicit PCM choice in the UI.
+    // Multichannel sources are the one format-level exception: a stereo DAC's
+    // wired DSD alts cannot carry them at all, so Auto degrades to a PCM
+    // stereo fold-down; explicit Native/DoP keep their mode and surface the
+    // actionable channel-mismatch error instead of being silently converted.
+    #[cfg(all(feature = "uac2", target_os = "android"))]
+    if usb_registered {
+        let multichannel = source_channels.is_some_and(|channels| channels > 2);
+        return match requested {
+            DsdOutputMode::PcmDecimation => DsdOutputMode::PcmDecimation,
+            DsdOutputMode::Dop => DsdOutputMode::Dop,
+            DsdOutputMode::Native | DsdOutputMode::Auto if usb_native_capable => {
+                DsdOutputMode::Native
+            }
+            DsdOutputMode::Auto if multichannel => {
+                log_info!(
+                    "[AUDIO] Auto DSD with {} source channels cannot ride the wired USB alts; using PCM decimation stereo fold-down",
+                    source_channels.unwrap_or(0)
+                );
+                DsdOutputMode::PcmDecimation
+            }
+            _ => DsdOutputMode::Dop,
+        };
+    }
 
     match requested {
         DsdOutputMode::PcmDecimation => return DsdOutputMode::PcmDecimation,
@@ -238,6 +286,7 @@ fn record_dsd_native_failure(error: &str) {
 
 pub fn clear_dsd_track_rate() {
     CURRENT_DSD_TRACK_RATE.store(0, Ordering::Relaxed);
+    CURRENT_DSD_SOURCE_CHANNELS.store(0, Ordering::Relaxed);
 }
 
 pub fn current_dsd_track_rate() -> Option<u32> {
@@ -246,6 +295,17 @@ pub fn current_dsd_track_rate() -> Option<u32> {
         Some(rate)
     } else {
         None
+    }
+}
+
+pub fn set_dsd_source_channels(channels: u16) {
+    CURRENT_DSD_SOURCE_CHANNELS.store(u32::from(channels), Ordering::Relaxed);
+}
+
+pub fn current_dsd_source_channels() -> Option<u16> {
+    match CURRENT_DSD_SOURCE_CHANNELS.load(Ordering::Relaxed) {
+        0 => None,
+        channels => u16::try_from(channels).ok(),
     }
 }
 
@@ -488,7 +548,17 @@ fn verify_dsd_engine_rate(
     let dsd_rate = DsdRate::from_sample_rate(decoder.sample_rate())
         .ok_or_else(|| format!("Unsupported DSD sample rate: {}", decoder.sample_rate()))?;
     let required_rate = match mode {
-        DsdOutputMode::Native => dsd_rate.byte_rate(),
+        DsdOutputMode::Native => {
+            #[cfg(all(feature = "uac2", target_os = "android"))]
+            if read_audio_engine(|handle| handle.output_runtime().direct_usb_active).unwrap_or(false) {
+                let debug = crate::uac2::android_direct_debug_state();
+                let subslot = debug.transport_subslot_size.filter(|&s| matches!(s, 1 | 2 | 4))
+                    .ok_or_else(|| "USB native DSD subslot is not verified".to_string())?;
+                dsd_rate.sample_rate() / (8 * u32::from(subslot))
+            } else { dsd_rate.byte_rate() }
+            #[cfg(not(all(feature = "uac2", target_os = "android")))]
+            { dsd_rate.byte_rate() }
+        },
         DsdOutputMode::Dop => dsd_rate.dop_carrier_rate(),
         _ => return Ok(()),
     };
@@ -505,42 +575,20 @@ fn verify_dsd_engine_rate(
 }
 
 fn verify_dop_passthrough(engine_rate: u32) -> Result<(), String> {
-    let signature = read_audio_engine(|handle| handle.output_signature().to_string());
-    let passthrough = read_audio_engine(|handle| {
+    let verified = read_audio_engine(|handle| {
         let rt = handle.output_runtime();
-        rt.passthrough_allowed
+        rt.strategy == OutputStrategy::DsdDoP.as_str()
+            && rt.actual_sample_rate == engine_rate && rt.requested_sample_rate == engine_rate
+            && rt.passthrough_allowed && !rt.resampler_active
+            && (!rt.direct_usb_active || rt.direct_usb_verified)
     });
-
-    let sig = signature.as_deref().unwrap_or("");
-    let sig_matches_dop = sig.contains("dsd-dop:") || sig.contains("dsd-native:");
-    let rate_matches = if let Some(rate_str) = sig.rsplit(':').next() {
-        rate_str.parse::<u32>().ok() == Some(engine_rate)
-    } else {
-        false
-    };
-
-    if sig_matches_dop && rate_matches && passthrough.unwrap_or(false) {
-        log::info!(
-            "[AUDIO] DoP pre-flight OK: wire_rate={} signature={}",
-            engine_rate,
-            sig
-        );
+    if verified.unwrap_or(false) {
+        log::info!("[AUDIO] DoP carrier pre-flight OK: wire_rate={}", engine_rate);
         return Ok(());
     }
-
-    log::warn!(
-        "[AUDIO] DoP pre-flight FAILED: Android may have resampled the carrier. \
-         engine_rate={} signature={} passthrough={:?}. Degrading to PCM decimation.",
-        engine_rate,
-        sig,
-        passthrough
-    );
-
     Err(format!(
-        "DoP passthrough verification failed: the output path did not confirm \
-         bit-perfect DoP delivery at {} Hz (signature={}, passthrough={:?}). \
-         Android likely resampled the carrier. Degrading to PCM decimation.",
-        engine_rate, sig, passthrough
+        "DoP carrier verification failed at {} Hz; select PCM Decimation explicitly if needed",
+        engine_rate
     ))
 }
 
@@ -572,8 +620,11 @@ fn plan_track_engine_config(path: &PathBuf) -> Result<TrackEnginePlan, String> {
                 .map_err(|e| format!("Failed to probe DSD rate for {}: {}", path.display(), e))?;
             let dsd_rate = DsdRate::from_sample_rate(decoder.sample_rate())
                 .ok_or_else(|| format!("Unsupported DSD sample rate: {}", decoder.sample_rate()))?;
-            let mode =
-                effective_dsd_output_mode_for_rate(current_dsd_output_mode(), Some(dsd_rate));
+            let mode = effective_dsd_output_mode_for_rate_and_channels(
+                current_dsd_output_mode(),
+                Some(dsd_rate),
+                Some(decoder.channels()),
+            );
             let sample_rate =
                 resolve_dsd_engine_sample_rate(path, mode)?.unwrap_or(DEFAULT_ENGINE_SAMPLE_RATE);
             Ok(TrackEnginePlan {
@@ -1087,6 +1138,16 @@ pub fn audio_get_runtime_debug_json_state() -> AudioRuntimeDebugJsonState {
     }
 }
 
+/// Callback starvation counters for the Android diagnostics JSON only.
+#[flutter_rust_bridge::frb(ignore)]
+pub(crate) fn dsd_callback_debug_json() -> serde_json::Value {
+    let stats = read_audio_engine(|handle| handle.dsd_starve_stats());
+    serde_json::json!({
+        "starved_samples": stats.map(|(samples, _)| samples),
+        "lock_misses": stats.map(|(_, misses)| misses),
+    })
+}
+
 /// Detect whether a DAC is present before attempting Rust engine initialization.
 pub fn audio_is_dac_available(preferred_sample_rate: Option<u32>) -> Result<bool, String> {
     ENGINE_MANAGER.is_dac_available(preferred_sample_rate)
@@ -1164,20 +1225,25 @@ pub fn audio_play(path: String) -> Result<(), String> {
     match detect_file_type(&path) {
         crate::audio::decoder_handle::FileType::Dsd => {
             let requested_mode = current_dsd_output_mode();
-            let dsd_sample_rate = {
+            let (dsd_sample_rate, dsd_source_channels) = {
                 let decoder = open_dsd_decoder(&path)
                     .map_err(|e| format!("Failed to probe DSD rate: {}", e))?;
-                decoder.sample_rate()
+                (decoder.sample_rate(), decoder.channels())
             };
             let dsd_rate_enum = DsdRate::from_sample_rate(dsd_sample_rate);
             set_dsd_track_rate(dsd_sample_rate);
+            set_dsd_source_channels(dsd_source_channels);
             clear_dsd_native_failure();
-            let mut effective_mode =
-                effective_dsd_output_mode_for_rate(requested_mode, dsd_rate_enum);
+            let mut effective_mode = effective_dsd_output_mode_for_rate_and_channels(
+                requested_mode,
+                dsd_rate_enum,
+                Some(dsd_source_channels),
+            );
             log_info!(
-                "[AUDIO] DSD play: requested={:?} dsd_rate={} effective={:?}",
+                "[AUDIO] DSD play: requested={:?} dsd_rate={} channels={} effective={:?}",
                 requested_mode,
                 dsd_sample_rate,
+                dsd_source_channels,
                 effective_mode
             );
             if matches!(effective_mode, DsdOutputMode::Native | DsdOutputMode::Auto) {
@@ -1206,6 +1272,8 @@ pub fn audio_play(path: String) -> Result<(), String> {
             verify_dsd_engine_rate(&path, effective_mode, output_sample_rate)?;
             if effective_mode == DsdOutputMode::Dop {
                 if let Err(dop_err) = verify_dop_passthrough(output_sample_rate) {
+                    #[cfg(all(feature = "uac2", target_os = "android"))]
+                    if crate::uac2::android_direct_usb_enabled() { return Err(dop_err); }
                     log::info!(
                         "[AUDIO] DoP pre-flight failed ({}), degrading to PCM decimation",
                         dop_err
@@ -1295,20 +1363,25 @@ pub fn audio_queue_next(path: String) -> Result<(), String> {
         match detect_file_type(&path) {
             crate::audio::decoder_handle::FileType::Dsd => {
                 let requested_mode = current_dsd_output_mode();
-                let dsd_sample_rate = {
+                let (dsd_sample_rate, dsd_source_channels) = {
                     let decoder = open_dsd_decoder(&path)
                         .map_err(|e| format!("Failed to probe DSD rate: {}", e))?;
-                    decoder.sample_rate()
+                    (decoder.sample_rate(), decoder.channels())
                 };
                 let dsd_rate_enum = DsdRate::from_sample_rate(dsd_sample_rate);
                 set_dsd_track_rate(dsd_sample_rate);
+                set_dsd_source_channels(dsd_source_channels);
                 clear_dsd_native_failure();
-                let mut effective_mode =
-                    effective_dsd_output_mode_for_rate(requested_mode, dsd_rate_enum);
+                let mut effective_mode = effective_dsd_output_mode_for_rate_and_channels(
+                    requested_mode,
+                    dsd_rate_enum,
+                    Some(dsd_source_channels),
+                );
                 log_info!(
-                    "[AUDIO] DSD queue_next: requested={:?} dsd_rate={} effective={:?}",
+                    "[AUDIO] DSD queue_next: requested={:?} dsd_rate={} channels={} effective={:?}",
                     requested_mode,
                     dsd_sample_rate,
+                    dsd_source_channels,
                     effective_mode
                 );
                 if matches!(effective_mode, DsdOutputMode::Native | DsdOutputMode::Auto) {
@@ -1337,6 +1410,8 @@ pub fn audio_queue_next(path: String) -> Result<(), String> {
                 verify_dsd_engine_rate(&path, effective_mode, output_sample_rate)?;
                 if effective_mode == DsdOutputMode::Dop {
                     if let Err(dop_err) = verify_dop_passthrough(output_sample_rate) {
+                        #[cfg(all(feature = "uac2", target_os = "android"))]
+                        if crate::uac2::android_direct_usb_enabled() { return Err(dop_err); }
                         log::info!(
                             "[AUDIO] DoP pre-flight failed ({}), degrading to PCM decimation",
                             dop_err

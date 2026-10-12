@@ -24,6 +24,7 @@ typedef AndroidFastStartPredicate = bool Function();
 typedef AndroidCrossfadeConfigProvider = AndroidCrossfadeConfig Function();
 typedef AndroidNextSongProvider = Song? Function();
 typedef AndroidTrackAdvancedCallback = void Function(Song track);
+typedef AndroidTrackErrorCallback = void Function(Song track);
 
 /// Crossfade curve applied to the outgoing/incoming volume ramps.
 enum AndroidCrossfadeCurve {
@@ -123,6 +124,7 @@ class AndroidAudioEngine implements AudioEngine {
     AndroidCrossfadeConfigProvider? crossfadeConfigProvider,
     AndroidNextSongProvider? onNextSong,
     AndroidTrackAdvancedCallback? onTrackAdvanced,
+    AndroidTrackErrorCallback? onTrackError,
   }) : _playerProvider = playerProvider,
        _sourcesBuilder = sourcesBuilder,
        _sourceBuilder = sourceBuilder,
@@ -135,7 +137,8 @@ class AndroidAudioEngine implements AudioEngine {
        _crossfadeConfigProvider = crossfadeConfigProvider ??
            (() => AndroidCrossfadeConfig.disabled),
        _onNextSong = onNextSong,
-       _onTrackAdvanced = onTrackAdvanced;
+       _onTrackAdvanced = onTrackAdvanced,
+       _onTrackError = onTrackError;
 
   final AndroidPlayerProvider _playerProvider;
   final AndroidAudioSourcesBuilder _sourcesBuilder;
@@ -149,6 +152,7 @@ class AndroidAudioEngine implements AudioEngine {
   final AndroidCrossfadeConfigProvider _crossfadeConfigProvider;
   final AndroidNextSongProvider? _onNextSong;
   final AndroidTrackAdvancedCallback? _onTrackAdvanced;
+  final AndroidTrackErrorCallback? _onTrackError;
 
   final StreamController<PlaybackState> _controller =
       StreamController<PlaybackState>.broadcast();
@@ -280,6 +284,10 @@ class AndroidAudioEngine implements AudioEngine {
           'trackFileType=${_loadedTrack?.fileType} '
           'trackTitle=${_loadedTrack?.title}',
         );
+        final failedTrack = _loadedTrack;
+        if (failedTrack != null) {
+          _onTrackError?.call(failedTrack);
+        }
       }),
     );
   }

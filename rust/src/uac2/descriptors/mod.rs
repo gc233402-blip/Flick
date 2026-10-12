@@ -11,6 +11,8 @@ mod types;
 mod validation;
 
 pub use audio_control_parser::AudioControlParser;
+#[cfg(test)]
+mod audio_control_parser_tests;
 pub use audio_streaming_parser::AudioStreamingParser;
 pub use builders::{FeatureUnitBuilder, FormatTypeIBuilder, FormatTypeIIBuilder};
 pub use factory::DescriptorFactory;

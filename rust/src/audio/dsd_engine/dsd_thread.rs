@@ -1,8 +1,11 @@
 use crate::audio::dsd_engine::dsd::{DsdOutputMode, DsdRate};
 use crate::audio::dsd_engine::format::{
-    open_dsd_decoder, DsdBitOrder, DsdChannelLayout, DsdFormatDecoder,
+    downmix_to_stereo, open_dsd_decoder, DsdBitOrder, DsdChannelConfig, DsdChannelLayout,
+    DsdFormatDecoder,
 };
+use crate::audio::decoder::remix_interleaved_channels;
 use crate::audio::dsd_engine::output::DsdOutputRouter;
+use crate::audio::resampler::AudioResampler;
 use crate::audio::source::{AudioSource, SourceInfo, SourceProducer};
 use anyhow::{anyhow, Result};
 use std::path::PathBuf;
@@ -49,16 +52,55 @@ impl DsdDecoderThread {
             .ok_or_else(|| anyhow!("Unsupported DSD sample rate: {}", decoder.sample_rate()))?;
 
         let source_channels = decoder.channels() as usize;
+        if source_channels == 0 || output_channels == 0 {
+            return Err(anyhow!("DSD channel count must be nonzero"));
+        }
         let duration_secs = decoder.duration_secs();
         let channel_layout = decoder.channel_layout();
         let source_bit_order = decoder.bit_order();
+        let source_config = decoder.channel_config();
+        let wire_mode = matches!(output_mode, DsdOutputMode::Dop | DsdOutputMode::Native);
+        if wire_mode && source_channels != output_channels {
+            return Err(anyhow!(
+                "DSD wire channel mismatch: source={}, output={}. Wired DSD needs a DAC alt with {} channels; choose Auto or PCM decimation for a stereo fold-down.",
+                source_channels,
+                output_channels,
+                source_channels
+            ));
+        }
+        if !wire_mode && source_channels > 6 {
+            return Err(anyhow!(
+                "DSD PCM decimation supports at most 6 source channels (file has {})",
+                source_channels
+            ));
+        }
 
-        let output_sample_rate = match output_mode {
+        // The decimator only produces 44.1 kHz-family rates. Keep that as an
+        // intermediate stage and let the output chain resample to whatever
+        // the engine actually negotiated (commonly 48 kHz on shared output).
+        let (output_sample_rate, router_rate, pcm_chain) = match output_mode {
             DsdOutputMode::PcmDecimation | DsdOutputMode::Auto => {
-                dsd_rate.best_pcm_target(target_rate)
+                let decimation_rate = select_decimation_target(dsd_rate, target_rate);
+                let engine_rate = if target_rate != 0 {
+                    target_rate
+                } else {
+                    decimation_rate
+                };
+                let chain = PcmOutputChain::new(
+                    decimation_rate,
+                    engine_rate,
+                    source_channels,
+                    output_channels,
+                    source_config,
+                );
+                (engine_rate, decimation_rate, chain)
             }
-            DsdOutputMode::Dop => dsd_rate.dop_carrier_rate(),
-            DsdOutputMode::Native => dsd_rate.byte_rate(),
+            DsdOutputMode::Dop => (
+                dsd_rate.dop_carrier_rate(),
+                dsd_rate.dop_carrier_rate(),
+                None,
+            ),
+            DsdOutputMode::Native => (dsd_rate.byte_rate(), dsd_rate.byte_rate(), None),
         };
 
         log::info!(
@@ -106,7 +148,7 @@ impl DsdDecoderThread {
         let output_router = DsdOutputRouter::new(
             output_mode,
             dsd_rate,
-            output_sample_rate,
+            router_rate,
             source_channels,
             source_bit_order,
         );
@@ -123,12 +165,13 @@ impl DsdDecoderThread {
                     producer,
                     output_router,
                     source_channels,
-                    output_channels,
+                    pcm_chain,
                     stop_clone,
                     start_position_secs,
                     channel_layout,
                     source_bit_order,
                 )
+                .inspect_err(|error| log::error!("[DSD-DECODER] {}: {}", path.display(), error))
             })
             .map_err(|e| anyhow!("Failed to spawn DSD decoder thread: {}", e))?;
 
@@ -186,7 +229,7 @@ fn dsd_decode_thread(
     mut producer: SourceProducer,
     mut output_router: DsdOutputRouter,
     source_channels: usize,
-    _output_channels: usize,
+    mut pcm_chain: Option<PcmOutputChain>,
     stop_signal: Arc<AtomicBool>,
     start_position_secs: Option<f64>,
     channel_layout: DsdChannelLayout,
@@ -196,18 +239,26 @@ fn dsd_decode_thread(
         if pos > 0.0 {
             let dsd_rate = decoder.sample_rate();
             let target_sample = (pos * dsd_rate as f64) as u64;
-            decoder.seek(target_sample)?;
+            if let Err(error) = decoder.seek(target_sample) {
+                producer.finish();
+                return Err(error);
+            }
             output_router.reset();
         }
     }
 
     let read_size = match &channel_layout {
         DsdChannelLayout::SequentialBlocks { block_size } => {
-            let aligned = block_size * source_channels;
-            let chunks = (DSD_READ_CHUNK_SIZE + aligned - 1) / aligned;
+            let aligned = block_size.checked_mul(source_channels).filter(|&size| size > 0);
+            let Some(aligned) = aligned else {
+                producer.finish();
+                return Err(anyhow!("Invalid DSD channel block size"));
+            };
+            let chunks = DSD_READ_CHUNK_SIZE.div_ceil(aligned);
             chunks * aligned
         }
-        DsdChannelLayout::Interleaved => DSD_READ_CHUNK_SIZE,
+        DsdChannelLayout::Interleaved =>
+            (DSD_READ_CHUNK_SIZE / source_channels).max(1) * source_channels,
     };
 
     let mut dsd_buf = vec![0u8; read_size];
@@ -252,9 +303,20 @@ fn dsd_decode_thread(
             break;
         }
 
-        let bytes_read = decoder.read_dsd_bytes(&mut dsd_buf)?;
+        let bytes_read = match decoder.read_dsd_bytes(&mut dsd_buf) {
+            Ok(n) => n,
+            Err(error) => { producer.finish(); return Err(error); }
+        };
         if bytes_read == 0 {
             break;
+        }
+        let frame_bytes = match &channel_layout {
+            DsdChannelLayout::Interleaved => source_channels,
+            DsdChannelLayout::SequentialBlocks { block_size } => block_size * source_channels,
+        };
+        if frame_bytes == 0 || bytes_read > dsd_buf.len() || bytes_read % frame_bytes != 0 {
+            producer.finish();
+            return Err(anyhow!("DSD decoder returned an incomplete channel frame"));
         }
 
         if let Some(f) = dump_raw.as_mut() {
@@ -288,7 +350,8 @@ fn dsd_decode_thread(
         if let Err(e) = output_router.process_dsd_bytes(data.as_slice(), &offsets, &mut output_buf)
         {
             log::error!("[DSD-DECODER] Processing error: {}", e);
-            break;
+            producer.finish();
+            return Err(e);
         }
 
         if let Some(f) = dump_prod.as_mut() {
@@ -304,7 +367,25 @@ fn dsd_decode_thread(
             }
         }
 
+        let samples: &[f32] = match pcm_chain.as_mut() {
+            Some(chain) => chain.process(&output_buf),
+            None => output_buf.as_slice(),
+        };
+        write_to_ring_buffer(samples, &mut producer, &stop_signal);
+    }
+
+    if !stop_signal.load(Ordering::Acquire) && !producer.should_stop() {
+        output_router.flush_dop(&mut output_buf);
         write_to_ring_buffer(&output_buf, &mut producer, &stop_signal);
+    }
+    if let Some(chain) = pcm_chain.as_mut() {
+        loop {
+            let tail = chain.flush();
+            if tail.is_empty() {
+                break;
+            }
+            write_to_ring_buffer(tail, &mut producer, &stop_signal);
+        }
     }
 
     producer.finish();
@@ -365,5 +446,210 @@ fn write_to_ring_buffer(samples: &[f32], producer: &mut SourceProducer, stop_sig
         if written == 0 {
             producer.wait_for_space(chunk.len().min(1024), 100);
         }
+    }
+}
+
+/// Pick the 44.1 kHz-family rate the CIC+FIR decimator should produce.
+/// Prefers an exact engine-rate match, then the highest family rate that
+/// fits below the engine rate, and falls back to the smallest family rate
+/// (the output chain then upsamples to the engine rate).
+fn select_decimation_target(dsd_rate: DsdRate, engine_rate: u32) -> u32 {
+    let targets = dsd_rate.pcm_decimation_targets();
+    if engine_rate != 0 {
+        if let Some(&exact) = targets.iter().find(|&&t| t == engine_rate) {
+            return exact;
+        }
+        if let Some(&below) = targets.iter().find(|&&t| t <= engine_rate) {
+            return below;
+        }
+    }
+    targets.last().copied().unwrap_or(44_100)
+}
+
+/// Converts the decimator's 44.1 kHz-family output into what the engine's
+/// callback actually consumes: the negotiated rate and channel count.
+/// Only used for PCM decimation modes; DoP/native payloads stay untouched.
+struct PcmOutputChain {
+    source_channels: usize,
+    output_channels: usize,
+    source_config: Option<DsdChannelConfig>,
+    resampler: Option<AudioResampler>,
+    remix_buf: Vec<f32>,
+    resample_buf: Vec<f32>,
+}
+
+impl PcmOutputChain {
+    fn new(
+        decimation_rate: u32,
+        engine_rate: u32,
+        source_channels: usize,
+        output_channels: usize,
+        source_config: Option<DsdChannelConfig>,
+    ) -> Option<Self> {
+        let needs_resample = decimation_rate != engine_rate;
+        let needs_remix = source_channels != output_channels;
+        if !needs_resample && !needs_remix {
+            return None;
+        }
+
+        let resampler = if needs_resample {
+            match AudioResampler::new(decimation_rate, engine_rate, output_channels.max(1), 4096) {
+                Ok(r) => Some(r),
+                Err(e) => {
+                    log::error!(
+                        "[DSD-PCM] failed to create output resampler {} -> {} Hz: {}",
+                        decimation_rate,
+                        engine_rate,
+                        e
+                    );
+                    return None;
+                }
+            }
+        } else {
+            None
+        };
+
+        log::info!(
+            "[DSD-PCM] output chain: decimation={} Hz, engine={} Hz, channels {} -> {}, layout={}, resample={}",
+            decimation_rate,
+            engine_rate,
+            source_channels,
+            output_channels,
+            source_config.map(|config| config.label()).unwrap_or("unknown"),
+            needs_resample,
+        );
+
+        Some(Self {
+            source_channels,
+            output_channels,
+            source_config,
+            resampler,
+            remix_buf: Vec::new(),
+            resample_buf: Vec::new(),
+        })
+    }
+
+    fn process(&mut self, input: &[f32]) -> &[f32] {
+        if self.source_channels != self.output_channels {
+            let frames = input.len() / self.source_channels.max(1);
+            self.remix_buf
+                .resize(frames * self.output_channels.max(1), 0.0);
+            let written = if self.output_channels == 2 && self.source_channels > 2 {
+                match self.source_config {
+                    Some(config) if config.channels() as usize == self.source_channels => {
+                        downmix_to_stereo(input, config, &mut self.remix_buf)
+                    }
+                    Some(_) => {
+                        log::error!(
+                            "[DSD-PCM] channel layout does not match {} source channels; dropping chunk",
+                            self.source_channels
+                        );
+                        0
+                    }
+                    None => {
+                        log::error!(
+                            "[DSD-PCM] unknown {}-channel layout; refusing to guess a downmix",
+                            self.source_channels
+                        );
+                        0
+                    }
+                }
+            } else {
+                remix_interleaved_channels(
+                    input,
+                    self.source_channels,
+                    self.output_channels,
+                    &mut self.remix_buf,
+                );
+                frames * self.output_channels
+            };
+            self.remix_buf.truncate(written);
+
+            if let Some(resampler) = self.resampler.as_mut() {
+                self.resample_buf.resize(self.remix_buf.len() * 2 + 8192, 0.0);
+                match resampler.process_interleaved(&self.remix_buf, &mut self.resample_buf) {
+                    Ok(written) => self.resample_buf.truncate(written),
+                    Err(e) => {
+                        log::error!("[DSD-PCM] output resampler error: {}", e);
+                        self.resample_buf.clear();
+                    }
+                }
+                return &self.resample_buf;
+            }
+
+            return &self.remix_buf;
+        }
+
+        if let Some(resampler) = self.resampler.as_mut() {
+            self.resample_buf.resize(input.len() * 2 + 8192, 0.0);
+            match resampler.process_interleaved(input, &mut self.resample_buf) {
+                Ok(written) => self.resample_buf.truncate(written),
+                Err(e) => {
+                    log::error!("[DSD-PCM] output resampler error: {}", e);
+                    self.resample_buf.clear();
+                }
+            }
+            return &self.resample_buf;
+        }
+
+        // A chain with neither remix nor resampler is never created.
+        &[]
+    }
+
+    fn flush(&mut self) -> &[f32] {
+        if let Some(resampler) = self.resampler.as_mut() {
+            self.resample_buf.resize(8192, 0.0);
+            match resampler.flush(&mut self.resample_buf) {
+                Ok(written) => self.resample_buf.truncate(written),
+                Err(e) => {
+                    log::error!("[DSD-PCM] output resampler flush error: {}", e);
+                    self.resample_buf.clear();
+                }
+            }
+            &self.resample_buf
+        } else {
+            &[]
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn decimation_target_prefers_family_rate_below_engine_rate() {
+        assert_eq!(select_decimation_target(DsdRate::Dsd64, 44_100), 44_100);
+        assert_eq!(select_decimation_target(DsdRate::Dsd64, 176_400), 176_400);
+        assert_eq!(select_decimation_target(DsdRate::Dsd64, 48_000), 44_100);
+        assert_eq!(select_decimation_target(DsdRate::Dsd64, 96_000), 88_200);
+        assert_eq!(select_decimation_target(DsdRate::Dsd64, 8_000), 44_100);
+        assert_eq!(select_decimation_target(DsdRate::Dsd64, 0), 44_100);
+        assert_eq!(select_decimation_target(DsdRate::Dsd128, 352_800), 352_800);
+        assert_eq!(select_decimation_target(DsdRate::Dsd128, 192_000), 176_400);
+    }
+
+    #[test]
+    fn pcm_chain_folds_down_known_multichannel_layouts() {
+        let mut chain = PcmOutputChain::new(
+            176_400,
+            176_400,
+            6,
+            2,
+            Some(DsdChannelConfig::FivePointOne),
+        )
+        .expect("six-to-two needs a chain");
+        // FL=1, FR=1, C=1, LFE=0, BL=1, BR=1; normalized to 1.0.
+        let output = chain.process(&[1.0, 1.0, 1.0, 0.0, 1.0, 1.0]);
+        assert_eq!(output.len(), 2);
+        assert!((output[0] - 1.0).abs() < 1e-6);
+        assert!((output[1] - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn pcm_chain_refuses_unknown_multichannel_layouts() {
+        let mut chain = PcmOutputChain::new(176_400, 176_400, 8, 2, None)
+            .expect("channel count change forces a chain");
+        assert!(chain.process(&[0.0f32; 16]).is_empty());
     }
 }

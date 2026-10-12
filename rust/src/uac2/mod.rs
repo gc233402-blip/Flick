@@ -67,6 +67,8 @@ mod transfer_buffer;
 mod transfer_manager;
 #[cfg(feature = "uac2")]
 mod uac_version;
+#[cfg(feature = "uac2")]
+mod volume_control;
 
 #[cfg(all(test, feature = "uac2"))]
 mod tests;

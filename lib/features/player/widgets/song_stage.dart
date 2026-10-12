@@ -26,7 +26,7 @@ import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 ///
 /// The file-info row keeps its layout slot even when hidden; the row is
 /// then drawn pinned by the parent screen ([fileInfoRowVisible]).
-class SongStage extends StatelessWidget {
+class SongStage extends ConsumerWidget {
   static const double _shortHeightThreshold = 620.0;
 
   final Song song;
@@ -124,7 +124,9 @@ class SongStage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Rebuild the capsule when verification settles, not on every diagnostic tick.
+    ref.watch(uac2BitPerfectIndicatorProvider);
     final isShortHeight =
         MediaQuery.sizeOf(context).height < _shortHeightThreshold;
     final showImmersiveFullView =

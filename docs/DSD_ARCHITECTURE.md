@@ -1,10 +1,13 @@
 # DSD / DSF / DFF / WavPack Playback Architecture
 
+USB hardening implementation and outstanding validation:
+[`audio/usb-dsd-hardening-plan.md`](audio/usb-dsd-hardening-plan.md).
+
 ## Overview
 
 | Format | Extension | Container | Source |
 |--------|-----------|-----------|--------|
-| **DSF** (DSD Stream File) | `.dsf` | Sony DSD container | `dsf_meta` crate |
+| **DSF** (DSD Stream File) | `.dsf` | Sony DSD container | Bounded Rust chunk reader |
 | **DFF** (DSD Interchange File) | `.dff` | Philips DSD container | `dff_meta` crate |
 | **WavPack DSD** | `.wv` | WavPack with DSD content | `wavpack-sys` C bindings |
 | **WavPack PCM** | `.wv` | WavPack with lossless PCM | `wavpack-sys` C bindings |
@@ -56,14 +59,15 @@ trait DsdFormatDecoder: Send {
 }
 ```
 
-`DsdBitOrder` (`Lsb`/`Msb`) indicates source bit ordering. All decoders report MSB by default. `open_dsd_decoder()` (`format/mod.rs:25-46`) dispatches by extension.
+`DsdBitOrder` indicates source bit ordering. DSF follows its header (1-bit storage is LSB-first, 8-bit storage is MSB-first); DFF and WavPack native output are MSB-first. `open_dsd_decoder()` dispatches by extension.
 
 ### DSF (`format/dsf_decoder.rs`)
 Sequential channel blocks: all bytes for channel 0, then channel 1, etc. Each block is `block_size` bytes (typically 4096).
-- Header via `dsf_meta::DsfFile`
-- `DsdChannelLayout::SequentialBlocks { block_size }`
-- Seek: block-aligned (`sample / block_size`)
-- No deinterleave needed
+- Bounded DSD/fmt/data chunk parsing, excluding metadata and invalid block tails
+- Audio bounds use the seekable physical extent; stale outer sizes or removed-tag pointers do not invalidate an otherwise complete audio chunk. Metadata overlap and truncated channel blocks still fail with boundary details.
+- Channel blocks are read intact, then emitted as `DsdChannelLayout::Interleaved`
+- Seek: exact byte-aligned sample (`sample / 8`), loading the containing channel block
+- Only declared valid samples are emitted; padding is not audio
 
 ### DFF (`format/dff_decoder.rs`)
 Interleaved: one byte per channel per frame.
@@ -74,8 +78,9 @@ Interleaved: one byte per channel per frame.
 
 ### WavPack DSD (`format/wavpack_decoder.rs`)
 Opened via `wavpack-sys` with `OPEN_DSD_NATIVE` (0x100) — returns raw DSD bitstream instead of PCM.
-- Detection (`wavpack_thread.rs:13-36`): bit 31 of `WavpackGetMode()` (`0x80000000`)
-- `read_dsd_bytes()` calls `WavpackUnpackSamples()`, truncates i32 → `u8`
+- Detection: `WavpackGetQualifyMode()` with `QMODE_DSD_AUDIO`
+- `read_dsd_bytes()` extracts native bytes from each i32; output is always MSB-first
+- Declared sample bounds and decoder/checksum errors are checked
 - `DsdChannelLayout::Interleaved`; `WavpackSeekSample64` for seeking
 
 ## 3. DSD Output Router
@@ -159,6 +164,22 @@ Two-stage software decimation from DSD bitrate to PCM standard rates.
 
 All targets are integer subdivisions of 44.1k × 64 (DSD base clock).
 
+### Multichannel Sources (Stereo Fold-down)
+DSF carries an explicit `channel_type` value (1 mono, 2 stereo, 3 = FL/FR/C,
+4 quad, 5 = FL/FR/C/LFE, 6 = FL/FR/C/BL/BR, 7 = 5.1); DFF and WavPack only
+carry a channel count, so they use the count-based mapping (quad is the
+default for four channels). Wired DSD (DoP/native) requires the DAC alt to
+expose exactly the source channel count — a stereo USB DAC cannot carry a
+5.1 stream, and explicitly forced DoP/native surfaces an actionable
+channel-mismatch error instead of silent truncation.
+
+With `auto` output, a multichannel source on a stereo DAC is converted
+through this PCM decimation path and folded down to stereo with an
+ITU-R BS.775-style mix (center and surrounds at -3 dB; LFE excluded per the
+standard). The fold-down is normalized by the sum of its absolute
+coefficients, so a full-scale multichannel source cannot clip the stereo
+bus. More than six source channels are refused rather than guessed.
+
 ### FIR Coefficient Generation (`coefficients.rs`)
 ```rust
 generate_lowpass_fir(num_taps, input_rate, output_rate) → Vec<f64>
@@ -187,7 +208,7 @@ A DoP DAC detects these to identify the stream as DoP. Without markers, the stre
 | DSD64 | 24-bit | 16 | 2 | 176.4 kHz |
 | DSD128 | 24-bit | 16 | 2 | 352.8 kHz |
 | DSD256 | 24-bit | 16 | 2 | 705.6 kHz |
-| DSD512 | 32-bit | 24 | 3 | 705.6 kHz |
+| DSD512 | 24-bit | 16 | 2 | 1411.2 kHz |
 
 **DSD64 24-bit frame** (2 bytes DSD + 1 marker, per channel):
 ```
@@ -197,22 +218,21 @@ byte 2: DSD channel byte 1
 → encoded as f32 via bit_cast (u32 interpretation)
 ```
 
-**DSD512 32-bit frame** (3 bytes DSD + 1 marker, per channel):
-```
-byte 0: 0x05/0xFA (marker)
-byte 1: DSD channel byte 0
-byte 2: DSD channel byte 1
-byte 3: DSD channel byte 2
-→ encoded as f32 via bit_cast
-```
+All rates use two DSD bytes plus one marker per channel. A 32-bit PCM container
+adds padding, not a third DSD byte. DSD512 DoP is refused unless the required
+1,411,200 Hz carrier is supported; native DSD or explicit PCM conversion are
+separate alternatives.
 
 ### Packing (`DopPacker::pack_to_f32()`)
 Per frame and channel:
-1. Build 24/32-bit value: `marker_byte << dsd_data_bits | dsd_bytes`
+1. Build a 24-bit word and left-justify it in a 32-bit opaque container
 2. Cast bit pattern to f32: `f32::from_bits(sample)`
 3. Advance marker state (toggle 0x05 ↔ 0xFA)
 
 The f32 values are opaque bit containers — never used as actual floating-point audio. The DAC reads the raw PCM sample bytes.
+Odd source bytes are carried across decoder reads. Markers are synchronized
+across channels and reframed at the emitted-stream boundary to remain continuous
+through pause, padding and recovery without changing the DSD data bytes.
 
 ## 7. WavPack PCM Decoder Thread
 
@@ -305,17 +325,18 @@ Always `PipelineMode::Dsp`. DoP not supported — f32 samples play as literal PC
 
 | Setting | Key | Description |
 |---------|-----|-------------|
-| DSD Output Mode | `dsd_output_mode` | `auto` / `forcePcm` / `forceDop` |
-| Auto-switch DoP → PCM | auto-switch flag | Activating software volume while in DoP restarts the decoder in PCM decimation |
+| DSD Output Mode | `dsd_output_mode` | `auto` / `forcePcm` / `forceDop` / `native` |
+| Auto-switch DSD → PCM | auto-switch flag | Explicit opt-in; volume adjustment restarts the decoder and renegotiates the USB PCM transport |
 
 Rust bridge:
-- `current_dsd_output_mode()` — reads `DSD_OUTPUT_MODE` atomic (0=PCM, 1=DoP)
+- `current_dsd_output_mode()` — reads `DSD_OUTPUT_MODE` atomic (0=PCM, 1=DoP, 2=native, 3=auto)
 - `audio_set_dsd_output_mode(mode: u8)` — writes the atomic
 - `audio_set_dsd_bit_reverse_override(bool)` — forces/inverts DSD byte ordering globally (`#[flutter_rust_bridge::frb(sync)]`)
 
-DoP volume constraint (`player_service.dart:3682-3707`):
+Wire DSD volume constraint:
 - DoP bypasses software gain (no-op in `PipelineMode::Dop`); native DSD also bypasses (mode `Dop`)
-- When software volume is needed (no hardware volume on DAC), the player auto-switches to PCM decimation
+- Verified DAC Feature Unit control is used without scaling the DSD stream
+- Without hardware volume, the level remains unchanged unless the user enabled PCM conversion
 
 ## 11. Key Constraints
 
@@ -324,7 +345,7 @@ DoP volume constraint (`player_service.dart:3682-3707`):
 - **DSD bit order is format-specific.** LSB vs MSB; the output router normalizes via the decoder's `bit_order()`. A global override inverts this for DACs expecting reversed byte order.
 - **USB native DSD uses quirk-based config.** Per-device byte ordering (endianness, bit reversal, subslot) via `lookup_dsd_quirk()` at USB output loop init.
 - **I32 streams required for DoP/DSD on DAP.** F32 streams apply format conversion that corrupts DoP markers. I32 passes raw bit patterns through AAudio.
-- **DSF sequential blocks** need read-aligned chunks: `(16384 / (block_size * channels)).ceil() * block_size * channels`.
+- **DSF channel blocks** are deblocked inside the decoder; emitted reads are whole interleaved channel frames bounded to valid samples.
 - **CIC decimation** introduces passband droop; the FIR stage compensates via Blackman-windowed lowpass.
 - **WavPack DSD detection** is via bit 31 of mode flags, NOT extension. The same `.wv` extension serves DSD and PCM WavPack.
 - **Ring buffer is fixed at 480,000 f32 samples** (~2.7s at 176.4k mono, ~170ms at 705.6k stereo). Producers block when full; consumers output silence when empty.

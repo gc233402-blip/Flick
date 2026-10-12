@@ -1,5 +1,10 @@
 # DSD Volume Control — Status & Investigation Log
 
+> Historical investigation (May 2026). For the October source audit, USB control
+> fixes and user-first testing plan, see
+> [USB DSD hardening](audio/usb-dsd-hardening-plan.md). The DAC-side volume
+> observations below are not a verified capability statement for the new path.
+
 **Last updated:** 2026-05-24
 **Status:** DSD PCM decimation still produces silence after initial "tic"
 
