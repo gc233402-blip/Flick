@@ -166,6 +166,13 @@ impl DsdOutputRouter {
             packer.reset();
         }
     }
+
+    pub fn flush_dop(&mut self, output: &mut Vec<f32>) {
+        output.clear();
+        if let Some(packer) = self.dop_packer.as_mut() {
+            packer.flush_to_f32(output);
+        }
+    }
 }
 
 #[inline]

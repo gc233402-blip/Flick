@@ -48,15 +48,14 @@ impl DsdRate {
             Self::Dsd64 => 176_400,
             Self::Dsd128 => 352_800,
             Self::Dsd256 => 705_600,
-            Self::Dsd512 => 705_600,
+            Self::Dsd512 => 1_411_200,
         }
     }
 
     pub fn dop_bits_per_frame(&self) -> u8 {
-        match self {
-            Self::Dsd64 | Self::Dsd128 | Self::Dsd256 => 24,
-            Self::Dsd512 => 32,
-        }
+        // Standard DoP always carries 16 DSD bits plus an eight-bit marker.
+        // A 32-bit PCM container adds padding, not another DSD byte.
+        24
     }
 
     pub fn dsd_bytes_per_channel_per_dop_frame(&self) -> usize {
