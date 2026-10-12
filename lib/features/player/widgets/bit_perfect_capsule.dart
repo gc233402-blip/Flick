@@ -146,7 +146,7 @@ class _BitPerfectCapsuleState extends State<BitPerfectCapsule>
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: context.responsiveText(widget.fontSize),
                   fontWeight: FontWeight.w600,
                   color: textColor,

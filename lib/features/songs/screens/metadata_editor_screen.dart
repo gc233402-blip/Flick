@@ -238,7 +238,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
           title: Text(
             l10n.editMetadata,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: accent,
@@ -320,7 +320,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
                   ? l10n.externalSongsCannotBeEdited2
                   : l10n.cueSheetTracksCannotBeEdited2,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -346,7 +346,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
             child: Text(
               _error!,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: Colors.redAccent,
               ),
@@ -375,7 +375,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
           Text(
             label,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: context.adaptiveTextSecondary,
@@ -389,7 +389,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
             keyboardType: keyboardType,
             textInputAction: textInputAction,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 15,
               color: enabled
                   ? context.adaptiveTextPrimary
@@ -426,7 +426,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
                 borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
               ),
               errorStyle: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 11,
                 color: Colors.redAccent,
               ),
@@ -446,7 +446,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
         Text(
           l10n.fileInformation,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: context.adaptiveTextSecondary,
@@ -475,7 +475,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
             child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextSecondary,
@@ -487,7 +487,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
             child: Text(
               value,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: context.adaptiveTextPrimary,
               ),
@@ -547,7 +547,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
                   : Text(
                       l10n.saveChanges,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),

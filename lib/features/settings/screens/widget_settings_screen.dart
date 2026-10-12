@@ -832,7 +832,7 @@ class _WidgetTextPreviewState extends State<_WidgetTextPreview> {
                       child: Text(
                         _sizeLabels[i],
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: selected
@@ -868,7 +868,7 @@ class _WidgetTextPreviewState extends State<_WidgetTextPreview> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontWeight: FontWeight.w700,
                   fontSize: titleSp,
                   color: Colors.white,
@@ -880,7 +880,7 @@ class _WidgetTextPreviewState extends State<_WidgetTextPreview> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: artistSp,
                   color: widget.accentColor,
                 ),

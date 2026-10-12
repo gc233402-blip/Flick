@@ -202,7 +202,7 @@ Future<void> _pump(
                         miniPlayerWidget: const DefaultTextStyle(
                           style: TextStyle(
                             color: ReplayStyle.paper,
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 14,
                           ),
                           child: SizedBox(
@@ -266,9 +266,9 @@ Future<void> _snapshot(WidgetTester tester, String name) async {
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    final fonts = FontLoader('ProductSans')
-      ..addFont(rootBundle.load('assets/fonts/Product_Sans_Regular.ttf'))
-      ..addFont(rootBundle.load('assets/fonts/Product_Sans_Bold.ttf'));
+    final fonts = FontLoader('GoogleSansFlex')
+      ..addFont(rootBundle.load('assets/fonts/GoogleSansFlex-Regular.ttf'))
+      ..addFont(rootBundle.load('assets/fonts/GoogleSansFlex-Bold.ttf'));
     await fonts.load();
     await (FontLoader(
       'MaterialIcons',

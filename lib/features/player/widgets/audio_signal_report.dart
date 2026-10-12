@@ -43,7 +43,7 @@ class AudioSignalReport extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextPrimary,
@@ -55,7 +55,7 @@ class AudioSignalReport extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 12,
                 color: context.adaptiveTextSecondary,
               ),
@@ -71,7 +71,7 @@ class AudioSignalReport extends StatelessWidget {
         Text(
           report.headline,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 21,
             fontWeight: FontWeight.w600,
             color: context.adaptiveTextPrimary,
@@ -81,7 +81,7 @@ class AudioSignalReport extends StatelessWidget {
         Text(
           report.summary,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: context.adaptiveTextPrimary,
@@ -91,7 +91,7 @@ class AudioSignalReport extends StatelessWidget {
         Text(
           report.description,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 13,
             height: 1.35,
             color: context.adaptiveTextSecondary,
@@ -380,7 +380,7 @@ class _ReportRow extends StatelessWidget {
             child: Text(
               field.label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 12,
                 color: context.adaptiveTextSecondary,
               ),
@@ -392,7 +392,7 @@ class _ReportRow extends StatelessWidget {
               field.value,
               textAlign: TextAlign.right,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 fontWeight: field.status == null
                     ? FontWeight.w400
@@ -431,7 +431,7 @@ class _BufferMeter extends StatelessWidget {
           Text(
             l10n.signalBufferOccupancy,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               color: context.adaptiveTextSecondary,
             ),
@@ -471,7 +471,7 @@ class _BufferMeter extends StatelessWidget {
                 ? '${buffer.fill} / ${buffer.capacity} ms'
                 : '${buffer.fill} / ${buffer.capacity} ms   ·   ${l10n.signalTarget} $target ms',
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               color: context.adaptiveTextSecondary,
             ),

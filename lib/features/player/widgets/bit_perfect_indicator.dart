@@ -81,7 +81,7 @@ class BitPerfectIndicator extends ConsumerWidget {
             Text(
               label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: context.responsive(9.0, 10.0, 11.0),
                 fontWeight: FontWeight.w600,
                 color: state.textColor,
@@ -414,7 +414,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
                 Text(
                   l10n.bitPerfect2,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: Colors.green.shade400,
@@ -474,7 +474,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
               Text(
                 l10n.audioSignalPath,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: context.adaptiveTextPrimary,
@@ -484,7 +484,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
                 Text(
                   l10n.bitPerfectVerified,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     color: Colors.green.shade400,
                     fontWeight: FontWeight.w500,
@@ -494,7 +494,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
                 Text(
                   l10n.directUsbExperimental,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     color: Colors.blue.shade400,
                     fontWeight: FontWeight.w500,
@@ -523,7 +523,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
                 Text(
                   'BP',
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: Colors.green.shade400,
@@ -754,7 +754,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
             child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextSecondary,
@@ -766,7 +766,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
             child: Text(
               value,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: context.adaptiveTextPrimary,
               ),
@@ -788,7 +788,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
       child: Text(
         text,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 10,
           fontWeight: FontWeight.w600,
           color: color,
@@ -810,7 +810,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
       child: Text(
         label,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 10,
           fontWeight: FontWeight.w600,
           color: context.adaptiveTextSecondary,

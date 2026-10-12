@@ -171,7 +171,7 @@ class _LineSeekBarState extends State<LineSeekBar>
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: Colors.white,
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
         ),
       ),
     );

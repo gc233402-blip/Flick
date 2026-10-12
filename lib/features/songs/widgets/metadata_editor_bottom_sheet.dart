@@ -290,7 +290,7 @@ class _MetadataEditorBottomSheetState
                 child: Text(
                   l10n.editMetadata,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: accent,
@@ -406,7 +406,7 @@ class _MetadataEditorBottomSheetState
                   ? l10n.externalSongsCannotBeEdited2
                   : l10n.cueSheetTracksCannotBeEdited2,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -432,7 +432,7 @@ class _MetadataEditorBottomSheetState
             child: Text(
               _error!,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: Colors.redAccent,
               ),
@@ -461,7 +461,7 @@ class _MetadataEditorBottomSheetState
           Text(
             label,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: context.adaptiveTextSecondary,
@@ -475,7 +475,7 @@ class _MetadataEditorBottomSheetState
             keyboardType: keyboardType,
             textInputAction: textInputAction,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 15,
               color: enabled
                   ? context.adaptiveTextPrimary
@@ -512,7 +512,7 @@ class _MetadataEditorBottomSheetState
                 borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
               ),
               errorStyle: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 11,
                 color: Colors.redAccent,
               ),
@@ -532,7 +532,7 @@ class _MetadataEditorBottomSheetState
         Text(
           l10n.fileInformation,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: context.adaptiveTextSecondary,
@@ -561,7 +561,7 @@ class _MetadataEditorBottomSheetState
             child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextSecondary,
@@ -573,7 +573,7 @@ class _MetadataEditorBottomSheetState
             child: Text(
               value,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: context.adaptiveTextPrimary,
               ),
@@ -614,7 +614,7 @@ class _MetadataEditorBottomSheetState
             : Text(
                 l10n.saveChanges,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),

@@ -250,7 +250,7 @@ class _OverflowNavItem extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: fontSize,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                       color: color,
@@ -431,7 +431,7 @@ class _OverflowMenuPopupState extends State<_OverflowMenuPopup>
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
-                                      fontFamily: 'ProductSans',
+                                      fontFamily: 'GoogleSansFlex',
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: AppColors.textPrimary,
@@ -472,7 +472,7 @@ class _OverflowMenuPopupState extends State<_OverflowMenuPopup>
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      fontFamily: 'ProductSans',
+                                      fontFamily: 'GoogleSansFlex',
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: AppColors.accent.withValues(alpha: 0.85),
@@ -638,7 +638,7 @@ class _FlickNavItemState extends State<_FlickNavItem>
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: fontSize,
                             fontWeight: widget.isSelected
                                 ? FontWeight.w600

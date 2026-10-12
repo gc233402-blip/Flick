@@ -57,7 +57,7 @@ class _SleepTimerBottomSheetState extends State<SleepTimerBottomSheet> {
                   Text(
                     l10n.sleepTimer2,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -115,7 +115,7 @@ class _SleepTimerBottomSheetState extends State<SleepTimerBottomSheet> {
                         Text(
                           l10n.stoppingIn(formatDuration(remaining)),
                           style: const TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 14,
                             color: AppColors.accent,
                             fontWeight: FontWeight.w600,
@@ -135,7 +135,7 @@ class _SleepTimerBottomSheetState extends State<SleepTimerBottomSheet> {
               Text(
                 l10n.m(_min.round()),
                 style: const TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -164,7 +164,7 @@ class _SleepTimerBottomSheetState extends State<SleepTimerBottomSheet> {
               Text(
                 l10n.m2(_max.round()),
                 style: const TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),
@@ -176,7 +176,7 @@ class _SleepTimerBottomSheetState extends State<SleepTimerBottomSheet> {
             child: Text(
               l10n.min(_value.round()),
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.accent,

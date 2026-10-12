@@ -68,7 +68,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
     Navigator.of(context).pop();
   }
 
-  static const String _topBarTextFontFamily = 'ProductSans';
+  static const String _topBarTextFontFamily = 'GoogleSansFlex';
   static const FontWeight _topBarTextFontWeight = FontWeight.w500;
 
   late AnimationController _dragController;
@@ -606,7 +606,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
                       Text(
                         l10n.nowPlaying,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: context.responsive(12.0, 13.0, 14.0),
                           fontWeight: FontWeight.w600,
                           color: Colors.white.withValues(alpha: 0.9),
@@ -618,7 +618,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
                         Text(
                           l10n.openedFromLocker,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: context.responsive(10.0, 10.5, 11.0),
                             color: Colors.white.withValues(alpha: 0.7),
                           ),
@@ -733,7 +733,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
             Text(
               l10n.backToLocker,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: context.responsive(11.0, 12.0, 13.0),
                 fontWeight: FontWeight.w600,
                 color: Colors.white.withValues(alpha: 0.92),
@@ -779,7 +779,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
           Text(
             count > 0 ? l10n.queue2(count) : l10n.queue,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: context.responsive(10.0, 11.0, 12.0),
               fontWeight: FontWeight.w600,
               color: Colors.white.withValues(alpha: highlighted ? 0.96 : 0.8),

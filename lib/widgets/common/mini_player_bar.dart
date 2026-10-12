@@ -188,7 +188,7 @@ class MiniPlayerBar extends StatelessWidget {
 
   Widget _songRow(BuildContext context, bool artworkVisible, double height) {
     final titleStyle = TextStyle(
-      fontFamily: 'ProductSans',
+      fontFamily: 'GoogleSansFlex',
       fontFamilyFallback: AppTheme.fontFamilyFallback,
       fontWeight: FontWeight.w600,
       fontSize: 14 * config.textScale,
@@ -245,7 +245,7 @@ class MiniPlayerBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontWeight: FontWeight.w500,
                     fontSize: 12 * config.textScale,
                     height: 1.15,

@@ -243,7 +243,7 @@ class _ShareBottomSheetState extends ConsumerState<ShareBottomSheet> {
               Text(
                 l10n.share,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -288,7 +288,7 @@ class _ShareBottomSheetState extends ConsumerState<ShareBottomSheet> {
               Text(
                 templates[_selectedTemplate].label(context.l10n),
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -356,7 +356,7 @@ class _ActionButton extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -405,7 +405,7 @@ class _SizePill extends StatelessWidget {
             : Text(
                 label!,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: color,

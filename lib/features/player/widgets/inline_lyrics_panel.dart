@@ -189,7 +189,7 @@ class _InlineLyricsPanelState extends ConsumerState<InlineLyricsPanel> {
         label: Text(
           label,
           style: const TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
@@ -242,7 +242,7 @@ class _InlineLyricsPanelState extends ConsumerState<InlineLyricsPanel> {
       bool marqueeLabel = false,
     }) {
       final labelStyle = TextStyle(
-        fontFamily: 'ProductSans',
+        fontFamily: 'GoogleSansFlex',
         fontSize: 11,
         fontWeight: FontWeight.w600,
         color: accent ? AppColors.accent : textColor,
@@ -350,7 +350,7 @@ class _InlineLyricsPanelState extends ConsumerState<InlineLyricsPanel> {
           lyrics.lines.map((line) => line.text).join('\n'),
           textAlign: alignment.textAlign,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 18,
             height: 1.9,
             color: Colors.white.withValues(alpha: 0.92),
@@ -414,7 +414,7 @@ class _InlineLyricsPanelState extends ConsumerState<InlineLyricsPanel> {
                 l10n.noLyricsYet,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: Colors.white.withValues(alpha: 0.9),
@@ -425,7 +425,7 @@ class _InlineLyricsPanelState extends ConsumerState<InlineLyricsPanel> {
                 l10n.searchOnlineCreateYourOwnSynced,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 13,
                   height: 1.5,
                   color: Colors.white.withValues(alpha: 0.56),

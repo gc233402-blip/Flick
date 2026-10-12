@@ -432,7 +432,7 @@ class SongStage extends ConsumerWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: context.responsiveText(
                             context.responsive(18.0, 19.0, 21.0) *
                                 immersiveTextScale,
@@ -452,7 +452,7 @@ class SongStage extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: context.responsiveText(
                               context.responsive(13.0, 14.0, 15.0) *
                                   immersiveTextScale,
@@ -487,7 +487,7 @@ class SongStage extends ConsumerWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: context.responsiveText(
                       context.responsive(22.0, 24.0, 28.0) * immersiveTextScale,
                     ),
@@ -506,7 +506,7 @@ class SongStage extends ConsumerWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: context.responsiveText(
                         context.responsive(13.0, 14.0, 16.0) *
                             immersiveTextScale,
@@ -796,7 +796,7 @@ class SongStage extends ConsumerWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: context.responsiveText(titleSize),
               fontWeight: FontWeight.w700,
               color: Colors.white,
@@ -814,7 +814,7 @@ class SongStage extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: context.responsiveText(artistSize),
                 fontWeight: FontWeight.w500,
                 color: Colors.white.withValues(alpha: 0.78),
@@ -852,7 +852,7 @@ class SongStage extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: context.responsiveText(albumFontSize),
                             color: Colors.white.withValues(alpha: 0.68),
                           ),
@@ -900,7 +900,7 @@ class SongStage extends ConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: context.responsiveText(albumFontSize),
                     color: Colors.white.withValues(alpha: 0.68),
                   ),

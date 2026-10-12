@@ -240,7 +240,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text(
             l10n.searchYourLibrary,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 15,
               color: context.adaptiveTextTertiary,
             ),
@@ -249,7 +249,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text(
             l10n.findSongsArtistsAlbumsFolders,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 13,
               color: context.adaptiveTextTertiary.withValues(alpha: 0.6),
             ),
@@ -258,7 +258,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text(
             l10n.tapChipsToFilterCategories,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 11,
               color: context.adaptiveTextTertiary.withValues(alpha: 0.45),
             ),
@@ -282,7 +282,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text(
             l10n.noResultsFor(query),
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 15,
               color: context.adaptiveTextTertiary,
             ),
@@ -291,7 +291,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text(
             l10n.tryAnotherKeywordOrEnableMore,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               color: context.adaptiveTextTertiary.withValues(alpha: 0.6),
             ),
@@ -315,7 +315,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text(
             l10n.noCategoriesSelected,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 15,
               color: context.adaptiveTextTertiary,
             ),
@@ -324,7 +324,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text(
             l10n.tapAllOrEnableAChip,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               color: context.adaptiveTextTertiary.withValues(alpha: 0.6),
             ),
@@ -371,7 +371,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 child: Text(
                   l10n.seeAll2(count),
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.accent.withValues(alpha: 0.9),
@@ -636,7 +636,7 @@ class _SectionHeader extends StatelessWidget {
             Text(
               category.label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.8,
@@ -654,7 +654,7 @@ class _SectionHeader extends StatelessWidget {
               child: Text(
                 '$count',
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   color: context.adaptiveTextTertiary,
@@ -671,7 +671,7 @@ class _SectionHeader extends StatelessWidget {
                   child: Text(
                     expanded ? l10n.showLess : l10n.seeAll,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.accent.withValues(alpha: 0.9),
@@ -734,7 +734,7 @@ class _SongTile extends ConsumerWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontWeight: FontWeight.w500,
           fontSize: 14,
           color: context.adaptiveTextPrimary,
@@ -747,7 +747,7 @@ class _SongTile extends ConsumerWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 12,
           color: context.adaptiveTextTertiary,
         ),
@@ -802,7 +802,7 @@ class _ArtistTile extends StatelessWidget {
         child: Text(
           _initials(name),
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: context.adaptiveTextSecondary,
@@ -841,7 +841,7 @@ class _ArtistTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontWeight: FontWeight.w600,
           fontSize: 14,
           color: context.adaptiveTextPrimary,
@@ -852,7 +852,7 @@ class _ArtistTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 12,
           color: context.adaptiveTextTertiary,
         ),
@@ -906,7 +906,7 @@ class _AlbumTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontWeight: FontWeight.w600,
           fontSize: 14,
           color: context.adaptiveTextPrimary,
@@ -917,7 +917,7 @@ class _AlbumTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 12,
           color: context.adaptiveTextTertiary,
         ),
@@ -958,7 +958,7 @@ class _FolderTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontWeight: FontWeight.w600,
           fontSize: 14,
           color: context.adaptiveTextPrimary,
@@ -969,7 +969,7 @@ class _FolderTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 12,
           color: context.adaptiveTextTertiary,
         ),
@@ -1071,7 +1071,7 @@ class _PlaylistTile extends ConsumerWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontWeight: FontWeight.w600,
           fontSize: 14,
           color: context.adaptiveTextPrimary,
@@ -1080,7 +1080,7 @@ class _PlaylistTile extends ConsumerWidget {
       subtitle: Text(
         l10n.songs13(count),
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 12,
           color: context.adaptiveTextTertiary,
         ),

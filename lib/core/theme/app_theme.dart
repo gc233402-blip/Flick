@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'app_colors.dart';
 
-/// App theme configuration with Product Sans font and dark theme.
+/// App theme configuration with Google Sans Flex font and dark theme.
 class AppTheme {
   AppTheme._();
 
-  /// Product Sans font family name
-  static const String _fontFamily = 'ProductSans';
+  /// Google Sans Flex font family name
+  static const String _fontFamily = 'GoogleSansFlex';
 
   /// Families tried, in order, for every style in [darkTheme].
   ///
-  /// Product Sans has no CJK glyphs, so Chinese comes from the bundled Noto
-  /// Sans SC subset (see pubspec.yaml). Skia does not search bundled fonts for
-  /// missing characters, so the fallback has to be declared explicitly here.
+  /// Google Sans Flex has no CJK glyphs, so Chinese comes from the bundled
+  /// Noto Sans SC subset (see pubspec.yaml). Skia does not search bundled fonts
+  /// for missing characters, so the fallback has to be declared explicitly
+  /// here.
   static const List<String> fontFamilyFallback = <String>['NotoSansSC'];
 
-  /// Primary text theme using Product Sans
+  /// Primary text theme using Google Sans Flex
   static TextTheme get _textTheme {
     return const TextTheme(
       // Display styles

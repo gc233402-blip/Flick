@@ -126,30 +126,34 @@ flutter:
     - assets/icons/svg/shuffle_white.svg
     - assets/autoeq/autoeq_catalog.json
     - assets/autoeq/autoeq_brands.json
+    - assets/fonts/GoogleSansFlex-OFL.txt
     - assets/fonts/NotoSansSC-OFL.txt
 
   fonts:
-    - family: ProductSans
+    # Google Sans Flex replaces Product Sans, which was not licensed for
+    # third-party redistribution. The four faces are instanced from the
+    # upstream variable font (SIL OFL 1.1, no Reserved Font Names) by
+    # tool/gen_app_font.py; see GoogleSansFlex-OFL.txt for the license.
+    - family: GoogleSansFlex
       fonts:
-        - asset: assets/fonts/Product_Sans_Bold_Italic.ttf
+        - asset: assets/fonts/GoogleSansFlex-BoldItalic.ttf
           weight: 700
           style: italic
-        - asset: assets/fonts/Product_Sans_Italic.ttf
+        - asset: assets/fonts/GoogleSansFlex-Italic.ttf
           weight: 400
           style: italic
-        - asset: assets/fonts/Product_Sans_Bold.ttf
+        - asset: assets/fonts/GoogleSansFlex-Bold.ttf
           weight: 700
           style: normal
-        - asset: assets/fonts/Product_Sans_Regular.ttf
+        - asset: assets/fonts/GoogleSansFlex-Regular.ttf
           weight: 400
           style: normal
 
     # Simplified Chinese fallback.
     #
-    # Product Sans is Latin/Greek/Cyrillic only -- it carries 216 codepoints and
-    # exactly zero CJK glyphs, so Chinese cannot come from it. Listing a family
-    # here only makes it available to the app; Skia does not search bundled
-    # fonts for missing characters (AssetFontManager::onMatchFamilyStyleCharacter
+    # Google Sans Flex is Latin/Greek only, and the app's bundled subset is
+    # deliberately smaller still. Skia does not search bundled fonts for
+    # missing characters (AssetFontManager::onMatchFamilyStyleCharacter
     # returns nullptr), so nothing would change without an explicit request.
     # AppTheme.fontFamilyFallback names this family, and every style in the
     # app's text theme carries that fallback, so Chinese renders in the bundled

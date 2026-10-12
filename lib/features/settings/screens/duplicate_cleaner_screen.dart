@@ -142,7 +142,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             Text(
               l10n.scanningForDuplicates,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextPrimary,
@@ -153,7 +153,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
               l10n.groupingByTitleArtistThisIs,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 height: 1.4,
                 color: context.adaptiveTextSecondary,
@@ -190,7 +190,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             Text(
               l10n.somethingWentWrong,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextPrimary,
@@ -201,7 +201,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
               error,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 height: 1.4,
                 color: context.adaptiveTextSecondary,
@@ -229,7 +229,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
       child: Text(
         l10n.noScanResultsYet,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 15,
           color: context.adaptiveTextSecondary,
         ),
@@ -264,7 +264,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
             Text(
               l10n.allClearNoDuplicates,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 19,
                 fontWeight: FontWeight.w700,
                 color: context.adaptiveTextPrimary,
@@ -275,7 +275,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
               l10n.yourLibraryIsTidyWeLl,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 height: 1.45,
                 color: context.adaptiveTextSecondary,
@@ -321,7 +321,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
                 child: Text(
                   l10n.checkVersionsToKeepUncheckedWill,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -339,7 +339,7 @@ class _DuplicateCleanerScreenState extends ConsumerState<DuplicateCleanerScreen>
                   child: Text(
                     l10n.reset,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -429,7 +429,7 @@ class _Header extends StatelessWidget {
                 Text(
                   l10n.duplicateCleaner,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: context.adaptiveTextPrimary,
@@ -442,7 +442,7 @@ class _Header extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12.5,
                     fontWeight: FontWeight.w500,
                     color: context.adaptiveTextSecondary,
@@ -545,7 +545,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                     Text(
                       l10n.reviewBeforeYouClean,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -557,7 +557,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                           ? l10n.groupsToRemove2(result.totalGroups, toRemove)
                           : l10n.onlyLibraryEntriesAreRemovedYour,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 12,
                         height: 1.35,
                         color: AppColors.textSecondary
@@ -667,7 +667,7 @@ class _SummaryCardState extends ConsumerState<_SummaryCard> {
                                 child: Text(
                                   l10n.youCustomizedWhichVersionsToKeep,
                                   style: TextStyle(
-                                    fontFamily: 'ProductSans',
+                                    fontFamily: 'GoogleSansFlex',
                                     fontSize: 11.5,
                                     color: AppColors.textSecondary,
                                   ),
@@ -714,7 +714,7 @@ class _SummaryStat extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 18,
             fontWeight: FontWeight.w800,
             color: context.adaptiveTextPrimary,
@@ -723,7 +723,7 @@ class _SummaryStat extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 11,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,
@@ -784,7 +784,7 @@ class _BottomActionBar extends ConsumerWidget {
                       ? l10n.removingDuplicates
                       : l10n.readyToRemoveSongKeepingIn(toRemove, scanState.selectedKeepCount),
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: context.adaptiveTextSecondary,
@@ -813,7 +813,7 @@ class _BottomActionBar extends ConsumerWidget {
               label: Text(
                 isRemoving ? l10n.removing : l10n.removeDuplicates3(toRemove),
                 style: const TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
@@ -851,7 +851,7 @@ class _BottomActionBar extends ConsumerWidget {
               child: Text(
                 l10n.orRemoveAllUsingRecommendedPicks,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                   color: context.adaptiveTextSecondary,
@@ -901,7 +901,7 @@ class _BottomActionBar extends ConsumerWidget {
                 child: Text(
                   l10n.removedDuplicatesKept(result.removedCount, result.keptCount),
                   style: const TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -947,7 +947,7 @@ class _BottomActionBar extends ConsumerWidget {
               child: Text(
                 l10n.duplicatesRemovedUsingRecommendedPicks,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -1064,7 +1064,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                           Text(
                             widget.group.songs.first.title,
                             style: TextStyle(
-                              fontFamily: 'ProductSans',
+                              fontFamily: 'GoogleSansFlex',
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                               color: context.adaptiveTextPrimary,
@@ -1077,7 +1077,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                           Text(
                             l10n.copies(widget.group.songs.first.artist, widget.group.songs.length),
                             style: TextStyle(
-                              fontFamily: 'ProductSans',
+                              fontFamily: 'GoogleSansFlex',
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textSecondary,
@@ -1113,7 +1113,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                     Text(
                                       keepingBadgeText,
                                       style: const TextStyle(
-                                        fontFamily: 'ProductSans',
+                                        fontFamily: 'GoogleSansFlex',
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.w700,
                                         color: Colors.green,
@@ -1178,7 +1178,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                               Text(
                                 l10n.chooseWhichToKeep,
                                 style: TextStyle(
-                                  fontFamily: 'ProductSans',
+                                  fontFamily: 'GoogleSansFlex',
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -1213,7 +1213,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                     child: Text(
                                       l10n.recommendedOnly,
                                       style: TextStyle(
-                                        fontFamily: 'ProductSans',
+                                        fontFamily: 'GoogleSansFlex',
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textSecondary,
@@ -1251,7 +1251,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                   child: Text(
                                     l10n.keepAll,
                                     style: TextStyle(
-                                      fontFamily: 'ProductSans',
+                                      fontFamily: 'GoogleSansFlex',
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textSecondary,
@@ -1265,7 +1265,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                           Text(
                             l10n.checkTheVersionsYouWantTo,
                             style: TextStyle(
-                              fontFamily: 'ProductSans',
+                              fontFamily: 'GoogleSansFlex',
                               fontSize: 11.5,
                               height: 1.35,
                               color: AppColors.textSecondary
@@ -1277,7 +1277,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                             Text(
                               l10n.keptWillBeRemoved(keptCount, removeCount),
                               style: TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.green.shade300,
@@ -1322,7 +1322,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                               child: Text(
                                                 l10n.atLeastOneVersionMustStay,
                                                 style: TextStyle(
-                                                  fontFamily: 'ProductSans',
+                                                  fontFamily: 'GoogleSansFlex',
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w600,
                                                   color: AppColors.textPrimary,
@@ -1461,7 +1461,7 @@ class _SongSelectRow extends StatelessWidget {
                             child: Text(
                               typeLabel,
                               style: TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 0.4,
@@ -1476,7 +1476,7 @@ class _SongSelectRow extends StatelessWidget {
                             child: Text(
                               '$bitrateLabel • $sizeLabel',
                               style: TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w700,
                                 color: selected
@@ -1515,7 +1515,7 @@ class _SongSelectRow extends StatelessWidget {
                                   Text(
                                     l10n.recommended,
                                     style: TextStyle(
-                                      fontFamily: 'ProductSans',
+                                      fontFamily: 'GoogleSansFlex',
                                       fontSize: 10,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.amber,
@@ -1531,7 +1531,7 @@ class _SongSelectRow extends StatelessWidget {
                       Text(
                         selected ? l10n.keepingThisVersion : l10n.willBeRemoved,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: selected
@@ -1545,7 +1545,7 @@ class _SongSelectRow extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -1557,7 +1557,7 @@ class _SongSelectRow extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 10.5,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textSecondary
@@ -1579,7 +1579,7 @@ class _SongSelectRow extends StatelessWidget {
                               Text(
                                 l10n.hasArtwork,
                                 style: TextStyle(
-                                  fontFamily: 'ProductSans',
+                                  fontFamily: 'GoogleSansFlex',
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w500,
                                   color: AppColors.textSecondary,

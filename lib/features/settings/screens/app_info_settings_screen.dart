@@ -461,7 +461,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
           Text(
             l10n.flickPlayer,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 24,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -471,7 +471,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
           Text(
             l10n.version(kAppVersion),
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 14,
               color: AppColors.textTertiary,
             ),
@@ -488,7 +488,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
               l10n.aPremiumMusicPlayerWithCustom,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 14,
                 color: AppColors.textSecondary,
                 height: 1.5,
@@ -505,7 +505,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                 icon: const Icon(LucideIcons.squareCode, size: 18),
                 label: Text(
                   l10n.github,
-                  style: TextStyle(fontFamily: 'ProductSans'),
+                  style: TextStyle(fontFamily: 'GoogleSansFlex'),
                 ),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.textSecondary,
@@ -517,7 +517,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
                 icon: const Icon(LucideIcons.messageCircle, size: 18),
                 label: Text(
                   l10n.discord,
-                  style: TextStyle(fontFamily: 'ProductSans'),
+                  style: TextStyle(fontFamily: 'GoogleSansFlex'),
                 ),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.textSecondary,

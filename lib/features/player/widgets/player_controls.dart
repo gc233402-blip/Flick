@@ -293,7 +293,7 @@ class PlaybackTimeLabels extends StatelessWidget {
           Text(
             formatDuration(position),
             style: const TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               color: Colors.white,
               fontFeatures: [FontFeature.tabularFigures()],
@@ -302,7 +302,7 @@ class PlaybackTimeLabels extends StatelessWidget {
           Text(
             formatDuration(duration),
             style: const TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               color: Colors.white,
               fontFeatures: [FontFeature.tabularFigures()],

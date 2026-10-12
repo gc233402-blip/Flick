@@ -214,7 +214,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
               Text(
                 l10n.identifyAlbum2,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: context.adaptiveTextPrimary,
@@ -224,7 +224,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
               Text(
                 l10n.matchByArtistAlbumAndTrack(widget.songs.length),
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 14,
                   color: context.adaptiveTextSecondary,
                 ),
@@ -281,14 +281,14 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
           : TextInputAction.search,
       onSubmitted: onSubmitted,
       style: TextStyle(
-        fontFamily: 'ProductSans',
+        fontFamily: 'GoogleSansFlex',
         fontSize: 14,
         color: context.adaptiveTextPrimary,
       ),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 13,
           color: context.adaptiveTextTertiary,
         ),
@@ -322,7 +322,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
         child: Text(
           _error!,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 14,
             color: context.adaptiveTextSecondary,
           ),
@@ -336,7 +336,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
         child: Text(
           l10n.noAppleMusicReleaseFoundTry,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 14,
             color: context.adaptiveTextSecondary,
           ),
@@ -350,7 +350,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
         Text(
           l10n.matches,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: context.adaptiveTextPrimary,
@@ -408,7 +408,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: context.adaptiveTextPrimary,
@@ -420,7 +420,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 13,
                             color: context.adaptiveTextTertiary,
                           ),
@@ -476,7 +476,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
       child: Text(
         candidate.matchedLabel,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: high ? AppColors.accent : context.adaptiveTextSecondary,
@@ -503,7 +503,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
               trackLabel ?? '–',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: track == null
@@ -522,7 +522,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 13,
                     color: track == null
                         ? context.adaptiveTextTertiary
@@ -535,7 +535,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 11,
                       color: context.adaptiveTextTertiary,
                     ),
@@ -548,7 +548,7 @@ class _IdentifyAlbumSheetState extends ConsumerState<IdentifyAlbumSheet> {
             Text(
               _deltaLabel(suggestion.durationDeltaMs!),
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 11,
                 color: context.adaptiveTextTertiary,
               ),

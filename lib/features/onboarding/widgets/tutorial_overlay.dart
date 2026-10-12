@@ -286,7 +286,7 @@ class _TooltipCard extends StatelessWidget {
                 child: Text(
                   '${currentStep + 1}/$totalSteps',
                   style: const TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textTertiary,
@@ -299,7 +299,7 @@ class _TooltipCard extends StatelessWidget {
                 child: Text(
                   l10n.skip,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textTertiary,
@@ -312,7 +312,7 @@ class _TooltipCard extends StatelessWidget {
           Text(
             step.title(context.l10n),
             style: const TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -322,7 +322,7 @@ class _TooltipCard extends StatelessWidget {
           Text(
             step.description(context.l10n),
             style: const TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 14,
               color: AppColors.textSecondary,
               height: 1.5,
@@ -397,7 +397,7 @@ class _PrimaryButton extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF0A111A),
@@ -450,7 +450,7 @@ class _SecondaryButton extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textSecondary,

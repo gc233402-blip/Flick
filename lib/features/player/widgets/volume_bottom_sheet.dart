@@ -51,7 +51,7 @@ class VolumeBottomSheet extends StatelessWidget {
                   Text(
                     l10n.volume,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
@@ -61,7 +61,7 @@ class VolumeBottomSheet extends StatelessWidget {
                   Text(
                     '${(currentVolume * 100).round()}%',
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textSecondary,
