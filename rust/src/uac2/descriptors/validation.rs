@@ -43,9 +43,9 @@ pub fn validate_feature_unit(f: &FeatureUnit) -> Result<(), Uac2Error> {
             "b_unit_id must be non-zero".to_string(),
         ));
     }
-    if f.b_control_size != 4 {
+    if !(1..=4).contains(&f.b_control_size) || f.bma_controls.is_empty() {
         return Err(Uac2Error::InvalidDescriptor(
-            "b_control_size must be 4".to_string(),
+            "feature unit must have 1..=4 byte controls and a master entry".to_string(),
         ));
     }
     Ok(())

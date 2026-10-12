@@ -3,6 +3,10 @@ use crate::dev_eprintln;
 use crate::audio::commands::AudioEvent;
 use crate::audio::engine::{audio_callback, AudioCallbackData};
 use crate::uac2::payload_audit_latch::PayloadAuditLatch;
+use crate::uac2::volume_control::{
+    normalize_volume, parse_uac2_volume_ranges, quantize_volume, volume_bounds,
+    AudioControlProtocol, VolumeRange,
+};
 use crate::uac2::{iso_packet_scheduler::IsoPacketScheduler, AudioControlParser, DescriptorIter};
 use crossbeam_channel::Sender;
 use libusb1_sys::{
@@ -26,7 +30,7 @@ use serde::Serialize;
 use std::collections::HashSet;
 use std::ffi::c_void;
 use std::os::fd::RawFd;
-use std::sync::atomic::{AtomicBool, AtomicI16, AtomicU32, AtomicU64, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Condvar, Mutex as StdMutex, Once};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
@@ -50,8 +54,9 @@ const UAC2_AS_GENERAL: u8 = 0x01;
 const UAC2_FORMAT_TYPE: u8 = 0x02;
 const UAC2_FORMAT_TYPE_I: u8 = 0x01;
 const UAC2_REQUEST_SET_CUR: u8 = 0x01;
-const UAC2_REQUEST_GET_CUR: u8 = 0x81;
-const UAC2_REQUEST_GET_RANGE: u8 = 0x82;
+const UAC2_REQUEST_GET_CUR: u8 = 0x01;
+const UAC2_REQUEST_GET_RANGE: u8 = 0x02;
+const UAC1_REQUEST_GET_CUR: u8 = 0x81;
 const UAC2_CLOCK_SOURCE_SAM_FREQ_CONTROL: u16 = 0x0100;
 const UAC2_CLOCK_SOURCE_CLOCK_VALID_CONTROL: u16 = 0x0200;
 const UAC1_SAM_FREQ_CONTROL: u16 = 0x0100;
@@ -62,13 +67,11 @@ const FORMAT_TAG_PCM: u16 = 0x0001;
 const FORMAT_TAG_PCM8: u16 = 0x0002;
 const FORMAT_TAG_IEEE_FLOAT: u16 = 0x0003;
 const FORMAT_TAG_DSD: u16 = 0x0008;
-const UAC2_REQUEST_GET_MIN: u8 = 0x82;
-const UAC2_REQUEST_GET_MAX: u8 = 0x83;
-const UAC2_REQUEST_GET_RES: u8 = 0x84;
+const UAC1_REQUEST_GET_MIN: u8 = 0x82;
+const UAC1_REQUEST_GET_MAX: u8 = 0x83;
+const UAC1_REQUEST_GET_RES: u8 = 0x84;
 const UAC2_FEATURE_UNIT_MUTE_CONTROL: u16 = 0x0100;
 const UAC2_FEATURE_UNIT_VOLUME_CONTROL: u16 = 0x0200;
-const FEATURE_MUTE: u32 = 0x0001;
-const FEATURE_VOLUME: u32 = 0x0002;
 const ISO_TRANSFER_TIMEOUT_MS: u32 = 1000;
 const ANDROID_USB_BUFFER_CAPACITY_MS: usize = 200;
 const ANDROID_USB_BUFFER_TARGET_MS: usize = 100;
@@ -466,6 +469,8 @@ pub struct AndroidDirectUsbDebugState {
     pub hardware_volume_min_raw: Option<i16>,
     pub hardware_volume_max_raw: Option<i16>,
     pub hardware_volume_resolution_raw: Option<i16>,
+    pub hardware_volume_error: Option<String>,
+    pub hardware_volume_generation: u64,
     pub feedback_endpoint_present: bool,
     pub feedback_endpoint_address: Option<u8>,
     pub feedback_transfer_type: Option<String>,
@@ -513,6 +518,8 @@ struct AndroidDirectUsbState {
     bit_perfect_verified: bool,
     software_volume_active: bool,
     hardware_volume_control: Option<AndroidDirectUsbHardwareVolumeControl>,
+    hardware_volume_generation: u64,
+    hardware_volume_error: Option<String>,
     hardware_volume_normalized: Option<f64>,
     hardware_mute_active: Option<bool>,
     packet_schedule_frames_preview: Vec<u32>,
@@ -562,7 +569,9 @@ struct AndroidDirectUsbClockApplyOutcome {
 struct AndroidDirectUsbHardwareVolumeControl {
     interface_number: u8,
     feature_unit_id: u8,
-    volume_channel: u16,
+    protocol: AudioControlProtocol,
+    volume_channels: Vec<u16>,
+    ranges: Vec<VolumeRange>,
     mute_channel: Option<u16>,
     min_volume_raw: i16,
     max_volume_raw: i16,
@@ -624,9 +633,11 @@ struct AndroidDirectUsbRuntimeStats {
 struct AndroidDirectUsbPcmRingBuffer {
     samples: Vec<i32>,
     capacity_samples: usize,
+    channels: usize,
     read_index: usize,
     write_index: usize,
     len_samples: usize,
+    dop_marker_is_fa: bool,
 }
 
 struct AndroidDirectUsbLock {
@@ -948,13 +959,17 @@ impl AndroidDirectUsbRuntimeStats {
 
 impl AndroidDirectUsbPcmRingBuffer {
     fn new(capacity_samples: usize, channels: usize) -> Self {
-        let min_capacity = channels.max(1) * 4;
+        let channels = channels.max(1);
+        let min_capacity = channels * 4;
+        let capacity_samples = capacity_samples.max(min_capacity) / channels * channels;
         Self {
-            samples: vec![0; capacity_samples.max(min_capacity)],
-            capacity_samples: capacity_samples.max(min_capacity),
+            samples: vec![0; capacity_samples],
+            capacity_samples,
+            channels,
             read_index: 0,
             write_index: 0,
             len_samples: 0,
+            dop_marker_is_fa: false,
         }
     }
 
@@ -970,6 +985,7 @@ impl AndroidDirectUsbPcmRingBuffer {
         let writable = input
             .len()
             .min(self.capacity_samples.saturating_sub(self.len_samples));
+        let writable = writable / self.channels * self.channels;
         for sample in input.iter().take(writable) {
             self.samples[self.write_index] = *sample;
             self.write_index = (self.write_index + 1) % self.capacity_samples;
@@ -988,7 +1004,7 @@ impl AndroidDirectUsbPcmRingBuffer {
             return false;
         }
 
-        let readable = output.len().min(self.len_samples);
+        let readable = output.len().min(self.len_samples) / self.channels * self.channels;
         for destination in output.iter_mut().take(readable) {
             *destination = self.samples[self.read_index];
             self.read_index = (self.read_index + 1) % self.capacity_samples;
@@ -999,23 +1015,24 @@ impl AndroidDirectUsbPcmRingBuffer {
         if underrun {
             // Zero is full-scale DC for native DSD and breaks DoP marker sync;
             // pad with a silent but valid bitstream instead.
-            for (offset, sample) in output[readable..].iter_mut().enumerate() {
-                let index = readable + offset;
+            for sample in output[readable..].iter_mut() {
                 *sample = match dsd_transport {
-                    DsdTransportMode::Native => {
-                        if index % 2 == 0 { 0x55 } else { 0xAA }
-                    }
-                    DsdTransportMode::DoP => {
-                        let marker = if index % 2 == 0 { 0x05 } else { 0xFA };
-                        let (b0, b1) = if index % 2 == 0 {
-                            (0x55, 0xAA)
-                        } else {
-                            (0xAA, 0x55)
-                        };
-                        ((marker as i32) << 24) | ((b0 as i32) << 16) | ((b1 as i32) << 8)
-                    }
+                    DsdTransportMode::Native => 0x69,
+                    DsdTransportMode::DoP => 0x00696900,
                     DsdTransportMode::None => 0,
                 };
+            }
+        }
+
+        // The final USB stream owns marker phase. Decoder restarts and inserted
+        // silence must not reset it or give L/R different markers.
+        if dsd_transport == DsdTransportMode::DoP {
+            for frame in output.chunks_exact_mut(self.channels) {
+                let marker = if self.dop_marker_is_fa { 0xFAu32 } else { 0x05 };
+                for sample in frame {
+                    *sample = ((*sample as u32 & 0x00ff_ffff) | marker << 24) as i32;
+                }
+                self.dop_marker_is_fa = !self.dop_marker_is_fa;
             }
         }
 
@@ -1058,7 +1075,7 @@ static ANDROID_DIRECT_HARDWARE_VOLUME_MUTEX: Lazy<Mutex<()>> = Lazy::new(|| Mute
 static DIRECT_USB_DISCOVERY_DISABLED: Once = Once::new();
 static ANDROID_DIRECT_USB_ENABLED: AtomicBool = AtomicBool::new(true);
 static USB_SESSION_CLEAR_PENDING: AtomicBool = AtomicBool::new(false);
-static LAST_SET_HW_VOLUME: AtomicI16 = AtomicI16::new(0);
+static HARDWARE_VOLUME_GENERATION: AtomicU64 = AtomicU64::new(0);
 
 /// Global guard: only one USB streaming session may be active at a time.
 /// Prevents "Resource busy" from concurrent or overlapping claim attempts.
@@ -1206,8 +1223,9 @@ fn bit_perfect_release_reason(state: &AndroidDirectUsbState) -> &'static str {
 }
 
 /// Verify the just-encoded wire payload looks like real DSD transport data.
-/// DoP: every word's marker byte must be 0x05/0xFA and channel-0 markers must
-/// alternate at least once. Native: require at least one non-zero byte (gross
+/// DoP: all channels share a marker and every frame alternates. This is a
+/// framing check, NOT proof of source-to-wire byte identity. Native: require
+/// at least one non-zero byte (gross
 /// pipeline-failure guard; DSD has no in-band markers to check).
 fn audit_dsd_payload(
     buffer: &[u8],
@@ -1221,29 +1239,26 @@ fn audit_dsd_payload(
     let ss = subslot_size as usize;
     match dsd_transport {
         DsdTransportMode::DoP => {
-            if ss == 0 {
+            if !(ss == 3 || ss == 4) || channels == 0 {
                 return false;
             }
             let ch = channels.max(1) as usize;
-            let num_words = buffer.len() / ss;
-            if num_words < 2 {
+            let stride = ss * ch;
+            if buffer.len() % stride != 0 || buffer.len() < 2 * stride {
                 return false;
             }
-            let mut prev_ch0: Option<u8> = None;
-            let mut alternations = 0u32;
-            for word in 0..num_words {
-                let marker = buffer[word * ss + (ss - 1)];
+            let mut previous: Option<u8> = None;
+            for frame in buffer.chunks_exact(stride) {
+                let marker = frame[ss - 1];
                 if marker != 0x05 && marker != 0xFA {
                     return false;
                 }
-                if word % ch == 0 {
-                    if prev_ch0.is_some_and(|p| marker != p) {
-                        alternations += 1;
-                    }
-                    prev_ch0 = Some(marker);
+                if previous == Some(marker) || frame.chunks_exact(ss).any(|word| word[ss - 1] != marker) {
+                    return false;
                 }
+                previous = Some(marker);
             }
-            alternations >= 1
+            true
         }
         DsdTransportMode::Native => buffer.iter().any(|&b| b != 0),
         DsdTransportMode::None => true,
@@ -1406,6 +1421,8 @@ pub fn register_android_usb_device(device: AndroidDirectUsbDevice) -> Result<(),
         bit_perfect_verified: false,
         software_volume_active: false,
         hardware_volume_control: None,
+        hardware_volume_generation: HARDWARE_VOLUME_GENERATION.fetch_add(1, Ordering::Relaxed),
+        hardware_volume_error: None,
         hardware_volume_normalized: None,
         hardware_mute_active: None,
         packet_schedule_frames_preview: Vec::new(),
@@ -1815,6 +1832,8 @@ pub fn android_direct_debug_state() -> AndroidDirectUsbDebugState {
             .hardware_volume_control
             .as_ref()
             .map(|control| control.resolution_raw),
+        hardware_volume_error: state.hardware_volume_error,
+        hardware_volume_generation: state.hardware_volume_generation,
         feedback_endpoint_present: active_transport
             .map(|transport| transport.feedback_endpoint_address.is_some())
             .unwrap_or(false),
@@ -2416,11 +2435,34 @@ fn set_software_volume_active(active: bool) {
 fn set_hardware_volume_control(control: Option<AndroidDirectUsbHardwareVolumeControl>) {
     if let Some(state) = DIRECT_USB_STATE.lock().as_mut() {
         state.hardware_volume_control = control;
+        state.hardware_volume_generation = HARDWARE_VOLUME_GENERATION.fetch_add(1, Ordering::Relaxed);
+        state.hardware_volume_normalized = None;
+        state.hardware_mute_active = None;
         if state.hardware_volume_control.is_none() {
             state.hardware_volume_normalized = None;
             state.hardware_mute_active = None;
         }
     }
+}
+
+fn set_hardware_volume_error(error: Option<String>) {
+    if let Some(state) = DIRECT_USB_STATE.lock().as_mut() {
+        state.hardware_volume_error = error;
+    }
+}
+
+fn publish_hardware_volume_snapshot(
+    generation: u64,
+    volume: f64,
+    muted: Option<bool>,
+) -> Result<(), String> {
+    let mut guard = DIRECT_USB_STATE.lock();
+    let state = guard.as_mut().filter(|state| state.hardware_volume_generation == generation)
+        .ok_or_else(|| "USB volume route changed during control transfer".to_string())?;
+    state.hardware_volume_normalized = Some(volume);
+    state.hardware_mute_active = muted;
+    state.hardware_volume_error = None;
+    Ok(())
 }
 
 fn set_hardware_volume_snapshot(volume: Option<f64>, muted: Option<bool>) {
@@ -2599,6 +2641,12 @@ fn set_packet_schedule_preview(packet_schedule_frames_preview: Vec<u32>) {
 fn set_stream_active(active: bool) {
     if let Some(state) = DIRECT_USB_STATE.lock().as_mut() {
         state.stream_active = active;
+        if !active {
+            state.hardware_volume_control = None;
+            state.hardware_volume_normalized = None;
+            state.hardware_mute_active = None;
+            state.hardware_volume_generation = HARDWARE_VOLUME_GENERATION.fetch_add(1, Ordering::Relaxed);
+        }
     }
 }
 
@@ -2803,8 +2851,12 @@ fn open_transient_usb_handle(
 #[derive(Debug, Clone)]
 struct AndroidAudioControlTopology {
     interface_number: u8,
+    protocol: AudioControlProtocol,
+    streaming_interfaces: Vec<u8>,
+    input_terminals: Vec<crate::uac2::InputTerminal>,
     feature_units: Vec<crate::uac2::FeatureUnit>,
     output_terminals: Vec<crate::uac2::OutputTerminal>,
+    sources: Vec<(u8, Vec<u8>)>,
 }
 
 fn parse_audio_control_topologies(
@@ -2826,23 +2878,57 @@ fn parse_audio_control_topologies(
 
             let mut topology = AndroidAudioControlTopology {
                 interface_number: descriptor.interface_number(),
+                protocol: match descriptor.protocol_code() {
+                    0x00 => AudioControlProtocol::Uac1,
+                    0x20 => AudioControlProtocol::Uac2,
+                    _ => continue,
+                },
+                streaming_interfaces: Vec::new(),
+                input_terminals: Vec::new(),
                 feature_units: Vec::new(),
                 output_terminals: Vec::new(),
+                sources: Vec::new(),
             };
 
             for extra in DescriptorIter::new(descriptor.extra()) {
-                let parsed = match extra.get(2).copied() {
-                    Some(UAC2_OUTPUT_TERMINAL) => {
-                        parser.parse_output_terminal(extra).ok().map(|value| {
-                            topology.output_terminals.push(value);
-                        })
+                if extra.get(1) != Some(&USB_DT_CS_INTERFACE) {
+                    continue;
+                }
+                let is_v1 = topology.protocol == AudioControlProtocol::Uac1;
+                match extra.get(2).copied() {
+                    Some(1) if is_v1 => {
+                        let header = parser.parse_ac_header_v1(extra).map_err(|e| e.to_string())?;
+                        topology.streaming_interfaces = header.ba_interface_nr;
                     }
-                    Some(UAC2_FEATURE_UNIT) => parser.parse_feature_unit(extra).ok().map(|value| {
-                        topology.feature_units.push(value);
-                    }),
-                    _ => None,
-                };
-                let _ = parsed;
+                    Some(UAC2_INPUT_TERMINAL) => {
+                        let terminal = if is_v1 { parser.parse_input_terminal_v1(extra) }
+                            else { parser.parse_input_terminal(extra) }.map_err(|e| e.to_string())?;
+                        topology.input_terminals.push(terminal);
+                    }
+                    Some(UAC2_OUTPUT_TERMINAL) => {
+                        let terminal = if is_v1 { parser.parse_output_terminal_v1(extra) }
+                            else { parser.parse_output_terminal(extra) }.map_err(|e| e.to_string())?;
+                        topology.sources.push((terminal.b_terminal_id, vec![terminal.b_source_id]));
+                        topology.output_terminals.push(terminal);
+                    }
+                    Some(UAC2_FEATURE_UNIT) => {
+                        let unit = if is_v1 { parser.parse_feature_unit_v1(extra) }
+                            else { parser.parse_feature_unit(extra) }.map_err(|e| e.to_string())?;
+                        topology.sources.push((unit.b_unit_id, vec![unit.b_source_id]));
+                        topology.feature_units.push(unit);
+                    }
+                    Some(4 | 5) => {
+                        let count = extra.get(4).copied().unwrap_or(0) as usize;
+                        if count == 0 || extra.len() < 6 + count {
+                            return Err("malformed USB mixer/selector sources".to_string());
+                        }
+                        // Do not guess the active branch of a multi-input selector.
+                        if extra[2] == 4 || count == 1 {
+                            topology.sources.push((extra[3], extra[5..5 + count].to_vec()));
+                        }
+                    }
+                    _ => {}
+                }
             }
 
             if !topology.feature_units.is_empty() || !topology.output_terminals.is_empty() {
@@ -2852,17 +2938,6 @@ fn parse_audio_control_topologies(
     }
 
     Ok(topologies)
-}
-
-fn feature_unit_channel_with_control(
-    feature_unit: &crate::uac2::FeatureUnit,
-    control_mask: u32,
-) -> Option<u16> {
-    feature_unit
-        .bma_controls
-        .iter()
-        .position(|controls| controls & control_mask != 0)
-        .map(|index| index as u16)
 }
 
 fn read_feature_unit_i16_control(
@@ -2909,7 +2984,7 @@ fn write_feature_unit_i16_control(
     let value = control_selector | (channel & 0xff);
     let index = (interface_number as u16) | ((feature_unit_id as u16) << 8);
     let data = value_raw.to_le_bytes();
-    handle
+    let transferred = handle
         .write_control(
             request_type,
             UAC2_REQUEST_SET_CUR,
@@ -2919,6 +2994,9 @@ fn write_feature_unit_i16_control(
             Duration::from_secs(1),
         )
         .map_err(|error| format!("feature-unit control write failed: {}", error))?;
+    if transferred != data.len() {
+        return Err("short feature-unit volume write".to_string());
+    }
     Ok(())
 }
 
@@ -2927,6 +3005,7 @@ fn read_feature_unit_bool_control(
     interface_number: u8,
     feature_unit_id: u8,
     channel: u16,
+    protocol: AudioControlProtocol,
     control_selector: u16,
 ) -> Result<bool, String> {
     let request_type = USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE;
@@ -2936,7 +3015,7 @@ fn read_feature_unit_bool_control(
     let transferred = handle
         .read_control(
             request_type,
-            UAC2_REQUEST_GET_CUR,
+            protocol.current_request(),
             value,
             index,
             &mut data,
@@ -2965,7 +3044,7 @@ fn write_feature_unit_bool_control(
     let value = control_selector | (channel & 0xff);
     let index = (interface_number as u16) | ((feature_unit_id as u16) << 8);
     let data = [u8::from(enabled)];
-    handle
+    let transferred = handle
         .write_control(
             request_type,
             UAC2_REQUEST_SET_CUR,
@@ -2975,6 +3054,9 @@ fn write_feature_unit_bool_control(
             Duration::from_secs(1),
         )
         .map_err(|error| format!("feature-unit mute write failed: {}", error))?;
+    if transferred != data.len() {
+        return Err("short feature-unit mute write".to_string());
+    }
     Ok(())
 }
 
@@ -2983,105 +3065,128 @@ fn read_feature_unit_volume_range(
     interface_number: u8,
     feature_unit_id: u8,
     channel: u16,
-) -> Result<(i16, i16, i16), String> {
-    Ok((
-        read_feature_unit_i16_control(
-            handle,
-            interface_number,
-            feature_unit_id,
-            channel,
-            UAC2_REQUEST_GET_MIN,
-            UAC2_FEATURE_UNIT_VOLUME_CONTROL,
-        )?,
-        read_feature_unit_i16_control(
-            handle,
-            interface_number,
-            feature_unit_id,
-            channel,
-            UAC2_REQUEST_GET_MAX,
-            UAC2_FEATURE_UNIT_VOLUME_CONTROL,
-        )?,
-        read_feature_unit_i16_control(
-            handle,
-            interface_number,
-            feature_unit_id,
-            channel,
-            UAC2_REQUEST_GET_RES,
-            UAC2_FEATURE_UNIT_VOLUME_CONTROL,
-        )?,
-    ))
-}
-
-fn normalize_hardware_volume(value_raw: i16, min_raw: i16, max_raw: i16) -> f64 {
-    if max_raw <= min_raw {
-        return if value_raw >= max_raw { 1.0 } else { 0.0 };
+    protocol: AudioControlProtocol,
+) -> Result<Vec<VolumeRange>, String> {
+    if protocol == AudioControlProtocol::Uac2 {
+        // Read the count first, then request exactly the advertised response.
+        // Some DAC firmware rejects an oversized RANGE request.
+        let request_type = USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE;
+        let value = UAC2_FEATURE_UNIT_VOLUME_CONTROL | (channel & 0xff);
+        let index = interface_number as u16 | (feature_unit_id as u16) << 8;
+        let mut count_bytes = [0u8; 2];
+        let transferred = handle.read_control(
+            request_type, UAC2_REQUEST_GET_RANGE, value, index,
+            &mut count_bytes, Duration::from_secs(1),
+        ).map_err(|e| format!("feature-unit volume RANGE count failed: {e}"))?;
+        if transferred != count_bytes.len() {
+            return Err("short USB volume RANGE count".to_string());
+        }
+        let count = u16::from_le_bytes(count_bytes) as usize;
+        if !(1..=64).contains(&count) {
+            return Err("invalid USB volume RANGE count".to_string());
+        }
+        let mut data = [0u8; 386];
+        let expected = 2 + count * 6;
+        let transferred = handle.read_control(
+            request_type, UAC2_REQUEST_GET_RANGE, value, index,
+            &mut data[..expected],
+            Duration::from_secs(1),
+        ).map_err(|e| format!("feature-unit volume RANGE failed: {e}"))?;
+        if transferred != expected {
+            return Err("short USB volume RANGE response".to_string());
+        }
+        return parse_uac2_volume_ranges(&data[..transferred]);
     }
-
-    ((value_raw - min_raw) as f64 / (max_raw - min_raw) as f64).clamp(0.0, 1.0)
-}
-
-fn quantize_hardware_volume(
-    normalized: f64,
-    min_raw: i16,
-    max_raw: i16,
-    resolution_raw: i16,
-) -> i16 {
-    let span = (max_raw - min_raw) as f64;
-    let raw = min_raw as f64 + normalized.clamp(0.0, 1.0) * span;
-    if resolution_raw <= 0 {
-        return raw.round().clamp(min_raw as f64, max_raw as f64) as i16;
-    }
-
-    let step = resolution_raw as f64;
-    let stepped = min_raw as f64 + ((raw - min_raw as f64) / step).round() * step;
-    stepped.clamp(min_raw as f64, max_raw as f64) as i16
-}
-
-fn quantize_then_normalize(
-    normalized: f64,
-    control: &AndroidDirectUsbHardwareVolumeControl,
-) -> f64 {
-    let raw = quantize_hardware_volume(
-        normalized,
-        control.min_volume_raw,
-        control.max_volume_raw,
-        control.resolution_raw,
-    );
-    normalize_hardware_volume(raw, control.min_volume_raw, control.max_volume_raw)
+    Ok(vec![VolumeRange {
+        min:
+        read_feature_unit_i16_control(
+            handle,
+            interface_number,
+            feature_unit_id,
+            channel,
+            UAC1_REQUEST_GET_MIN,
+            UAC2_FEATURE_UNIT_VOLUME_CONTROL,
+        )?,
+        max:
+        read_feature_unit_i16_control(
+            handle,
+            interface_number,
+            feature_unit_id,
+            channel,
+            UAC1_REQUEST_GET_MAX,
+            UAC2_FEATURE_UNIT_VOLUME_CONTROL,
+        )?,
+        resolution:
+        read_feature_unit_i16_control(
+            handle,
+            interface_number,
+            feature_unit_id,
+            channel,
+            UAC1_REQUEST_GET_RES,
+            UAC2_FEATURE_UNIT_VOLUME_CONTROL,
+        )?,
+    }.validate()?])
 }
 
 fn build_hardware_volume_control_from_feature_unit(
     handle: &DeviceHandle<Context>,
-    interface_number: u8,
+    topology: &AndroidAudioControlTopology,
     feature_unit: &crate::uac2::FeatureUnit,
-) -> Option<AndroidDirectUsbHardwareVolumeControl> {
-    let volume_channel = feature_unit_channel_with_control(feature_unit, FEATURE_VOLUME)?;
-    let mute_channel = feature_unit_channel_with_control(feature_unit, FEATURE_MUTE);
-    let (min_volume_raw, max_volume_raw, resolution_raw) = read_feature_unit_volume_range(
-        handle,
-        interface_number,
-        feature_unit.b_unit_id,
-        volume_channel,
-    )
-    .ok()?;
-
-    Some(AndroidDirectUsbHardwareVolumeControl {
-        interface_number,
+    channels: u16,
+) -> Result<Option<AndroidDirectUsbHardwareVolumeControl>, String> {
+    let Some(volume_channels) = topology.protocol.volume_channels(&feature_unit.bma_controls, channels)
+        else { return Ok(None); };
+    let mut ranges = Vec::new();
+    for &channel in &volume_channels {
+        let channel_ranges = read_feature_unit_volume_range(
+            handle, topology.interface_number, feature_unit.b_unit_id, channel, topology.protocol,
+        )?;
+        if ranges.is_empty() { ranges = channel_ranges; }
+        else if ranges != channel_ranges {
+            return Err("per-channel USB volume ranges differ; unified control refused".to_string());
+        }
+    }
+    let (min_volume_raw, max_volume_raw) = volume_bounds(&ranges);
+    if min_volume_raw == max_volume_raw {
+        return Ok(None);
+    }
+    // Master mute only: muting one channel would not mute playback.
+    let mute_channel = topology.protocol.writable(feature_unit.bma_controls[0], 1).then_some(0);
+    let resolution_raw = ranges.iter().map(|range| range.resolution).min().unwrap_or(0);
+    Ok(Some(AndroidDirectUsbHardwareVolumeControl {
+        interface_number: topology.interface_number,
         feature_unit_id: feature_unit.b_unit_id,
-        volume_channel,
+        protocol: topology.protocol,
+        volume_channels,
+        ranges,
         mute_channel,
         min_volume_raw,
         max_volume_raw,
         resolution_raw,
-    })
+    }))
 }
 
 fn discover_hardware_volume_control_for_terminal(
     handle: &DeviceHandle<Context>,
     topology: &AndroidAudioControlTopology,
-    terminal_link: Option<u8>,
-) -> Option<AndroidDirectUsbHardwareVolumeControl> {
-    let terminal_link = terminal_link?;
+    terminal_link: u8,
+    channels: u16,
+) -> Result<Option<AndroidDirectUsbHardwareVolumeControl>, String> {
+    // An OUT streaming terminal must be a USB input terminal, not capture.
+    if !topology.input_terminals.iter().any(|terminal|
+        terminal.b_terminal_id == terminal_link && terminal.w_terminal_type == 0x0101
+    ) { return Ok(None); }
+    let mut ancestors = HashSet::new();
+    let mut pending: Vec<u8> = topology.output_terminals.iter()
+        .filter(|terminal| terminal.w_terminal_type != 0x0101)
+        .map(|terminal| terminal.b_terminal_id).collect();
+    while let Some(entity) = pending.pop() {
+        if ancestors.insert(entity) {
+            for (_, sources) in topology.sources.iter().filter(|(id, _)| *id == entity) {
+                pending.extend(sources.iter().copied());
+            }
+        }
+    }
     let mut pending = vec![terminal_link];
     let mut visited = HashSet::new();
 
@@ -3095,70 +3200,41 @@ fn discover_hardware_volume_control_for_terminal(
             .iter()
             .find(|feature_unit| feature_unit.b_unit_id == entity_id)
         {
-            if let Some(control) = build_hardware_volume_control_from_feature_unit(
-                handle,
-                topology.interface_number,
-                feature_unit,
-            ) {
-                return Some(control);
-            }
-            pending.push(feature_unit.b_source_id);
-        }
-
-        for feature_unit in &topology.feature_units {
-            if feature_unit.b_source_id == entity_id {
+            if ancestors.contains(&entity_id) {
                 if let Some(control) = build_hardware_volume_control_from_feature_unit(
-                    handle,
-                    topology.interface_number,
-                    feature_unit,
-                ) {
-                    return Some(control);
-                }
-                pending.push(feature_unit.b_unit_id);
+                    handle, topology, feature_unit, channels,
+                )? { return Ok(Some(control)); }
             }
         }
 
-        for output_terminal in &topology.output_terminals {
-            if output_terminal.b_terminal_id == entity_id {
-                pending.push(output_terminal.b_source_id);
-            }
-            if output_terminal.b_source_id == entity_id {
-                pending.push(output_terminal.b_terminal_id);
+        for (id, sources) in &topology.sources {
+            if sources.contains(&entity_id) && ancestors.contains(id) {
+                pending.push(*id);
             }
         }
     }
 
-    None
+    Ok(None)
 }
 
 fn discover_android_usb_hardware_volume_control(
     device: &Device<Context>,
     handle: &DeviceHandle<Context>,
-    terminal_link: Option<u8>,
-) -> Option<AndroidDirectUsbHardwareVolumeControl> {
-    let topologies = parse_audio_control_topologies(device).ok()?;
-
-    for topology in &topologies {
-        if let Some(control) =
-            discover_hardware_volume_control_for_terminal(handle, topology, terminal_link)
-        {
-            return Some(control);
-        }
+    candidate: &AndroidIsoStreamCandidate,
+    clock_interface: Option<u8>,
+) -> Result<Option<AndroidDirectUsbHardwareVolumeControl>, String> {
+    let terminal = candidate.terminal_link.ok_or_else(|| "no playback terminal link for USB volume".to_string())?;
+    let topologies = parse_audio_control_topologies(device)?;
+    let matches: Vec<_> = topologies.iter().filter(|topology| {
+        clock_interface.map_or(true, |interface| topology.interface_number == interface)
+            && (topology.protocol != AudioControlProtocol::Uac1
+                || topology.streaming_interfaces.contains(&candidate.interface_number))
+            && topology.input_terminals.iter().any(|input| input.b_terminal_id == terminal)
+    }).collect();
+    if matches.len() != 1 {
+        return Err("USB playback AudioControl topology is missing or ambiguous".to_string());
     }
-
-    for topology in &topologies {
-        for feature_unit in &topology.feature_units {
-            if let Some(control) = build_hardware_volume_control_from_feature_unit(
-                handle,
-                topology.interface_number,
-                feature_unit,
-            ) {
-                return Some(control);
-            }
-        }
-    }
-
-    None
+    discover_hardware_volume_control_for_terminal(handle, matches[0], terminal, candidate.channels)
 }
 
 fn refresh_android_usb_hardware_volume_snapshot_with_handle(
@@ -3170,17 +3246,20 @@ fn refresh_android_usb_hardware_volume_snapshot_with_handle(
 
     let mut last_err = None;
     for attempt in 0..GET_CUR_RETRIES {
-        match read_feature_unit_i16_control(
-            handle,
-            control.interface_number,
-            control.feature_unit_id,
-            control.volume_channel,
-            UAC2_REQUEST_GET_CUR,
-            UAC2_FEATURE_UNIT_VOLUME_CONTROL,
-        ) {
+        let read = control.volume_channels.iter().map(|&channel| read_feature_unit_i16_control(
+            handle, control.interface_number, control.feature_unit_id, channel,
+            control.protocol.current_request(), UAC2_FEATURE_UNIT_VOLUME_CONTROL,
+        )).collect::<Result<Vec<_>, _>>().and_then(|values| {
+            let raw = values[0];
+            if values.iter().any(|value| *value != raw)
+                || !control.ranges.iter().any(|range| raw >= range.min && raw <= range.max) {
+                return Err("USB volume readback is out of range or channels disagree".to_string());
+            }
+            Ok(raw)
+        });
+        match read {
             Ok(raw) => {
-                let normalized =
-                    normalize_hardware_volume(raw, control.min_volume_raw, control.max_volume_raw);
+                let normalized = normalize_volume(raw, &control.ranges);
                 let muted = control
                     .mute_channel
                     .map(|channel| {
@@ -3189,6 +3268,7 @@ fn refresh_android_usb_hardware_volume_snapshot_with_handle(
                             control.interface_number,
                             control.feature_unit_id,
                             channel,
+                            control.protocol,
                             UAC2_FEATURE_UNIT_MUTE_CONTROL,
                         )
                     })
@@ -3230,6 +3310,9 @@ pub fn android_direct_cached_hardware_mute() -> Option<bool> {
 }
 
 pub fn android_direct_set_hardware_volume(volume: f64) -> Result<(), String> {
+    if !volume.is_finite() {
+        return Err("USB hardware volume must be finite".to_string());
+    }
     let _hold = ANDROID_DIRECT_HARDWARE_VOLUME_MUTEX.lock();
     let state = DIRECT_USB_STATE
         .lock()
@@ -3241,59 +3324,69 @@ pub fn android_direct_set_hardware_volume(volume: f64) -> Result<(), String> {
         .clone()
         .ok_or_else(|| "Android direct USB hardware volume is unavailable".to_string())?;
     let claimed_handle = open_transient_usb_handle(&state.device)
-        .inspect_err(|e| dev_eprintln!("[VolFlow] open_transient_usb_handle failed: {e}"))?;
+        .inspect_err(|e| {
+            dev_eprintln!("[VolFlow] open_transient_usb_handle failed: {e}");
+            set_hardware_volume_error(Some(e.clone()));
+        })?;
 
-    let target_raw = quantize_hardware_volume(
-        volume,
-        control.min_volume_raw,
-        control.max_volume_raw,
-        control.resolution_raw,
-    );
+    let target_raw = quantize_volume(volume, &control.ranges);
     dev_eprintln!(
         "[VolFlow] min={} max={} res={} -> raw={target_raw}",
         control.min_volume_raw, control.max_volume_raw, control.resolution_raw
     );
-    let write_result = write_feature_unit_i16_control(
-        &claimed_handle.handle,
-        control.interface_number,
-        control.feature_unit_id,
-        control.volume_channel,
-        UAC2_FEATURE_UNIT_VOLUME_CONTROL,
-        target_raw,
-    );
-    write_result.inspect_err(|e| dev_eprintln!("[VolFlow] write_feature_unit failed: {e}"))?;
+    // Snapshot every channel before a grouped write, for best-effort rollback.
+    let previous = control.volume_channels.iter().map(|&channel| read_feature_unit_i16_control(
+        &claimed_handle.handle, control.interface_number, control.feature_unit_id, channel,
+        control.protocol.current_request(), UAC2_FEATURE_UNIT_VOLUME_CONTROL,
+    )).collect::<Result<Vec<_>, _>>()
+        .inspect_err(|e| set_hardware_volume_error(Some(e.clone())))?;
+    for (index, &channel) in control.volume_channels.iter().enumerate() {
+        let unchanged = DIRECT_USB_STATE.lock().as_ref()
+            .is_some_and(|current| current.hardware_volume_generation == state.hardware_volume_generation);
+        if !unchanged { return Err("USB volume route changed before write".to_string()); }
+        if let Err(error) = write_feature_unit_i16_control(
+            &claimed_handle.handle, control.interface_number, control.feature_unit_id, channel,
+            UAC2_FEATURE_UNIT_VOLUME_CONTROL, target_raw,
+        ) {
+            for (&channel, &raw) in control.volume_channels[..=index].iter().zip(&previous) {
+                let _ = write_feature_unit_i16_control(
+                    &claimed_handle.handle, control.interface_number, control.feature_unit_id, channel,
+                    UAC2_FEATURE_UNIT_VOLUME_CONTROL, raw,
+                );
+            }
+            set_hardware_volume_error(Some(error.clone()));
+            return Err(error);
+        }
+    }
 
     let (normalized, muted) =
         refresh_android_usb_hardware_volume_snapshot_with_handle(&claimed_handle.handle, &control)
-            .inspect_err(|e| dev_eprintln!("[VolFlow] refresh_snapshot failed: {e}"))?;
+            .inspect_err(|e| {
+                dev_eprintln!("[VolFlow] refresh_snapshot failed: {e}");
+                set_hardware_volume_error(Some(e.clone()));
+            })?;
 
-    let expected = quantize_then_normalize(volume, &control);
-    let step = if control.resolution_raw > 0 {
-        control.resolution_raw as f64
-    } else {
-        1.0f64
-    };
-    let span = ((control.max_volume_raw - control.min_volume_raw) as f64).max(1.0);
-    let tolerance = (step / span * 0.6).max(1e-6);
-    if (normalized - expected).abs() > tolerance {
+    let expected = normalize_volume(target_raw, &control.ranges);
+    if (normalized - expected).abs() > 1e-6 {
         dev_eprintln!(
             "[VolFlow] post-SET_CUR volume mismatch: expected={expected:.3} got={normalized:.3}"
         );
-        return Err(format!(
+        let error = format!(
             "volume verification failed: expected {:.3}, got {:.3}",
             expected, normalized
-        ));
+        );
+        set_hardware_volume_error(Some(error.clone()));
+        return Err(error);
     }
 
-    LAST_SET_HW_VOLUME.store(target_raw, Ordering::Release);
-    set_hardware_volume_snapshot(Some(normalized), muted);
+    publish_hardware_volume_snapshot(state.hardware_volume_generation, normalized, muted)?;
     dev_eprintln!("[VolFlow] SET_CUR OK: normalized={normalized:.3}");
     Ok(())
 }
 
-/// Periodic health check: reads current hardware volume via GET_CUR and compares
-/// with the last value written by SET_CUR. Returns `Ok(true)` if they match,
-/// `Ok(false)` if they diverge (caller should fall back to Tier 2 software volume).
+/// Refresh actual DAC state. A physical volume-button change is not a failure.
+/// SET_CUR verification happens immediately after the write, not against an
+/// indefinitely stale value in this periodic read.
 pub fn android_direct_verify_hardware_volume_health() -> Result<bool, String> {
     let _hold = ANDROID_DIRECT_HARDWARE_VOLUME_MUTEX.lock();
     let state = DIRECT_USB_STATE
@@ -3306,26 +3399,15 @@ pub fn android_direct_verify_hardware_volume_health() -> Result<bool, String> {
         .clone()
         .ok_or_else(|| "Android direct USB hardware volume is unavailable".to_string())?;
     let claimed_handle = open_transient_usb_handle(&state.device)
-        .inspect_err(|e| dev_eprintln!("[VolFlow] health: open_transient_usb_handle failed: {e}"))?;
+        .inspect_err(|e| {
+            dev_eprintln!("[VolFlow] health: open_transient_usb_handle failed: {e}");
+            set_hardware_volume_error(Some(e.clone()));
+        })?;
 
-    let current_raw = read_feature_unit_i16_control(
-        &claimed_handle.handle,
-        control.interface_number,
-        control.feature_unit_id,
-        control.volume_channel,
-        UAC2_REQUEST_GET_CUR,
-        UAC2_FEATURE_UNIT_VOLUME_CONTROL,
-    )
-    .inspect_err(|e| dev_eprintln!("[VolFlow] health: GET_CUR failed: {e}"))?;
-
-    let expected_raw = LAST_SET_HW_VOLUME.load(Ordering::Acquire);
-    if current_raw != expected_raw {
-        dev_eprintln!(
-            "[VolFlow] HEALTH CHECK FAILED: expected_raw={} got_raw={}",
-            expected_raw, current_raw
-        );
-        return Ok(false);
-    }
+    let (normalized, muted) = refresh_android_usb_hardware_volume_snapshot_with_handle(
+        &claimed_handle.handle, &control,
+    ).inspect_err(|e| set_hardware_volume_error(Some(e.clone())))?;
+    publish_hardware_volume_snapshot(state.hardware_volume_generation, normalized, muted)?;
     Ok(true)
 }
 
@@ -3345,6 +3427,10 @@ pub fn android_direct_set_hardware_mute(muted: bool) -> Result<(), String> {
         .ok_or_else(|| "Android direct USB hardware mute is unavailable".to_string())?;
     let claimed_handle = open_transient_usb_handle(&state.device)?;
 
+    if !DIRECT_USB_STATE.lock().as_ref()
+        .is_some_and(|current| current.hardware_volume_generation == state.hardware_volume_generation) {
+        return Err("USB mute route changed before write".to_string());
+    }
     let write_result = write_feature_unit_bool_control(
         &claimed_handle.handle,
         control.interface_number,
@@ -3357,7 +3443,10 @@ pub fn android_direct_set_hardware_mute(muted: bool) -> Result<(), String> {
     let snapshot_result =
         refresh_android_usb_hardware_volume_snapshot_with_handle(&claimed_handle.handle, &control);
     let (normalized, snapshot_muted) = snapshot_result?;
-    set_hardware_volume_snapshot(Some(normalized), snapshot_muted);
+    if snapshot_muted != Some(muted) {
+        return Err("USB mute write did not match readback".to_string());
+    }
+    publish_hardware_volume_snapshot(state.hardware_volume_generation, normalized, snapshot_muted)?;
     Ok(())
 }
 
@@ -3719,7 +3808,7 @@ fn create_android_usb_backend_inner(
         set_android_usb_engine_state(AndroidDirectUsbEngineState::Error, Some(error.clone()));
         error
     })?;
-    let requested_playback_format = state.requested_playback_format.unwrap_or(playback_format);
+    let mut requested_playback_format = state.requested_playback_format.unwrap_or(playback_format);
     let device = claimed_handle.handle.device();
     let speed = resolve_device_speed(&device);
     let lock_requested = current_lock_requested_for_fd(state.device.fd);
@@ -3740,6 +3829,25 @@ fn create_android_usb_backend_inner(
                 return Err(error);
             }
         };
+    if playback_format.dsd_transport == DsdTransportMode::Native {
+        // Native DSD clock frames contain subslot_size bytes per channel.
+        // The producer still supplies interleaved byte-rate samples.
+        if !matches!(candidate.subslot_size, 1 | 2 | 4)
+            || playback_format.dsd_bit_rate == 0 {
+            let error = "USB native DSD refused: invalid subslot or source bit rate".to_string();
+            set_last_error(Some(error.clone()));
+            set_direct_mode_refusal_reason(Some(error.clone()));
+            cleanup_claimed_handle(claimed_handle, None, lock_requested);
+            return Err(error);
+        }
+        let wire_rate = playback_format.dsd_bit_rate / (8 * u32::from(candidate.subslot_size));
+        playback_format.sample_rate = wire_rate;
+        requested_playback_format.sample_rate = wire_rate;
+        if let Some(current) = DIRECT_USB_STATE.lock().as_mut() {
+            current.playback_format = Some(playback_format);
+            current.requested_playback_format = Some(requested_playback_format);
+        }
+    }
     let clock = find_audio_control_clock(&device, &claimed_handle.handle, candidate.terminal_link);
     let clock_detection_msg = match &clock {
         Some(c) => format!(
@@ -3760,8 +3868,22 @@ fn create_android_usb_backend_inner(
     let hardware_volume_control = discover_android_usb_hardware_volume_control(
         &device,
         &claimed_handle.handle,
-        candidate.terminal_link,
+        &candidate,
+        clock.map(|clock| clock.interface_number),
     );
+    let hardware_volume_control = match hardware_volume_control {
+        Ok(control) => {
+            set_hardware_volume_error(if control.is_none() {
+                Some("no writable volume on the active USB playback topology".to_string())
+            } else { None });
+            control
+        }
+        Err(error) => {
+            log_error!("[USB] Hardware volume discovery failed: {}", error);
+            set_hardware_volume_error(Some(error));
+            None
+        }
+    };
     set_hardware_volume_control(hardware_volume_control.clone());
     if let Some(control) = hardware_volume_control.as_ref() {
         log_info!(
@@ -3791,6 +3913,8 @@ fn create_android_usb_backend_inner(
                     control.interface_number,
                     error
                 );
+                set_hardware_volume_control(None);
+                set_hardware_volume_error(Some(error));
             }
         }
     } else {
@@ -4287,7 +4411,7 @@ fn create_android_usb_backend_inner(
             &state.device.product_name,
             crate::uac2::quirk::UsbAudioQuirk::SkipClockValidation,
         );
-        if skip_clock_validation {
+        if skip_clock_validation && playback_format.dsd_transport == DsdTransportMode::None {
             dev_eprintln!(
                 "[USB] Skipping post-alt GET_CUR re-verification (SkipClockValidation quirk)",
             );
@@ -4333,6 +4457,7 @@ fn create_android_usb_backend_inner(
                         );
 
                         if retry.set_cur_succeeded
+                            && playback_format.dsd_transport == DsdTransportMode::None
                             && !clock_verification_passed
                             && !retry.known_mismatch
                         {
@@ -4349,6 +4474,10 @@ fn create_android_usb_backend_inner(
                                 playback_format.sample_rate, clock.clock_id,
                             );
                         }
+                    } else if playback_format.dsd_transport != DsdTransportMode::None {
+                        reported_sample_rate = Some(post_alt_rate);
+                        clock_verification_passed = true;
+                        set_clock_verification(clock_control_attempted, clock_control_succeeded, true, reported_sample_rate);
                     }
                 }
                 Err(error) => {
@@ -4356,9 +4485,20 @@ fn create_android_usb_backend_inner(
                         "[USB] GET_CUR (post-alt): failed for clock {}: {}",
                         clock.clock_id, error,
                     );
+                    if playback_format.dsd_transport != DsdTransportMode::None {
+                        reported_sample_rate = None;
+                        clock_verification_passed = false;
+                        set_clock_verification(clock_control_attempted, clock_control_succeeded, false, None);
+                    }
                 }
             }
         } // end of else (not skip_clock_validation)
+    } else if candidate.is_uac1 && playback_format.dsd_transport != DsdTransportMode::None {
+        reported_sample_rate = get_uac1_sampling_frequency(
+            &claimed_handle.handle, candidate.interface_number, candidate.endpoint_address,
+        ).ok();
+        clock_verification_passed = reported_sample_rate == Some(playback_format.sample_rate);
+        set_clock_verification(clock_control_attempted, clock_control_succeeded, clock_verification_passed, reported_sample_rate);
     }
 
     dev_eprintln!(
@@ -4391,7 +4531,7 @@ fn create_android_usb_backend_inner(
             crate::uac2::quirk::UsbAudioQuirk::SkipClockValidation,
         );
 
-        if skip_clock_validation {
+        if skip_clock_validation && playback_format.dsd_transport == DsdTransportMode::None {
             dev_eprintln!(
                 "[USB] Clock verification failed but SkipClockValidation quirk is active — trusting SET_CUR for {}Hz",
                 playback_format.sample_rate,
@@ -4405,7 +4545,6 @@ fn create_android_usb_backend_inner(
                 reported_sample_rate,
             );
         } else {
-            reported_sample_rate = reported_sample_rate.or(Some(playback_format.sample_rate));
             set_clock_verification(
                 clock_control_attempted,
                 clock_control_succeeded,
@@ -4445,7 +4584,7 @@ fn create_android_usb_backend_inner(
                 crate::uac2::quirk::UsbAudioQuirk::IgnoreInvalidSampleRate,
             );
 
-            if ignore_invalid_rate {
+            if ignore_invalid_rate && playback_format.dsd_transport == DsdTransportMode::None {
                 dev_eprintln!(
                     "[USB] DAC reported {}Hz (expected {}Hz) but IgnoreInvalidSampleRate quirk is active — continuing",
                     rate, playback_format.sample_rate,
@@ -6375,7 +6514,7 @@ fn get_uac1_sampling_frequency(
     for (request_type, index, label) in encodings {
         match handle.read_control(
             request_type,
-            UAC2_REQUEST_GET_CUR,
+            UAC1_REQUEST_GET_CUR,
             UAC1_SAM_FREQ_CONTROL,
             index,
             &mut data,
@@ -7901,6 +8040,28 @@ mod dsd_bitperfect_tests {
     fn audit_dop_rejects_bad_marker_byte() {
         let buf: [u8; 8] = [0xAA, 0xAA, 0xAA, 0x05, 0xAA, 0xAA, 0xAA, 0x00];
         assert!(!audit_dsd_payload(&buf, DsdTransportMode::DoP, 4, 2));
+    }
+
+    #[test]
+    fn dop_ring_preserves_phase_through_starvation_and_resume() {
+        let mut ring = AndroidDirectUsbPcmRingBuffer::new(9, 2);
+        assert_eq!(ring.capacity_samples % 2, 0);
+        assert_eq!(ring.push_samples(&[0xfa112200u32 as i32, 0xfa334400u32 as i32]), 2);
+        let mut first = [0i32; 6];
+        assert!(ring.pop_into_or_pad(&mut first, 2, DsdTransportMode::DoP));
+        assert_eq!(first.map(|s| s as u32), [
+            0x05112200, 0x05334400, 0xfa696900, 0xfa696900, 0x05696900, 0x05696900,
+        ]);
+        assert_eq!(ring.push_samples(&[0x05556600, 0x05778800, 99]), 2);
+        let mut resumed = [0i32; 2];
+        assert!(!ring.pop_into_or_pad(&mut resumed, 2, DsdTransportMode::DoP));
+        assert_eq!(resumed.map(|s| s as u32), [0xfa556600, 0xfa778800]);
+    }
+
+    #[test]
+    fn dop_audit_rejects_disagreeing_channel_markers() {
+        let payload = [0, 0, 0x05, 0, 0, 0xFA, 0, 0, 0xFA, 0, 0, 0x05];
+        assert!(!audit_dsd_payload(&payload, DsdTransportMode::DoP, 3, 2));
     }
 
     #[test]
