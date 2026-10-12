@@ -800,6 +800,12 @@ abstract class AppLocalizations {
   /// **'{arg1} and more in rotation'**
   String andMoreInRotation(Object arg1);
 
+  /// lib/features/settings/screens/casting_settings_screen.dart:121
+  ///
+  /// In en, this message translates to:
+  /// **'Android'**
+  String get android;
+
   /// lib/features/settings/screens/uac2_preferences_screen.dart:346
   ///
   /// In en, this message translates to:
@@ -4556,6 +4562,12 @@ abstract class AppLocalizations {
   /// **'Finishing metadata enrichment…'**
   String get finishingMetadataEnrichment;
 
+  /// lib/app/app.dart:504
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Finishing metadata for {count} song…} other{Finishing metadata for {count} songs…}}'**
+  String finishingMetadataForSongs(int count);
+
   /// lib/features/menu/screens/restarting_screen.dart:13
   ///
   /// In en, this message translates to:
@@ -5557,6 +5569,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Incredible — over a month of daily listening.'**
   String get incredibleOverAMonthOfDaily;
+
+  /// lib/features/settings/screens/casting_settings_screen.dart:126
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get info2;
 
   /// lib/features/settings/screens/library_settings_screen.dart:1171
   ///
@@ -11142,6 +11160,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spatial & Time'**
   String get spatialTime;
+
+  /// lib/app/app.dart:508
+  ///
+  /// In en, this message translates to:
+  /// **'Speed up'**
+  String get speedUp;
 
   /// lib/features/settings/screens/visualizer_settings_screen.dart:170
   ///

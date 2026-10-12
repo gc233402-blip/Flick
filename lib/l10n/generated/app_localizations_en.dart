@@ -418,6 +418,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get android => 'Android';
+
+  @override
   String get androidAudioApi => 'Android Audio API';
 
   @override
@@ -2635,6 +2638,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get finishingMetadataEnrichment => 'Finishing metadata enrichment…';
 
   @override
+  String finishingMetadataForSongs(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Finishing metadata for $count songs…',
+      one: 'Finishing metadata for $count song…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get finishingUp => 'Finishing up…';
 
   @override
@@ -3233,6 +3247,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get incredibleOverAMonthOfDaily =>
       'Incredible — over a month of daily listening.';
+
+  @override
+  String get info2 => 'Info';
 
   @override
   String get initializing => 'Initializing…';
@@ -6544,6 +6561,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get spatialTime => 'Spatial & Time';
+
+  @override
+  String get speedUp => 'Speed up';
 
   @override
   String get springPhysicsEnergeticAndReactive =>

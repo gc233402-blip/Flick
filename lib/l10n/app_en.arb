@@ -561,6 +561,10 @@
       }
     }
   },
+  "android": "Android",
+  "@android": {
+    "description": "lib/features/settings/screens/casting_settings_screen.dart:121"
+  },
   "androidAudioApi": "Android Audio API",
   "@androidAudioApi": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:346"
@@ -3568,6 +3572,15 @@
   "@finishingMetadataEnrichment": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1170"
   },
+  "finishingMetadataForSongs": "{count, plural, =1{Finishing metadata for {count} song…} other{Finishing metadata for {count} songs…}}",
+  "@finishingMetadataForSongs": {
+    "description": "lib/app/app.dart:504",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "finishingUp": "Finishing up…",
   "@finishingUp": {
     "description": "lib/features/menu/screens/restarting_screen.dart:13"
@@ -4361,6 +4374,10 @@
   "incredibleOverAMonthOfDaily": "Incredible — over a month of daily listening.",
   "@incredibleOverAMonthOfDaily": {
     "description": "lib/features/milestone/widgets/streak_popup.dart:96"
+  },
+  "info2": "Info",
+  "@info2": {
+    "description": "lib/features/settings/screens/casting_settings_screen.dart:126"
   },
   "initializing": "Initializing…",
   "@initializing": {
@@ -8780,6 +8797,10 @@
   "spatialTime": "Spatial & Time",
   "@spatialTime": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:3548"
+  },
+  "speedUp": "Speed up",
+  "@speedUp": {
+    "description": "lib/app/app.dart:508"
   },
   "springPhysicsEnergeticAndReactive": "Spring physics — energetic and reactive",
   "@springPhysicsEnergeticAndReactive": {

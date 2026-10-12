@@ -118,12 +118,12 @@ class _CastingSettingsScreenState extends ConsumerState<CastingSettingsScreen> {
             ),
           ],
           const SizedBox(height: AppConstants.spacingLg),
-          SettingsSectionHeader(l10n.outputDevice, tag: 'Android'),
+          SettingsSectionHeader(l10n.outputDevice, tag: l10n.android),
           SettingsCard(
             children: [_OutputSection()],
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          SettingsSectionHeader(l10n.about, tag: 'Info'),
+          SettingsSectionHeader(l10n.about, tag: l10n.info2),
           SettingsCard(
             children: [
               _AboutBody(),

@@ -399,6 +399,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get android => 'Android';
+
+  @override
   String get androidAudioApi => 'Android 音频 API';
 
   @override
@@ -2491,6 +2494,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get finishingMetadataEnrichment => '正在完成元数据补充…';
 
   @override
+  String finishingMetadataForSongs(int count) {
+    return '正在完成 $count 首歌曲的元数据…';
+  }
+
+  @override
   String get finishingUp => '即将完成…';
 
   @override
@@ -3043,6 +3051,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get incredibleOverAMonthOfDaily => '太棒了，每日收听已超过一个月。';
+
+  @override
+  String get info2 => '信息';
 
   @override
   String get initializing => '初始化中…';
@@ -6105,6 +6116,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get spatialTime => '空间与时间';
+
+  @override
+  String get speedUp => '加速';
 
   @override
   String get springPhysicsEnergeticAndReactive => '弹簧物理效果——活泼灵敏';

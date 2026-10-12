@@ -501,11 +501,11 @@ class _MainShellState extends ConsumerState<MainShell>
     messenger.showSnackBar(
       SnackBar(
         content: Text(
-          'Finishing metadata for $count song${count == 1 ? '' : 's'}…',
+          l10n.finishingMetadataForSongs(count),
         ),
         duration: const Duration(days: 1),
         action: SnackBarAction(
-          label: 'Speed up',
+          label: l10n.speedUp,
           onPressed: () {
             final bg = ref.read(backgroundMetadataServiceProvider);
             unawaited(bg?.extractPendingMetadata());
