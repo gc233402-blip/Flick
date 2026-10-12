@@ -165,6 +165,19 @@ class Song {
     return ft == 'DSF' || ft == 'DFF' || ft == 'DSD' || ft == 'WV-DSD';
   }
 
+  /// WavPack container (DSD or PCM payload). The Android system tier cannot
+  /// open WavPack, so these files always need the Rust engine.
+  bool get isWavPack {
+    final ft = fileType.toUpperCase();
+    if (ft == 'WV' || ft == 'WV-DSD' || ft == 'WAVPACK') return true;
+    final ext = filePath?.split('.').last.toLowerCase() ?? '';
+    return ext == _wavpackExtension;
+  }
+
+  /// Whether playback needs the Rust engine because the Android system
+  /// decoder (just_audio/ExoPlayer) cannot decode this container.
+  bool get requiresRustDecoder => isDsd || isWavPack;
+
   String get dsdRateLabel {
     if (!isDsd) return '';
     final rate = sampleRate ?? 0;
