@@ -332,7 +332,7 @@ class _BluetoothSettingsScreenState
             ),
             const SizedBox(height: AppConstants.spacingLg),
           ],
-          SettingsSectionHeader(l10n.codecU0026Audio, tag: 'Experimental'),
+          SettingsSectionHeader(l10n.codecU0026Audio, tag: l10n.experimental),
           SettingsCard(
             children: _withDividers([
               ToggleSetting(
@@ -402,7 +402,7 @@ class _BluetoothSettingsScreenState
             ]),
           ),
           const SizedBox(height: AppConstants.spacingLg),
-          SettingsSectionHeader(l10n.outputMode, tag: 'Experimental'),
+          SettingsSectionHeader(l10n.outputMode, tag: l10n.experimental),
           SettingsCard(
             children: _withDividers([
               ValueListenableBuilder<bool>(

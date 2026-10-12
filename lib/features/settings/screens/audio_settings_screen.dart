@@ -311,7 +311,7 @@ class _CrossfadeSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SettingsSectionHeader(l10n.crossfade, tag: 'Experimental'),
+            SettingsSectionHeader(l10n.crossfade, tag: l10n.experimental),
             SettingsCard(
               children: [
                 ToggleSetting(
@@ -425,7 +425,7 @@ class _CrossfeedSection extends ConsumerWidget {
           children: [
             SettingsSectionHeader(
               l10n.crossfeedBs2b,
-              tag: 'Experimental',
+              tag: l10n.experimental,
             ),
             SettingsCard(
               children: [

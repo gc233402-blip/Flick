@@ -399,6 +399,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get android => 'Android';
+
+  @override
   String get androidAudioApi => 'Android 音频 API';
 
   @override
@@ -3043,6 +3046,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get incredibleOverAMonthOfDaily => '太棒了，每日收听已超过一个月。';
+
+  @override
+  String get info2 => '信息';
 
   @override
   String get initializing => '初始化中…';
