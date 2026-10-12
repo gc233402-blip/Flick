@@ -2494,6 +2494,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get finishingMetadataEnrichment => '正在完成元数据补充…';
 
   @override
+  String finishingMetadataForSongs(int count) {
+    return '正在完成 $count 首歌曲的元数据…';
+  }
+
+  @override
   String get finishingUp => '即将完成…';
 
   @override
@@ -6111,6 +6116,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get spatialTime => '空间与时间';
+
+  @override
+  String get speedUp => '加速';
 
   @override
   String get springPhysicsEnergeticAndReactive => '弹簧物理效果——活泼灵敏';

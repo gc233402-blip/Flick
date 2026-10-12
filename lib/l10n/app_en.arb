@@ -3572,6 +3572,15 @@
   "@finishingMetadataEnrichment": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1170"
   },
+  "finishingMetadataForSongs": "{count, plural, =1{Finishing metadata for {count} song…} other{Finishing metadata for {count} songs…}}",
+  "@finishingMetadataForSongs": {
+    "description": "lib/app/app.dart:504",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "finishingUp": "Finishing up…",
   "@finishingUp": {
     "description": "lib/features/menu/screens/restarting_screen.dart:13"
@@ -8788,6 +8797,10 @@
   "spatialTime": "Spatial & Time",
   "@spatialTime": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:3548"
+  },
+  "speedUp": "Speed up",
+  "@speedUp": {
+    "description": "lib/app/app.dart:508"
   },
   "springPhysicsEnergeticAndReactive": "Spring physics — energetic and reactive",
   "@springPhysicsEnergeticAndReactive": {

@@ -4562,6 +4562,12 @@ abstract class AppLocalizations {
   /// **'Finishing metadata enrichment…'**
   String get finishingMetadataEnrichment;
 
+  /// lib/app/app.dart:504
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Finishing metadata for {count} song…} other{Finishing metadata for {count} songs…}}'**
+  String finishingMetadataForSongs(int count);
+
   /// lib/features/menu/screens/restarting_screen.dart:13
   ///
   /// In en, this message translates to:
@@ -11154,6 +11160,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spatial & Time'**
   String get spatialTime;
+
+  /// lib/app/app.dart:508
+  ///
+  /// In en, this message translates to:
+  /// **'Speed up'**
+  String get speedUp;
 
   /// lib/features/settings/screens/visualizer_settings_screen.dart:170
   ///
