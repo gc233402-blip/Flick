@@ -10,8 +10,9 @@
 //      `_error!.startsWith('Camera')` while `_error` was
 //      `l10n.cameraAccessIsNeeded...`. English worked, every translation lost the
 //      button (fixed upstream in 318fce03).
-//   P  a plural spelled with a ternary -- `count == 1 ? 'song' : 'songs'`. It is
-//      correct English and untranslatable everywhere else.
+//   P  a plural spelled with a ternary -- `count == 1 ? 'song' : 'songs'`, or
+//      its suffix form `${count == 1 ? '' : 's'}`. Correct English and
+//      untranslatable everywhere else.
 //   W  localized copy used as a wire value -- `kAppVersionLabel` became an HTTP
 //      User-Agent, and full-width punctuation is not a valid header value
 //      (fixed upstream in 4cb94be3).
@@ -54,8 +55,8 @@ final List<_Pattern> _patterns = <_Pattern>[
   _Pattern('C', r'[A-Za-z_]\w*\s*[!?]{0,2}\s*\.\s*contains\s*\(\s*[\x27"]', 'inspecting localized copy'),
 
   // ----------------------------------------------------------- plural ternary --
-  _Pattern('P', r'==\s*1\s*\?\s*[\x27"][^\x27"]{2,}[\x27"]\s*:\s*[\x27"]', 'a plural spelled with a ternary'),
-  _Pattern('P', r'!=\s*1\s*\?\s*[\x27"][^\x27"]{2,}[\x27"]\s*:\s*[\x27"]', 'a plural spelled with a ternary'),
+  _Pattern('P', r'==\s*1\s*\?\s*[\x27"][^\x27"]*[\x27"]\s*:\s*[\x27"]', 'a plural spelled with a ternary'),
+  _Pattern('P', r'!=\s*1\s*\?\s*[\x27"][^\x27"]*[\x27"]\s*:\s*[\x27"]', 'a plural spelled with a ternary'),
 
   // -------------------------------------------------------------- wire values --
   _Pattern('W', r'[\x27"](?:User-Agent|Authorization|SOAPAction|Accept|Content-Type)[\x27"]\s*:\s*l10n\.', 'localized copy as an HTTP header'),
