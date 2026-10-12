@@ -418,6 +418,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get android => 'Android';
+
+  @override
   String get androidAudioApi => 'Android Audio API';
 
   @override
@@ -3233,6 +3236,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get incredibleOverAMonthOfDaily =>
       'Incredible — over a month of daily listening.';
+
+  @override
+  String get info2 => 'Info';
 
   @override
   String get initializing => 'Initializing…';

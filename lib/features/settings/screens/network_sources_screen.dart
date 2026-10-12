@@ -313,7 +313,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
   ) {
     final synced = server.lastSyncedAt;
     final parts = <String>[
-      if (songCount > 0) '$songCount ${songCount == 1 ? 'song' : 'songs'}',
+      if (songCount > 0) l10n.song2(songCount),
       synced == null ? l10n.neverSynced : l10n.synced2(_formatDate(synced)),
     ];
     return Row(

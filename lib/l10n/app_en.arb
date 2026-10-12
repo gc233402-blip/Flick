@@ -561,6 +561,10 @@
       }
     }
   },
+  "android": "Android",
+  "@android": {
+    "description": "lib/features/settings/screens/casting_settings_screen.dart:121"
+  },
   "androidAudioApi": "Android Audio API",
   "@androidAudioApi": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:346"
@@ -4361,6 +4365,10 @@
   "incredibleOverAMonthOfDaily": "Incredible — over a month of daily listening.",
   "@incredibleOverAMonthOfDaily": {
     "description": "lib/features/milestone/widgets/streak_popup.dart:96"
+  },
+  "info2": "Info",
+  "@info2": {
+    "description": "lib/features/settings/screens/casting_settings_screen.dart:126"
   },
   "initializing": "Initializing…",
   "@initializing": {
