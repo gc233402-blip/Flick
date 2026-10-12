@@ -91,7 +91,12 @@ impl DsdOutputRouter {
     ) -> Self {
         let pcm_pipeline = match mode {
             DsdOutputMode::PcmDecimation | DsdOutputMode::Auto => {
-                Some(DsdDecimationPipeline::new(dsd_rate, target_rate, channels))
+                Some(DsdDecimationPipeline::new(
+                    dsd_rate,
+                    target_rate,
+                    channels,
+                    needs_bit_reversal(source_bit_order),
+                ))
             }
             DsdOutputMode::Dop | DsdOutputMode::Native => None,
         };
@@ -100,7 +105,7 @@ impl DsdOutputRouter {
             DsdOutputMode::Dop => Some(DopPacker::with_bit_reverse(
                 dsd_rate,
                 channels,
-                dop_needs_bit_reverse(source_bit_order),
+                needs_bit_reversal(source_bit_order),
             )),
             DsdOutputMode::PcmDecimation | DsdOutputMode::Native | DsdOutputMode::Auto => None,
         };
@@ -186,7 +191,10 @@ fn normalize_dsd_byte(byte: u8, source_order: DsdBitOrder) -> u8 {
     }
 }
 
-fn dop_needs_bit_reverse(source_order: DsdBitOrder) -> bool {
+/// True when bytes must be reversed before being consumed MSB-first.
+/// Both the DoP packer and the PCM decimator walk bits in that order.
+/// Respects the user's bit-reverse override.
+fn needs_bit_reversal(source_order: DsdBitOrder) -> bool {
     let source_lsb = matches!(source_order, DsdBitOrder::LsbFirst);
     if DSD_BIT_REVERSE_OVERRIDE.load(Ordering::Relaxed) {
         !source_lsb

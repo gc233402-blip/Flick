@@ -718,7 +718,7 @@ fn decode_thread(
     Ok(())
 }
 
-fn remix_interleaved_channels(
+pub(crate) fn remix_interleaved_channels(
     input: &[f32],
     source_channels: usize,
     output_channels: usize,
