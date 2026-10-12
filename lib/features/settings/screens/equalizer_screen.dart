@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/core/theme/app_theme.dart';
 import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/providers/equalizer_provider.dart';
@@ -4202,6 +4203,7 @@ class _ModeToggleButton extends StatelessWidget {
             duration: AppConstants.animationFast,
             style: TextStyle(
               fontFamily: 'ProductSans',
+              fontFamilyFallback: AppTheme.fontFamilyFallback,
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: selected

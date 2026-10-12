@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flick/core/theme/app_theme.dart';
 import 'package:flick/models/song.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 
@@ -121,6 +122,8 @@ class LyricShareCard extends StatelessWidget {
         text: TextSpan(
           text: text,
           style: TextStyle(
+            fontFamily: 'ProductSans',
+            fontFamilyFallback: AppTheme.fontFamilyFallback,
             fontSize: mid,
             fontWeight: FontWeight.w700,
             height: 1.2,
