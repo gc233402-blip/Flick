@@ -9,6 +9,7 @@ import 'replay_card_surface.dart';
 import 'replay_graphics.dart';
 import 'replay_reveal.dart';
 import 'replay_style.dart';
+import 'package:flick/l10n/l10n.dart';
 
 TextStyle _display(Color color, double size) => TextStyle(
   fontSize: size,
@@ -65,7 +66,7 @@ class ReplayOverview extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'plays in rotation',
+                  l10n.playsInRotation,
                   style: _display(palette.foreground, 21),
                 ),
                 const SizedBox(height: 8),
@@ -88,7 +89,7 @@ class ReplayOverview extends StatelessWidget {
                     layered: options.layered,
                     ornaments: options.ornaments,
                     badge: options.badges && song != null
-                        ? 'Most replayed · ${ReplayStyle.plays(song.plays)}'
+                        ? l10n.mostReplayed(ReplayStyle.plays(song.plays))
                         : null,
                   ),
                 ),
@@ -108,7 +109,7 @@ class ReplayOverview extends StatelessWidget {
                   if (options.tagline) ...[
                     const SizedBox(height: 14),
                     Text(
-                      'Your most replayed track',
+                      l10n.yourMostReplayedTrack,
                       style: TextStyle(color: palette.secondary, fontSize: 12),
                     ),
                   ],
@@ -123,7 +124,7 @@ class ReplayOverview extends StatelessWidget {
                     Expanded(
                       child: Text(
                         options.tagline
-                            ? 'Your music. On repeat.'
+                            ? l10n.yourMusicOnRepeat
                             : recap.period.label,
                         style: TextStyle(
                           fontSize: 11,
@@ -140,10 +141,10 @@ class ReplayOverview extends StatelessWidget {
         ),
         if (options.metrics.contains(ReplayMetric.trackTime)) ...[
           const SizedBox(height: 12),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 6),
             child: Text(
-              'Track time sums the full duration of logged plays.',
+              l10n.trackTimeSumsTheFullDuration,
               style: TextStyle(fontSize: 12, color: ReplayStyle.muted),
             ),
           ),
@@ -239,7 +240,7 @@ class ReplayRankings extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              artists ? 'Top artists' : 'Top songs',
+              artists ? l10n.topArtists : l10n.topSongs2,
               style: _display(palette.foreground, 34),
             ),
             const SizedBox(height: 8),
@@ -261,7 +262,7 @@ class ReplayRankings extends StatelessWidget {
                       ? recap.topArtists[i].artist
                       : recap.topSongs[i].song.title,
                   subtitle: artists
-                      ? '${recap.topArtists[i].uniqueSongs} ${recap.topArtists[i].uniqueSongs == 1 ? 'song' : 'songs'}'
+                      ? l10n.songsCount(recap.topArtists[i].uniqueSongs)
                       : recap.topSongs[i].song.artist,
                   path: artists ? null : recap.topSongs[i].song.albumArt,
                   plays: artists
@@ -435,7 +436,7 @@ class ReplayArtistFeature extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Top artist', style: _display(palette.foreground, 34)),
+            Text(l10n.topArtist, style: _display(palette.foreground, 34)),
             const SizedBox(height: 8),
             Text(
               ReplayStyle.range(recap),
@@ -462,7 +463,7 @@ class ReplayArtistFeature extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${artist.uniqueSongs} ${artist.uniqueSongs == 1 ? 'song' : 'songs'} in your rotation',
+              l10n.songsInRotation(artist.uniqueSongs),
               style: TextStyle(fontSize: 15, color: palette.secondary),
             ),
             const SizedBox(height: 24),
@@ -504,7 +505,7 @@ class ReplayAlbumFeature extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Top album', style: _display(palette.foreground, 34)),
+            Text(l10n.topAlbum, style: _display(palette.foreground, 34)),
             const SizedBox(height: 8),
             Text(
               ReplayStyle.range(recap),
@@ -533,7 +534,7 @@ class ReplayAlbumFeature extends StatelessWidget {
             Divider(height: 1, color: palette.rule),
             const SizedBox(height: 16),
             Text(
-              '${album.uniqueSongs} ${album.uniqueSongs == 1 ? 'song' : 'songs'} · ${ReplayStyle.plays(album.plays)}',
+              '${l10n.songsCount(album.uniqueSongs)} · ${ReplayStyle.plays(album.plays)}',
               style: TextStyle(fontSize: 13, color: palette.secondary),
             ),
           ],

@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../../data/repositories/recently_played_repository.dart';
 import 'replay_style.dart';
+import 'package:flick/l10n/l10n.dart';
 
 enum ReplayLook { signal, night, artwork }
 
 extension ReplayLookX on ReplayLook {
   String get label => switch (this) {
-    ReplayLook.signal => 'Signal',
-    ReplayLook.night => 'Night',
-    ReplayLook.artwork => 'Artwork',
+    ReplayLook.signal => l10n.signal,
+    ReplayLook.night => l10n.night,
+    ReplayLook.artwork => l10n.artwork,
   };
 }
 
@@ -17,11 +18,11 @@ enum ReplayMetric { trackTime, songs, artists, activeDays, peakHour }
 
 extension ReplayMetricX on ReplayMetric {
   String get label => switch (this) {
-    ReplayMetric.trackTime => 'Track time',
-    ReplayMetric.songs => 'Songs',
-    ReplayMetric.artists => 'Artists',
-    ReplayMetric.activeDays => 'Active days',
-    ReplayMetric.peakHour => 'Peak hour',
+    ReplayMetric.trackTime => l10n.trackTime,
+    ReplayMetric.songs => l10n.songs14,
+    ReplayMetric.artists => l10n.artists,
+    ReplayMetric.activeDays => l10n.activeDays,
+    ReplayMetric.peakHour => l10n.peakHour,
   };
 
   String value(ListeningRecap recap) => switch (this) {

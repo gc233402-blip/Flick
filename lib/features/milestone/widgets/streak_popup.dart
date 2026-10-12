@@ -6,6 +6,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/milestone_service.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Launch-day streak popup. Shows a rolling 7-day window of containers; the
 /// trailing [streak] days are "checked" and animate in with a staggered
@@ -32,7 +33,6 @@ class StreakPopup extends StatefulWidget {
 class _StreakPopupState extends State<StreakPopup>
     with TickerProviderStateMixin {
   static const _window = 7;
-  static const _weekdayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   late final AnimationController _reveal;
   late final AnimationController _pulse;
@@ -90,10 +90,10 @@ class _StreakPopupState extends State<StreakPopup>
 
   String get _motivationalMessage {
     final s = widget.streak;
-    if (s <= 1) return "Welcome back — let's start a streak.";
-    if (s < 7) return 'Keep it going. Open tomorrow to add another day.';
-    if (s < 30) return 'A week and counting — your dedication shows.';
-    return 'Incredible — over a month of daily listening.';
+    if (s <= 1) return l10n.welcomeBackLetSStartA;
+    if (s < 7) return l10n.keepItGoingOpenTomorrowTo;
+    if (s < 30) return l10n.aWeekAndCountingYourDedication;
+    return l10n.incredibleOverAMonthOfDaily;
   }
 
   @override
@@ -190,7 +190,7 @@ class _StreakPopupState extends State<StreakPopup>
             ),
             const SizedBox(width: AppConstants.spacingSm),
             Text(
-              'day streak',
+              l10n.dayStreak,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -210,7 +210,9 @@ class _StreakPopupState extends State<StreakPopup>
         final checked = _isChecked(i);
         final isToday = i == _todayIndex;
         return _DayCell(
-          letter: _weekdayLetters[day.weekday % 7],
+          letter: MaterialLocalizations.of(
+            context,
+          ).narrowWeekdays[day.weekday % 7],
           dayNumber: day.day,
           checked: checked,
           isToday: isToday,
@@ -261,8 +263,8 @@ class _StreakPopupState extends State<StreakPopup>
             borderRadius: BorderRadius.circular(AppConstants.radiusMd),
           ),
         ),
-        child: const Text(
-          'Continue',
+        child: Text(
+          l10n.continueLabel,
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
@@ -284,7 +286,7 @@ class _StreakPopupState extends State<StreakPopup>
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       child: Text(
-        "Don't show again today",
+        l10n.donTShowAgainToday,
         style: TextStyle(
           color: AppColors.textTertiary,
           fontSize: 12,

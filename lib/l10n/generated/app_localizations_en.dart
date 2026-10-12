@@ -13,6 +13,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'A draggable overlay shows while using other apps';
 
   @override
+  String get aLittleRecordOfWhatStayed =>
+      'A little record of what stayed on repeat.';
+
+  @override
   String get aNewerFlickBuildIsOn =>
       'A newer Flick build is on the Play Store.';
 
@@ -34,6 +38,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aTighterMixOfFavoritesAnd =>
       'A tighter mix of favorites and the songs you keep circling back to.';
+
+  @override
+  String get aWeekAndCountingYourDedication =>
+      'A week and counting — your dedication shows.';
 
   @override
   String get aaudio => 'AAudio';
@@ -64,6 +72,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accuraterip => 'AccurateRip';
 
   @override
+  String achieved(Object arg1) {
+    return 'Achieved $arg1';
+  }
+
+  @override
+  String get achievementUnlocked => 'ACHIEVEMENT UNLOCKED';
+
+  @override
   String get activateFallback => 'Activate Fallback';
 
   @override
@@ -73,6 +89,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String activeBands(Object activeCount) {
     return '$activeCount active bands';
   }
+
+  @override
+  String get activeDays => 'Active days';
 
   @override
   String get activeQueue => 'Active Queue';
@@ -258,6 +277,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get albumArt => 'Album Art';
+
+  @override
+  String get albumArt2 => 'Album art';
 
   @override
   String get albumArtImport => 'Album Art Import';
@@ -526,6 +548,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get artistName => 'Artist Name';
 
   @override
+  String artistUnit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'artists',
+      one: 'artist',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get artists => 'Artists';
 
   @override
@@ -535,6 +568,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get artistsInRotation => 'Artists In Rotation';
+
+  @override
+  String get artwork => 'Artwork';
 
   @override
   String get artworkCacheCleared => 'Artwork cache cleared';
@@ -674,6 +710,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backToLocker => 'Back to Locker';
+
+  @override
+  String get backToReplay => 'Back to Replay';
 
   @override
   String get backend => 'Backend';
@@ -890,6 +929,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Both bit-perfect options are off on this DAP, so the standard engine is unavailable. You can still use Rust via Oboe or Isochronous USB.';
 
   @override
+  String get bottom => 'Bottom';
+
+  @override
   String get bottomBar => 'Bottom Bar';
 
   @override
@@ -978,6 +1020,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calmFrequencies => 'Calm Frequencies';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get cameraAccessIsNeededYouCan =>
+      'Camera access is needed. You can enable it in Android settings.';
 
   @override
   String get cameraAndPhotoLibraryAccessIs =>
@@ -1180,6 +1229,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearing => 'Clearing...';
 
   @override
+  String get close => 'Close';
+
+  @override
+  String get closePreview => 'Close preview';
+
+  @override
   String codecApplied(Object arg1) {
     return 'Codec applied: $arg1';
   }
@@ -1325,6 +1380,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contentPlacement2 => 'Content Placement';
 
   @override
+  String get continueLabel => 'Continue';
+
+  @override
   String get continueThroughTheSearchResults =>
       'Continue through the search results';
 
@@ -1395,6 +1453,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotLoadAlbumSongs => 'Could not load album songs';
 
   @override
+  String get couldNotCreateThePosterImage =>
+      'Could not create the poster image.';
+
+  @override
   String get couldNotLoadArtistSongs => 'Could not load artist songs';
 
   @override
@@ -1409,12 +1471,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotOpenBrowser => 'Could not open browser.';
 
   @override
+  String get couldNotOpenKoFiPlease =>
+      'Could not open Ko-fi. Please try again.';
+
+  @override
   String get couldNotOpenLink => 'Could not open link';
 
   @override
   String couldNotOpenLink2(Object e) {
     return 'Could not open link: $e';
   }
+
+  @override
+  String get couldNotOpenThatPhotoTry =>
+      'Could not open that photo. Try another image.';
 
   @override
   String get couldNotOpenTheLink => 'Could not open the link';
@@ -1436,11 +1506,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotOpenThePlayStore3 => 'Could not open the Play Store';
 
   @override
+  String get couldNotReadTheCoverColors =>
+      'Could not read the cover colors. Signal is still available.';
+
+  @override
   String get couldNotReadTheSelectedLyrics =>
       'Could not read the selected lyrics file.';
 
   @override
   String get couldNotSaveTheLyricsFile => 'Could not save the lyrics file.';
+
+  @override
+  String get couldNotSaveYourRecapPlease =>
+      'Could not save your recap. Please try again.';
 
   @override
   String get couldNotUseTheSelectedLyrics =>
@@ -1577,6 +1655,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentSongPreviewOnly => 'Current song · preview only';
 
   @override
+  String get currentStreak => 'Current Streak';
+
+  @override
   String get curvature => 'Curvature';
 
   @override
@@ -1689,7 +1770,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dateAddedOldest => 'Date Added (Oldest)';
 
   @override
+  String get dayStreak => 'day streak';
+
+  @override
+  String get dayStreak2 => 'Day streak';
+
+  @override
+  String get dayStreak3 => 'Day Streak';
+
+  @override
   String get dayStreaks => 'Day Streaks';
+
+  @override
+  String dayUnit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
+    );
+    return '$_temp0';
+  }
 
   @override
   String db10(Object arg1) {
@@ -1830,7 +1931,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deselectAll => 'Deselect all';
 
   @override
+  String get designed => 'Designed';
+
+  @override
   String get detailScreens => 'Detail Screens';
+
+  @override
+  String get details => 'Details';
 
   @override
   String get developerMode => 'Developer Mode';
@@ -1998,6 +2105,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dlnaUpnpAndChromecastReceivers =>
       'DLNA, UPnP and Chromecast receivers';
+
+  @override
+  String get donTShowAgainToday => 'Don\'t show again today';
 
   @override
   String get donate => 'Donate';
@@ -2306,6 +2416,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportAsM3u8 => 'Export as .m3u8';
 
   @override
+  String get exportCsv => 'Export CSV';
+
+  @override
   String get exportCurrentPreset => 'Export current preset';
 
   @override
@@ -2318,6 +2431,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportFormat => 'Export format';
+
+  @override
+  String get exportTxt => 'Export TXT';
 
   @override
   String exportedPresetTo(Object savePath) {
@@ -2345,6 +2461,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get externalSongsCannotBeEdited2 => 'External songs cannot be edited';
+
+  @override
+  String get extraCovers => 'Extra covers';
 
   @override
   String get failedToActivateFallback => 'Failed to activate fallback';
@@ -2638,6 +2757,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fontScale => 'Font Scale';
 
   @override
+  String get footerLine => 'Footer line';
+
+  @override
   String get forceDop => 'Force DoP';
 
   @override
@@ -2747,6 +2869,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gain => 'Gain';
+
+  @override
+  String get gallery => 'Gallery';
 
   @override
   String get gapAboveNavigation => 'Gap Above Navigation';
@@ -2955,6 +3080,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get horizontalReach => 'Horizontal Reach';
 
   @override
+  String hourUnit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'hours',
+      one: 'hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get howFarTheArcOpensFrom =>
       'How far the arc opens from the left edge';
 
@@ -3095,6 +3231,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inactive => 'Inactive';
 
   @override
+  String get incredibleOverAMonthOfDaily =>
+      'Incredible — over a month of daily listening.';
+
+  @override
   String get initializing => 'Initializing…';
 
   @override
@@ -3189,6 +3329,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keepEditing => 'Keep Editing';
 
   @override
+  String get keepItGoingOpenTomorrowTo =>
+      'Keep it going. Open tomorrow to add another day.';
+
+  @override
+  String get keepListeningWithFlick => 'Keep listening with Flick';
+
+  @override
   String get keepMiniPlayerAndNavVisible => 'Keep mini player and nav visible';
 
   @override
@@ -3205,6 +3352,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get keepTheSessionMovingOrHead =>
       'Keep the session moving or head straight back to the player.';
+
+  @override
+  String get keepYourReplay => 'Keep your Replay.';
 
   @override
   String keeping(Object type, Object br) {
@@ -3317,6 +3467,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get latestUpdate => 'Latest Update';
+
+  @override
+  String get layered => 'Layered';
 
   @override
   String get layoutMode => 'Layout Mode';
@@ -3506,6 +3659,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get listenbrainzConnected2 => 'ListenBrainz connected!';
 
   @override
+  String get listeningHours => 'Listening Hours';
+
+  @override
   String listeningToByOnFlick(Object arg1, Object arg2) {
     return 'Listening to $arg1 by $arg2 on Flick';
   }
@@ -3520,6 +3676,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get livePreview => 'Live Preview';
+
+  @override
+  String get livingOrnament => 'Living ornament';
 
   @override
   String get loadAJsonOrTxtPreset => 'Load a JSON or TXT preset';
@@ -3550,6 +3709,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingPatchNotes => 'Loading patch notes...';
 
   @override
+  String get loadingReplay => 'Loading Replay';
+
+  @override
   String get loadingSession => 'Loading session...';
 
   @override
@@ -3572,6 +3734,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get longSongTitles => 'Long Song Titles';
+
+  @override
+  String get look => 'Look';
 
   @override
   String get lookingForCoverArtFromMusicbrainz =>
@@ -3763,6 +3928,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get midnightSignal => 'Midnight Signal';
 
   @override
+  String get milestone => 'Milestone';
+
+  @override
   String get milestones => 'Milestones';
 
   @override
@@ -3853,6 +4021,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreArtists2 => 'More Artists';
 
   @override
+  String get moreExportOptions => 'More export options';
+
+  @override
   String moreFrom(Object arg1) {
     return 'More from $arg1';
   }
@@ -3864,6 +4035,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreFromArtist2 => 'More from Artist';
 
   @override
+  String moreTo(Object arg1, Object arg2) {
+    return '$arg1 more to $arg2';
+  }
+
+  @override
+  String moreToUnlock(Object remaining, Object unit) {
+    return '$remaining more $unit to unlock.';
+  }
+
+  @override
   String get mossEcosystem => 'Moss Ecosystem';
 
   @override
@@ -3872,6 +4053,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mostPlayed => 'Most Played';
+
+  @override
+  String mostReplayed(Object arg1) {
+    return 'Most replayed · $arg1';
+  }
 
   @override
   String get motionArtInBitPerfect => 'Motion Art in Bit-Perfect';
@@ -4021,7 +4207,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nextSong2 => 'Next Song';
 
   @override
+  String nextToGo(Object arg1, Object remaining, Object unit) {
+    return 'Next: $arg1 — $remaining $unit to go';
+  }
+
+  @override
   String get nextcloudOwncloudSabredav => 'Nextcloud · ownCloud · SabreDAV';
+
+  @override
+  String get night => 'Night';
 
   @override
   String get no => 'No';
@@ -4029,6 +4223,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get noAchievementsYetKeepListening =>
       'No achievements yet — keep listening';
+
+  @override
+  String get noAlbumDataYet => 'No album data yet';
 
   @override
   String get noAlbumsFound => 'No Albums Found';
@@ -4140,6 +4337,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get noPlaylistsYetNcreateOneIn =>
       'No playlists yet.\nCreate one in the Playlists tab.';
+
+  @override
+  String get noRankingDataYet => 'No ranking data yet';
 
   @override
   String noResultsFor(Object query) {
@@ -4296,6 +4496,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get open => 'Open';
 
   @override
+  String get openAndroidSettings => 'Open Android settings';
+
+  @override
   String get openBluetoothCodecSettings => 'Open Bluetooth Codec Settings';
 
   @override
@@ -4382,6 +4585,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Overlay permission is required to show the floating player';
 
   @override
+  String get overviewMetricsChooseUpTo3 => 'Overview metrics · choose up to 3';
+
+  @override
   String get paired => 'Paired';
 
   @override
@@ -4430,6 +4636,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pcmFrames => 'PCM Frames';
 
   @override
+  String get peakHour => 'Peak hour';
+
+  @override
   String get peaking => 'Peaking';
 
   @override
@@ -4447,11 +4656,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'Phone and headset volume are linked';
 
   @override
+  String get photoFraming => 'Photo framing';
+
+  @override
   String get pickALineWithLyrics => 'Pick a line with lyrics';
 
   @override
   String get pickALyricLineIn =>
       '1. Pick a lyric line in Lines, then switch to Tools.\n2. Press play and tap the big \"Tap Word\" button as you hear each word — the first tap also stamps the line.\n3. Tap a word chip to nudge, re-time, or clear it.\n4. Lines with every word stamped save with per-word karaoke timing.';
+
+  @override
+  String get pickAgain => 'Pick again';
 
   @override
   String get pickImage => 'Pick Image';
@@ -4507,6 +4722,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playAtTheRecordedLevel => 'Play at the recorded level';
+
+  @override
+  String get playBadges => 'Play badges';
 
   @override
   String get playCategoriesInRandomOrderTracks =>
@@ -4653,11 +4871,30 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String plays2(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plays',
+      one: '1 play',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get playsInRotation => 'plays in rotation';
+
+  @override
   String get pleaseEnterAPlaylistName => 'Please enter a playlist name';
 
   @override
   String get pleaseEnterYourListenbrainzUserToken =>
       'Please enter your ListenBrainz user token.';
+
+  @override
+  String posterPreviewPlays(Object arg1, Object arg2) {
+    return '$arg1 poster preview. $arg2 plays.';
+  }
 
   @override
   String get preAmp => 'Pre-amp';
@@ -4684,6 +4921,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get preloadingAudio3 => 'Preloading audio';
+
+  @override
+  String get preparing => 'Preparing…';
 
   @override
   String get presence => 'Presence';
@@ -4817,6 +5057,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readMode => 'Read Mode';
 
   @override
+  String get readingTheCoverColors => 'Reading the cover colors…';
+
+  @override
   String readyToRemoveSongKeepingIn(int count, Object kept) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -4825,6 +5068,11 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '$count song',
     );
     return 'Ready to remove $_temp0 — keeping $kept in total.';
+  }
+
+  @override
+  String recapSavedAs(Object format) {
+    return 'Recap saved as $format';
   }
 
   @override
@@ -5052,6 +5300,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'Replace album name with a verified bit-perfect capsule when streaming bit-perfect';
 
   @override
+  String get replay => 'Replay';
+
+  @override
+  String get replayCouldnTLoad => 'Replay couldn’t load.';
+
+  @override
+  String get replayStudio => 'Replay Studio';
+
+  @override
   String get replayTheTutorialAndFeatureGuide =>
       'Replay the tutorial and feature guide';
 
@@ -5096,6 +5353,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String resetArtworkFor2(Object arg1) {
     return 'Reset artwork for \"$arg1\".';
   }
+
+  @override
+  String get resetCardDesign => 'Reset card design';
 
   @override
   String get resetDeclinedUsbDacs => 'Reset Declined USB DACs';
@@ -5165,6 +5425,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resumeOnReconnect => 'Resume on Reconnect';
+
+  @override
+  String get retakePhoto => 'Retake photo';
 
   @override
   String get retroFuture => 'Retro Future';
@@ -5290,6 +5553,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveCurrentAsPreset => 'Save current as preset';
 
   @override
+  String get saveCustomizeReplay => 'Save / customize Replay';
+
+  @override
   String get saveInFlick => 'Save in Flick';
 
   @override
@@ -5305,6 +5571,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveLyrics => 'Save Lyrics';
 
   @override
+  String get savePng => 'Save PNG';
+
+  @override
   String get savePreset => 'Save Preset';
 
   @override
@@ -5312,6 +5581,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saved => 'Saved';
+
+  @override
+  String get savedAgain => 'Saved · again';
 
   @override
   String get savedAndVerified => 'Saved and verified';
@@ -5343,6 +5615,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String savedToNNNshareIt(Object path) {
     return 'Saved to:\n$path\n\nShare it now?';
+  }
+
+  @override
+  String savedToYourGallery(Object arg1) {
+    return '$arg1 saved to your gallery';
   }
 
   @override
@@ -5785,6 +6062,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get showingYourLastLoadedReplay => 'Showing your last loaded Replay.';
+
+  @override
   String get shownWhenThereIsRoomBeside =>
       'Shown when there is room beside the controls';
 
@@ -5812,6 +6092,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shuffleSongsInCurrentList => 'Shuffle songs in current list';
+
+  @override
+  String get signInFailedRetry => 'Sign-in Failed — Retry';
+
+  @override
+  String get signInWithTidal => 'Sign in with Tidal';
+
+  @override
+  String get signInWithYourAccountHifi =>
+      'Sign in with your account · HiFi lossless';
+
+  @override
+  String get signInWithYourOwnTidal =>
+      'Sign in with your own Tidal account. HiFi lossless (FLAC/ALAC) plays through the bit-perfect engine; HiRes/MQA and Atmos are gated by Tidal and will show an error instead of playing.';
+
+  @override
+  String get signal => 'Signal';
 
   @override
   String get signalAccurateUnverified => 'AccurateRip not verified';
@@ -5945,20 +6242,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signalVerifiedInLog => 'Verified in log';
 
   @override
-  String get signInFailedRetry => 'Sign-in Failed — Retry';
-
-  @override
-  String get signInWithTidal => 'Sign in with Tidal';
-
-  @override
-  String get signInWithYourAccountHifi =>
-      'Sign in with your account · HiFi lossless';
-
-  @override
-  String get signInWithYourOwnTidal =>
-      'Sign in with your own Tidal account. HiFi lossless (FLAC/ALAC) plays through the bit-perfect engine; HiRes/MQA and Atmos are gated by Tidal and will show an error instead of playing.';
-
-  @override
   String get signedIn => 'Signed in';
 
   @override
@@ -5976,6 +6259,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get simplifiedChinese => 'Simplified Chinese';
+
+  @override
+  String get single => 'Single';
 
   @override
   String get size => 'Size';
@@ -6006,6 +6292,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sleepTimer2 => 'Sleep Timer';
+
+  @override
+  String get sleeves => 'Sleeves';
 
   @override
   String get slope => 'Slope';
@@ -6092,6 +6381,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get songTitle => 'Song Title';
 
   @override
+  String songUnit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'songs',
+      one: 'song',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get songViewList => 'Song View: List';
 
   @override
@@ -6163,6 +6463,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get songsCategories => 'Songs & Categories';
 
   @override
+  String songsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count songs',
+      one: '$count song',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String songsFound(Object arg1) {
     return '$arg1 songs found';
   }
@@ -6182,6 +6493,17 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '$folders folder',
     );
     return '$_temp0 in $_temp1';
+  }
+
+  @override
+  String songsInRotation(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count songs in your rotation',
+      one: '$count song in your rotation',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -6406,6 +6728,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportFlick => 'Support Flick';
 
   @override
+  String get supportFlickOnKoFi => 'Support Flick on Ko-fi';
+
+  @override
+  String get surfaceShading => 'Surface shading';
+
+  @override
   String get sweepAHighlightThroughWordsAs =>
       'Sweep a highlight through words as they are sung';
 
@@ -6532,6 +6860,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap the mini player for waveform seekbar, EQ, lyrics, and visualizer.';
 
   @override
+  String get tapToInspect12602280Png => 'Tap to inspect · 1260 × 2280 PNG';
+
+  @override
   String get tapToPlayLongPressFor =>
       'Tap to play, long-press for options (queue, play next, info).';
 
@@ -6600,6 +6931,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get theNamesShowingUpAgainAnd =>
       'The names showing up again and again in your recent queue.';
+
+  @override
+  String get thePosterIsNotReadyYet =>
+      'The poster is not ready yet. Try saving again.';
 
   @override
   String get theTracksDominatingYourWeeklyAnd =>
@@ -6694,7 +7029,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tools => 'Tools';
 
   @override
+  String get top => 'Top';
+
+  @override
+  String get topAlbum => 'Top album';
+
+  @override
+  String get topArtist => 'Top artist';
+
+  @override
+  String get topArtists => 'Top artists';
+
+  @override
   String get topSongs => 'Top Songs';
+
+  @override
+  String get topSongs2 => 'Top songs';
 
   @override
   String get total => 'Total';
@@ -6734,6 +7084,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trackThumbnails => 'Track Thumbnails';
+
+  @override
+  String get trackTime => 'Track time';
+
+  @override
+  String get trackTimeSumsTheFullDuration =>
+      'Track time sums the full duration of logged plays.';
 
   @override
   String tracks(Object _totalTracks) {
@@ -6924,6 +7281,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unfavoriteSelected => 'Unfavorite selected';
 
   @override
+  String get uniqueArtists => 'Unique Artists';
+
+  @override
   String get universalCompatibility => 'Universal compatibility';
 
   @override
@@ -6946,6 +7306,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownTrack => 'Unknown Track';
+
+  @override
+  String unlocked(Object unlocked, Object arg1) {
+    return '$unlocked / $arg1 unlocked';
+  }
 
   @override
   String unlocked3(Object _milestonesUnlocked, Object arg1) {
@@ -7336,6 +7701,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weekly => 'Weekly';
 
   @override
+  String get welcomeBackLetSStartA => 'Welcome back — let\'s start a streak.';
+
+  @override
   String get welcomeToFlick => 'Welcome to Flick!';
 
   @override
@@ -7487,6 +7855,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'You\'re offline. Some online features may not work.';
 
   @override
+  String get youVeHitTheThresholdKeep =>
+      'You\'ve hit the threshold — keep it up!';
+
+  @override
   String get yourCollectionAtAGlance => 'Your collection at a glance';
 
   @override
@@ -7509,6 +7881,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your library is tidy. We’ll let you know if new duplicates appear after the next scan.';
 
   @override
+  String get yourListeningHistoryIsStillYours =>
+      'Your listening history is still yours. Try loading it again.';
+
+  @override
   String get yourListensWillRemainOnListenbrainz =>
       'Your listens will remain on ListenBrainz, but Flick will stop submitting them.';
 
@@ -7521,14 +7897,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your monthly recap needs a bit more listening time this month.';
 
   @override
+  String get yourMostReplayedTrack => 'Your most replayed track';
+
+  @override
   String get yourMusicIsBeingScrobbled => 'Your music is being scrobbled';
 
   @override
   String get yourMusicIsBeingSubmitted => 'Your music is being submitted';
 
   @override
+  String get yourMusicOnRepeat => 'Your music. On repeat.';
+
+  @override
   String get yourNewAudioEngineIsReady =>
       'Your new audio engine is ready. Restart Flick to apply it.';
+
+  @override
+  String get yourNextFavoriteIsWaiting => 'Your next favorite is waiting.';
+
+  @override
+  String get yourNextFavoriteNisWaiting => 'Your next favorite\nis waiting.';
 
   @override
   String get yourPlaylists => 'Your Playlists';

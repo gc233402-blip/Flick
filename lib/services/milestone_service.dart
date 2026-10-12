@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/theme/app_colors.dart';
 import '../data/repositories/recently_played_repository.dart';
+import '../l10n/l10n.dart';
 
 /// Coarse grouping a milestone tier belongs to. Drives unit copy and how the
 /// current progress value is sourced.
@@ -238,6 +239,15 @@ extension MilestoneCategoryX on MilestoneCategory {
       MilestoneCategory.uniqueArtists => 'artist',
     };
   }
+
+  /// Localized unit for progress copy ("3 more songs to unlock"). Takes the
+  /// count so English can pick the singular/plural form.
+  String unitLabel(int count) => switch (this) {
+    MilestoneCategory.songs => l10n.songUnit(count),
+    MilestoneCategory.hours => l10n.hourUnit(count),
+    MilestoneCategory.dayStreak => l10n.dayUnit(count),
+    MilestoneCategory.uniqueArtists => l10n.artistUnit(count),
+  };
 
   /// Accent color of the highest tier in this category met by [value], or
   /// null when no tier is reached (callers fall back to a neutral accent).

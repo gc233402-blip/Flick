@@ -13,6 +13,7 @@ import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/features/settings/widgets/settings_widgets.dart';
 import 'package:flick/features/milestone/widgets/milestone_card.dart';
 import 'package:flick/features/milestone/widgets/streak_popup.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Achievement-style collection view of every milestone tier. Unlocked tiles
 /// re-open the celebration card on tap; locked tiles show a small bottom
@@ -119,7 +120,7 @@ class _MilestonesScreenState extends ConsumerState<MilestonesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Milestones',
+                  l10n.milestones,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextPrimary,
@@ -127,7 +128,7 @@ class _MilestonesScreenState extends ConsumerState<MilestonesScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$unlocked / ${MilestoneType.values.length} unlocked',
+                  l10n.unlocked(unlocked, MilestoneType.values.length),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.adaptiveTextTertiary,
                   ),
@@ -187,7 +188,7 @@ class _MilestonesScreenState extends ConsumerState<MilestonesScreen> {
     showFlickDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Day streak',
+      barrierLabel: l10n.dayStreak2,
       builder: (context) => StreakPopup(
         streak: streak,
         onSnooze: () => _service.snoozeStreakPopup(),
@@ -215,14 +216,14 @@ class _MilestonesScreenState extends ConsumerState<MilestonesScreen> {
     await showFlickDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Milestone',
+      barrierLabel: l10n.milestone,
       builder: (context) => MilestoneCard(
         milestone: type,
         achievedAt: achievedAt,
         nextMilestone: next.next,
         nextRemaining: next.next == null ? null : next.remaining,
-        supportLabel: 'Close',
-        dismissLabel: 'Done',
+        supportLabel: l10n.close,
+        dismissLabel: l10n.done,
       ),
     );
   }
@@ -230,7 +231,7 @@ class _MilestonesScreenState extends ConsumerState<MilestonesScreen> {
   Future<void> _showLockedSheet(MilestoneType type) async {
     final current = _current[type.category] ?? 0;
     final remaining = (type.threshold - current).clamp(0, type.threshold);
-    final unit = remaining == 1 ? type.category.unitSingular : type.unit;
+    final unit = type.category.unitLabel(remaining);
     if (!mounted) return;
     await showModalBottomSheet<void>(
       useRootNavigator: true,
@@ -313,7 +314,7 @@ class _CategorySectionState extends State<_CategorySection> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '$unlocked / ${types.length} unlocked',
+                          l10n.unlocked(unlocked, types.length),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: context.adaptiveTextTertiary),
                         ),
@@ -373,10 +374,10 @@ class _CategorySectionState extends State<_CategorySection> {
 }
 
 String _categoryLabel(MilestoneCategory cat) => switch (cat) {
-  MilestoneCategory.songs => 'Songs',
-  MilestoneCategory.hours => 'Listening Hours',
-  MilestoneCategory.dayStreak => 'Day Streak',
-  MilestoneCategory.uniqueArtists => 'Unique Artists',
+  MilestoneCategory.songs => l10n.songs14,
+  MilestoneCategory.hours => l10n.listeningHours,
+  MilestoneCategory.dayStreak => l10n.dayStreak3,
+  MilestoneCategory.uniqueArtists => l10n.uniqueArtists,
 };
 
 class _MilestoneTile extends StatelessWidget {
@@ -406,7 +407,7 @@ class _MilestoneTile extends StatelessWidget {
     final iconFg = unlocked ? Colors.white : AppColors.textTertiary;
 
     final progress = (current / type.threshold).clamp(0.0, 1.0);
-    final unit = type.unit;
+    final unit = type.category.unitLabel(type.threshold);
 
     return Material(
       color: Colors.transparent,
@@ -457,8 +458,8 @@ class _MilestoneTile extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           unlocked
-                              ? 'Achieved ${_formatDate(record!.achievedAt)}'
-                              : 'Locked',
+                              ? l10n.achieved(_formatDate(record!.achievedAt))
+                              : l10n.locked,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.bodySmall
@@ -498,19 +499,19 @@ class _MilestoneTile extends StatelessWidget {
   }
 
   static String _formatDate(DateTime dt) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+    final months = [
+      l10n.jan,
+      l10n.feb,
+      l10n.mar,
+      l10n.apr,
+      l10n.may,
+      l10n.jun,
+      l10n.jul,
+      l10n.aug,
+      l10n.sep,
+      l10n.oct,
+      l10n.nov,
+      l10n.dec,
     ];
     return '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
   }
@@ -585,7 +586,7 @@ class _LockedSheet extends StatelessWidget {
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         Text(
-                          'Locked',
+                          l10n.locked,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: context.adaptiveTextTertiary),
                         ),
@@ -615,8 +616,8 @@ class _LockedSheet extends StatelessWidget {
               const SizedBox(height: AppConstants.spacingXs),
               Text(
                 remaining > 0
-                    ? '$remaining more $unit to unlock.'
-                    : 'You\'ve hit the threshold — keep it up!',
+                    ? l10n.moreToUnlock(remaining, unit)
+                    : l10n.youVeHitTheThresholdKeep,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -753,7 +754,7 @@ class _StreakBannerState extends State<_StreakBanner>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Current Streak',
+                        l10n.currentStreak,
                         style:
                             Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: context.adaptiveTextTertiary,
@@ -778,7 +779,7 @@ class _StreakBannerState extends State<_StreakBanner>
                           ),
                           const SizedBox(width: AppConstants.spacingXs),
                           Text(
-                            streak == 1 ? 'day' : 'days',
+                            l10n.dayUnit(streak),
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -791,7 +792,7 @@ class _StreakBannerState extends State<_StreakBanner>
                       if (next != null) ...[
                         const SizedBox(height: 4),
                         Text(
-                          '${next.threshold - streak} more to ${next.title}',
+                          l10n.moreTo(next.threshold - streak, next.title),
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: context.adaptiveTextTertiary,

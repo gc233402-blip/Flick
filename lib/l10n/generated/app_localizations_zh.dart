@@ -12,6 +12,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aDraggableOverlayShowsWhileUsing => '使用其他应用时显示可拖动的悬浮窗';
 
   @override
+  String get aLittleRecordOfWhatStayed => '记录下那些被你反复播放的旋律。';
+
+  @override
   String get aNewerFlickBuildIsOn => 'Play Store 上有更新的 Flick 版本。';
 
   @override
@@ -29,6 +32,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get aTighterMixOfFavoritesAnd => '收藏与反复回味的歌曲更紧凑的混合。';
+
+  @override
+  String get aWeekAndCountingYourDedication => '已坚持一周，你的用心看得见。';
 
   @override
   String get aaudio => 'AAudio';
@@ -58,6 +64,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get accuraterip => 'AccurateRip';
 
   @override
+  String achieved(Object arg1) {
+    return '已达成 $arg1';
+  }
+
+  @override
+  String get achievementUnlocked => '成就已解锁';
+
+  @override
   String get activateFallback => '启用回退';
 
   @override
@@ -67,6 +81,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String activeBands(Object activeCount) {
     return '$activeCount 个已启用频段';
   }
+
+  @override
+  String get activeDays => '活跃天数';
 
   @override
   String get activeQueue => '当前队列';
@@ -244,6 +261,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get albumArt => '专辑封面';
+
+  @override
+  String get albumArt2 => '专辑封面';
 
   @override
   String get albumArtImport => '专辑封面导入';
@@ -497,6 +517,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get artistName => '艺术家名称';
 
   @override
+  String artistUnit(int count) {
+    return '位';
+  }
+
+  @override
   String get artists => '艺术家';
 
   @override
@@ -506,6 +531,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get artistsInRotation => '高频播放的艺术家';
+
+  @override
+  String get artwork => '封面';
 
   @override
   String get artworkCacheCleared => '封面缓存已清除';
@@ -640,6 +668,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get backToLocker => '返回 Locker';
+
+  @override
+  String get backToReplay => '返回回顾';
 
   @override
   String get backend => '后端';
@@ -845,6 +876,9 @@ class AppLocalizationsZh extends AppLocalizations {
       '此 DAP 上两个位完美选项均已关闭，因此标准引擎不可用。你仍可使用通过 Oboe 的 Rust 或等时 USB。';
 
   @override
+  String get bottom => '底部';
+
+  @override
   String get bottomBar => '底部栏';
 
   @override
@@ -931,6 +965,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get calmFrequencies => '平静频率';
+
+  @override
+  String get camera => '相机';
+
+  @override
+  String get cameraAccessIsNeededYouCan => '需要相机权限。可在 Android 设置中开启。';
 
   @override
   String get cameraAndPhotoLibraryAccessIs =>
@@ -1125,6 +1165,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get clearing => '清除中…';
 
   @override
+  String get close => '关闭';
+
+  @override
+  String get closePreview => '关闭预览';
+
+  @override
   String codecApplied(Object arg1) {
     return '已应用编解码器：$arg1';
   }
@@ -1265,6 +1311,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get contentPlacement2 => '内容位置';
 
   @override
+  String get continueLabel => '继续';
+
+  @override
   String get continueThroughTheSearchResults => '在搜索结果中继续播放';
 
   @override
@@ -1332,6 +1381,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotLoadAlbumSongs => '无法加载专辑歌曲';
 
   @override
+  String get couldNotCreateThePosterImage => '无法生成海报图片。';
+
+  @override
   String get couldNotLoadArtistSongs => '无法加载艺术家歌曲';
 
   @override
@@ -1346,12 +1398,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotOpenBrowser => '无法打开浏览器。';
 
   @override
+  String get couldNotOpenKoFiPlease => '无法打开 Ko-fi，请重试。';
+
+  @override
   String get couldNotOpenLink => '无法打开链接';
 
   @override
   String couldNotOpenLink2(Object e) {
     return '无法打开链接：$e';
   }
+
+  @override
+  String get couldNotOpenThatPhotoTry => '无法打开该照片，请换一张。';
 
   @override
   String get couldNotOpenTheLink => '无法打开链接';
@@ -1373,10 +1431,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotOpenThePlayStore3 => '无法打开 Play Store';
 
   @override
+  String get couldNotReadTheCoverColors => '无法读取封面配色。信号图仍可使用。';
+
+  @override
   String get couldNotReadTheSelectedLyrics => '无法读取所选歌词文件。';
 
   @override
   String get couldNotSaveTheLyricsFile => '无法保存歌词文件。';
+
+  @override
+  String get couldNotSaveYourRecapPlease => '无法保存回顾，请重试。';
 
   @override
   String get couldNotUseTheSelectedLyrics => '无法使用所选歌词文件。';
@@ -1505,6 +1569,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currentSongPreviewOnly => '当前歌曲 · 仅供预览';
 
   @override
+  String get currentStreak => '当前连续';
+
+  @override
   String get curvature => '曲率';
 
   @override
@@ -1606,7 +1673,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dateAddedOldest => '添加日期（最早）';
 
   @override
+  String get dayStreak => '天连续播放';
+
+  @override
+  String get dayStreak2 => '连续天数';
+
+  @override
+  String get dayStreak3 => '连续天数';
+
+  @override
   String get dayStreaks => '连续收听';
+
+  @override
+  String dayUnit(int count) {
+    return '天';
+  }
 
   @override
   String db10(Object arg1) {
@@ -1746,7 +1827,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deselectAll => '取消全选';
 
   @override
+  String get designed => '设计';
+
+  @override
   String get detailScreens => '详情页面';
+
+  @override
+  String get details => '细节';
 
   @override
   String get developerMode => '开发者模式';
@@ -1900,6 +1987,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dlnaUpnpAndChromecastReceivers => 'DLNA、UPnP 与 Chromecast 接收器';
+
+  @override
+  String get donTShowAgainToday => '今天不再显示';
 
   @override
   String get donate => '捐赠';
@@ -2194,6 +2284,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exportAsM3u8 => '导出为 .m3u8';
 
   @override
+  String get exportCsv => '导出 CSV';
+
+  @override
   String get exportCurrentPreset => '导出当前预设';
 
   @override
@@ -2206,6 +2299,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exportFormat => '导出格式';
+
+  @override
+  String get exportTxt => '导出 TXT';
 
   @override
   String exportedPresetTo(Object savePath) {
@@ -2233,6 +2329,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get externalSongsCannotBeEdited2 => '外部歌曲无法编辑';
+
+  @override
+  String get extraCovers => '额外封面';
 
   @override
   String get failedToActivateFallback => '启用回退失败';
@@ -2511,6 +2610,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fontScale => '字体缩放';
 
   @override
+  String get footerLine => '页脚文字';
+
+  @override
   String get forceDop => '强制 DoP';
 
   @override
@@ -2613,6 +2715,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gain => '增益';
+
+  @override
+  String get gallery => '相册';
 
   @override
   String get gapAboveNavigation => '导航栏上方间距';
@@ -2811,6 +2916,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get horizontalReach => '水平延伸';
 
   @override
+  String hourUnit(int count) {
+    return '小时';
+  }
+
+  @override
   String get howFarTheArcOpensFrom => '弧线从左边延伸的距离';
 
   @override
@@ -2932,6 +3042,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get inactive => '未启用';
 
   @override
+  String get incredibleOverAMonthOfDaily => '太棒了，每日收听已超过一个月。';
+
+  @override
   String get initializing => '初始化中…';
 
   @override
@@ -3025,6 +3138,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get keepEditing => '继续编辑';
 
   @override
+  String get keepItGoingOpenTomorrowTo => '保持下去，明天打开就能再添一天。';
+
+  @override
+  String get keepListeningWithFlick => '继续用 Flick 听歌';
+
+  @override
   String get keepMiniPlayerAndNavVisible => '保持迷你播放器与导航栏可见';
 
   @override
@@ -3038,6 +3157,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get keepTheSessionMovingOrHead => '让音乐继续，或直接回到播放器。';
+
+  @override
+  String get keepYourReplay => '留住你的回顾。';
 
   @override
   String keeping(Object type, Object br) {
@@ -3144,6 +3266,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get latestUpdate => '最新更新';
+
+  @override
+  String get layered => '层叠';
 
   @override
   String get layoutMode => '布局模式';
@@ -3321,6 +3446,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get listenbrainzConnected2 => 'ListenBrainz 已连接！';
 
   @override
+  String get listeningHours => '收听时长';
+
+  @override
   String listeningToByOnFlick(Object arg1, Object arg2) {
     return '正在 Flick 上收听 $arg2 的 $arg1';
   }
@@ -3333,6 +3461,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get livePreview => '实时预览';
+
+  @override
+  String get livingOrnament => '动态装饰';
 
   @override
   String get loadAJsonOrTxtPreset => '加载 JSON 或 TXT 预设';
@@ -3362,6 +3493,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get loadingPatchNotes => '正在加载更新日志…';
 
   @override
+  String get loadingReplay => '正在载入回顾';
+
+  @override
   String get loadingSession => '正在加载会话…';
 
   @override
@@ -3384,6 +3518,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get longSongTitles => '长歌名';
+
+  @override
+  String get look => '外观';
 
   @override
   String get lookingForCoverArtFromMusicbrainz =>
@@ -3563,6 +3700,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get midnightSignal => '午夜信号';
 
   @override
+  String get milestone => '里程碑';
+
+  @override
   String get milestones => '里程碑';
 
   @override
@@ -3653,6 +3793,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreArtists2 => '更多艺术家';
 
   @override
+  String get moreExportOptions => '更多导出选项';
+
+  @override
   String moreFrom(Object arg1) {
     return '更多来自 $arg1';
   }
@@ -3664,6 +3807,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreFromArtist2 => '该艺术家的更多作品';
 
   @override
+  String moreTo(Object arg1, Object arg2) {
+    return '还差 $arg1 即可 $arg2';
+  }
+
+  @override
+  String moreToUnlock(Object remaining, Object unit) {
+    return '再 $remaining $unit 即可解锁。';
+  }
+
+  @override
   String get mossEcosystem => 'Moss 生态';
 
   @override
@@ -3671,6 +3824,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mostPlayed => '最常播放';
+
+  @override
+  String mostReplayed(Object arg1) {
+    return '播放最多 · $arg1';
+  }
 
   @override
   String get motionArtInBitPerfect => '位完美模式下的动态封面';
@@ -3816,13 +3974,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nextSong2 => '下一首';
 
   @override
+  String nextToGo(Object arg1, Object remaining, Object unit) {
+    return '下一个：$arg1 — 还需 $remaining $unit';
+  }
+
+  @override
   String get nextcloudOwncloudSabredav => 'Nextcloud · ownCloud · SabreDAV';
+
+  @override
+  String get night => '夜色';
 
   @override
   String get no => '否';
 
   @override
   String get noAchievementsYetKeepListening => '暂无成就 —— 继续收听吧';
+
+  @override
+  String get noAlbumDataYet => '暂无专辑数据';
 
   @override
   String get noAlbumsFound => '未找到专辑';
@@ -3928,6 +4097,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noPlaylistsYetNcreateOneIn => '还没有播放列表。\n在「播放列表」标签页里创建一个。';
+
+  @override
+  String get noRankingDataYet => '暂无排行数据';
 
   @override
   String noResultsFor(Object query) {
@@ -4076,6 +4248,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get open => '打开';
 
   @override
+  String get openAndroidSettings => '打开 Android 设置';
+
+  @override
   String get openBluetoothCodecSettings => '打开蓝牙编解码器设置';
 
   @override
@@ -4158,6 +4333,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get overlayPermissionIsRequiredToShow => '显示浮动播放器需要悬浮窗权限';
 
   @override
+  String get overviewMetricsChooseUpTo3 => '概览指标 · 最多选 3 项';
+
+  @override
   String get paired => '已配对';
 
   @override
@@ -4205,6 +4383,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pcmFrames => 'PCM 帧';
 
   @override
+  String get peakHour => '高峰时段';
+
+  @override
   String get peaking => '峰值';
 
   @override
@@ -4220,11 +4401,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get phoneAndHeadsetVolumeAreLinked => '手机与耳机音量已联动';
 
   @override
+  String get photoFraming => '照片取景';
+
+  @override
   String get pickALineWithLyrics => '选择含歌词的行';
 
   @override
   String get pickALyricLineIn =>
       '1. 在「歌词行」里选一行，然后切到「工具」。\n2. 播放并逐词点击大按钮「打点」——第一次点击同时给整行打点。\n3. 点击词块可以微调、重新计时或清除。\n4. 每个词都打过点的行会保存为逐词卡拉 OK 时间轴。';
+
+  @override
+  String get pickAgain => '重新选择';
 
   @override
   String get pickImage => '选择图片';
@@ -4270,6 +4457,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get playAtTheRecordedLevel => '按录制时的音量播放';
+
+  @override
+  String get playBadges => '播放徽标';
 
   @override
   String get playCategoriesInRandomOrderTracks => '分类随机顺序播放，曲目按顺序播放';
@@ -4389,10 +4579,23 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String plays2(int count) {
+    return '$count 次播放';
+  }
+
+  @override
+  String get playsInRotation => '循环播放次数';
+
+  @override
   String get pleaseEnterAPlaylistName => '请输入播放列表名称';
 
   @override
   String get pleaseEnterYourListenbrainzUserToken => '请输入你的 ListenBrainz 用户令牌。';
+
+  @override
+  String posterPreviewPlays(Object arg1, Object arg2) {
+    return '$arg1 海报预览。$arg2 次播放。';
+  }
 
   @override
   String get preAmp => '前置放大';
@@ -4419,6 +4622,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get preloadingAudio3 => '正在预加载音频';
+
+  @override
+  String get preparing => '正在准备…';
 
   @override
   String get presence => '临场感';
@@ -4549,8 +4755,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readMode => '读取模式';
 
   @override
+  String get readingTheCoverColors => '正在读取封面配色…';
+
+  @override
   String readyToRemoveSongKeepingIn(int count, Object kept) {
     return '将移除 $count 首歌曲，共保留 $kept 首。';
+  }
+
+  @override
+  String recapSavedAs(Object format) {
+    return '回顾已保存为 $format';
   }
 
   @override
@@ -4769,6 +4983,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get replaceAlbumNameWithAVerified => '位完美串流时，用已验证的位完美标识替换专辑名';
 
   @override
+  String get replay => '回顾';
+
+  @override
+  String get replayCouldnTLoad => '回顾加载失败。';
+
+  @override
+  String get replayStudio => '回顾工作室';
+
+  @override
   String get replayTheTutorialAndFeatureGuide => '重新观看教程与功能指南';
 
   @override
@@ -4811,6 +5034,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String resetArtworkFor2(Object arg1) {
     return '已重置“$arg1”的专辑封面。';
   }
+
+  @override
+  String get resetCardDesign => '重置卡片设计';
 
   @override
   String get resetDeclinedUsbDacs => '重置已拒绝的 USB DAC';
@@ -4876,6 +5102,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get resumeOnReconnect => '重新连接时继续';
+
+  @override
+  String get retakePhoto => '重拍照片';
 
   @override
   String get retroFuture => '复古未来';
@@ -4996,6 +5225,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get saveCurrentAsPreset => '将当前设置存为预设';
 
   @override
+  String get saveCustomizeReplay => '保存 / 自定义回顾';
+
+  @override
   String get saveInFlick => '保存到 Flick';
 
   @override
@@ -5011,6 +5243,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get saveLyrics => '保存歌词';
 
   @override
+  String get savePng => '保存 PNG';
+
+  @override
   String get savePreset => '保存预设';
 
   @override
@@ -5018,6 +5253,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get saved => '已保存';
+
+  @override
+  String get savedAgain => '已保存 · 再次';
 
   @override
   String get savedAndVerified => '已保存并验证';
@@ -5045,6 +5283,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String savedToNNNshareIt(Object path) {
     return '已保存到：\n$path\n\n现在分享？';
+  }
+
+  @override
+  String savedToYourGallery(Object arg1) {
+    return '$arg1 已保存到相册';
   }
 
   @override
@@ -5444,6 +5687,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get showingYourLastLoadedReplay => '显示上次载入的回顾。';
+
+  @override
   String get shownWhenThereIsRoomBeside => '控件旁边有空间时显示';
 
   @override
@@ -5468,6 +5714,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get shuffleSongsInCurrentList => '随机播放当前列表中的歌曲';
+
+  @override
+  String get signInFailedRetry => '登录失败 —— 重试';
+
+  @override
+  String get signInWithTidal => '使用 Tidal 登录';
+
+  @override
+  String get signInWithYourAccountHifi => '使用你的账号登录 · HiFi 无损';
+
+  @override
+  String get signInWithYourOwnTidal =>
+      '用你自己的 Tidal 账号登录。HiFi 无损（FLAC/ALAC）走位完美引擎播放；HiRes/MQA 与 Atmos 由 Tidal 限制，会提示错误而无法播放。';
+
+  @override
+  String get signal => '信号';
 
   @override
   String get signalAccurateUnverified => 'AccurateRip 未验证';
@@ -5596,19 +5858,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signalVerifiedInLog => '在日志中已验证';
 
   @override
-  String get signInFailedRetry => '登录失败 —— 重试';
-
-  @override
-  String get signInWithTidal => '使用 Tidal 登录';
-
-  @override
-  String get signInWithYourAccountHifi => '使用你的账号登录 · HiFi 无损';
-
-  @override
-  String get signInWithYourOwnTidal =>
-      '用你自己的 Tidal 账号登录。HiFi 无损（FLAC/ALAC）走位完美引擎播放；HiRes/MQA 与 Atmos 由 Tidal 限制，会提示错误而无法播放。';
-
-  @override
   String get signedIn => '已登录';
 
   @override
@@ -5625,6 +5874,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get simplifiedChinese => '简体中文';
+
+  @override
+  String get single => '单张';
 
   @override
   String get size => '大小';
@@ -5649,6 +5901,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sleepTimer2 => '睡眠定时';
+
+  @override
+  String get sleeves => '封套';
 
   @override
   String get slope => '斜率';
@@ -5717,6 +5972,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get songTitle => '歌曲标题';
+
+  @override
+  String songUnit(int count) {
+    return '首';
+  }
 
   @override
   String get songViewList => '歌曲视图：列表';
@@ -5789,6 +6049,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get songsCategories => '歌曲与分类';
 
   @override
+  String songsCount(int count) {
+    return '$count 首歌曲';
+  }
+
+  @override
   String songsFound(Object arg1) {
     return '找到 $arg1 首歌曲';
   }
@@ -5796,6 +6061,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String songsIn(int songs, int folders) {
     return '$songs 首歌曲，分布在 $folders 个文件夹中';
+  }
+
+  @override
+  String songsInRotation(int count) {
+    return '$count 首歌曲在你的循环播放中';
   }
 
   @override
@@ -6003,6 +6273,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get supportFlick => '支持 Flick';
 
   @override
+  String get supportFlickOnKoFi => '在 Ko-fi 上支持 Flick';
+
+  @override
+  String get surfaceShading => '表面阴影';
+
+  @override
   String get sweepAHighlightThroughWordsAs => '唱到每个词时扫过一道高亮';
 
   @override
@@ -6113,6 +6389,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tapTheMiniPlayerForWaveform => '点按迷你播放器，打开波形进度条、均衡器、歌词和可视化效果。';
 
   @override
+  String get tapToInspect12602280Png => '点击查看 · 1260 × 2280 PNG';
+
+  @override
   String get tapToPlayLongPressFor => '点按播放，长按查看更多选项（播放队列、下一首播放、信息）。';
 
   @override
@@ -6176,6 +6455,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get theNamesShowingUpAgainAnd => '在你的近期队列中反复出现的名字。';
+
+  @override
+  String get thePosterIsNotReadyYet => '海报尚未准备好，请再次尝试保存。';
 
   @override
   String get theTracksDominatingYourWeeklyAnd => '主导你每周与每月回顾的曲目。';
@@ -6267,7 +6549,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tools => '工具';
 
   @override
+  String get top => '顶部';
+
+  @override
+  String get topAlbum => '最常播放的专辑';
+
+  @override
+  String get topArtist => '最常播放的艺人';
+
+  @override
+  String get topArtists => '最常播放的艺人';
+
+  @override
   String get topSongs => '最常播放的歌曲';
+
+  @override
+  String get topSongs2 => '最常播放的歌曲';
 
   @override
   String get total => '总计';
@@ -6306,6 +6603,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trackThumbnails => '曲目缩略图';
+
+  @override
+  String get trackTime => '曲目时长';
+
+  @override
+  String get trackTimeSumsTheFullDuration => '曲目时长按已记录播放的完整时长累计。';
 
   @override
   String tracks(Object _totalTracks) {
@@ -6483,6 +6786,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unfavoriteSelected => '取消收藏所选';
 
   @override
+  String get uniqueArtists => '不同艺术家';
+
+  @override
   String get universalCompatibility => '通用兼容性';
 
   @override
@@ -6505,6 +6811,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unknownTrack => '未知曲目';
+
+  @override
+  String unlocked(Object unlocked, Object arg1) {
+    return '已解锁 $unlocked / $arg1';
+  }
 
   @override
   String unlocked3(Object _milestonesUnlocked, Object arg1) {
@@ -6855,6 +7166,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weekly => '每周';
 
   @override
+  String get welcomeBackLetSStartA => '欢迎回来，来开启连续收听吧。';
+
+  @override
   String get welcomeToFlick => '欢迎使用 Flick！';
 
   @override
@@ -6999,6 +7313,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get youReOfflineSomeOnlineFeatures => '你处于离线状态。部分在线功能可能无法使用。';
 
   @override
+  String get youVeHitTheThresholdKeep => '你已达到目标，继续保持！';
+
+  @override
   String get yourCollectionAtAGlance => '你的收藏一览';
 
   @override
@@ -7020,6 +7337,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get yourLibraryIsTidyWeLl => '你的音乐库很整洁。下次扫描后若出现新的重复项，我们会通知你。';
 
   @override
+  String get yourListeningHistoryIsStillYours => '你的收听历史仍然属于你。请尝试重新载入。';
+
+  @override
   String get yourListensWillRemainOnListenbrainz =>
       '你的收听记录会保留在 ListenBrainz，但 Flick 将停止提交。';
 
@@ -7031,13 +7351,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get yourMonthlyRecapNeedsABit => '本月再多听一些，你的每月回顾才会生成。';
 
   @override
+  String get yourMostReplayedTrack => '你播放最多的曲目';
+
+  @override
   String get yourMusicIsBeingScrobbled => '正在记录你的收听';
 
   @override
   String get yourMusicIsBeingSubmitted => '正在提交你的收听';
 
   @override
+  String get yourMusicOnRepeat => '你的音乐，循环不息。';
+
+  @override
   String get yourNewAudioEngineIsReady => '新的音频引擎已就绪，重启 Flick 即可生效。';
+
+  @override
+  String get yourNextFavoriteIsWaiting => '你的下一首心头好正在等你。';
+
+  @override
+  String get yourNextFavoriteNisWaiting => '你的下一首心头好\n正在等你。';
 
   @override
   String get yourPlaylists => '你的播放列表';

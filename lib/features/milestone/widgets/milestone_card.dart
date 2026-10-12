@@ -7,6 +7,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/milestone_service.dart';
 import '../../../widgets/common/vinyl_record.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Signature celebration card shown when a milestone is unlocked. The visual
 /// anchor is a hand-painted vinyl record — a deliberate reference to Flick's
@@ -171,7 +172,7 @@ class _MilestoneCardState extends State<MilestoneCard>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'ACHIEVEMENT UNLOCKED',
+          l10n.achievementUnlocked,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             color: AppColors.textTertiary,
             letterSpacing: 1.6,
@@ -208,13 +209,13 @@ class _MilestoneCardState extends State<MilestoneCard>
   Widget _buildMetaLine(BuildContext context, Color tierColor) {
     final parts = <String>[];
     if (widget.achievedAt != null) {
-      parts.add('Achieved ${_formatDate(widget.achievedAt!)}');
+      parts.add(l10n.achieved(_formatDate(widget.achievedAt!)));
     }
     final next = widget.nextMilestone;
     if (next != null && widget.nextRemaining != null) {
       final remaining = widget.nextRemaining!;
-      final unit = remaining == 1 ? next.category.unitSingular : next.unit;
-      parts.add('Next: ${next.shortLabel} — $remaining $unit to go');
+      final unit = next.category.unitLabel(remaining);
+      parts.add(l10n.nextToGo(next.shortLabel, remaining, unit));
     }
     return Text(
       parts.join(' · '),
@@ -248,19 +249,19 @@ class _MilestoneCardState extends State<MilestoneCard>
   }
 
   static String _formatDate(DateTime dt) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+    final months = [
+      l10n.jan,
+      l10n.feb,
+      l10n.mar,
+      l10n.apr,
+      l10n.may,
+      l10n.jun,
+      l10n.jul,
+      l10n.aug,
+      l10n.sep,
+      l10n.oct,
+      l10n.nov,
+      l10n.dec,
     ];
     return '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
   }
