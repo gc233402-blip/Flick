@@ -61,6 +61,10 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
   bool _sampling = false;
   int _colorGeneration = 0;
   String? _error;
+  // Whether the current error is the camera-permission one, which offers a
+  // shortcut into Android settings. Kept out of [_error] so the check does not
+  // depend on the localized message text.
+  bool _cameraPermissionError = false;
 
   @override
   void dispose() {
@@ -99,10 +103,10 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
     setState(() => _sampling = false);
     if (color == null) {
       _setOptions(_options.copyWith(look: ReplayLook.signal));
-      setState(
-        () => _error =
-            l10n.couldNotReadTheCoverColors,
-      );
+      setState(() {
+        _error = l10n.couldNotReadTheCoverColors;
+        _cameraPermissionError = false;
+      });
     } else {
       _setOptions(_options.copyWith(artworkColor: color));
     }
@@ -128,6 +132,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
       change();
       _saved = false;
       _error = null;
+      _cameraPermissionError = false;
     });
   }
 
@@ -136,16 +141,17 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
     setState(() {
       _busy = true;
       _error = null;
+      _cameraPermissionError = false;
     });
     try {
       if (source == ImageSource.camera) {
         final permission = await Permission.camera.request();
         if (!mounted) return;
         if (!permission.isGranted) {
-          setState(
-            () => _error =
-                l10n.cameraAccessIsNeededYouCan,
-          );
+          setState(() {
+            _error = l10n.cameraAccessIsNeededYouCan;
+            _cameraPermissionError = true;
+          });
           return;
         }
       }
@@ -167,9 +173,10 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
       });
     } catch (_) {
       if (mounted) {
-        setState(
-          () => _error = l10n.couldNotOpenThatPhotoTry,
-        );
+        setState(() {
+          _error = l10n.couldNotOpenThatPhotoTry;
+          _cameraPermissionError = false;
+        });
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -182,6 +189,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
       _busy = true;
       _saved = false;
       _error = null;
+      _cameraPermissionError = false;
       _capturing = format == null;
     });
     try {
@@ -211,17 +219,13 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
         if (!mounted) return;
         final boundary = _boundaryKey.currentContext?.findRenderObject();
         if (boundary is! RenderRepaintBoundary || boundary.debugNeedsPaint) {
-          throw const GallerySaveException(
-            'The poster is not ready yet. Try saving again.',
-          );
+          throw GallerySaveException(l10n.thePosterIsNotReadyYet);
         }
         final image = await boundary.toImage(pixelRatio: 3);
         try {
           final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
           if (bytes == null) {
-            throw const GallerySaveException(
-              'Could not create the poster image.',
-            );
+            throw GallerySaveException(l10n.couldNotCreateThePosterImage);
           }
           final stamp = DateTime.now()
               .toIso8601String()
@@ -249,11 +253,12 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
       );
     } catch (error) {
       if (mounted) {
-        setState(
-          () => _error = error is GallerySaveException
+        setState(() {
+          _error = error is GallerySaveException
               ? error.message
-              : 'Could not save your recap. Please try again.',
-        );
+              : l10n.couldNotSaveYourRecapPlease;
+          _cameraPermissionError = false;
+        });
       }
     } finally {
       if (mounted) {
@@ -402,7 +407,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
                           color: ReplayStyle.paper,
                         ),
                       ),
-                      if (_error!.startsWith('Camera'))
+                      if (_cameraPermissionError)
                         TextButton(
                           onPressed: openAppSettings,
                           child: Text(l10n.openAndroidSettings),

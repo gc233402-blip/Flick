@@ -399,11 +399,13 @@ class _MainShellState extends ConsumerState<MainShell>
     await showFlickDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Milestone',
+      barrierLabel: l10n.milestone,
       builder: (context) => MilestoneCard(
         milestone: milestone,
         nextMilestone: next.next,
         nextRemaining: next.next == null ? null : next.remaining,
+        supportLabel: l10n.supportFlick,
+        dismissLabel: l10n.dismiss,
         onSupportTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const SupportFlickScreen()),
@@ -420,7 +422,7 @@ class _MainShellState extends ConsumerState<MainShell>
     showFlickDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Day streak',
+      barrierLabel: l10n.dayStreak2,
       builder: (context) => StreakPopup(
         streak: streak,
         onSnooze: () => MilestoneService().snoozeStreakPopup(),

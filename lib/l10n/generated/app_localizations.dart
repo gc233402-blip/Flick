@@ -2564,6 +2564,12 @@ abstract class AppLocalizations {
   /// **'Could not load album songs'**
   String get couldNotLoadAlbumSongs;
 
+  /// lib/features/recap/screens/replay_studio_screen.dart:228
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the poster image.'**
+  String get couldNotCreateThePosterImage;
+
   /// lib/features/player/widgets/player_navigation.dart:56
   ///
   /// In en, this message translates to:
@@ -2659,6 +2665,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not save the lyrics file.'**
   String get couldNotSaveTheLyricsFile;
+
+  /// lib/features/recap/screens/replay_studio_screen.dart:259
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save your recap. Please try again.'**
+  String get couldNotSaveYourRecapPlease;
 
   /// lib/features/player/widgets/inline_lyrics_panel.dart:142
   ///
@@ -11736,6 +11748,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The names showing up again and again in your recent queue.'**
   String get theNamesShowingUpAgainAnd;
+
+  /// lib/features/recap/screens/replay_studio_screen.dart:222
+  ///
+  /// In en, this message translates to:
+  /// **'The poster is not ready yet. Try saving again.'**
+  String get thePosterIsNotReadyYet;
 
   /// lib/features/menu/screens/menu_screen.dart:1750
   ///

@@ -1952,6 +1952,10 @@
   "@couldNotLoadAlbumSongs": {
     "description": "lib/features/player/widgets/player_navigation.dart:85"
   },
+  "couldNotCreateThePosterImage": "Could not create the poster image.",
+  "@couldNotCreateThePosterImage": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:228"
+  },
   "couldNotLoadArtistSongs": "Could not load artist songs",
   "@couldNotLoadArtistSongs": {
     "description": "lib/features/player/widgets/player_navigation.dart:56"
@@ -2035,6 +2039,10 @@
   "couldNotSaveTheLyricsFile": "Could not save the lyrics file.",
   "@couldNotSaveTheLyricsFile": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:565"
+  },
+  "couldNotSaveYourRecapPlease": "Could not save your recap. Please try again.",
+  "@couldNotSaveYourRecapPlease": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:259"
   },
   "couldNotUseTheSelectedLyrics": "Could not use the selected lyrics file.",
   "@couldNotUseTheSelectedLyrics": {
@@ -9211,6 +9219,10 @@
   "theNamesShowingUpAgainAnd": "The names showing up again and again in your recent queue.",
   "@theNamesShowingUpAgainAnd": {
     "description": "lib/features/menu/screens/menu_screen.dart:889"
+  },
+  "thePosterIsNotReadyYet": "The poster is not ready yet. Try saving again.",
+  "@thePosterIsNotReadyYet": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:222"
   },
   "theTracksDominatingYourWeeklyAnd": "The tracks dominating your weekly and monthly recap.",
   "@theTracksDominatingYourWeeklyAnd": {

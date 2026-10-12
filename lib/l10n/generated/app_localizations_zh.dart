@@ -1372,6 +1372,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotLoadAlbumSongs => '无法加载专辑歌曲';
 
   @override
+  String get couldNotCreateThePosterImage => '无法生成海报图片。';
+
+  @override
   String get couldNotLoadArtistSongs => '无法加载艺术家歌曲';
 
   @override
@@ -1426,6 +1429,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get couldNotSaveTheLyricsFile => '无法保存歌词文件。';
+
+  @override
+  String get couldNotSaveYourRecapPlease => '无法保存回顾，请重试。';
 
   @override
   String get couldNotUseTheSelectedLyrics => '无法使用所选歌词文件。';
@@ -6424,6 +6430,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get theNamesShowingUpAgainAnd => '在你的近期队列中反复出现的名字。';
+
+  @override
+  String get thePosterIsNotReadyYet => '海报尚未准备好，请再次尝试保存。';
 
   @override
   String get theTracksDominatingYourWeeklyAnd => '主导你每周与每月回顾的曲目。';

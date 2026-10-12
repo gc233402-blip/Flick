@@ -1444,6 +1444,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotLoadAlbumSongs => 'Could not load album songs';
 
   @override
+  String get couldNotCreateThePosterImage =>
+      'Could not create the poster image.';
+
+  @override
   String get couldNotLoadArtistSongs => 'Could not load artist songs';
 
   @override
@@ -1502,6 +1506,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get couldNotSaveTheLyricsFile => 'Could not save the lyrics file.';
+
+  @override
+  String get couldNotSaveYourRecapPlease =>
+      'Could not save your recap. Please try again.';
 
   @override
   String get couldNotUseTheSelectedLyrics =>
@@ -6897,6 +6905,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get theNamesShowingUpAgainAnd =>
       'The names showing up again and again in your recent queue.';
+
+  @override
+  String get thePosterIsNotReadyYet =>
+      'The poster is not ready yet. Try saving again.';
 
   @override
   String get theTracksDominatingYourWeeklyAnd =>
