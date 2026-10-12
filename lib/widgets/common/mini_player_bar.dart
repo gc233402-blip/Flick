@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/core/theme/app_theme.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/l10n/l10n.dart';
 import 'package:flick/models/mini_player_config.dart';
@@ -188,6 +189,7 @@ class MiniPlayerBar extends StatelessWidget {
   Widget _songRow(BuildContext context, bool artworkVisible, double height) {
     final titleStyle = TextStyle(
       fontFamily: 'ProductSans',
+      fontFamilyFallback: AppTheme.fontFamilyFallback,
       fontWeight: FontWeight.w600,
       fontSize: 14 * config.textScale,
       height: 1.15,

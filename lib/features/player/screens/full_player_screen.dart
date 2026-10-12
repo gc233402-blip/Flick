@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/core/theme/app_theme.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/utils/duration_format.dart';
 import 'package:flick/core/utils/responsive.dart';
@@ -300,6 +301,7 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
         text: text,
         style: TextStyle(
           fontFamily: _topBarTextFontFamily,
+          fontFamilyFallback: AppTheme.fontFamilyFallback,
           fontSize: fontSize,
           fontWeight: _topBarTextFontWeight,
         ),

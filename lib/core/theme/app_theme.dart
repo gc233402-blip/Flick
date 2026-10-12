@@ -9,6 +9,13 @@ class AppTheme {
   /// Product Sans font family name
   static const String _fontFamily = 'ProductSans';
 
+  /// Families tried, in order, for every style in [darkTheme].
+  ///
+  /// Product Sans has no CJK glyphs, so Chinese comes from the bundled Noto
+  /// Sans SC subset (see pubspec.yaml). Skia does not search bundled fonts for
+  /// missing characters, so the fallback has to be declared explicitly here.
+  static const List<String> fontFamilyFallback = <String>['NotoSansSC'];
+
   /// Primary text theme using Product Sans
   static TextTheme get _textTheme {
     return const TextTheme(
@@ -120,7 +127,7 @@ class AppTheme {
         letterSpacing: 0.5,
         color: AppColors.textTertiary,
       ),
-    );
+    ).apply(fontFamilyFallback: fontFamilyFallback);
   }
 
   /// Dark theme for the app
@@ -202,6 +209,7 @@ class AppTheme {
         checkmarkColor: AppColors.textPrimary,
         labelStyle: TextStyle(
           fontFamily: _fontFamily,
+          fontFamilyFallback: fontFamilyFallback,
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: AppColors.textPrimary,

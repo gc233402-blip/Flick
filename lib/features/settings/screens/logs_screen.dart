@@ -13,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/core/theme/app_theme.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/utils/app_haptics.dart';
 import 'package:flick/core/utils/app_log.dart';
@@ -474,6 +475,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
                   text: TextSpan(
                     style: TextStyle(
                       fontFamily: 'monospace',
+                      fontFamilyFallback: AppTheme.fontFamilyFallback,
                       fontSize: 11,
                       height: 1.3,
                       color: context.adaptiveTextSecondary,

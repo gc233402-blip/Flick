@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart'
     show ScrollCacheExtent, ScrollDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flick/core/theme/app_theme.dart';
 import 'package:flick/features/player/widgets/album_color_helpers.dart';
 import 'package:flick/features/player/widgets/karaoke_lyric_line.dart';
 import 'package:flick/features/player/widgets/lyrics_alignment.dart';
@@ -195,6 +196,7 @@ class _SyncedLyricsViewState extends ConsumerState<SyncedLyricsView> {
         text: text,
         style: TextStyle(
           fontFamily: 'ProductSans',
+          fontFamilyFallback: AppTheme.fontFamilyFallback,
           fontSize: fontSize,
           height: heightFactor,
           fontWeight: maxLines == 3 ? FontWeight.w700 : FontWeight.w500,
