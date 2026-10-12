@@ -3,7 +3,7 @@
 
 Why this exists
 ---------------
-The app font is Product Sans, which carries 216 codepoints and exactly zero CJK
+The app font is Google Sans Flex, which is Latin/Greek only and carries no CJK
 glyphs. Android would happily fall back to the device font, but then Chinese
 renders in a different typeface from the Latin text around it. Registering a
 subset of Noto Sans SC in `pubspec.yaml` fixes that with no Dart changes: Skia

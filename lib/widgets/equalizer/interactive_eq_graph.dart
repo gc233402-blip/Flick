@@ -725,7 +725,7 @@ class _EqCurvePainter extends CustomPainter {
         text: TextSpan(
           text: label,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 9 * textScale,
             color: AppColors.textTertiary.withValues(alpha: 0.7),
           ),
@@ -761,7 +761,7 @@ class _EqCurvePainter extends CustomPainter {
         text: TextSpan(
           text: label,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 9 * textScale,
             color: AppColors.textTertiary.withValues(alpha: 0.7),
           ),

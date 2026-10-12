@@ -339,7 +339,7 @@ class _FloatingMiniPlayerState extends ConsumerState<FloatingMiniPlayer>
                                           Text(
                                             currentSong.title,
                                             style: TextStyle(
-                                              fontFamily: 'ProductSans',
+                                              fontFamily: 'GoogleSansFlex',
                                               fontSize: 11,
                                               fontWeight: FontWeight.w600,
                                               color:
@@ -352,7 +352,7 @@ class _FloatingMiniPlayerState extends ConsumerState<FloatingMiniPlayer>
                                           Text(
                                             currentSong.artist,
                                             style: TextStyle(
-                                              fontFamily: 'ProductSans',
+                                              fontFamily: 'GoogleSansFlex',
                                               fontSize: 9,
                                               color:
                                                   context.adaptiveTextSecondary,

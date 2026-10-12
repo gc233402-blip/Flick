@@ -152,7 +152,7 @@ class SongActionsSheet extends ConsumerWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontSize: context.responsive(16.0, 17.0, 18.0),
                                 fontWeight: FontWeight.w600,
                                 color: sheetContext.adaptiveTextPrimary,
@@ -164,7 +164,7 @@ class SongActionsSheet extends ConsumerWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontSize: context.responsive(12.0, 13.0, 14.0),
                                 color: sheetContext.adaptiveTextSecondary,
                               ),
@@ -405,7 +405,7 @@ class SongActionsSheet extends ConsumerWidget {
       child: Text(
         value,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: context.responsive(10.0, 11.0, 12.0),
           fontWeight: FontWeight.w600,
           color: context.adaptiveTextSecondary,
@@ -454,7 +454,7 @@ class SongActionsSheet extends ConsumerWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: context.responsive(13.0, 14.0, 15.0),
                     fontWeight: FontWeight.w500,
                     color: context.adaptiveTextPrimary,

@@ -196,7 +196,7 @@ class _WaveformSeekBarState extends State<WaveformSeekBar> {
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: Colors.white,
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
         ),
       ),
     );

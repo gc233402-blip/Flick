@@ -195,7 +195,7 @@ class _SyncedLyricsViewState extends ConsumerState<SyncedLyricsView> {
       text: TextSpan(
         text: text,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontFamilyFallback: AppTheme.fontFamilyFallback,
           fontSize: fontSize,
           height: heightFactor,
@@ -352,7 +352,7 @@ class _SyncedLyricsViewState extends ConsumerState<SyncedLyricsView> {
 
   TextStyle _textStyle(bool isActive, double opacity) {
     return TextStyle(
-      fontFamily: 'ProductSans',
+      fontFamily: 'GoogleSansFlex',
       fontSize: isActive ? 22 : 17,
       height: isActive ? 1.18 : 1.24,
       fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
@@ -362,7 +362,7 @@ class _SyncedLyricsViewState extends ConsumerState<SyncedLyricsView> {
 
   StrutStyle _strutStyle(bool isActive) {
     return StrutStyle(
-      fontFamily: 'ProductSans',
+      fontFamily: 'GoogleSansFlex',
       fontSize: isActive ? 22 : 17,
       height: isActive ? 1.18 : 1.24,
       forceStrutHeight: true,

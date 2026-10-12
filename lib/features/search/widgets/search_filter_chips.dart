@@ -106,7 +106,7 @@ class _Chip extends StatelessWidget {
             child: Text(
               displayLabel,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: selected

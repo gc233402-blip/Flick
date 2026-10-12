@@ -681,7 +681,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -692,7 +692,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
                 Text(
                   _formatElapsed(startedAt),
                   style: const TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     color: AppColors.textTertiary,
                   ),
@@ -717,7 +717,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
                   ? l10n.loadingArtwork2
                   : l10n.countingFiles,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),
@@ -729,7 +729,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 11,
                   color: AppColors.textTertiary,
                 ),
@@ -751,7 +751,7 @@ class _FloatingScanProgressState extends State<FloatingScanProgress>
                   child: Text(
                     loadingArtwork ? l10n.skip : l10n.stop,
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontWeight: FontWeight.w500,
                     ),
                   ),

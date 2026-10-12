@@ -743,7 +743,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                   Text(
                     title,
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -753,7 +753,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 12,
                       color: AppColors.textTertiary,
                     ),
@@ -942,7 +942,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                 Text(
                   progress?.currentFolder ?? folderName,
                   style: const TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -981,7 +981,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                       ? l10n.filesChecked(progress!.filesProcessed)
                       : l10n.countingFiles,
                   style: const TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     color: AppColors.textTertiary,
                   ),
@@ -992,7 +992,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                   Text(
                     l10n.folderOf(progress.foldersCompleted ?? 0, progress.foldersTotal ?? progress.folders!.length),
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -1054,7 +1054,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                         child: Text(
                           l10n.minimize,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -1089,7 +1089,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                         child: Text(
                           loadingArtwork ? l10n.skip : l10n.cancel,
                           style: const TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -1125,7 +1125,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),
@@ -1151,7 +1151,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
               status,
               textAlign: TextAlign.right,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 11,
                 color: AppColors.textTertiary,
               ),
@@ -1182,7 +1182,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
           Text(
             text,
             style: const TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 13,
               color: AppColors.accent,
             ),
@@ -1213,7 +1213,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
             Text(
               text,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: AppColors.accent,
               ),
@@ -1240,7 +1240,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
             Text(
               l10n.usbStorageNotConnected,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -1251,7 +1251,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
               l10n.isOfflineRetainedSongsStillListed(progress.currentFolder ?? folderName),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: AppColors.textTertiary,
               ),
@@ -1272,7 +1272,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                 child: Text(
                   l10n.done,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1372,7 +1372,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                             Text(
                               l10n.preloadingAudio2(preload.completed, preload.total),
                               style: const TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1383,7 +1383,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontFamily: 'ProductSans',
+                                  fontFamily: 'GoogleSansFlex',
                                   fontSize: 11,
                                   color: AppColors.textSecondary,
                                 ),
@@ -1423,7 +1423,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
                     child: Text(
                       l10n.noAudioWasFoundIfThis,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 12,
                         color: AppColors.textSecondary,
                         height: 1.4,
@@ -1450,7 +1450,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
               child: Text(
                 l10n.done,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -1482,7 +1482,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
           Text(
             parts.join(' · '),
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 12,
               color: AppColors.accent,
             ),
@@ -1535,7 +1535,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
         Text(
           value,
           style: const TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -1545,7 +1545,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 12,
             color: AppColors.textTertiary,
           ),

@@ -478,7 +478,7 @@ class AnimatedSongScene extends ConsumerWidget {
                       Text(
                         l10n.nowPlaying,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: context.responsive(12.0, 13.0, 14.0),
                           fontWeight: FontWeight.w600,
                           color: Colors.white.withValues(alpha: 0.9),
@@ -490,7 +490,7 @@ class AnimatedSongScene extends ConsumerWidget {
                         Text(
                           l10n.openedFromLocker,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: context.responsive(10.0, 10.5, 11.0),
                             color: Colors.white.withValues(alpha: 0.7),
                           ),
@@ -590,7 +590,7 @@ class AnimatedSongScene extends ConsumerWidget {
             Text(
               l10n.backToLocker,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: context.responsive(11.0, 12.0, 13.0),
                 fontWeight: FontWeight.w600,
                 color: Colors.white.withValues(alpha: 0.92),
@@ -636,7 +636,7 @@ class AnimatedSongScene extends ConsumerWidget {
           Text(
             count > 0 ? l10n.queue2(count) : l10n.queue,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: context.responsive(10.0, 11.0, 12.0),
               fontWeight: FontWeight.w600,
               color: Colors.white.withValues(alpha: highlighted ? 0.96 : 0.8),
@@ -915,7 +915,7 @@ class AnimatedSongScene extends ConsumerWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: context.responsiveText(
                             context.responsive(18.0, 19.0, 21.0) *
                                 immersiveTextScale,
@@ -935,7 +935,7 @@ class AnimatedSongScene extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: context.responsiveText(
                               context.responsive(13.0, 14.0, 15.0) *
                                   immersiveTextScale,
@@ -970,7 +970,7 @@ class AnimatedSongScene extends ConsumerWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: context.responsiveText(
                       context.responsive(22.0, 24.0, 28.0) * immersiveTextScale,
                     ),
@@ -989,7 +989,7 @@ class AnimatedSongScene extends ConsumerWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: context.responsiveText(
                         context.responsive(13.0, 14.0, 16.0) *
                             immersiveTextScale,
@@ -1260,7 +1260,7 @@ class AnimatedSongScene extends ConsumerWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: context.responsiveText(titleSize),
               fontWeight: FontWeight.w700,
               color: Colors.white,
@@ -1278,7 +1278,7 @@ class AnimatedSongScene extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: context.responsiveText(artistSize),
                 fontWeight: FontWeight.w500,
                 color: Colors.white.withValues(alpha: 0.78),
@@ -1316,7 +1316,7 @@ class AnimatedSongScene extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: context.responsiveText(albumFontSize),
                             color: Colors.white.withValues(alpha: 0.68),
                           ),
@@ -1364,7 +1364,7 @@ class AnimatedSongScene extends ConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: context.responsiveText(albumFontSize),
                     color: Colors.white.withValues(alpha: 0.68),
                   ),

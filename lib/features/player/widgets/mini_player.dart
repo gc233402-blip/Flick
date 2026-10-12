@@ -63,7 +63,7 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer> {
               Text(
                 '$queueCount',
                 style: const TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
                   color: AppColors.textPrimary,
@@ -226,7 +226,7 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15.5,
                                 color: AppColors.textPrimary,
@@ -242,7 +242,7 @@ class _MiniPlayerState extends ConsumerState<MiniPlayer> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      fontFamily: 'ProductSans',
+                                      fontFamily: 'GoogleSansFlex',
                                       fontSize: 13.5,
                                       fontWeight: FontWeight.w500,
                                       color: AppColors.textSecondary.withValues(

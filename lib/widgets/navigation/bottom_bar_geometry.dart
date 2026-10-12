@@ -20,7 +20,7 @@ class BottomBarGeometry {
       text: TextSpan(
         text: 'Ag',
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 14 * config.textScale,
           fontWeight: FontWeight.w600,
           height: 1.15,
@@ -34,7 +34,7 @@ class BottomBarGeometry {
       text: TextSpan(
         text: 'Ag',
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 12 * config.textScale,
           fontWeight: FontWeight.w500,
           height: 1.15,

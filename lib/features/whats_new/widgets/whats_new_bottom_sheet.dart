@@ -38,7 +38,7 @@ class WhatsNewBottomSheet extends ConsumerWidget {
           child: Text(
             l10n.gotIt,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontWeight: FontWeight.w600,
             ),
           ),

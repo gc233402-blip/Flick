@@ -548,7 +548,7 @@ class SliderSetting extends StatelessWidget {
                       Text(
                         displayValue,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: context.adaptiveTextSecondary,

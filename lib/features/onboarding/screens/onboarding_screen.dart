@@ -166,7 +166,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               child: const Text(
                 'Skip',
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: AppConstants.fontSizeMd,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.4,
@@ -268,7 +268,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             Text(
               isLastPage ? 'Get Started' : 'Next',
               style: const TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: AppConstants.fontSizeMd,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.3,
@@ -486,7 +486,7 @@ class _StepContent extends StatelessWidget {
             data.title,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 38,
               fontWeight: FontWeight.w900,
               color: AppColors.textPrimary,
@@ -499,7 +499,7 @@ class _StepContent extends StatelessWidget {
             data.description,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: AppConstants.fontSizeMd,
               fontWeight: FontWeight.w400,
               color: AppColors.textSecondary,

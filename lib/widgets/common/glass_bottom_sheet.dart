@@ -83,7 +83,7 @@ class AppBottomSheetSurface extends StatelessWidget {
   }
 }
 
-/// A reusable bottom sheet dialog with Product Sans font.
+/// A reusable bottom sheet dialog with Google Sans Flex font.
 class GlassBottomSheet extends StatelessWidget {
   /// Title displayed at the top of the bottom sheet
   final String? title;

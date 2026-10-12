@@ -55,7 +55,7 @@ class AddToPlaylistSheet extends ConsumerWidget {
                     ? l10n.addToPlaylist2
                     : l10n.addSongsToPlaylist2(songs.length),
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: context.adaptiveTextPrimary,
@@ -84,7 +84,7 @@ class AddToPlaylistSheet extends ConsumerWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: context.adaptiveTextTertiary,
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                           ),
                         ),
                       ),
@@ -121,14 +121,14 @@ class AddToPlaylistSheet extends ConsumerWidget {
                             playlist.name,
                             style: TextStyle(
                               color: context.adaptiveTextPrimary,
-                              fontFamily: 'ProductSans',
+                              fontFamily: 'GoogleSansFlex',
                             ),
                           ),
                           subtitle: Text(
                             l10n.songs9(playlist.songIds.length),
                             style: TextStyle(
                               color: context.adaptiveTextTertiary,
-                              fontFamily: 'ProductSans',
+                              fontFamily: 'GoogleSansFlex',
                             ),
                           ),
                           trailing: isAlreadyAdded

@@ -254,7 +254,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: context.adaptiveTextPrimary,
@@ -266,7 +266,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 14,
                   color: context.adaptiveTextSecondary,
                 ),
@@ -298,7 +298,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
       child: Text(
         value,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: context.adaptiveTextSecondary,
@@ -346,7 +346,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                     color: context.adaptiveTextPrimary,
@@ -390,7 +390,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                   Text(
                     l10n.addToPlaylist2,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: sheetContext.adaptiveTextPrimary,
@@ -575,7 +575,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                   Text(
                     l10n.songMetadata,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: sheetContext.adaptiveTextPrimary,
@@ -846,7 +846,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextSecondary,
@@ -858,7 +858,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             child: Text(
               value,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: context.adaptiveTextPrimary,
               ),

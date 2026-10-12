@@ -107,7 +107,7 @@ class _ModeTile extends StatelessWidget {
                     Text(
                       label,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 15,
                         fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                         color: selected
@@ -118,7 +118,7 @@ class _ModeTile extends StatelessWidget {
                     Text(
                       description,
                       style: const TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 12,
                         color: AppColors.textTertiary,
                       ),

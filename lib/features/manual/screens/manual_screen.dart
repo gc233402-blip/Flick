@@ -133,7 +133,7 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
                   child: Text(
                     l10n.manual,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -224,7 +224,7 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
               Text(
                 l10n.noMatchesFor(_query),
                 style: const TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   color: AppColors.textSecondary,
                   fontSize: 15,
                 ),
@@ -313,7 +313,7 @@ class _ManualSectionCardState extends State<_ManualSectionCard> {
                     child: Text(
                       widget.section.title,
                       style: const TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -323,7 +323,7 @@ class _ManualSectionCardState extends State<_ManualSectionCard> {
                   Text(
                     '${widget.section.entries.length}',
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 13,
                       color: AppColors.textTertiary,
                     ),
@@ -409,7 +409,7 @@ class _ManualEntryContent extends StatelessWidget {
           Text(
             sectionLabel!.toUpperCase(),
             style: const TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.1,
@@ -421,7 +421,7 @@ class _ManualEntryContent extends StatelessWidget {
         Text(
           entry.title,
           style: const TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 15,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -431,7 +431,7 @@ class _ManualEntryContent extends StatelessWidget {
         Text(
           entry.body,
           style: const TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 13.5,
             color: AppColors.textSecondary,
             height: 1.5,
@@ -455,7 +455,7 @@ class _ManualEntryContent extends StatelessWidget {
                   TextSpan(
                     text: tip,
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 12.5,
                       color: AppColors.textTertiary,
                       height: 1.45,

@@ -81,7 +81,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                         Text(
                           l10n.fullscreen,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                             color: Colors.white.withValues(alpha: 0.86),
@@ -554,7 +554,7 @@ class PlayerLayoutSettingsScreen extends ConsumerWidget {
                                   Text(
                                     mode.label,
                                     style: TextStyle(
-                                      fontFamily: 'ProductSans',
+                                      fontFamily: 'GoogleSansFlex',
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white.withValues(
@@ -667,7 +667,7 @@ class _LayoutPreview extends StatelessWidget {
                 Text(
                   l10n.livePreview,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: context.adaptiveTextTertiary,
@@ -699,7 +699,7 @@ class _LayoutPreview extends StatelessWidget {
                     child: Text(
                       l10n.noSongPlaying,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 14,
                         color: Color(0xFF888888),
                       ),
@@ -743,7 +743,7 @@ class _LayoutPreview extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 17 * artworkCardTextScale,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -758,7 +758,7 @@ class _LayoutPreview extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12 * artworkCardTextScale,
                     color: Colors.white.withValues(alpha: 0.72),
                   ),
@@ -771,7 +771,7 @@ class _LayoutPreview extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 11 * artworkCardTextScale,
                     color: Colors.white.withValues(alpha: 0.55),
                   ),
@@ -785,7 +785,7 @@ class _LayoutPreview extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 10,
                       color: Colors.white.withValues(alpha: 0.48),
                     ),
@@ -848,7 +848,7 @@ class _LayoutPreview extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 18 * immersiveTextScale,
                             fontWeight: FontWeight.w700,
                             height: 1.05,
@@ -863,7 +863,7 @@ class _LayoutPreview extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 12 * immersiveTextScale,
                             color: Colors.white.withValues(alpha: 0.76),
                           ),
@@ -876,7 +876,7 @@ class _LayoutPreview extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontFamily: 'ProductSans',
+                              fontFamily: 'GoogleSansFlex',
                               fontSize: 11,
                               color: Colors.white.withValues(alpha: 0.48),
                             ),
@@ -1082,7 +1082,7 @@ class _FullScreenPreview extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 28 * artworkCardTextScale,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -1097,7 +1097,7 @@ class _FullScreenPreview extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 17 * artworkCardTextScale,
                         color: Colors.white.withValues(alpha: 0.72),
                       ),
@@ -1110,7 +1110,7 @@ class _FullScreenPreview extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 14 * artworkCardTextScale,
                         color: Colors.white.withValues(alpha: 0.56),
                       ),
@@ -1121,7 +1121,7 @@ class _FullScreenPreview extends StatelessWidget {
                       child: Text(
                         _fileInfoLabel(song),
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 11,
                           color: Colors.white.withValues(alpha: 0.4),
                         ),
@@ -1186,7 +1186,7 @@ class _FullScreenPreview extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 32 * immersiveTextScale,
                             fontWeight: FontWeight.w700,
                             height: 1.05,
@@ -1201,7 +1201,7 @@ class _FullScreenPreview extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 18 * immersiveTextScale,
                             color: Colors.white.withValues(alpha: 0.76),
                           ),
@@ -1212,7 +1212,7 @@ class _FullScreenPreview extends StatelessWidget {
                           child: Text(
                             _fileInfoLabel(song),
                             style: TextStyle(
-                              fontFamily: 'ProductSans',
+                              fontFamily: 'GoogleSansFlex',
                               fontSize: 12,
                               color: Colors.white.withValues(alpha: 0.4),
                             ),

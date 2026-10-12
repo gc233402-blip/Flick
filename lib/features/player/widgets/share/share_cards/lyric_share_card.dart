@@ -122,7 +122,7 @@ class LyricShareCard extends StatelessWidget {
         text: TextSpan(
           text: text,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontFamilyFallback: AppTheme.fontFamilyFallback,
             fontSize: mid,
             fontWeight: FontWeight.w700,

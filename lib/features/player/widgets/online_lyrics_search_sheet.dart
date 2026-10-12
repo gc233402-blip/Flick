@@ -277,7 +277,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
           child: Text(
             l10n.searchOnlineLyrics,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 17,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -363,7 +363,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                   child: Text(
                     l10n.exactMatch,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: AppColors.accent,
@@ -386,7 +386,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
             Text(
               result.trackName ?? widget.song.title,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: textColor,
@@ -396,7 +396,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
             Text(
               result.artistName ?? widget.song.artist,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
                 color: secondaryColor,
@@ -407,7 +407,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
               Text(
                 result.albumName!,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 12,
                   color: subtitleColor,
                 ),
@@ -430,7 +430,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     height: 1.5,
                     color: AppColors.textSecondary.withValues(alpha: 0.8),
@@ -457,7 +457,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                 child: Text(
                   l10n.previewUse,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.background,
@@ -486,7 +486,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
           Text(
             label,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 9,
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
@@ -546,7 +546,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
               Text(
                 label,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color:
@@ -611,14 +611,14 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
       controller: _searchController,
       onSubmitted: _doCustomSearch,
       style: TextStyle(
-        fontFamily: 'ProductSans',
+        fontFamily: 'GoogleSansFlex',
         fontSize: 14,
         color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
         hintText: l10n.searchArtistTitle,
         hintStyle: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           color: AppColors.textSecondary,
         ),
         prefixIcon: const Icon(LucideIcons.search, size: 18),
@@ -759,7 +759,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 14,
                 height: 1.5,
                 color: AppColors.textTertiary,
@@ -782,7 +782,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                 label: Text(
                   l10n.tryOriginalSearch,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 13,
                     color: AppColors.accent,
                     fontWeight: FontWeight.w600,
@@ -807,7 +807,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                 label: Text(
                   l10n.clearFilters,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 13,
                     color: AppColors.accent,
                     fontWeight: FontWeight.w600,
@@ -852,7 +852,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                     child: Text(
                       result.trackName ?? '',
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -874,7 +874,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                         child: Text(
                           l10n.durationMatch,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 9,
                             fontWeight: FontWeight.w700,
                             color: Colors.green.shade300,
@@ -894,7 +894,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
               Text(
                 result.artistName ?? '',
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: AppColors.textSecondary,
@@ -904,7 +904,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                 Text(
                   result.albumName!,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 11,
                     color: AppColors.textTertiary,
                   ),
@@ -915,7 +915,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                   _formatDuration(
                       Duration(seconds: result.duration!.round())),
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 10,
                     color: AppColors.textTertiary.withValues(alpha: 0.7),
                   ),
@@ -938,7 +938,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 12,
                       height: 1.5,
                       color: AppColors.textSecondary.withValues(alpha: 0.75),
@@ -955,7 +955,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                   Text(
                     l10n.tapToPreview,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: AppColors.accent.withValues(alpha: 0.7),
@@ -986,7 +986,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
       child: Text(
         label,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: 10,
           color: AppColors.textTertiary,
         ),
@@ -1012,7 +1012,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
               child: Text(
                 l10n.lyricsPreview,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -1053,7 +1053,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -1065,7 +1065,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
@@ -1121,7 +1121,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                   child: Text(
                     lyrics,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 13,
                       height: 1.7,
                       color: AppColors.textSecondary.withValues(alpha: 0.9),
@@ -1150,7 +1150,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                 child: Text(
                   l10n.cancel,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1184,7 +1184,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
                     : Text(
                         l10n.saveLyrics,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColors.background,

@@ -126,7 +126,7 @@ class _RatingButtonState extends State<RatingButton>
               Text(
                 '$rating',
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: widget.iconSize * 0.6,
                   fontWeight: FontWeight.w700,
                   color: Colors.white.withValues(alpha: 0.96),

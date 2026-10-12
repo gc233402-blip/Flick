@@ -87,7 +87,7 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
                   Text(
                     l10n.playerLayout,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: context.adaptiveTextPrimary,
@@ -147,7 +147,7 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
                             Text(
                               l10n.fullscreen,
                               style: TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white.withValues(alpha: 0.86),
@@ -397,7 +397,7 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
                         Text(
                           l10n.albumColors,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: context.adaptiveTextPrimary,
@@ -438,7 +438,7 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
                             child: Text(
                               mode.label,
                               style: TextStyle(
-                                fontFamily: 'ProductSans',
+                                fontFamily: 'GoogleSansFlex',
                                 fontSize: 14,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
@@ -525,7 +525,7 @@ class _PlayerLayoutSheetState extends ConsumerState<PlayerLayoutSheet> {
                                   Text(
                                     _mode.label,
                                     style: TextStyle(
-                                      fontFamily: 'ProductSans',
+                                      fontFamily: 'GoogleSansFlex',
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white.withValues(alpha: 0.72),
@@ -627,7 +627,7 @@ class _PlayerLayoutOptionTile extends StatelessWidget {
                     Text(
                       title,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: context.adaptiveTextPrimary,
@@ -637,7 +637,7 @@ class _PlayerLayoutOptionTile extends StatelessWidget {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 13,
                         height: 1.4,
                         color: context.adaptiveTextSecondary,
@@ -692,7 +692,7 @@ class _PlayerCustomizationGroup extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: context.adaptiveTextPrimary,
@@ -729,7 +729,7 @@ class _PlayerCustomizationToggle extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: context.adaptiveTextPrimary,
@@ -778,7 +778,7 @@ class _PlayerCustomizationSlider extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: context.adaptiveTextPrimary,
@@ -787,7 +787,7 @@ class _PlayerCustomizationSlider extends StatelessWidget {
               Text(
                 valueLabel,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 12,
                   color: context.adaptiveTextSecondary,
                 ),
@@ -876,7 +876,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
               child: Text(
                 l10n.samplePreview,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: Colors.white.withValues(alpha: 0.68),
@@ -919,7 +919,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 17 * artworkCardTextScale,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -934,7 +934,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12 * artworkCardTextScale,
                     color: Colors.white.withValues(alpha: 0.72),
                   ),
@@ -996,7 +996,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 18 * immersiveTextScale,
                             fontWeight: FontWeight.w700,
                             height: 1.05,
@@ -1011,7 +1011,7 @@ class _PlayerLayoutPreview extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 12 * immersiveTextScale,
                             color: Colors.white.withValues(alpha: 0.76),
                           ),
@@ -1163,7 +1163,7 @@ class _FullScreenPreview extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 28 * artworkCardTextScale,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -1178,7 +1178,7 @@ class _FullScreenPreview extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 17 * artworkCardTextScale,
                         color: Colors.white.withValues(alpha: 0.72),
                       ),
@@ -1191,7 +1191,7 @@ class _FullScreenPreview extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 14 * artworkCardTextScale,
                         color: Colors.white.withValues(alpha: 0.56),
                       ),
@@ -1202,7 +1202,7 @@ class _FullScreenPreview extends StatelessWidget {
                       child: Text(
                         l10n.flac24Bit96Khz,
                         style: TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 11,
                           color: Colors.white.withValues(alpha: 0.4),
                         ),
@@ -1267,7 +1267,7 @@ class _FullScreenPreview extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 32 * immersiveTextScale,
                             fontWeight: FontWeight.w700,
                             height: 1.05,
@@ -1282,7 +1282,7 @@ class _FullScreenPreview extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 18 * immersiveTextScale,
                             color: Colors.white.withValues(alpha: 0.76),
                           ),
@@ -1293,7 +1293,7 @@ class _FullScreenPreview extends StatelessWidget {
                           child: Text(
                             l10n.flac24Bit96Khz,
                             style: TextStyle(
-                              fontFamily: 'ProductSans',
+                              fontFamily: 'GoogleSansFlex',
                               fontSize: 12,
                               color: Colors.white.withValues(alpha: 0.4),
                             ),
@@ -1330,7 +1330,7 @@ class _PlayerActionButtonSelector extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: context.adaptiveTextPrimary,
@@ -1375,7 +1375,7 @@ class _PlayerActionButtonSelector extends StatelessWidget {
                     Text(
                       action.label,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontSize: 12,
                         fontWeight: isSelected
                             ? FontWeight.bold

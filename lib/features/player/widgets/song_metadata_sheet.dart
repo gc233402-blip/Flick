@@ -43,7 +43,7 @@ class SongMetadataSheet extends StatelessWidget {
               Text(
                 l10n.songMetadata,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: context.adaptiveTextPrimary,
@@ -98,7 +98,7 @@ class SongMetadataSheet extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: context.adaptiveTextSecondary,
@@ -110,7 +110,7 @@ class SongMetadataSheet extends StatelessWidget {
             child: Text(
               value,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 13,
                 color: context.adaptiveTextPrimary,
               ),

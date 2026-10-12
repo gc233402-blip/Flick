@@ -46,7 +46,7 @@ class SpeedBottomSheet extends StatelessWidget {
               Text(
                 l10n.playbackSpeed,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -66,7 +66,7 @@ class SpeedBottomSheet extends StatelessWidget {
                       Text(
                         l10n.x(min),
                         style: const TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 14,
                           color: AppColors.textSecondary,
                         ),
@@ -85,7 +85,7 @@ class SpeedBottomSheet extends StatelessWidget {
                       Text(
                         l10n.x2(max),
                         style: const TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontSize: 14,
                           color: AppColors.textSecondary,
                         ),
@@ -96,7 +96,7 @@ class SpeedBottomSheet extends StatelessWidget {
                   Text(
                     l10n.x3(currentSpeed),
                     style: const TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: AppColors.accent,

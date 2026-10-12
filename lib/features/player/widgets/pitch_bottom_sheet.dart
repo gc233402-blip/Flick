@@ -39,7 +39,7 @@ class PitchBottomSheet extends StatelessWidget {
               Text(
                 l10n.pitch,
                 style: TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -57,7 +57,7 @@ class PitchBottomSheet extends StatelessWidget {
                   Text(
                     '−12',
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 14,
                       color: AppColors.textSecondary,
                     ),
@@ -78,7 +78,7 @@ class PitchBottomSheet extends StatelessWidget {
                   Text(
                     '+12',
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 14,
                       color: AppColors.textSecondary,
                     ),
@@ -97,7 +97,7 @@ class PitchBottomSheet extends StatelessWidget {
                 return Text(
                   v == 0 ? l10n.off : '$sign${l10n.pitchSemitones(v)}',
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: v == 0 ? AppColors.textSecondary : AppColors.accent,

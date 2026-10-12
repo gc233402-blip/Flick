@@ -788,7 +788,7 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
                   child: Text(
                     l10n.noCustomPresetsYet,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -2566,7 +2566,7 @@ class _BandDetailPanelState extends ConsumerState<_BandDetailPanel> {
                 child: Text(
                   '${widget.index + 1}',
                   style: const TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
                     color: AppColors.textPrimary,
@@ -2806,7 +2806,7 @@ class _DetailKnob extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: accentColor ?? context.adaptiveTextPrimary,
                 fontWeight: FontWeight.w700,
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
               ),
             ),
           ),
@@ -2910,7 +2910,7 @@ class _InlineValueEditorState extends State<_InlineValueEditor> {
                   textInputAction: TextInputAction.done,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: context.adaptiveTextPrimary,
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                   ),
                   decoration: InputDecoration(
                     isDense: true,
@@ -2952,7 +2952,7 @@ class _InlineValueEditorState extends State<_InlineValueEditor> {
                     child: Text(
                       l10n.done,
                       style: TextStyle(
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -3118,7 +3118,7 @@ class _ParametricBandEditor extends ConsumerWidget {
                       child: Text(
                         '${index + 1}',
                         style: const TextStyle(
-                          fontFamily: 'ProductSans',
+                          fontFamily: 'GoogleSansFlex',
                           fontWeight: FontWeight.w700,
                           fontSize: 11,
                           color: AppColors.textPrimary,
@@ -3205,7 +3205,7 @@ class _ParametricBandEditor extends ConsumerWidget {
                             ? toneColor
                             : context.adaptiveTextTertiary,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'ProductSans',
+                        fontFamily: 'GoogleSansFlex',
                       ),
                     ),
                   ),
@@ -3285,7 +3285,7 @@ class _DynamicsSection extends ConsumerWidget {
             label: Text(
               l10n.resetDynamics,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -3534,7 +3534,7 @@ class _CreativeFxSection extends ConsumerWidget {
             label: Text(
               l10n.resetFx,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -4088,7 +4088,7 @@ class _BandTypeDropdown extends StatelessWidget {
             color: enabled
                 ? context.adaptiveTextPrimary
                 : context.adaptiveTextTertiary,
-            fontFamily: 'ProductSans',
+            fontFamily: 'GoogleSansFlex',
             fontWeight: FontWeight.w600,
             fontSize: compact ? 10 : null,
           ),
@@ -4202,7 +4202,7 @@ class _ModeToggleButton extends StatelessWidget {
           child: AnimatedDefaultTextStyle(
             duration: AppConstants.animationFast,
             style: TextStyle(
-              fontFamily: 'ProductSans',
+              fontFamily: 'GoogleSansFlex',
               fontFamilyFallback: AppTheme.fontFamilyFallback,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -4307,7 +4307,7 @@ class _ActionButton extends StatelessWidget {
               Text(
                 label,
                 style: const TextStyle(
-                  fontFamily: 'ProductSans',
+                  fontFamily: 'GoogleSansFlex',
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,

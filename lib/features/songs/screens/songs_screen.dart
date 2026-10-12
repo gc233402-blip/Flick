@@ -1412,7 +1412,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: sheetContext.adaptiveTextPrimary,
@@ -1559,7 +1559,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                 Text(
                   l10n.moreActions,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: sheetContext.adaptiveTextPrimary,
@@ -1771,7 +1771,7 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
                 child: Text(
                   label,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                     color: destructive

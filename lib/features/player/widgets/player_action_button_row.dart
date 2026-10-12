@@ -137,7 +137,7 @@ class _PlayerActionButtonRowState extends ConsumerState<PlayerActionButtonRow> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: context.responsive(9.0, 10.0, 11.0),
                       color: Colors.white.withValues(alpha: 0.7),
                     ),
@@ -151,7 +151,7 @@ class _PlayerActionButtonRowState extends ConsumerState<PlayerActionButtonRow> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: context.responsive(9.0, 10.0, 11.0),
                       color: Colors.white.withValues(alpha: 0.7),
                     ),
@@ -210,7 +210,7 @@ class _PlayerActionButtonRowState extends ConsumerState<PlayerActionButtonRow> {
       child: Text(
         label,
         style: TextStyle(
-          fontFamily: 'ProductSans',
+          fontFamily: 'GoogleSansFlex',
           fontSize: context.responsive(9.0, 10.0, 11.0),
           fontWeight: FontWeight.w600,
           color: Colors.white,

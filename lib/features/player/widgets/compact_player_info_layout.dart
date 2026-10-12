@@ -81,7 +81,7 @@ class CompactPlayerInfoLayout extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: context.responsiveText(
                       context.responsive(15.0, 16.0, 17.0),
                     ),
@@ -99,7 +99,7 @@ class CompactPlayerInfoLayout extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: context.responsiveText(
                         context.responsive(12.0, 13.0, 13.5),
                       ),

@@ -323,7 +323,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                         Text(
                           l10n.setAlbumArt,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             color: context.adaptiveTextPrimary,
@@ -337,7 +337,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'ProductSans',
+                            fontFamily: 'GoogleSansFlex',
                             fontSize: 14,
                             color: context.adaptiveTextSecondary,
                           ),
@@ -411,7 +411,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                   Text(
                     l10n.onlineResults,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: context.adaptiveTextPrimary,
@@ -496,7 +496,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
             Text(
               label,
               style: TextStyle(
-                fontFamily: 'ProductSans',
+                fontFamily: 'GoogleSansFlex',
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: selected ? AppColors.accent : context.adaptiveTextSecondary,
@@ -607,7 +607,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: isSelected
@@ -623,7 +623,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'ProductSans',
+                      fontFamily: 'GoogleSansFlex',
                       fontSize: 11,
                       color: context.adaptiveTextTertiary,
                     ),
@@ -693,7 +693,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: context.adaptiveTextPrimary,
@@ -705,7 +705,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 13,
                     color: context.adaptiveTextSecondary,
                   ),
@@ -716,7 +716,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                       ? l10n.importedArtIsSavedInsideThe
                       : l10n.importedArtIsSavedInsideThe2,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 12,
                     color: context.adaptiveTextTertiary,
                   ),
@@ -763,7 +763,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: context.adaptiveTextPrimary,
@@ -773,7 +773,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontFamily: 'ProductSans',
+                    fontFamily: 'GoogleSansFlex',
                     fontSize: 13,
                     color: context.adaptiveTextSecondary,
                   ),
