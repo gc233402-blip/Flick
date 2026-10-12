@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -540,6 +541,12 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
       _flickLicenseRegistered = true;
       LicenseRegistry.addLicense(() async* {
         yield LicenseEntryWithLineBreaks(['Flick'], _flickLicenseText);
+        // The Simplified Chinese fallback font ships with the app, so its
+        // license has to be surfaced here as well.
+        yield LicenseEntryWithLineBreaks(
+          ['Noto Sans SC'],
+          await rootBundle.loadString('assets/fonts/NotoSansSC-OFL.txt'),
+        );
       });
     }
     Navigator.of(context).push(
