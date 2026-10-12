@@ -3,6 +3,10 @@
   "@aDraggableOverlayShowsWhileUsing": {
     "description": "lib/features/settings/screens/playback_display_settings_screen.dart:85"
   },
+  "aLittleRecordOfWhatStayed": "A little record of what stayed on repeat.",
+  "@aLittleRecordOfWhatStayed": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:476"
+  },
   "aNewerFlickBuildIsOn": "A newer Flick build is on the Play Store.",
   "@aNewerFlickBuildIsOn": {
     "description": "lib/features/menu/screens/menu_screen.dart:1234"
@@ -26,6 +30,10 @@
   "aTighterMixOfFavoritesAnd": "A tighter mix of favorites and the songs you keep circling back to.",
   "@aTighterMixOfFavoritesAnd": {
     "description": "lib/features/menu/screens/menu_screen.dart:1768"
+  },
+  "aWeekAndCountingYourDedication": "A week and counting — your dedication shows.",
+  "@aWeekAndCountingYourDedication": {
+    "description": "lib/features/milestone/widgets/streak_popup.dart:95"
   },
   "aaudio": "AAudio",
   "@aaudio": {
@@ -63,6 +71,19 @@
   "@accuraterip": {
     "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1102"
   },
+  "achieved": "Achieved {arg1}",
+  "@achieved": {
+    "description": "lib/features/milestone/widgets/milestone_card.dart:211",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "achievementUnlocked": "ACHIEVEMENT UNLOCKED",
+  "@achievementUnlocked": {
+    "description": "lib/features/milestone/widgets/milestone_card.dart:174"
+  },
   "activateFallback": "Activate Fallback",
   "@activateFallback": {
     "description": "lib/widgets/uac2/uac2_fallback_manager.dart:179"
@@ -79,6 +100,10 @@
         "type": "Object"
       }
     }
+  },
+  "activeDays": "Active days",
+  "@activeDays": {
+    "description": "lib/features/recap/widgets/replay_card_options.dart:23"
   },
   "activeQueue": "Active Queue",
   "@activeQueue": {
@@ -343,6 +368,10 @@
   "albumArt": "Album Art",
   "@albumArt": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:200"
+  },
+  "albumArt2": "Album art",
+  "@albumArt2": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:598"
   },
   "albumArtImport": "Album Art Import",
   "@albumArtImport": {
@@ -691,6 +720,15 @@
   "@artistName": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:215"
   },
+  "artistUnit": "{count, plural, =1{artist} other{artists}}",
+  "@artistUnit": {
+    "description": "lib/services/milestone_service.dart:226",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "artists": "Artists",
   "@artists": {
     "description": "lib/features/artists/screens/artists_screen.dart:253"
@@ -707,6 +745,10 @@
   "artistsInRotation": "Artists In Rotation",
   "@artistsInRotation": {
     "description": "lib/features/menu/screens/menu_screen.dart:887"
+  },
+  "artwork": "Artwork",
+  "@artwork": {
+    "description": "lib/features/recap/widgets/replay_card_options.dart:12"
   },
   "artworkCacheCleared": "Artwork cache cleared",
   "@artworkCacheCleared": {
@@ -892,6 +934,10 @@
   "backToLocker": "Back to Locker",
   "@backToLocker": {
     "description": "lib/features/player/screens/full_player_screen.dart:731"
+  },
+  "backToReplay": "Back to Replay",
+  "@backToReplay": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:298"
   },
   "backend": "Backend",
   "@backend": {
@@ -1199,6 +1245,10 @@
   "@bothBitPerfectOptionsAreOff": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:873"
   },
+  "bottom": "Bottom",
+  "@bottom": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:628"
+  },
   "bottomBar": "Bottom Bar",
   "@bottomBar": {
     "description": "lib/features/settings/screens/bottom_bar_settings_screen.dart:27"
@@ -1328,6 +1378,14 @@
   "calmFrequencies": "Calm Frequencies",
   "@calmFrequencies": {
     "description": "lib/models/song.dart:313"
+  },
+  "camera": "Camera",
+  "@camera": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:404"
+  },
+  "cameraAccessIsNeededYouCan": "Camera access is needed. You can enable it in Android settings.",
+  "@cameraAccessIsNeededYouCan": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:146"
   },
   "cameraAndPhotoLibraryAccessIs": "Camera and photo library access is used solely for the Flick Replay feature to create custom poster backgrounds for listening recap posters. Photos are only used at your explicit request and remain entirely on your device. No images are uploaded or transmitted.",
   "@cameraAndPhotoLibraryAccessIs": {
@@ -1604,6 +1662,14 @@
   "@clearing": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:249"
   },
+  "close": "Close",
+  "@close": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:224"
+  },
+  "closePreview": "Close preview",
+  "@closePreview": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:473"
+  },
   "codecApplied": "Codec applied: {arg1}",
   "@codecApplied": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:144",
@@ -1795,6 +1861,10 @@
   "@contentPlacement2": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:271"
   },
+  "continueLabel": "Continue",
+  "@continueLabel": {
+    "description": "lib/features/milestone/widgets/streak_popup.dart:265"
+  },
   "continueThroughTheSearchResults": "Continue through the search results",
   "@continueThroughTheSearchResults": {
     "description": "lib/features/settings/screens/interface_settings_screen.dart:253"
@@ -1894,6 +1964,10 @@
   "@couldNotLoadAlbumSongs": {
     "description": "lib/features/player/widgets/player_navigation.dart:85"
   },
+  "couldNotCreateThePosterImage": "Could not create the poster image.",
+  "@couldNotCreateThePosterImage": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:228"
+  },
   "couldNotLoadArtistSongs": "Could not load artist songs",
   "@couldNotLoadArtistSongs": {
     "description": "lib/features/player/widgets/player_navigation.dart:56"
@@ -1915,6 +1989,10 @@
   "@couldNotOpenBrowser": {
     "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:683"
   },
+  "couldNotOpenKoFiPlease": "Could not open Ko-fi. Please try again.",
+  "@couldNotOpenKoFiPlease": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:796"
+  },
   "couldNotOpenLink": "Could not open link",
   "@couldNotOpenLink": {
     "description": "lib/features/settings/screens/support_flick_screen.dart:110"
@@ -1927,6 +2005,10 @@
         "type": "Object"
       }
     }
+  },
+  "couldNotOpenThatPhotoTry": "Could not open that photo. Try another image.",
+  "@couldNotOpenThatPhotoTry": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:170"
   },
   "couldNotOpenTheLink": "Could not open the link",
   "@couldNotOpenTheLink": {
@@ -1958,6 +2040,10 @@
   "@couldNotOpenThePlayStore3": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:117"
   },
+  "couldNotReadTheCoverColors": "Could not read the cover colors. Signal is still available.",
+  "@couldNotReadTheCoverColors": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:103"
+  },
   "couldNotReadTheSelectedLyrics": "Could not read the selected lyrics file.",
   "@couldNotReadTheSelectedLyrics": {
     "description": "lib/features/player/widgets/inline_lyrics_panel.dart:129"
@@ -1965,6 +2051,10 @@
   "couldNotSaveTheLyricsFile": "Could not save the lyrics file.",
   "@couldNotSaveTheLyricsFile": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:565"
+  },
+  "couldNotSaveYourRecapPlease": "Could not save your recap. Please try again.",
+  "@couldNotSaveYourRecapPlease": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:259"
   },
   "couldNotUseTheSelectedLyrics": "Could not use the selected lyrics file.",
   "@couldNotUseTheSelectedLyrics": {
@@ -2150,6 +2240,10 @@
   "@currentSongPreviewOnly": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:389"
   },
+  "currentStreak": "Current Streak",
+  "@currentStreak": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:756"
+  },
   "curvature": "Curvature",
   "@curvature": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:26"
@@ -2289,9 +2383,30 @@
   "@dateAddedOldest": {
     "description": "lib/features/playlists/widgets/playlist_sort_bottom_sheet.dart:25"
   },
+  "dayStreak": "day streak",
+  "@dayStreak": {
+    "description": "lib/features/milestone/widgets/streak_popup.dart:193"
+  },
+  "dayStreak2": "Day streak",
+  "@dayStreak2": {
+    "description": "lib/app/app.dart:423"
+  },
+  "dayStreak3": "Day Streak",
+  "@dayStreak3": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:378"
+  },
   "dayStreaks": "Day Streaks",
   "@dayStreaks": {
     "description": "lib/features/settings/screens/interface_settings_screen.dart:161"
+  },
+  "dayUnit": "{count, plural, =1{day} other{days}}",
+  "@dayUnit": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:782",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "db10": "{arg1} dB",
   "@db10": {
@@ -2504,9 +2619,17 @@
   "@deselectAll": {
     "description": "lib/features/songs/screens/songs_screen.dart:1574"
   },
+  "designed": "Designed",
+  "@designed": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:593"
+  },
   "detailScreens": "Detail Screens",
   "@detailScreens": {
     "description": "lib/features/settings/screens/ui_customization_settings_screen.dart:137"
+  },
+  "details": "Details",
+  "@details": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:522"
   },
   "developerMode": "Developer Mode",
   "@developerMode": {
@@ -2708,6 +2831,10 @@
   "dlnaUpnpAndChromecastReceivers": "DLNA, UPnP and Chromecast receivers",
   "@dlnaUpnpAndChromecastReceivers": {
     "description": "lib/features/settings/screens/settings_screen.dart:160"
+  },
+  "donTShowAgainToday": "Don't show again today",
+  "@donTShowAgainToday": {
+    "description": "lib/features/milestone/widgets/streak_popup.dart:287"
   },
   "donate": "Donate",
   "@donate": {
@@ -3124,6 +3251,10 @@
   "@exportAsM3u8": {
     "description": "lib/features/playlists/screens/playlists_screen.dart:638"
   },
+  "exportCsv": "Export CSV",
+  "@exportCsv": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:771"
+  },
   "exportCurrentPreset": "Export current preset",
   "@exportCurrentPreset": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:751"
@@ -3144,6 +3275,10 @@
   "exportFormat": "Export format",
   "@exportFormat": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:652"
+  },
+  "exportTxt": "Export TXT",
+  "@exportTxt": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:772"
   },
   "exportedPresetTo": "Exported preset to {savePath}",
   "@exportedPresetTo": {
@@ -3190,6 +3325,10 @@
   "externalSongsCannotBeEdited2": "External songs cannot be edited",
   "@externalSongsCannotBeEdited2": {
     "description": "lib/features/songs/screens/metadata_editor_screen.dart:318"
+  },
+  "extraCovers": "Extra covers",
+  "@extraCovers": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:684"
   },
   "failedToActivateFallback": "Failed to activate fallback",
   "@failedToActivateFallback": {
@@ -3595,6 +3734,10 @@
   "@fontScale": {
     "description": "lib/features/settings/screens/widget_settings_screen.dart:235"
   },
+  "footerLine": "Footer line",
+  "@footerLine": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:689"
+  },
   "forceDop": "Force DoP",
   "@forceDop": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1681"
@@ -3737,6 +3880,10 @@
   "gain": "Gain",
   "@gain": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:2666"
+  },
+  "gallery": "Gallery",
+  "@gallery": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:610"
   },
   "gapAboveNavigation": "Gap Above Navigation",
   "@gapAboveNavigation": {
@@ -4012,6 +4159,15 @@
   "@horizontalReach": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:50"
   },
+  "hourUnit": "{count, plural, =1{hour} other{hours}}",
+  "@hourUnit": {
+    "description": "lib/services/milestone_service.dart:226",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "howFarTheArcOpensFrom": "How far the arc opens from the left edge",
   "@howFarTheArcOpensFrom": {
     "description": "lib/features/settings/screens/orbit_settings_screen.dart:51"
@@ -4202,6 +4358,10 @@
   "@inactive": {
     "description": "lib/features/player/widgets/bit_perfect_indicator.dart:670"
   },
+  "incredibleOverAMonthOfDaily": "Incredible — over a month of daily listening.",
+  "@incredibleOverAMonthOfDaily": {
+    "description": "lib/features/milestone/widgets/streak_popup.dart:96"
+  },
   "initializing": "Initializing…",
   "@initializing": {
     "description": "lib/features/settings/screens/library_settings_screen.dart:1171"
@@ -4333,6 +4493,14 @@
   "@keepEditing": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:598"
   },
+  "keepItGoingOpenTomorrowTo": "Keep it going. Open tomorrow to add another day.",
+  "@keepItGoingOpenTomorrowTo": {
+    "description": "lib/features/milestone/widgets/streak_popup.dart:94"
+  },
+  "keepListeningWithFlick": "Keep listening with Flick",
+  "@keepListeningWithFlick": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:195"
+  },
   "keepMiniPlayerAndNavVisible": "Keep mini player and nav visible",
   "@keepMiniPlayerAndNavVisible": {
     "description": "lib/features/settings/screens/playback_display_settings_screen.dart:143"
@@ -4352,6 +4520,10 @@
   "keepTheSessionMovingOrHead": "Keep the session moving or head straight back to the player.",
   "@keepTheSessionMovingOrHead": {
     "description": "lib/features/menu/screens/menu_screen.dart:1313"
+  },
+  "keepYourReplay": "Keep your Replay.",
+  "@keepYourReplay": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:465"
   },
   "keeping": "Keeping • {type} • {br}",
   "@keeping": {
@@ -4536,6 +4708,10 @@
   "latestUpdate": "Latest Update",
   "@latestUpdate": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:250"
+  },
+  "layered": "Layered",
+  "@layered": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:580"
   },
   "layoutMode": "Layout Mode",
   "@layoutMode": {
@@ -4787,6 +4963,10 @@
   "@listenbrainzConnected2": {
     "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:599"
   },
+  "listeningHours": "Listening Hours",
+  "@listeningHours": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:377"
+  },
   "listeningToByOnFlick": "Listening to {arg1} by {arg2} on Flick",
   "@listeningToByOnFlick": {
     "description": "lib/features/player/widgets/share/share_bottom_sheet.dart:134",
@@ -4810,6 +4990,10 @@
   "livePreview": "Live Preview",
   "@livePreview": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:669"
+  },
+  "livingOrnament": "Living ornament",
+  "@livingOrnament": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:669"
   },
   "loadAJsonOrTxtPreset": "Load a JSON or TXT preset",
   "@loadAJsonOrTxtPreset": {
@@ -4848,6 +5032,10 @@
   "@loadingPatchNotes": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:276"
   },
+  "loadingReplay": "Loading Replay",
+  "@loadingReplay": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:235"
+  },
   "loadingSession": "Loading session...",
   "@loadingSession": {
     "description": "lib/features/settings/widgets/lastfm_settings_tile.dart:737"
@@ -4880,6 +5068,10 @@
   "longSongTitles": "Long Song Titles",
   "@longSongTitles": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:244"
+  },
+  "look": "Look",
+  "@look": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:520"
   },
   "lookingForCoverArtFromMusicbrainz": "Looking for cover art from MusicBrainz and Cover Art Archive.",
   "@lookingForCoverArtFromMusicbrainz": {
@@ -5132,6 +5324,10 @@
   "@midnightSignal": {
     "description": "lib/features/player/widgets/player_layout_sheet.dart:914"
   },
+  "milestone": "Milestone",
+  "@milestone": {
+    "description": "lib/app/app.dart:402"
+  },
   "milestones": "Milestones",
   "@milestones": {
     "description": "lib/features/milestone/screens/milestones_screen.dart:122"
@@ -5263,6 +5459,10 @@
   "@moreArtists2": {
     "description": "lib/features/settings/screens/ui_customization_settings_screen.dart:154"
   },
+  "moreExportOptions": "More export options",
+  "@moreExportOptions": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:762"
+  },
   "moreFrom": "More from {arg1}",
   "@moreFrom": {
     "description": "lib/features/albums/screens/album_detail_screen.dart:549",
@@ -5280,6 +5480,30 @@
   "@moreFromArtist2": {
     "description": "lib/features/settings/screens/ui_customization_settings_screen.dart:142"
   },
+  "moreTo": "{arg1} more to {arg2}",
+  "@moreTo": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:794",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "moreToUnlock": "{remaining} more {unit} to unlock.",
+  "@moreToUnlock": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:618",
+    "placeholders": {
+      "remaining": {
+        "type": "Object"
+      },
+      "unit": {
+        "type": "Object"
+      }
+    }
+  },
   "mossEcosystem": "Moss Ecosystem",
   "@mossEcosystem": {
     "description": "lib/features/settings/screens/privacy_policy_screen.dart:69"
@@ -5291,6 +5515,15 @@
   "mostPlayed": "Most Played",
   "@mostPlayed": {
     "description": "lib/features/artists/screens/artist_detail_screen.dart:701"
+  },
+  "mostReplayed": "Most replayed · {arg1}",
+  "@mostReplayed": {
+    "description": "lib/features/recap/widgets/replay_sections.dart:91",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "motionArtInBitPerfect": "Motion Art in Bit-Perfect",
   "@motionArtInBitPerfect": {
@@ -5510,9 +5743,28 @@
   "@nextSong2": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:184"
   },
+  "nextToGo": "Next: {arg1} — {remaining} {unit} to go",
+  "@nextToGo": {
+    "description": "lib/features/milestone/widgets/milestone_card.dart:217",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "remaining": {
+        "type": "Object"
+      },
+      "unit": {
+        "type": "Object"
+      }
+    }
+  },
   "nextcloudOwncloudSabredav": "Nextcloud · ownCloud · SabreDAV",
   "@nextcloudOwncloudSabredav": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:74"
+  },
+  "night": "Night",
+  "@night": {
+    "description": "lib/features/recap/widgets/replay_card_options.dart:11"
   },
   "no": "No",
   "@no": {
@@ -5521,6 +5773,10 @@
   "noAchievementsYetKeepListening": "No achievements yet — keep listening",
   "@noAchievementsYetKeepListening": {
     "description": "lib/features/settings/screens/settings_screen.dart:254"
+  },
+  "noAlbumDataYet": "No album data yet",
+  "@noAlbumDataYet": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:228"
   },
   "noAlbumsFound": "No Albums Found",
   "@noAlbumsFound": {
@@ -5663,6 +5919,10 @@
   "noPlaylistsYetNcreateOneIn": "No playlists yet.\nCreate one in the Playlists tab.",
   "@noPlaylistsYetNcreateOneIn": {
     "description": "lib/features/player/widgets/add_to_playlist_sheet.dart:79"
+  },
+  "noRankingDataYet": "No ranking data yet",
+  "@noRankingDataYet": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:323"
   },
   "noResultsFor": "No results for \"{query}\"",
   "@noResultsFor": {
@@ -5858,6 +6118,10 @@
   "@open": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:156"
   },
+  "openAndroidSettings": "Open Android settings",
+  "@openAndroidSettings": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:407"
+  },
   "openBluetoothCodecSettings": "Open Bluetooth Codec Settings",
   "@openBluetoothCodecSettings": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:351"
@@ -5966,6 +6230,10 @@
   "@overlayPermissionIsRequiredToShow": {
     "description": "lib/features/settings/screens/playback_display_settings_screen.dart:299"
   },
+  "overviewMetricsChooseUpTo3": "Overview metrics · choose up to 3",
+  "@overviewMetricsChooseUpTo3": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:643"
+  },
   "paired": "Paired",
   "@paired": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:110"
@@ -6031,6 +6299,10 @@
   "@pcmFrames": {
     "description": "lib/features/player/widgets/bit_perfect_indicator.dart:987"
   },
+  "peakHour": "Peak hour",
+  "@peakHour": {
+    "description": "lib/features/recap/widgets/replay_card_options.dart:24"
+  },
   "peaking": "Peaking",
   "@peaking": {
     "description": "lib/providers/equalizer_provider.dart:27"
@@ -6051,6 +6323,10 @@
   "@phoneAndHeadsetVolumeAreLinked": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:400"
   },
+  "photoFraming": "Photo framing",
+  "@photoFraming": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:619"
+  },
   "pickALineWithLyrics": "Pick a line with lyrics",
   "@pickALineWithLyrics": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:1390"
@@ -6058,6 +6334,10 @@
   "pickALyricLineIn": "1. Pick a lyric line in Lines, then switch to Tools.\n2. Press play and tap the big \"Tap Word\" button as you hear each word — the first tap also stamps the line.\n3. Tap a word chip to nudge, re-time, or clear it.\n4. Lines with every word stamped save with per-word karaoke timing.",
   "@pickALyricLineIn": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:678"
+  },
+  "pickAgain": "Pick again",
+  "@pickAgain": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:610"
   },
   "pickImage": "Pick Image",
   "@pickImage": {
@@ -6119,6 +6399,10 @@
   "playAtTheRecordedLevel": "Play at the recorded level",
   "@playAtTheRecordedLevel": {
     "description": "lib/features/settings/screens/audio_settings_screen.dart:190"
+  },
+  "playBadges": "Play badges",
+  "@playBadges": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:679"
   },
   "playCategoriesInRandomOrderTracks": "Play categories in random order, tracks in sequence",
   "@playCategoriesInRandomOrderTracks": {
@@ -6285,6 +6569,19 @@
       }
     }
   },
+  "plays2": "{count, plural, =1{1 play} other{{count} plays}}",
+  "@plays2": {
+    "description": "lib/features/recap/widgets/replay_style.dart:45",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playsInRotation": "plays in rotation",
+  "@playsInRotation": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:147"
+  },
   "pleaseEnterAPlaylistName": "Please enter a playlist name",
   "@pleaseEnterAPlaylistName": {
     "description": "lib/features/playlists/screens/playlists_screen.dart:430"
@@ -6292,6 +6589,18 @@
   "pleaseEnterYourListenbrainzUserToken": "Please enter your ListenBrainz user token.",
   "@pleaseEnterYourListenbrainzUserToken": {
     "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:584"
+  },
+  "posterPreviewPlays": "{arg1} poster preview. {arg2} plays.",
+  "@posterPreviewPlays": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:423",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
   },
   "preAmp": "Pre-amp",
   "@preAmp": {
@@ -6332,6 +6641,10 @@
   "preloadingAudio3": "Preloading audio",
   "@preloadingAudio3": {
     "description": "lib/widgets/common/floating_scan_progress.dart:379"
+  },
+  "preparing": "Preparing…",
+  "@preparing": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:753"
   },
   "presence": "Presence",
   "@presence": {
@@ -6514,6 +6827,10 @@
   "@readMode": {
     "description": "lib/features/player/widgets/bit_perfect_indicator.dart:1086"
   },
+  "readingTheCoverColors": "Reading the cover colors…",
+  "@readingTheCoverColors": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:562"
+  },
   "readyToRemoveSongKeepingIn": "Ready to remove {count, plural, =1{{count} song} other{{count} songs}} — keeping {kept} in total.",
   "@readyToRemoveSongKeepingIn": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:784",
@@ -6522,6 +6839,15 @@
         "type": "int"
       },
       "kept": {
+        "type": "Object"
+      }
+    }
+  },
+  "recapSavedAs": "Recap saved as {format}",
+  "@recapSavedAs": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:245",
+    "placeholders": {
+      "format": {
         "type": "Object"
       }
     }
@@ -6846,6 +7172,18 @@
   "@replaceAlbumNameWithAVerified": {
     "description": "lib/features/settings/screens/player_layout_settings_screen.dart:368"
   },
+  "replay": "Replay",
+  "@replay": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:15"
+  },
+  "replayCouldnTLoad": "Replay couldn’t load.",
+  "@replayCouldnTLoad": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:248"
+  },
+  "replayStudio": "Replay Studio",
+  "@replayStudio": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:304"
+  },
   "replayTheTutorialAndFeatureGuide": "Replay the tutorial and feature guide",
   "@replayTheTutorialAndFeatureGuide": {
     "description": "lib/features/settings/screens/app_info_settings_screen.dart:680"
@@ -6907,6 +7245,10 @@
         "type": "Object"
       }
     }
+  },
+  "resetCardDesign": "Reset card design",
+  "@resetCardDesign": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:314"
   },
   "resetDeclinedUsbDacs": "Reset Declined USB DACs",
   "@resetDeclinedUsbDacs": {
@@ -6996,6 +7338,10 @@
   "resumeOnReconnect": "Resume on Reconnect",
   "@resumeOnReconnect": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:271"
+  },
+  "retakePhoto": "Retake photo",
+  "@retakePhoto": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:605"
   },
   "retroFuture": "Retro Future",
   "@retroFuture": {
@@ -7160,6 +7506,10 @@
   "@saveCurrentAsPreset": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:737"
   },
+  "saveCustomizeReplay": "Save / customize Replay",
+  "@saveCustomizeReplay": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:221"
+  },
   "saveInFlick": "Save in Flick",
   "@saveInFlick": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:503"
@@ -7180,6 +7530,10 @@
   "@saveLyrics": {
     "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:1184"
   },
+  "savePng": "Save PNG",
+  "@savePng": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:756"
+  },
   "savePreset": "Save Preset",
   "@savePreset": {
     "description": "lib/features/settings/screens/equalizer_screen.dart:437"
@@ -7191,6 +7545,10 @@
   "saved": "Saved",
   "@saved": {
     "description": "lib/features/settings/screens/logs_screen.dart:217"
+  },
+  "savedAgain": "Saved · again",
+  "@savedAgain": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:755"
   },
   "savedAndVerified": "Saved and verified",
   "@savedAndVerified": {
@@ -7230,6 +7588,15 @@
     "description": "lib/features/settings/screens/logs_screen.dart:218",
     "placeholders": {
       "path": {
+        "type": "Object"
+      }
+    }
+  },
+  "savedToYourGallery": "{arg1} saved to your gallery",
+  "@savedToYourGallery": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:244",
+    "placeholders": {
+      "arg1": {
         "type": "Object"
       }
     }
@@ -7791,6 +8158,10 @@
       }
     }
   },
+  "showingYourLastLoadedReplay": "Showing your last loaded Replay.",
+  "@showingYourLastLoadedReplay": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:386"
+  },
   "shownWhenThereIsRoomBeside": "Shown when there is room beside the controls",
   "@shownWhenThereIsRoomBeside": {
     "description": "lib/features/settings/widgets/mini_player_customization.dart:153"
@@ -7827,6 +8198,26 @@
   "shuffleSongsInCurrentList": "Shuffle songs in current list",
   "@shuffleSongsInCurrentList": {
     "description": "lib/models/shuffle_mode.dart:20"
+  },
+  "signInFailedRetry": "Sign-in Failed — Retry",
+  "@signInFailedRetry": {
+    "description": "lib/features/settings/screens/network_server_edit_screen.dart:355"
+  },
+  "signInWithTidal": "Sign in with Tidal",
+  "@signInWithTidal": {
+    "description": "lib/features/settings/screens/network_server_edit_screen.dart:360"
+  },
+  "signInWithYourAccountHifi": "Sign in with your account · HiFi lossless",
+  "@signInWithYourAccountHifi": {
+    "description": "lib/features/settings/screens/network_server_edit_screen.dart:98"
+  },
+  "signInWithYourOwnTidal": "Sign in with your own Tidal account. HiFi lossless (FLAC/ALAC) plays through the bit-perfect engine; HiRes/MQA and Atmos are gated by Tidal and will show an error instead of playing.",
+  "@signInWithYourOwnTidal": {
+    "description": "lib/features/settings/screens/network_server_edit_screen.dart:419"
+  },
+  "signal": "Signal",
+  "@signal": {
+    "description": "lib/features/recap/widgets/replay_card_options.dart:10"
   },
   "signalAccurateUnverified": "AccurateRip not verified",
   "@signalAccurateUnverified": {
@@ -7996,22 +8387,6 @@
   "@signalVerifiedInLog": {
     "description": "lib/features/player/widgets/audio_signal_report.dart"
   },
-  "signInFailedRetry": "Sign-in Failed — Retry",
-  "@signInFailedRetry": {
-    "description": "lib/features/settings/screens/network_server_edit_screen.dart:355"
-  },
-  "signInWithTidal": "Sign in with Tidal",
-  "@signInWithTidal": {
-    "description": "lib/features/settings/screens/network_server_edit_screen.dart:360"
-  },
-  "signInWithYourAccountHifi": "Sign in with your account · HiFi lossless",
-  "@signInWithYourAccountHifi": {
-    "description": "lib/features/settings/screens/network_server_edit_screen.dart:98"
-  },
-  "signInWithYourOwnTidal": "Sign in with your own Tidal account. HiFi lossless (FLAC/ALAC) plays through the bit-perfect engine; HiRes/MQA and Atmos are gated by Tidal and will show an error instead of playing.",
-  "@signInWithYourOwnTidal": {
-    "description": "lib/features/settings/screens/network_server_edit_screen.dart:419"
-  },
   "signedIn": "Signed in",
   "@signedIn": {
     "description": "lib/features/settings/screens/network_server_edit_screen.dart:353"
@@ -8035,6 +8410,10 @@
   "simplifiedChinese": "Simplified Chinese",
   "@simplifiedChinese": {
     "description": "lib/features/settings/screens/interface_settings_screen.dart:59"
+  },
+  "single": "Single",
+  "@single": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:575"
   },
   "size": "Size",
   "@size": {
@@ -8068,6 +8447,10 @@
   "sleepTimer2": "Sleep Timer",
   "@sleepTimer2": {
     "description": "lib/features/player/widgets/sleep_timer_bottom_sheet.dart:55"
+  },
+  "sleeves": "Sleeves",
+  "@sleeves": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:567"
   },
   "slope": "Slope",
   "@slope": {
@@ -8165,6 +8548,15 @@
   "songTitle": "Song Title",
   "@songTitle": {
     "description": "lib/features/folders/screens/folders_screen.dart:2592"
+  },
+  "songUnit": "{count, plural, =1{song} other{songs}}",
+  "@songUnit": {
+    "description": "lib/services/milestone_service.dart:226",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "songViewList": "Song View: List",
   "@songViewList": {
@@ -8294,6 +8686,15 @@
   "@songsCategories": {
     "description": "lib/models/shuffle_mode.dart:13"
   },
+  "songsCount": "{count, plural, =1{{count} song} other{{count} songs}}",
+  "@songsCount": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:280",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "songsFound": "{arg1} songs found",
   "@songsFound": {
     "description": "lib/features/settings/screens/network_sources_screen.dart:406",
@@ -8311,6 +8712,15 @@
         "type": "int"
       },
       "folders": {
+        "type": "int"
+      }
+    }
+  },
+  "songsInRotation": "{count, plural, =1{{count} song in your rotation} other{{count} songs in your rotation}}",
+  "@songsInRotation": {
+    "description": "lib/features/recap/widgets/replay_sections.dart:466",
+    "placeholders": {
+      "count": {
         "type": "int"
       }
     }
@@ -8593,6 +9003,14 @@
   "@supportFlick": {
     "description": "lib/features/menu/screens/menu_screen.dart:367"
   },
+  "supportFlickOnKoFi": "Support Flick on Ko-fi",
+  "@supportFlickOnKoFi": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:775"
+  },
+  "surfaceShading": "Surface shading",
+  "@surfaceShading": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:674"
+  },
   "sweepAHighlightThroughWordsAs": "Sweep a highlight through words as they are sung",
   "@sweepAHighlightThroughWordsAs": {
     "description": "lib/features/settings/screens/lyrics_settings_screen.dart:45"
@@ -8745,6 +9163,10 @@
   "@tapTheMiniPlayerForWaveform": {
     "description": "lib/providers/tutorial_provider.dart:50"
   },
+  "tapToInspect12602280Png": "Tap to inspect · 1260 × 2280 PNG",
+  "@tapToInspect12602280Png": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:450"
+  },
   "tapToPlayLongPressFor": "Tap to play, long-press for options (queue, play next, info).",
   "@tapToPlayLongPressFor": {
     "description": "lib/providers/tutorial_provider.dart:34"
@@ -8835,6 +9257,10 @@
   "theNamesShowingUpAgainAnd": "The names showing up again and again in your recent queue.",
   "@theNamesShowingUpAgainAnd": {
     "description": "lib/features/menu/screens/menu_screen.dart:889"
+  },
+  "thePosterIsNotReadyYet": "The poster is not ready yet. Try saving again.",
+  "@thePosterIsNotReadyYet": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:222"
   },
   "theTracksDominatingYourWeeklyAnd": "The tracks dominating your weekly and monthly recap.",
   "@theTracksDominatingYourWeeklyAnd": {
@@ -8953,9 +9379,29 @@
   "@tools": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:870"
   },
+  "top": "Top",
+  "@top": {
+    "description": "lib/features/recap/screens/replay_studio_screen.dart:626"
+  },
+  "topAlbum": "Top album",
+  "@topAlbum": {
+    "description": "lib/features/recap/widgets/replay_sections.dart:507"
+  },
+  "topArtist": "Top artist",
+  "@topArtist": {
+    "description": "lib/features/recap/widgets/replay_sections.dart:438"
+  },
+  "topArtists": "Top artists",
+  "@topArtists": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:17"
+  },
   "topSongs": "Top Songs",
   "@topSongs": {
     "description": "lib/features/recap/screens/listening_recap_screen.dart:456"
+  },
+  "topSongs2": "Top songs",
+  "@topSongs2": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:16"
   },
   "total": "Total",
   "@total": {
@@ -9009,6 +9455,14 @@
   "trackThumbnails": "Track Thumbnails",
   "@trackThumbnails": {
     "description": "lib/features/settings/screens/ui_customization_settings_screen.dart:204"
+  },
+  "trackTime": "Track time",
+  "@trackTime": {
+    "description": "lib/features/recap/widgets/replay_card_options.dart:20"
+  },
+  "trackTimeSumsTheFullDuration": "Track time sums the full duration of logged plays.",
+  "@trackTimeSumsTheFullDuration": {
+    "description": "lib/features/recap/widgets/replay_sections.dart:146"
   },
   "tracks": "{_totalTracks} tracks",
   "@tracks": {
@@ -9291,6 +9745,10 @@
   "@unfavoriteSelected": {
     "description": "lib/features/favorites/screens/favorites_screen.dart:273"
   },
+  "uniqueArtists": "Unique Artists",
+  "@uniqueArtists": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:379"
+  },
   "universalCompatibility": "Universal compatibility",
   "@universalCompatibility": {
     "description": "lib/features/settings/screens/bluetooth_settings_screen.dart:486"
@@ -9322,6 +9780,18 @@
   "unknownTrack": "Unknown Track",
   "@unknownTrack": {
     "description": "lib/features/player/widgets/online_lyrics_search_sheet.dart:1051"
+  },
+  "unlocked": "{unlocked} / {arg1} unlocked",
+  "@unlocked": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:316",
+    "placeholders": {
+      "unlocked": {
+        "type": "Object"
+      },
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "unlocked3": "{_milestonesUnlocked} / {arg1} unlocked",
   "@unlocked3": {
@@ -9793,6 +10263,10 @@
   "@weekly": {
     "description": "lib/data/repositories/recently_played_repository.dart:15"
   },
+  "welcomeBackLetSStartA": "Welcome back — let's start a streak.",
+  "@welcomeBackLetSStartA": {
+    "description": "lib/features/milestone/widgets/streak_popup.dart:93"
+  },
   "welcomeToFlick": "Welcome to Flick!",
   "@welcomeToFlick": {
     "description": "lib/features/menu/screens/menu_screen.dart:305"
@@ -10007,6 +10481,10 @@
   "@youReOfflineSomeOnlineFeatures": {
     "description": "lib/widgets/common/offline_notice.dart:136"
   },
+  "youVeHitTheThresholdKeep": "You've hit the threshold — keep it up!",
+  "@youVeHitTheThresholdKeep": {
+    "description": "lib/features/milestone/screens/milestones_screen.dart:619"
+  },
   "yourCollectionAtAGlance": "Your collection at a glance",
   "@yourCollectionAtAGlance": {
     "description": "lib/features/albums/screens/albums_screen.dart:333"
@@ -10035,6 +10513,10 @@
   "@yourLibraryIsTidyWeLl": {
     "description": "lib/features/settings/screens/duplicate_cleaner_screen.dart:274"
   },
+  "yourListeningHistoryIsStillYours": "Your listening history is still yours. Try loading it again.",
+  "@yourListeningHistoryIsStillYours": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:249"
+  },
   "yourListensWillRemainOnListenbrainz": "Your listens will remain on ListenBrainz, but Flick will stop submitting them.",
   "@yourListensWillRemainOnListenbrainz": {
     "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:136"
@@ -10047,6 +10529,10 @@
   "@yourMonthlyRecapNeedsABit": {
     "description": "lib/data/repositories/recently_played_repository.dart:37"
   },
+  "yourMostReplayedTrack": "Your most replayed track",
+  "@yourMostReplayedTrack": {
+    "description": "lib/features/recap/widgets/replay_sections.dart:111"
+  },
   "yourMusicIsBeingScrobbled": "Your music is being scrobbled",
   "@yourMusicIsBeingScrobbled": {
     "description": "lib/features/settings/widgets/lastfm_settings_tile.dart:837"
@@ -10055,9 +10541,21 @@
   "@yourMusicIsBeingSubmitted": {
     "description": "lib/features/settings/widgets/listenbrainz_settings_tile.dart:267"
   },
+  "yourMusicOnRepeat": "Your music. On repeat.",
+  "@yourMusicOnRepeat": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:108"
+  },
   "yourNewAudioEngineIsReady": "Your new audio engine is ready. Restart Flick to apply it.",
   "@yourNewAudioEngineIsReady": {
     "description": "lib/widgets/common/engine_restart_notice.dart:54"
+  },
+  "yourNextFavoriteIsWaiting": "Your next favorite is waiting.",
+  "@yourNextFavoriteIsWaiting": {
+    "description": "lib/features/recap/widgets/replay_poster.dart:183"
+  },
+  "yourNextFavoriteNisWaiting": "Your next favorite\nis waiting.",
+  "@yourNextFavoriteNisWaiting": {
+    "description": "lib/features/recap/screens/listening_recap_screen.dart:295"
   },
   "yourPlaylists": "Your Playlists",
   "@yourPlaylists": {

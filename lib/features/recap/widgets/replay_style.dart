@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../data/repositories/recently_played_repository.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Two print-like color fields, grounded by Flick's ink surfaces.
 abstract final class ReplayStyle {
@@ -41,7 +42,7 @@ abstract final class ReplayStyle {
     };
   }
 
-  static String plays(int count) => count == 1 ? '1 play' : '$count plays';
+  static String plays(int count) => l10n.plays2(count);
 
   static String durationLabel(Duration duration) {
     final hours = duration.inHours;
