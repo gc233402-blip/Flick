@@ -454,6 +454,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustAudioDe
         "device_profile": crate::audio::device::current_device_profile(),
         "direct_usb": direct_usb_state,
         "dsd_callback": crate::api::audio_api::dsd_callback_debug_json(),
+        "managed_output": crate::api::audio_api::managed_output_debug_json(),
     });
     let json = serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string());
     env.with_env(|env| -> jni::errors::Result<jstring> {
@@ -480,6 +481,7 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustAudioDe
             "stream_active": false,
         },
         "dsd_callback": crate::api::audio_api::dsd_callback_debug_json(),
+        "managed_output": crate::api::audio_api::managed_output_debug_json(),
     });
     let json = serde_json::to_string(&payload).unwrap_or_else(|_| "{}".to_string());
     env.with_env(|env| -> jni::errors::Result<jstring> {

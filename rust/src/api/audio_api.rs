@@ -1148,6 +1148,24 @@ pub(crate) fn dsd_callback_debug_json() -> serde_json::Value {
     })
 }
 
+/// Managed-output burst telemetry for the Android diagnostics JSON only.
+/// Distinguishes device-provided callback sizes from app-side scratch
+/// capacity so oversized Bluetooth bursts are visible in logs.
+#[flutter_rust_bridge::frb(ignore)]
+pub(crate) fn managed_output_debug_json() -> serde_json::Value {
+    #[cfg(target_os = "android")]
+    let scratch_frames = crate::audio::engine::ANDROID_DIRECT_SCRATCH_FRAMES;
+    #[cfg(not(target_os = "android"))]
+    let scratch_frames = 0usize;
+
+    let stats = read_audio_engine(|handle| handle.managed_output_stats());
+    serde_json::json!({
+        "burst_frames_max": stats.map(|(frames, _)| frames),
+        "burst_chunked_count": stats.map(|(_, chunks)| chunks),
+        "scratch_frames": scratch_frames,
+    })
+}
+
 /// Detect whether a DAC is present before attempting Rust engine initialization.
 pub fn audio_is_dac_available(preferred_sample_rate: Option<u32>) -> Result<bool, String> {
     ENGINE_MANAGER.is_dac_available(preferred_sample_rate)

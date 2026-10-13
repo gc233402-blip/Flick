@@ -46,7 +46,7 @@ use oboe::{
 use parking_lot::Mutex;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, AtomicU8, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, AtomicU8, AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::thread;
 
@@ -232,6 +232,16 @@ pub struct AudioCallbackData {
     /// mix buffers) so the RT callback emits a single "output lost" event
     /// instead of spamming the channel every callback.
     output_loss_reported: AtomicBool,
+    /// Telemetry: largest device-provided output burst seen, in frames.
+    oboe_burst_frames_max: AtomicU32,
+    /// Telemetry: bursts that exceeded the scratch capacity and had to be
+    /// rendered in multiple bounded chunks.
+    oboe_burst_chunked_count: AtomicU64,
+    /// Largest frame count the internal DSP mix buffers can process in a single
+    /// callback chunk. Chunked rendering never exceeds this, so the crossfade
+    /// and speed scratch buffers stay in range even when a Bluetooth mixer
+    /// hands out huge bursts.
+    dsp_burst_frames_cap: AtomicUsize,
 }
 
 impl AudioCallbackData {
@@ -292,6 +302,9 @@ impl AudioCallbackData {
             dsd_starved_samples: AtomicU64::new(0),
             dsd_lock_misses: AtomicU64::new(0),
             output_loss_reported: AtomicBool::new(false),
+            oboe_burst_frames_max: AtomicU32::new(0),
+            oboe_burst_chunked_count: AtomicU64::new(0),
+            dsp_burst_frames_cap: AtomicUsize::new((buffer_size / channels.max(1)).max(1)),
         }
     }
 
@@ -363,6 +376,32 @@ impl AudioCallbackData {
             self.dsd_starved_samples.load(Ordering::Relaxed),
             self.dsd_lock_misses.load(Ordering::Relaxed),
         )
+    }
+
+    /// Telemetry: record a managed-output device burst and the number of
+    /// bounded chunks it was rendered in (see `render_managed_burst`).
+    #[allow(dead_code)] // consumed by the Android-only managed output callbacks
+    pub(crate) fn note_oboe_burst(&self, frames: usize, chunks: usize) {
+        self.oboe_burst_frames_max
+            .fetch_max(frames as u32, Ordering::Relaxed);
+        if chunks > 1 {
+            self.oboe_burst_chunked_count.fetch_add(1, Ordering::Relaxed);
+        }
+    }
+
+    /// Telemetry: (largest device burst in frames, bursts that needed chunking).
+    #[allow(dead_code)] // consumed by the Android diagnostics JSON
+    pub(crate) fn oboe_burst_stats(&self) -> (u32, u64) {
+        (
+            self.oboe_burst_frames_max.load(Ordering::Relaxed),
+            self.oboe_burst_chunked_count.load(Ordering::Relaxed),
+        )
+    }
+
+    /// Frames the DSP mix buffers can process per callback chunk.
+    #[allow(dead_code)] // consumed by the Android-only managed output callbacks
+    pub(crate) fn dsp_burst_frames_cap(&self) -> usize {
+        self.dsp_burst_frames_cap.load(Ordering::Relaxed)
     }
 
     #[inline]
@@ -503,6 +542,8 @@ impl AudioCallbackData {
             ((sample_rate as usize / 10) * self.channels).max(8192 * self.channels.max(1));
         let speed_buffer_size = buffer_size * 3;
 
+        self.dsp_burst_frames_cap
+            .store((buffer_size / self.channels.max(1)).max(1), Ordering::Relaxed);
         self.crossfader.lock().rebind_sample_rate(sample_rate);
         self.crossfade_active.store(false, Ordering::Relaxed);
         *self.sources.lock() = SourceProvider::new(sample_rate, self.channels);
@@ -892,6 +933,10 @@ impl AudioEngineHandle {
         self.callback_data.dsd_starve_stats()
     }
 
+    pub(crate) fn managed_output_stats(&self) -> (u32, u64) {
+        self.callback_data.oboe_burst_stats()
+    }
+
     pub fn audio_api_pref(&self) -> AudioApiPreference {
         self.audio_api_pref
     }
@@ -1095,10 +1140,15 @@ pub fn create_audio_engine(
     })
 }
 
-#[cfg(target_os = "android")]
+#[cfg(any(target_os = "android", test))]
 const ANDROID_DIRECT_CHANNELS: usize = 2;
 #[cfg(target_os = "android")]
 const ANDROID_DIRECT_SCRATCH_SAMPLES: usize = 32_768;
+/// Frames one managed-output scratch buffer holds. Shared with the
+/// diagnostics JSON so the app can report the callback capacity.
+#[cfg(target_os = "android")]
+pub(crate) const ANDROID_DIRECT_SCRATCH_FRAMES: usize =
+    ANDROID_DIRECT_SCRATCH_SAMPLES / ANDROID_DIRECT_CHANNELS;
 
 #[cfg(target_os = "android")]
 pub fn desired_output_signature(preferred_sample_rate: Option<u32>) -> String {
@@ -2420,6 +2470,54 @@ fn report_oboe_callback_failure(
     let _ = event_tx.try_send(AudioEvent::Error { message });
 }
 
+/// Render one device callback in bounded, frame-aligned chunks.
+///
+/// Bluetooth mixers can hand out bursts far larger than any sane app-side
+/// scratch buffer (e.g. 26,490 frames vs a 16,384-frame capacity). Silencing
+/// the whole burst kills playback; instead each chunk runs a full
+/// `audio_callback`, so DSP, crossfade and speed state plus the DoP marker
+/// phase advance exactly as if the device had issued several smaller
+/// callbacks. Chunks never exceed the scratch capacity or the internal mix
+/// buffer capacity (`max_frames_per_chunk`), so the crossfade/speed scratch
+/// buffers stay in range. No allocation happens on this path.
+///
+/// `render` fills one chunk of `frames * ANDROID_DIRECT_CHANNELS` samples and
+/// `write_chunk(start_frame, frames, chunk)` copies it to the device buffer.
+/// Returns `(chunks_rendered, panicked)`.
+#[cfg(any(target_os = "android", test))]
+fn render_managed_burst<F, W>(
+    scratch: &mut [f32],
+    total_frames: usize,
+    max_frames_per_chunk: usize,
+    mut render: F,
+    mut write_chunk: W,
+) -> (usize, bool)
+where
+    F: FnMut(&mut [f32]),
+    W: FnMut(usize, usize, &[f32]),
+{
+    let frames_per_chunk = (scratch.len() / ANDROID_DIRECT_CHANNELS)
+        .min(max_frames_per_chunk.max(1))
+        .max(1);
+    let chunks = std::cell::Cell::new(0usize);
+
+    let panicked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let mut start = 0usize;
+        while start < total_frames {
+            let frames = (total_frames - start).min(frames_per_chunk);
+            let samples = frames * ANDROID_DIRECT_CHANNELS;
+            let chunk = &mut scratch[..samples];
+            render(chunk);
+            write_chunk(start, frames, chunk);
+            chunks.set(chunks.get() + 1);
+            start += frames;
+        }
+    }))
+    .is_err();
+
+    (chunks.get(), panicked)
+}
+
 #[cfg(target_os = "android")]
 struct AndroidOutputCallbackF32 {
     callback_data: Arc<AudioCallbackData>,
@@ -2480,29 +2578,24 @@ impl AudioOutputCallback for AndroidOutputCallbackF32 {
         _audio_stream: &mut dyn AudioOutputStreamSafe,
         audio_data: &mut [(f32, f32)],
     ) -> DataCallbackResult {
-        let required_samples = audio_data.len() * ANDROID_DIRECT_CHANNELS;
-
-        if required_samples > self.scratch.len() {
-            let detail = format!(
-                "output burst of {} frames exceeds scratch capacity of {} frames",
-                audio_data.len(),
-                self.scratch.len() / ANDROID_DIRECT_CHANNELS,
-            );
-            report_oboe_callback_failure(&self.event_tx, &mut self.failure_reported, detail);
-            audio_data.fill((0.0, 0.0));
-            return DataCallbackResult::Continue;
-        }
-
-        let panicked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let scratch = &mut self.scratch[..required_samples];
-            audio_callback(scratch, &self.callback_data, &self.event_tx);
-
-            for (frame_index, frame) in audio_data.iter_mut().enumerate() {
-                let sample_index = frame_index * ANDROID_DIRECT_CHANNELS;
-                *frame = (scratch[sample_index], scratch[sample_index + 1]);
-            }
-        }))
-        .is_err();
+        let total_frames = audio_data.len();
+        let callback_data = &self.callback_data;
+        let event_tx = &self.event_tx;
+        let (chunks, panicked) = render_managed_burst(
+            &mut self.scratch,
+            total_frames,
+            callback_data.dsp_burst_frames_cap(),
+            |chunk| audio_callback(chunk, callback_data, event_tx),
+            |start, frames, chunk| {
+                for (frame_index, frame) in
+                    audio_data[start..start + frames].iter_mut().enumerate()
+                {
+                    let sample_index = frame_index * ANDROID_DIRECT_CHANNELS;
+                    *frame = (chunk[sample_index], chunk[sample_index + 1]);
+                }
+            },
+        );
+        callback_data.note_oboe_burst(total_frames, chunks);
 
         if panicked {
             report_oboe_callback_failure(
@@ -2510,7 +2603,7 @@ impl AudioOutputCallback for AndroidOutputCallbackF32 {
                 &mut self.failure_reported,
                 format!(
                     "audio callback panicked for a {} frame buffer",
-                    audio_data.len()
+                    total_frames
                 ),
             );
             audio_data.fill((0.0, 0.0));
@@ -2584,31 +2677,27 @@ impl AudioOutputCallback for AndroidOutputCallbackI32 {
         _audio_stream: &mut dyn AudioOutputStreamSafe,
         audio_data: &mut [(i32, i32)],
     ) -> DataCallbackResult {
-        let required_samples = audio_data.len() * ANDROID_DIRECT_CHANNELS;
-
-        if required_samples > self.scratch.len() {
-            let detail = format!(
-                "output burst of {} frames exceeds scratch capacity of {} frames",
-                audio_data.len(),
-                self.scratch.len() / ANDROID_DIRECT_CHANNELS,
-            );
-            report_oboe_callback_failure(&self.event_tx, &mut self.failure_reported, detail);
-            audio_data.fill((0, 0));
-            return DataCallbackResult::Continue;
-        }
-
-        let panicked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let scratch = &mut self.scratch[..required_samples];
-            audio_callback(scratch, &self.callback_data, &self.event_tx);
-
-            for (frame_index, frame) in audio_data.iter_mut().enumerate() {
-                let sample_index = frame_index * ANDROID_DIRECT_CHANNELS;
-                let l = scratch[sample_index].to_bits() as i32;
-                let r = scratch[sample_index + 1].to_bits() as i32;
-                *frame = (l, r);
-            }
-        }))
-        .is_err();
+        let total_frames = audio_data.len();
+        let callback_data = &self.callback_data;
+        let event_tx = &self.event_tx;
+        let (chunks, panicked) = render_managed_burst(
+            &mut self.scratch,
+            total_frames,
+            callback_data.dsp_burst_frames_cap(),
+            |chunk| audio_callback(chunk, callback_data, event_tx),
+            |start, frames, chunk| {
+                for (frame_index, frame) in
+                    audio_data[start..start + frames].iter_mut().enumerate()
+                {
+                    let sample_index = frame_index * ANDROID_DIRECT_CHANNELS;
+                    *frame = (
+                        chunk[sample_index].to_bits() as i32,
+                        chunk[sample_index + 1].to_bits() as i32,
+                    );
+                }
+            },
+        );
+        callback_data.note_oboe_burst(total_frames, chunks);
 
         if panicked {
             report_oboe_callback_failure(
@@ -2616,7 +2705,7 @@ impl AudioOutputCallback for AndroidOutputCallbackI32 {
                 &mut self.failure_reported,
                 format!(
                     "audio callback panicked for a {} frame buffer",
-                    audio_data.len()
+                    total_frames
                 ),
             );
             audio_data.fill((0, 0));
@@ -2698,32 +2787,27 @@ impl AudioOutputCallback for AndroidOutputCallbackI32Pcm {
         _audio_stream: &mut dyn AudioOutputStreamSafe,
         audio_data: &mut [(i32, i32)],
     ) -> DataCallbackResult {
-        let required_samples = audio_data.len() * ANDROID_DIRECT_CHANNELS;
-
-        if required_samples > self.scratch.len() {
-            let detail = format!(
-                "output burst of {} frames exceeds scratch capacity of {} frames",
-                audio_data.len(),
-                self.scratch.len() / ANDROID_DIRECT_CHANNELS,
-            );
-            report_oboe_callback_failure(&self.event_tx, &mut self.failure_reported, detail);
-            audio_data.fill((0, 0));
-            return DataCallbackResult::Continue;
-        }
-
-        let panicked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let scratch = &mut self.scratch[..required_samples];
-            audio_callback(scratch, &self.callback_data, &self.event_tx);
-
-            for (frame_index, frame) in audio_data.iter_mut().enumerate() {
-                let sample_index = frame_index * ANDROID_DIRECT_CHANNELS;
-                *frame = (
-                    f32_to_i32(scratch[sample_index]),
-                    f32_to_i32(scratch[sample_index + 1]),
-                );
-            }
-        }))
-        .is_err();
+        let total_frames = audio_data.len();
+        let callback_data = &self.callback_data;
+        let event_tx = &self.event_tx;
+        let (chunks, panicked) = render_managed_burst(
+            &mut self.scratch,
+            total_frames,
+            callback_data.dsp_burst_frames_cap(),
+            |chunk| audio_callback(chunk, callback_data, event_tx),
+            |start, frames, chunk| {
+                for (frame_index, frame) in
+                    audio_data[start..start + frames].iter_mut().enumerate()
+                {
+                    let sample_index = frame_index * ANDROID_DIRECT_CHANNELS;
+                    *frame = (
+                        f32_to_i32(chunk[sample_index]),
+                        f32_to_i32(chunk[sample_index + 1]),
+                    );
+                }
+            },
+        );
+        callback_data.note_oboe_burst(total_frames, chunks);
 
         if panicked {
             report_oboe_callback_failure(
@@ -2731,7 +2815,7 @@ impl AudioOutputCallback for AndroidOutputCallbackI32Pcm {
                 &mut self.failure_reported,
                 format!(
                     "audio callback panicked for a {} frame buffer",
-                    audio_data.len()
+                    total_frames
                 ),
             );
             audio_data.fill((0, 0));
@@ -2807,32 +2891,27 @@ impl AudioOutputCallback for AndroidOutputCallbackI16 {
         _audio_stream: &mut dyn AudioOutputStreamSafe,
         audio_data: &mut [(i16, i16)],
     ) -> DataCallbackResult {
-        let required_samples = audio_data.len() * ANDROID_DIRECT_CHANNELS;
-
-        if required_samples > self.scratch.len() {
-            let detail = format!(
-                "output burst of {} frames exceeds scratch capacity of {} frames",
-                audio_data.len(),
-                self.scratch.len() / ANDROID_DIRECT_CHANNELS,
-            );
-            report_oboe_callback_failure(&self.event_tx, &mut self.failure_reported, detail);
-            audio_data.fill((0, 0));
-            return DataCallbackResult::Continue;
-        }
-
-        let panicked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            let scratch = &mut self.scratch[..required_samples];
-            audio_callback(scratch, &self.callback_data, &self.event_tx);
-
-            for (frame_index, frame) in audio_data.iter_mut().enumerate() {
-                let sample_index = frame_index * ANDROID_DIRECT_CHANNELS;
-                *frame = (
-                    f32_to_i16(scratch[sample_index]),
-                    f32_to_i16(scratch[sample_index + 1]),
-                );
-            }
-        }))
-        .is_err();
+        let total_frames = audio_data.len();
+        let callback_data = &self.callback_data;
+        let event_tx = &self.event_tx;
+        let (chunks, panicked) = render_managed_burst(
+            &mut self.scratch,
+            total_frames,
+            callback_data.dsp_burst_frames_cap(),
+            |chunk| audio_callback(chunk, callback_data, event_tx),
+            |start, frames, chunk| {
+                for (frame_index, frame) in
+                    audio_data[start..start + frames].iter_mut().enumerate()
+                {
+                    let sample_index = frame_index * ANDROID_DIRECT_CHANNELS;
+                    *frame = (
+                        f32_to_i16(chunk[sample_index]),
+                        f32_to_i16(chunk[sample_index + 1]),
+                    );
+                }
+            },
+        );
+        callback_data.note_oboe_burst(total_frames, chunks);
 
         if panicked {
             report_oboe_callback_failure(
@@ -2840,7 +2919,7 @@ impl AudioOutputCallback for AndroidOutputCallbackI16 {
                 &mut self.failure_reported,
                 format!(
                     "audio callback panicked for a {} frame buffer",
-                    audio_data.len()
+                    total_frames
                 ),
             );
             audio_data.fill((0, 0));
@@ -5361,5 +5440,231 @@ mod tests {
             audio_api_attempts(AudioApiPreference::OpenSLES, false),
             vec![AudioApi::OpenSLES, AudioApi::Unspecified]
         );
+    }
+
+    fn build_dop_callback_data() -> AudioCallbackData {
+        let (finished_tx, _finished_rx) = bounded::<AudioSource>(8);
+        let data = AudioCallbackData::new(48_000, 2, finished_tx, PipelineMode::Dop);
+        data.set_dop_wire_silence(true);
+        data
+    }
+
+    #[test]
+    fn managed_burst_chunks_oversized_callback_and_preserves_samples() {
+        // 26_490 frames is the exact Bluetooth burst that used to silence the
+        // output when it exceeded the 16_384-frame scratch buffer.
+        let total_frames = 26_490usize;
+        let samples: Vec<f32> = (0..total_frames * 2)
+            .map(|index| ((index % 977) as f32 / 977.0) * 0.5 - 0.25)
+            .collect();
+
+        let reference_data = build_callback_data(48_000, 2);
+        reference_data
+            .sources
+            .lock()
+            .set_current(build_source(&samples, 48_000, 2));
+        let reference = run_callback(&reference_data, total_frames * 2);
+
+        let chunked_data = build_callback_data(48_000, 2);
+        chunked_data
+            .sources
+            .lock()
+            .set_current(build_source(&samples, 48_000, 2));
+        let (event_tx, _event_rx) = bounded::<AudioEvent>(64);
+        let mut scratch = vec![0.0f32; 32_768];
+        let mut output = vec![0.0f32; total_frames * 2];
+        let (chunks, panicked) = render_managed_burst(
+            &mut scratch,
+            total_frames,
+            chunked_data.dsp_burst_frames_cap(),
+            |chunk| audio_callback(chunk, &chunked_data, &event_tx),
+            |start, frames, chunk| {
+                output[start * 2..(start + frames) * 2].copy_from_slice(&chunk[..frames * 2]);
+            },
+        );
+
+        assert!(!panicked);
+        assert_eq!(chunks, 2, "26_490 frames must split into 16_384 + 10_106");
+        assert_eq!(output, reference);
+
+        chunked_data.note_oboe_burst(total_frames, chunks);
+        assert_eq!(chunked_data.oboe_burst_stats(), (26_490, 1));
+    }
+
+    #[test]
+    fn managed_burst_splits_only_past_the_scratch_boundary() {
+        let capture = |scratch_frames: usize, cap: usize, total_frames: usize| {
+            let mut scratch = vec![0.0f32; scratch_frames * ANDROID_DIRECT_CHANNELS];
+            let mut spans: Vec<(usize, usize)> = Vec::new();
+            let (chunks, panicked) = render_managed_burst(
+                &mut scratch,
+                total_frames,
+                cap,
+                |chunk| chunk.fill(1.0),
+                |start, frames, chunk| {
+                    assert_eq!(chunk.len(), frames * ANDROID_DIRECT_CHANNELS);
+                    spans.push((start, frames));
+                },
+            );
+            assert!(!panicked);
+            (chunks, spans)
+        };
+
+        let (chunks, spans) = capture(16_384, usize::MAX, 16_384);
+        assert_eq!(chunks, 1);
+        assert_eq!(spans, vec![(0, 16_384)]);
+
+        let (chunks, spans) = capture(16_384, usize::MAX, 16_385);
+        assert_eq!(chunks, 2);
+        assert_eq!(spans, vec![(0, 16_384), (16_384, 1)]);
+
+        // The internal DSP capacity caps the chunk size even when the scratch
+        // buffer is larger (e.g. after a low-rate reconfigure).
+        let (chunks, spans) = capture(16_384, 1_000, 2_500);
+        assert_eq!(chunks, 3);
+        assert_eq!(spans, vec![(0, 1_000), (1_000, 1_000), (2_000, 500)]);
+    }
+
+    #[test]
+    fn managed_output_telemetry_reports_peak_burst_and_chunking() {
+        let data = build_callback_data(48_000, 2);
+        assert_eq!(data.oboe_burst_stats(), (0, 0));
+
+        data.note_oboe_burst(4_096, 1);
+        assert_eq!(data.oboe_burst_stats(), (4_096, 0));
+
+        data.note_oboe_burst(26_490, 2);
+        assert_eq!(data.oboe_burst_stats(), (26_490, 1));
+
+        data.note_oboe_burst(1_024, 1);
+        assert_eq!(data.oboe_burst_stats(), (26_490, 1));
+    }
+
+    #[test]
+    fn dsp_burst_cap_tracks_reconfigured_buffers() {
+        let data = build_callback_data(48_000, 2);
+        assert_eq!(data.dsp_burst_frames_cap(), 48_000);
+
+        data.reconfigure_sample_rate(176_400);
+        assert_eq!(data.dsp_burst_frames_cap(), 17_640);
+
+        data.reconfigure_sample_rate(44_100);
+        assert_eq!(data.dsp_burst_frames_cap(), 8_192);
+    }
+
+    #[test]
+    fn managed_burst_preserves_dop_marker_phase_across_chunks() {
+        let total_frames = 10_000usize;
+        let reference = build_dop_callback_data();
+        let reference_output = run_callback(&reference, total_frames * ANDROID_DIRECT_CHANNELS);
+
+        let chunked = build_dop_callback_data();
+        let (event_tx, _event_rx) = bounded::<AudioEvent>(64);
+        let mut scratch = vec![0.0f32; 4_096 * ANDROID_DIRECT_CHANNELS];
+        let mut output = vec![0.0f32; total_frames * ANDROID_DIRECT_CHANNELS];
+        let (chunks, panicked) = render_managed_burst(
+            &mut scratch,
+            total_frames,
+            usize::MAX,
+            |chunk| audio_callback(chunk, &chunked, &event_tx),
+            |start, frames, chunk| {
+                output[start * ANDROID_DIRECT_CHANNELS
+                    ..(start + frames) * ANDROID_DIRECT_CHANNELS]
+                    .copy_from_slice(&chunk[..frames * ANDROID_DIRECT_CHANNELS]);
+            },
+        );
+
+        assert!(!panicked);
+        assert_eq!(chunks, 3, "10_000 frames must split into 4_096 + 4_096 + 1_808");
+        assert_eq!(output, reference_output);
+
+        // Markers alternate per frame without restarting at chunk boundaries.
+        let marker = |frame: usize| (output[frame * ANDROID_DIRECT_CHANNELS].to_bits() >> 24) & 0xff;
+        assert_eq!(marker(0), 0x05);
+        assert_eq!(marker(1), 0xfa);
+        assert_eq!(marker(4_095), 0xfa);
+        assert_eq!(marker(4_096), 0x05);
+    }
+
+    #[test]
+    fn managed_burst_keeps_crossfade_state_across_chunks() {
+        let build = || {
+            let data = build_callback_data(48_000, 2);
+            let outgoing: Vec<f32> = (0..96_000).flat_map(|_| [0.25, 0.0]).collect();
+            let incoming: Vec<f32> = (0..96_000).flat_map(|_| [0.0, 0.25]).collect();
+            {
+                let mut sources = data.sources.lock();
+                sources.set_current(build_source(&outgoing, 48_000, 2));
+                sources.queue_next(build_source(&incoming, 48_000, 2));
+            }
+            {
+                let mut fade = data.crossfader.lock();
+                fade.set_enabled(true);
+                fade.set_duration(1.0);
+                fade.set_curve(crate::audio::crossfader::CrossfadeCurve::Linear);
+                fade.start();
+            }
+            data.crossfade_active.store(true, Ordering::Relaxed);
+            data
+        };
+
+        let reference = build();
+        let reference_first = run_callback(&reference, 48_000);
+        let reference_second = run_callback(&reference, 48_000);
+
+        let chunked = build();
+        let (event_tx, _event_rx) = bounded::<AudioEvent>(64);
+        let mut scratch = vec![0.0f32; 4_096 * ANDROID_DIRECT_CHANNELS];
+        let mut first = vec![0.0f32; 48_000];
+        let mut second = vec![0.0f32; 48_000];
+        let mut render_burst = |output: &mut Vec<f32>| {
+            let (chunks, panicked) = render_managed_burst(
+                &mut scratch,
+                output.len() / ANDROID_DIRECT_CHANNELS,
+                usize::MAX,
+                |chunk| audio_callback(chunk, &chunked, &event_tx),
+                |start, frames, chunk| {
+                    output[start * ANDROID_DIRECT_CHANNELS
+                        ..(start + frames) * ANDROID_DIRECT_CHANNELS]
+                        .copy_from_slice(&chunk[..frames * ANDROID_DIRECT_CHANNELS]);
+                },
+            );
+            assert!(!panicked);
+            assert_eq!(chunks, 6, "24_000 frames at 4_096-frame chunks");
+        };
+        render_burst(&mut first);
+        render_burst(&mut second);
+
+        assert_eq!(first, reference_first);
+        assert_eq!(second, reference_second);
+        assert!(!chunked.crossfade_active.load(Ordering::Relaxed));
+        assert_eq!(
+            chunked.sources.lock().current().unwrap().position_samples(),
+            96_000
+        );
+    }
+
+    #[test]
+    fn managed_burst_reports_panics_after_completed_chunks() {
+        let mut scratch = vec![0.0f32; 2_048 * ANDROID_DIRECT_CHANNELS];
+        let mut rendered = 0usize;
+        let mut spans: Vec<(usize, usize)> = Vec::new();
+        let (chunks, panicked) = render_managed_burst(
+            &mut scratch,
+            2_500,
+            1_000,
+            |chunk| {
+                rendered += 1;
+                if rendered == 2 {
+                    panic!("simulated render panic");
+                }
+                chunk.fill(1.0);
+            },
+            |start, frames, _chunk| spans.push((start, frames)),
+        );
+
+        assert!(panicked);
+        assert_eq!(chunks, 1);
+        assert_eq!(spans, vec![(0, 1_000)]);
     }
 }
