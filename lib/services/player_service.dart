@@ -235,6 +235,18 @@ bool shouldForceRustEngineFallback({
   return recent.length >= deadRustEngineRecoveryLimit;
 }
 
+/// True when a Rust-only container (DSF/DFF/WavPack) lost its engine and
+/// cannot fall back to the system decoder: ExoPlayer rejects these sources, so
+/// switching to NORMAL_ANDROID would fail to decode and bounce straight back
+/// to the dead Rust engine. Stopping cleanly keeps the failure actionable.
+@visibleForTesting
+bool shouldStopForRustOnlyContainer({
+  required bool revived,
+  required bool requiresRustDecoder,
+}) {
+  return !revived && requiresRustDecoder;
+}
+
 /// just_audio routes any non-`file://` URI through its local HTTP proxy as
 /// soon as the headers map is non-null (even when empty), and that proxy can
 /// only speak HTTP — `content://` sources then fail with "Unsupported scheme
@@ -2435,6 +2447,7 @@ class PlayerService {
     final engineState = _mapValue(rustAudioState?['engine']);
     final directUsbState = _mapValue(rustAudioState?['direct_usb']);
     final dsdCallbackState = _mapValue(rustAudioState?['dsd_callback']);
+    final managedOutputState = _mapValue(rustAudioState?['managed_output']);
     final deviceProfile = _mapValue(rustAudioState?['device_profile']);
     final detectedDap = _isDetectedDapProfile(deviceProfile);
     final detectedDapBrand = _detectedDapBrand(deviceProfile);
@@ -2830,6 +2843,19 @@ class PlayerService {
     );
     unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
 
+    // `reported` is the app-side stream rate. Bluetooth links usually resample
+    // before the codec, so a 176400 report does not prove the transport
+    // carries 176.4 kHz; flag when the stream rate differs from what A2DP/SBC
+    // links typically carry.
+    final btTransportHint = !deviceInfo.isBluetoothRoute
+        ? null
+        : reportedOutputSampleRate == null
+        ? 'unknown'
+        : reportedOutputSampleRate == 44100 ||
+              reportedOutputSampleRate == 48000
+        ? 'app-stream-may-match-link'
+        : 'app-stream-resampled-by-bt-mixer';
+
     _debugLog(
       '[Diagnostics] $reason: mode=${mode.logLabel}, '
       'selected=${_sessionManager.selectedMode.logLabel}, '
@@ -2851,6 +2877,9 @@ class PlayerService {
       'framesPerPacket=${framesPerPacket ?? -1}, underruns=${underrunCount ?? -1}, '
       'dsdStarvedSamples=${_intValue(dsdCallbackState?['starved_samples']) ?? -1}, '
       'dsdLockMisses=${_intValue(dsdCallbackState?['lock_misses']) ?? -1}, '
+      'callbackFramesMax=${_intValue(managedOutputState?['burst_frames_max']) ?? -1}, '
+      'callbackChunks=${_intValue(managedOutputState?['burst_chunked_count']) ?? -1}, '
+      'callbackScratchFrames=${_intValue(managedOutputState?['scratch_frames']) ?? -1}, '
       'producerFrames=${producerFrames ?? -1}, consumerFrames=${consumerFrames ?? -1}, '
       'driftMs=${driftMsFromTarget ?? -999}, '
       'resampler=$resamplerActive, passthrough=$passthroughAllowed, '
@@ -2861,6 +2890,7 @@ class PlayerService {
       'fallback=${_sessionManager.fallbackReason ?? 'none'}, '
       'dsdMode=${dsdEffectiveMode ?? 'none'}, '
       'dsdTransport=${dsdTransport ?? 'none'}, '
+      'btTransportHint=${btTransportHint ?? 'n/a'}, '
       'volumeMode=${_uac2Service.currentDeviceStatus?.volumeMode.name ?? 'unknown'}, '
       'hardwareVolume=${directUsbState?['hardware_volume_normalized'] ?? 'unknown'}, '
       'volumeError=${directUsbState?['hardware_volume_error'] ?? 'none'}',
@@ -5492,6 +5522,27 @@ class PlayerService {
         } catch (e) {
           _debugLog('[Engine] Rust engine respawn failed: $e');
         }
+      }
+
+      if (shouldStopForRustOnlyContainer(
+        revived: revived,
+        requiresRustDecoder: song?.requiresRustDecoder ?? false,
+      )) {
+        // DSF/DFF/WavPack cannot ride ExoPlayer: switching to NORMAL_ANDROID
+        // fails to decode and bounces straight back to the dead Rust engine.
+        // Stop with a shareable reason instead of starting a fallback loop.
+        final title = song?.title ?? 'this track';
+        const stopReason =
+            'Rust engine unrecoverable; ExoPlayer cannot decode this '
+            'container — stopping playback instead of falling back';
+        _debugLog('[Engine] $title: $stopReason');
+        AppLog.instance.add('[Engine] $title: $stopReason');
+        try {
+          await _pauseInternal();
+        } catch (e) {
+          _debugLog('[Playback] Failed to stop after Rust engine loss: $e');
+        }
+        return true;
       }
 
       if (!revived) {

@@ -86,4 +86,43 @@ void main() {
       );
     });
   });
+
+  group('shouldStopForRustOnlyContainer', () {
+    test('stops when the engine is dead and ExoPlayer cannot decode', () {
+      expect(
+        shouldStopForRustOnlyContainer(
+          revived: false,
+          requiresRustDecoder: true,
+        ),
+        isTrue,
+      );
+    });
+
+    test('keeps the ExoPlayer fallback for system-decodable tracks', () {
+      expect(
+        shouldStopForRustOnlyContainer(
+          revived: false,
+          requiresRustDecoder: false,
+        ),
+        isFalse,
+      );
+    });
+
+    test('replays on the Rust engine after a successful respawn', () {
+      expect(
+        shouldStopForRustOnlyContainer(
+          revived: true,
+          requiresRustDecoder: true,
+        ),
+        isFalse,
+      );
+      expect(
+        shouldStopForRustOnlyContainer(
+          revived: true,
+          requiresRustDecoder: false,
+        ),
+        isFalse,
+      );
+    });
+  });
 }

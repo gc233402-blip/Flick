@@ -313,24 +313,29 @@ class AudioSessionManager {
 
     if (info.isBluetoothRoute) {
       // ponytail: dapInternalHighRes is never used on BT (level loss + 5-10s
-      // dropouts on A2DP); both output-mode toggles use the stable shared
-      // Rust Oboe stream. Codec quality stays driven by codec prefs.
-      final outputModeReason = Uac2PreferencesService.isBtLowLatencyModeSync
-          ? 'Low-latency mode'
-          : Uac2PreferencesService.isBtHiResDirectSync
-          ? 'Hi-Res Direct'
-          : null;
-      if (outputModeReason != null) {
+      // dropouts on A2DP); every path below uses the stable shared Rust Oboe
+      // stream, never exclusive output. Codec quality stays driven by codec
+      // prefs, and ExoPlayer stays available for users who prefer it.
+      final routeLabel = info.routeLabel ?? info.routeType ?? 'unknown';
+      final preferredMode = resolveBluetoothPreferredMode(
+        enginePreference: audioEnginePreference,
+        lowLatencyEnabled: Uac2PreferencesService.isBtLowLatencyModeSync,
+        hiResDirectEnabled: Uac2PreferencesService.isBtHiResDirectSync,
+      );
+      if (preferredMode == AudioEngineType.rustOboe) {
+        final reason = Uac2PreferencesService.isBtLowLatencyModeSync
+            ? 'Low-latency mode is enabled'
+            : Uac2PreferencesService.isBtHiResDirectSync
+            ? 'Hi-Res Direct is enabled'
+            : 'the user prefers the Rust Android-managed engine';
         _debugLog(
-          '[Session] Selected RUST_OBOE for Bluetooth because '
-          '$outputModeReason is enabled '
-          '(${info.routeLabel ?? info.routeType ?? 'unknown'})',
+          '[Session] Selected RUST_OBOE for Bluetooth because $reason '
+          '($routeLabel)',
         );
         return AudioEngineType.rustOboe;
       }
       _debugLog(
-        '[Session] Keeping NORMAL_ANDROID for Bluetooth '
-        '(${info.routeLabel ?? info.routeType ?? 'unknown'})',
+        '[Session] Keeping NORMAL_ANDROID for Bluetooth ($routeLabel)',
       );
       return AudioEngineType.normalAndroid;
     }
@@ -526,4 +531,23 @@ class AudioSessionManager {
     fallbackReasonNotifier.dispose();
     capabilityInfoNotifier.dispose();
   }
+}
+
+/// Bluetooth engine routing without platform-service lookups, kept pure so the
+/// rules can be unit tested. Bluetooth never uses exclusive/DAP output: the
+/// output-mode toggles and the user preference all select the shared Rust Oboe
+/// stream, and ExoPlayer remains the fallback for users who chose it.
+@visibleForTesting
+AudioEngineType resolveBluetoothPreferredMode({
+  required AudioEnginePreference enginePreference,
+  required bool lowLatencyEnabled,
+  required bool hiResDirectEnabled,
+}) {
+  if (lowLatencyEnabled || hiResDirectEnabled) {
+    return AudioEngineType.rustOboe;
+  }
+  if (enginePreference == AudioEnginePreference.rustOboe) {
+    return AudioEngineType.rustOboe;
+  }
+  return AudioEngineType.normalAndroid;
 }

@@ -1,8 +1,66 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flick/models/audio_engine_type.dart';
 import 'package:flick/services/audio_session_manager.dart';
+import 'package:flick/services/uac2_preferences_service.dart';
 
 void main() {
+  group('resolveBluetoothPreferredMode', () {
+    test('honors the Rust engine preference with both toggles off', () {
+      expect(
+        resolveBluetoothPreferredMode(
+          enginePreference: AudioEnginePreference.rustOboe,
+          lowLatencyEnabled: false,
+          hiResDirectEnabled: false,
+        ),
+        AudioEngineType.rustOboe,
+      );
+    });
+
+    test('keeps ExoPlayer for the default preference', () {
+      expect(
+        resolveBluetoothPreferredMode(
+          enginePreference: AudioEnginePreference.exoPlayer,
+          lowLatencyEnabled: false,
+          hiResDirectEnabled: false,
+        ),
+        AudioEngineType.normalAndroid,
+      );
+    });
+
+    test('keeps ExoPlayer for the isochronous USB preference', () {
+      expect(
+        resolveBluetoothPreferredMode(
+          enginePreference: AudioEnginePreference.isochronousUsb,
+          lowLatencyEnabled: false,
+          hiResDirectEnabled: false,
+        ),
+        AudioEngineType.normalAndroid,
+      );
+    });
+
+    test('low-latency mode selects the Rust engine regardless of preference', () {
+      expect(
+        resolveBluetoothPreferredMode(
+          enginePreference: AudioEnginePreference.exoPlayer,
+          lowLatencyEnabled: true,
+          hiResDirectEnabled: false,
+        ),
+        AudioEngineType.rustOboe,
+      );
+    });
+
+    test('Hi-Res Direct selects the Rust engine regardless of preference', () {
+      expect(
+        resolveBluetoothPreferredMode(
+          enginePreference: AudioEnginePreference.exoPlayer,
+          lowLatencyEnabled: false,
+          hiResDirectEnabled: true,
+        ),
+        AudioEngineType.rustOboe,
+      );
+    });
+  });
+
   test(
     'Rust fallback remains identifiable while Standard is initialized',
     () async {
