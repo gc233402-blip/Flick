@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/flagship_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:background="@drawable/widget_flagship_background"
+    android:clipToOutline="true"
+    android:outlineProvider="background"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <include
+        layout="@layout/widget_flagship_panel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+    <include
+        layout="@layout/widget_flagship_controls"
+        android:layout_width="144dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="12dp" />
+</LinearLayout>

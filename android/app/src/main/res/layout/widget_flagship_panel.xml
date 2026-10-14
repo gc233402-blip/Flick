@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/flagship_panel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_flagship_panel_background"
+    android:clipToOutline="true"
+    android:outlineProvider="background">
+
+    <ImageView
+        android:id="@+id/flagship_panel_art"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY" />
+
+    <LinearLayout
+        android:id="@+id/flagship_panel_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/flagship_art"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:maxWidth="64dp"
+                    android:maxHeight="64dp"
+                    android:contentDescription="@string/widget_open_app"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/widget_default_art" />
+                <ImageView
+                    android:id="@+id/flagship_next_art_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/widget_open_app"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/flagship_next_art_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/widget_open_app"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/flagship_repeat_header"
+                style="@style/WidgetTransportButton"
+                android:layout_gravity="top|end"
+                android:padding="14dp"
+                android:contentDescription="@string/widget_repeat"
+                android:src="@drawable/widget_ic_lucide_repeat"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <ImageView
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:importantForAccessibility="no" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:id="@+id/flagship_metadata_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingStart="0dp"
+                android:paddingEnd="56dp">
+
+                <ImageView
+                    android:id="@+id/flagship_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/widget_nothing_playing"
+                    android:scaleType="fitStart"
+                    android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/flagship_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/widget_nothing_playing"
+                    android:scaleType="fitStart" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/flagship_repeat"
+                style="@style/WidgetTransportButton"
+                android:layout_gravity="end"
+                android:padding="14dp"
+                android:contentDescription="@string/widget_repeat"
+                android:src="@drawable/widget_ic_lucide_repeat" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/flagship_progress"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="6dp"
+            android:importantForAccessibility="no"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/flagship_times"
+            android:layout_width="match_parent"
+            android:layout_height="18dp"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/flagship_elapsed"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/widget_elapsed"
+                android:scaleType="fitStart" />
+            <ImageView
+                android:id="@+id/flagship_duration"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/widget_duration"
+                android:scaleType="fitEnd" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

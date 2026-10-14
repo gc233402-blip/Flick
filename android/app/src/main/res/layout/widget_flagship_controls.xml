@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/flagship_controls"
+    android:layout_width="104dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/flagship_shuffle"
+            style="@style/WidgetTileButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/widget_shuffle"
+            android:src="@drawable/widget_ic_lucide_shuffle" />
+        <ImageButton
+            android:id="@+id/flagship_play_pause"
+            style="@style/WidgetTileButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/widget_play_pause"
+            android:src="@drawable/widget_ic_lucide_play" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/flagship_prev"
+            style="@style/WidgetTileButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/widget_previous"
+            android:src="@drawable/widget_ic_lucide_skip_back" />
+        <ImageButton
+            android:id="@+id/flagship_next"
+            style="@style/WidgetTileButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/widget_next"
+            android:src="@drawable/widget_ic_lucide_skip_forward" />
+    </LinearLayout>
+</LinearLayout>

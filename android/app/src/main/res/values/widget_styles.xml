@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="WidgetTransportButton">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:background">@drawable/widget_button_transport_bg</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+    <style name="WidgetCompactPlayButton" parent="WidgetTransportButton">
+        <item name="android:background">@drawable/widget_button_small_play</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:tint">#FF0A0A0A</item>
+    </style>
+    <style name="WidgetTileButton" parent="WidgetTransportButton">
+        <item name="android:background">@drawable/widget_button_tile</item>
+    </style>
+</resources>

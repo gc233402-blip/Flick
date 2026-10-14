@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Legacy launchers infer spans from dp, not targetCellWidth/Height. -->
+    <dimen name="widget_compact_min_width">110dp</dimen>
+    <!-- Preserve the working two-row height on older, less dense home grids. -->
+    <dimen name="widget_compact_min_height">156dp</dimen>
+</resources>
