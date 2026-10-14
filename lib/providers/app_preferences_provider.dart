@@ -447,6 +447,12 @@ class AppPreferencesNotifier extends Notifier<AppPreferences> {
         .setWidgetCompactTextScale(value);
   }
 
+  Future<void> setWidgetReplayLook(String value) async {
+    if (state.widgetReplayLook == value) return;
+    state = state.copyWith(widgetReplayLook: value);
+    await ref.read(appPreferencesServiceProvider).setWidgetReplayLook(value);
+  }
+
   Future<void> setLyricsMatchAudioFilename(bool value) async {
     if (state.lyricsMatchAudioFilename == value) return;
     state = state.copyWith(lyricsMatchAudioFilename: value);

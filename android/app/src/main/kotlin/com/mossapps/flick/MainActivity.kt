@@ -17,6 +17,7 @@ package com.mossapps.flick
 // (android_audio_device_service.dart isLikelyDap). Kotlin does NOT detect DAP brands.
 
 import android.Manifest
+import com.mossapps.flick.widgets.WidgetLaunchInbox
 import android.app.ActivityManager
 import android.app.ApplicationExitInfo
 import android.app.PendingIntent
@@ -168,6 +169,7 @@ class MainActivity: FlutterActivity() {
     private var visualizer: Visualizer? = null
     private var visualizerEventSink: EventChannel.EventSink? = null
     private var widgetChannel: MethodChannel? = null
+    private val widgetLaunchInbox = WidgetLaunchInbox()
     private val HOME_WIDGET_LAUNCH_ACTION = "com.mossapps.flick.WIDGET_LAUNCH"
     private var a2dpProxy: BluetoothA2dp? = null
     private var developerMode: Boolean = false
@@ -1243,7 +1245,21 @@ class MainActivity: FlutterActivity() {
         registerVolumeContentObserver()
 
         widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, WIDGET_CHANNEL)
+        widgetLaunchInbox.detach()
         dispatchWidgetIntent(intent)
+        widgetChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "widgetHandlerReady" -> result.success(widgetLaunchInbox.attach())
+                "widgetHandlerDetached" -> {
+                    widgetLaunchInbox.detach()
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
+        // A cached engine may already have a Dart handler from the old Activity.
+        // A fresh engine drains the queued URI when its handler attaches later.
+        widgetChannel?.invokeMethod("channelReady", null)
     }
 
     // private fun handleConversionResult(conversionResult: ConversionResult?, result: MethodChannel.Result) {
@@ -1419,7 +1435,8 @@ class MainActivity: FlutterActivity() {
     private fun dispatchWidgetIntent(intent: Intent?) {
         if (intent?.action != HOME_WIDGET_LAUNCH_ACTION) return
         val uri = intent.data?.toString() ?: return
-        widgetChannel?.invokeMethod("dispatch", uri)
+        val dispatch = widgetLaunchInbox.offer(uri) ?: return
+        widgetChannel?.invokeMethod("dispatch", dispatch)
     }
 
     private fun emitCastEvent(event: Map<String, Any?>) {

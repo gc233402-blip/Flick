@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="widget_up_next">Up next: %1$s</string>
+    <string name="widget_elapsed">Elapsed time</string>
+    <string name="widget_duration">Track duration</string>
+    <string name="widget_repeat_special">Playback mode enabled; tap to change</string>
     <string name="widget_mini_player_name">Flick Player</string>
 
     <string name="widget_mini_player_desc">Compact player with transport controls</string>
 
     <string name="widget_nothing_playing">Nothing playing</string>
+    <string name="widget_unknown_track">Unknown track</string>
     <string name="widget_tap_to_open">Tap to open Flick</string>
     <string name="widget_open_app">Open Flick</string>
     <string name="widget_play_pause">Play / pause</string>
+    <string name="widget_play">Play</string>
+    <string name="widget_pause">Pause</string>
+    <string name="widget_shuffle_on">Shuffle on. Tap to turn off</string>
+    <string name="widget_shuffle_off">Shuffle off. Tap to turn on</string>
+    <string name="widget_repeat_off">Repeat off. Tap to change</string>
+    <string name="widget_repeat_one">Repeat one track. Tap to change</string>
+    <string name="widget_repeat_all">Repeat all tracks. Tap to change</string>
     <string name="widget_next">Next track</string>
     <string name="widget_previous">Previous track</string>
     <string name="widget_shuffle">Toggle shuffle</string>
@@ -19,4 +31,17 @@
 
     <string name="widget_compact_name">Flick Player 2×2</string>
     <string name="widget_compact_desc">Title and artist with transport controls</string>
+
+    <string name="widget_replay_name">Flick Replay</string>
+    <string name="widget_replay_desc">Today\'s listening at a glance</string>
+    <string name="widget_replay_brand">Flick Replay</string>
+    <string name="widget_replay_time">Time</string>
+    <string name="widget_replay_plays">Plays</string>
+    <string name="widget_replay_date">Today · %1$s</string>
+    <string name="widget_replay_comparison">vs yesterday</string>
+    <string name="widget_replay_time_change">%1$s listening time vs yesterday</string>
+    <string name="widget_replay_plays_change">%1$s plays vs yesterday</string>
+    <string name="widget_replay_empty">Nothing played yet today</string>
+    <string name="widget_replay_open">Open today\'s recap</string>
+    <string name="widget_replay_summary">Flick Replay: %1$s listened and %2$d plays today</string>
 </resources>

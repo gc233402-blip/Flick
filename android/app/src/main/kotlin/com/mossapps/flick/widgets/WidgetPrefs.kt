@@ -28,6 +28,22 @@ internal object WidgetPrefs {
     const val KEY_POSITION_MS = "flick_widget_position_ms"
     const val KEY_DURATION_MS = "flick_widget_duration_ms"
     const val KEY_QUEUE_COUNT = "flick_widget_queue_count"
+    const val KEY_NEXT_1_ID = "flick_widget_next_1_id"
+    const val KEY_NEXT_1_TITLE = "flick_widget_next_1_title"
+    const val KEY_NEXT_1_ART = "flick_widget_next_1_art"
+    const val KEY_NEXT_2_ID = "flick_widget_next_2_id"
+    const val KEY_NEXT_2_TITLE = "flick_widget_next_2_title"
+    const val KEY_NEXT_2_ART = "flick_widget_next_2_art"
+
+    const val KEY_REPLAY_LOOK = "flick_widget_replay_look"
+    const val KEY_REPLAY_DAY = "flick_widget_replay_day"
+    const val KEY_REPLAY_TIME_MS = "flick_widget_replay_time_ms"
+    const val KEY_REPLAY_PLAYS = "flick_widget_replay_plays"
+    const val KEY_REPLAY_TIME_DELTA = "flick_widget_replay_time_delta"
+    const val KEY_REPLAY_PLAYS_DELTA = "flick_widget_replay_plays_delta"
+    const val KEY_REPLAY_COVER_1 = "flick_widget_replay_cover_1"
+    const val KEY_REPLAY_COVER_2 = "flick_widget_replay_cover_2"
+    const val KEY_REPLAY_COVER_3 = "flick_widget_replay_cover_3"
 
     private val BG_OPACITY_MAP = mapOf(
         0 to 0x00, 1 to 0x40, 2 to 0x80, 3 to 0xC0, 4 to 0xFF
@@ -48,7 +64,7 @@ internal object WidgetPrefs {
     fun get(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    // ponytail: rebuild all three home widgets from current prefs; used when the
+    // ponytail: rebuild all home widgets from current prefs; used when the
     // app process is about to die so the play/pause state can't drift stale.
     fun updateAllWidgets(context: Context) {
         val mgr = AppWidgetManager.getInstance(context)
@@ -56,6 +72,7 @@ internal object WidgetPrefs {
             MiniPlayerWidgetProvider::class.java,
             FlagshipWidgetProvider::class.java,
             CompactWidgetProvider::class.java,
+            ReplayWidgetProvider::class.java,
         ).forEach { cls ->
             val ids = mgr.getAppWidgetIds(ComponentName(context, cls))
             if (ids.isNotEmpty()) {
@@ -190,5 +207,10 @@ internal object WidgetPrefs {
             else -> 0xFFFFFFFF.toInt()
         }
     }
+
+    // --- Replay widget preferences ---
+
+    fun getReplayLook(context: Context): String =
+        get(context).getString(KEY_REPLAY_LOOK, "acid") ?: "acid"
 
 }

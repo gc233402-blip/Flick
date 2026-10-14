@@ -1,205 +1,103 @@
 package com.mossapps.flick.widgets
 
 import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.graphics.Color
 import android.text.Layout
-import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import com.mossapps.flick.R
 
-class FlagshipWidgetProvider : AppWidgetProvider() {
+class FlagshipWidgetProvider : ResponsiveWidgetProvider() {
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        val state = WidgetPlaybackState.read(context)
+        val showArtist = WidgetPrefs.getFlagshipShowArtist(context)
+        val accent = WidgetPrefs.getFlagshipAccentColor(context)
+        val textScale = WidgetPrefs.getFlagshipTextScale(context)
+        val upcoming = WidgetUpcomingTrack.read(context)
 
-    companion object {
-        private const val TAG = "FlagshipWidget"
-        private const val ART_MAX_PX = 1024
-    }
-
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray,
-    ) {
-        Log.d(TAG, "onUpdate called for ids=${appWidgetIds.contentToString()}")
-        try {
-            val prefs = WidgetPrefs.get(context)
-            val hasSong = prefs.getBoolean(WidgetPrefs.KEY_HAS_SONG, false)
-            val isPlaying = prefs.getBoolean(WidgetPrefs.KEY_IS_PLAYING, false)
-            val title = prefs.getString(WidgetPrefs.KEY_TITLE, "")?.takeIf { it.isNotEmpty() }
-                ?: context.getString(R.string.widget_nothing_playing)
-            val artist = prefs.getString(WidgetPrefs.KEY_ARTIST, "") ?: ""
-            val artPath = prefs.getString(WidgetPrefs.KEY_ALBUM_ART, "") ?: ""
-            val showArtist = WidgetPrefs.getFlagshipShowArtist(context)
-            val accentColor = WidgetPrefs.getFlagshipAccentColor(context)
-            val textScale = WidgetPrefs.getFlagshipTextScale(context)
-            val isShuffle = prefs.getBoolean(WidgetPrefs.KEY_IS_SHUFFLE, false)
-            val loopMode = prefs.getInt(WidgetPrefs.KEY_LOOP_MODE, 0)
-            Log.d(TAG, "hasSong=$hasSong, isPlaying=$isPlaying, title=$title, idsCount=${appWidgetIds.size}")
-
-            val dm = context.resources.displayMetrics
-            val marginPadDp = 48f
-
-            for (id in appWidgetIds) {
-                Log.d(TAG, "Updating widget id=$id")
-                val views = RemoteViews(context.packageName, R.layout.widget_flagship_art)
-
-                val options = appWidgetManager.getAppWidgetOptions(id)
-                val widgetWidthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 0)
-                val widgetWidthPx = if (widgetWidthDp > 0) (widgetWidthDp * dm.density).toInt() else dm.widthPixels
-                val textWidthPx = (widgetWidthPx - marginPadDp * dm.density).toInt().coerceAtLeast(100)
-                val titleSp = WidgetPrefs.scaledSp(15, widgetWidthDp, 400f, textScale)
-                val artistSp = WidgetPrefs.scaledSp(12, widgetWidthDp, 400f, textScale)
-
-                if (hasSong) {
-                    val art = WidgetArtLoader.load(artPath, ART_MAX_PX)
-                    if (art != null) {
-                        views.setImageViewBitmap(R.id.flagship_art, art)
-                    } else {
-                        views.setImageViewResource(R.id.flagship_art, R.drawable.widget_default_art)
-                    }
-                    views.setViewVisibility(R.id.flagship_art, View.VISIBLE)
-
-                    views.setImageViewBitmap(
-                        R.id.flagship_title,
-                        WidgetTextRenderer.createTextBitmap(
-                            context,
-                            title,
-                            R.font.product_sans_bold,
-                            titleSp,
-                            Color.WHITE,
-                            textWidthPx,
-                            Layout.Alignment.ALIGN_CENTER,
-                        ),
-                    )
-                    views.setContentDescription(R.id.flagship_title, title)
-
-                    if (showArtist && artist.isNotEmpty()) {
-                        views.setImageViewBitmap(
-                            R.id.flagship_artist,
-                            WidgetTextRenderer.createTextBitmap(
-                                context,
-                                artist,
-                                R.font.product_sans_regular,
-                                artistSp,
-                                accentColor,
-                                textWidthPx,
-                                Layout.Alignment.ALIGN_CENTER,
-                            ),
-                        )
-                        views.setContentDescription(R.id.flagship_artist, artist)
-                        views.setViewVisibility(R.id.flagship_artist, View.VISIBLE)
-                    } else {
-                        views.setViewVisibility(R.id.flagship_artist, View.GONE)
-                    }
-
-                    views.setImageViewResource(
-                        R.id.flagship_play_pause,
-                        if (isPlaying) R.drawable.widget_ic_lucide_pause else R.drawable.widget_ic_lucide_play,
-                    )
-                    views.setViewVisibility(R.id.flagship_prev, View.VISIBLE)
-                    views.setViewVisibility(R.id.flagship_play_pause, View.VISIBLE)
-                    views.setViewVisibility(R.id.flagship_next, View.VISIBLE)
-                    views.setViewVisibility(R.id.flagship_shuffle, View.VISIBLE)
-                    views.setViewVisibility(R.id.flagship_repeat, View.VISIBLE)
-
-                    val inactiveTint = Color.argb(0x55, 0xFF, 0xFF, 0xFF)
-                    val activeBg = R.drawable.widget_button_transport_active_bg
-                    val inactiveBg = R.drawable.widget_button_transport_bg
-                    views.setInt(
-                        R.id.flagship_shuffle,
-                        "setBackgroundResource",
-                        if (isShuffle) activeBg else inactiveBg,
-                    )
-                    views.setInt(
-                        R.id.flagship_shuffle,
-                        "setColorFilter",
-                        if (isShuffle) accentColor else inactiveTint,
-                    )
-                    val repeatActive = loopMode != 0
-                    views.setInt(
-                        R.id.flagship_repeat,
-                        "setBackgroundResource",
-                        if (repeatActive) activeBg else inactiveBg,
-                    )
-                    views.setImageViewResource(
-                        R.id.flagship_repeat,
-                        if (loopMode == 1) R.drawable.widget_ic_repeat1
-                        else R.drawable.widget_ic_lucide_repeat,
-                    )
-                    views.setInt(
-                        R.id.flagship_repeat,
-                        "setColorFilter",
-                        if (repeatActive) accentColor else inactiveTint,
-                    )
-
-                    views.setOnClickPendingIntent(
-                        R.id.flagship_art,
-                        WidgetIntents.openApp(context, 30),
-                    )
-                    views.setOnClickPendingIntent(
-                        R.id.flagship_title,
-                        WidgetIntents.openApp(context, 31),
-                    )
-                    views.setOnClickPendingIntent(
-                        R.id.flagship_artist,
-                        WidgetIntents.openApp(context, 32),
-                    )
-                    views.setOnClickPendingIntent(
-                        R.id.flagship_play_pause,
-                        WidgetIntents.playerPlayPause(context),
-                    )
-                    views.setOnClickPendingIntent(
-                        R.id.flagship_next,
-                        WidgetIntents.playerNext(context),
-                    )
-                    views.setOnClickPendingIntent(
-                        R.id.flagship_prev,
-                        WidgetIntents.playerPrevious(context),
-                    )
-                    views.setOnClickPendingIntent(
-                        R.id.flagship_shuffle,
-                        WidgetIntents.playerShuffle(context),
-                    )
-                    views.setOnClickPendingIntent(
-                        R.id.flagship_repeat,
-                        WidgetIntents.playerRepeat(context),
-                    )
-                } else {
-                    views.setImageViewResource(R.id.flagship_art, R.drawable.widget_default_art)
-                    views.setViewVisibility(R.id.flagship_art, View.VISIBLE)
-                    val tapText = context.getString(R.string.widget_tap_to_open)
-                    views.setImageViewBitmap(
-                        R.id.flagship_title,
-                        WidgetTextRenderer.createTextBitmap(
-                            context,
-                            tapText,
-                            R.font.product_sans_bold,
-                            titleSp,
-                            Color.WHITE,
-                            textWidthPx,
-                            Layout.Alignment.ALIGN_CENTER,
-                        ),
-                    )
-                    views.setContentDescription(R.id.flagship_title, tapText)
-                    views.setViewVisibility(R.id.flagship_artist, View.GONE)
-                    views.setViewVisibility(R.id.flagship_prev, View.GONE)
-                    views.setViewVisibility(R.id.flagship_play_pause, View.GONE)
-                    views.setViewVisibility(R.id.flagship_next, View.GONE)
-                    views.setViewVisibility(R.id.flagship_shuffle, View.GONE)
-                    views.setViewVisibility(R.id.flagship_repeat, View.GONE)
-
-                    val openIntent = WidgetIntents.openApp(context, 40)
-                    views.setOnClickPendingIntent(R.id.flagship_art, openIntent)
-                    views.setOnClickPendingIntent(R.id.flagship_title, openIntent)
+        for (id in appWidgetIds) {
+            val views = responsiveViews(appWidgetManager.getAppWidgetOptions(id), WidgetLayoutPolicy.flagshipDefault) { size ->
+                val geometry = WidgetLayoutPolicy.flagship(size)
+                val layout = when (geometry.gridWidthDp) {
+                    184 -> R.layout.widget_flagship_art_large
+                    144 -> R.layout.widget_flagship_art_wide
+                    else -> R.layout.widget_flagship_art
                 }
-
-                appWidgetManager.updateAppWidget(id, views)
-                Log.d(TAG, "Widget id=$id updated successfully")
+                val view = RemoteViews(context.packageName, layout)
+                view.setOnClickPendingIntent(R.id.flagship_root, WidgetIntents.openApp(context, 30))
+                val padding = WidgetViews.pixels(context, geometry.paddingDp)
+                view.setViewPadding(R.id.flagship_root, padding, padding, padding, padding)
+                view.setImageViewBitmap(R.id.flagship_panel_art, WidgetArtLoader.rounded(context,
+                    state.artPath, WidgetSize(geometry.panelWidthDp, size.heightDp - geometry.paddingDp * 2),
+                    512, 20, overlayColor = 0xBD0A0A0A.toInt()))
+                val panelPadding = WidgetViews.pixels(context, geometry.panelPaddingDp)
+                view.setViewPadding(R.id.flagship_panel_content, panelPadding, panelPadding, panelPadding, panelPadding)
+                WidgetViews.art(context, view, R.id.flagship_art, state,
+                    WidgetSize(geometry.coverDp, geometry.coverDp), 352, 12)
+                for ((index, coverId) in listOf(R.id.flagship_next_art_1, R.id.flagship_next_art_2).withIndex()) {
+                    val track = upcoming.getOrNull(index)
+                    val visible = track != null && index < geometry.upcomingSlots
+                    view.setViewVisibility(coverId, if (visible) View.VISIBLE else View.GONE)
+                    if (visible) {
+                        view.setImageViewBitmap(coverId, WidgetArtLoader.rounded(context, track.artPath,
+                            WidgetSize(geometry.coverDp, geometry.coverDp), 352, 12))
+                        view.setInt(coverId, "setImageAlpha", 150)
+                        view.setContentDescription(coverId, context.getString(R.string.widget_up_next, track.title))
+                        view.setOnClickPendingIntent(coverId, WidgetIntents.openApp(context, coverId))
+                    }
+                }
+                for (coverId in listOf(R.id.flagship_art, R.id.flagship_next_art_1, R.id.flagship_next_art_2)) {
+                    view.setInt(coverId, "setMaxWidth", WidgetViews.pixels(context, geometry.coverDp))
+                    view.setInt(coverId, "setMaxHeight", WidgetViews.pixels(context, geometry.coverDp))
+                }
+                view.setViewPadding(R.id.flagship_metadata_text, 0, 0,
+                    WidgetViews.pixels(context, if (geometry.repeatInHeader || !state.hasSong) 0 else 56), 0)
+                val width = if (state.hasSong) geometry.textWidthDp else geometry.panelContentWidthDp
+                val artistVisible = state.hasSong && showArtist && state.artist.isNotBlank()
+                WidgetViews.text(context, view, R.id.flagship_title, state.title,
+                    WidgetPrefs.scaledSp(16, size.widthDp, 360f, textScale), width, if (artistVisible) 26 else 44, true)
+                view.setViewVisibility(R.id.flagship_artist, if (artistVisible) View.VISIBLE else View.GONE)
+                if (artistVisible) WidgetViews.text(context, view, R.id.flagship_artist, state.artist,
+                    WidgetPrefs.scaledSp(11, size.widthDp, 360f, textScale), width, 18, false)
+                view.setOnClickPendingIntent(R.id.flagship_title, WidgetIntents.openApp(context, 31))
+                view.setOnClickPendingIntent(R.id.flagship_artist, WidgetIntents.openApp(context, 32))
+                view.setViewVisibility(R.id.flagship_controls, if (state.hasSong) View.VISIBLE else View.INVISIBLE)
+                WidgetViews.playButton(context, view, state, R.id.flagship_play_pause,
+                    R.drawable.widget_button_tile, Color.WHITE)
+                WidgetViews.skipButtons(context, view, state, R.id.flagship_prev, R.id.flagship_next, Color.WHITE)
+                view.setInt(R.id.flagship_shuffle, "setBackgroundResource",
+                    if (state.shuffle) R.drawable.widget_button_tile_active else R.drawable.widget_button_tile)
+                view.setInt(R.id.flagship_shuffle, "setColorFilter", if (state.shuffle) accent else Color.WHITE)
+                for (repeatId in listOf(R.id.flagship_repeat, R.id.flagship_repeat_header)) {
+                    val inHeader = repeatId == R.id.flagship_repeat_header
+                    view.setViewVisibility(repeatId,
+                        if (state.hasSong && geometry.repeatInHeader == inHeader) View.VISIBLE else View.GONE)
+                    view.setInt(repeatId, "setColorFilter", if (state.loopMode != 0) accent else Color.WHITE)
+                    view.setInt(repeatId, "setBackgroundResource", if (state.loopMode != 0)
+                        R.drawable.widget_button_transport_active_bg else R.drawable.widget_button_transport_bg)
+                    view.setImageViewResource(repeatId, if (state.loopMode == 1)
+                        R.drawable.widget_ic_lucide_repeat_one else R.drawable.widget_ic_lucide_repeat)
+                    view.setContentDescription(repeatId, context.getString(WidgetViews.repeatDescription(state.loopMode)))
+                    view.setOnClickPendingIntent(repeatId, WidgetIntents.playerRepeat(context))
+                }
+                view.setContentDescription(R.id.flagship_shuffle, context.getString(
+                    if (state.shuffle) R.string.widget_shuffle_on else R.string.widget_shuffle_off))
+                view.setOnClickPendingIntent(R.id.flagship_shuffle, WidgetIntents.playerShuffle(context))
+                WidgetViews.progress(view, R.id.flagship_progress, state, accent)
+                val timingVisible = state.hasSong && state.durationMs > 0
+                view.setViewVisibility(R.id.flagship_times, if (timingVisible) View.VISIBLE else View.GONE)
+                if (timingVisible) {
+                    val timeWidth = geometry.panelContentWidthDp / 2
+                    WidgetViews.text(context, view, R.id.flagship_elapsed,
+                        WidgetLayoutPolicy.time(state.positionMs.coerceIn(0, state.durationMs)),
+                        11, timeWidth, 18, false, color = Color.WHITE)
+                    WidgetViews.text(context, view, R.id.flagship_duration, WidgetLayoutPolicy.time(state.durationMs),
+                        11, timeWidth, 18, false, color = Color.WHITE, alignment = Layout.Alignment.ALIGN_OPPOSITE)
+                }
+                view
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error updating flagship widget", e)
+            appWidgetManager.updateAppWidget(id, views)
         }
     }
 }

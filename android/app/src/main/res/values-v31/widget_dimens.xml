@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- A large fallback minimum can override the requested 2x2 target cells. -->
+    <dimen name="widget_compact_min_height">110dp</dimen>
+</resources>

@@ -55,6 +55,7 @@ class AppPreferences {
   final double widgetTextScale;
   final double widgetFlagshipTextScale;
   final double widgetCompactTextScale;
+  final String widgetReplayLook;
   final bool lyricsMatchAudioFilename;
   final String leftActionButton;
   final String rightActionButton;
@@ -173,6 +174,7 @@ class AppPreferences {
     this.widgetTextScale = 1.0,
     this.widgetFlagshipTextScale = 1.0,
     this.widgetCompactTextScale = 1.0,
+    this.widgetReplayLook = 'acid',
     this.lyricsMatchAudioFilename = false,
     this.leftActionButton = 'lyrics',
     this.rightActionButton = 'favorites',
@@ -292,6 +294,7 @@ class AppPreferences {
     double? widgetTextScale,
     double? widgetFlagshipTextScale,
     double? widgetCompactTextScale,
+    String? widgetReplayLook,
     bool? lyricsMatchAudioFilename,
     String? leftActionButton,
     String? rightActionButton,
@@ -433,6 +436,7 @@ class AppPreferences {
           widgetFlagshipTextScale ?? this.widgetFlagshipTextScale,
       widgetCompactTextScale:
           widgetCompactTextScale ?? this.widgetCompactTextScale,
+      widgetReplayLook: widgetReplayLook ?? this.widgetReplayLook,
       lyricsMatchAudioFilename:
           lyricsMatchAudioFilename ?? this.lyricsMatchAudioFilename,
       leftActionButton: leftActionButton ?? this.leftActionButton,
@@ -584,6 +588,7 @@ class AppPreferencesService {
   static const _widgetTextScaleKey = 'widget_text_scale';
   static const _widgetFlagshipTextScaleKey = 'widget_flagship_text_scale';
   static const _widgetCompactTextScaleKey = 'widget_compact_text_scale';
+  static const _widgetReplayLookKey = 'widget_replay_look';
   static const _lyricsMatchAudioFilenameKey = 'lyrics_match_audio_filename';
   static const _leftActionButtonKey = 'left_action_button';
   static const _rightActionButtonKey = 'right_action_button';
@@ -742,6 +747,7 @@ class AppPreferencesService {
           prefs.getDouble(_widgetFlagshipTextScaleKey) ?? 1.0,
       widgetCompactTextScale:
           prefs.getDouble(_widgetCompactTextScaleKey) ?? 1.0,
+      widgetReplayLook: prefs.getString(_widgetReplayLookKey) ?? 'acid',
       lyricsMatchAudioFilename:
           prefs.getBool(_lyricsMatchAudioFilenameKey) ?? false,
       leftActionButton: prefs.getString(_leftActionButtonKey) ?? 'lyrics',
@@ -1359,6 +1365,16 @@ class AppPreferencesService {
   Future<void> setWidgetCompactTextScale(double value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_widgetCompactTextScaleKey, value);
+  }
+
+  Future<String> getWidgetReplayLook() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_widgetReplayLookKey) ?? 'acid';
+  }
+
+  Future<void> setWidgetReplayLook(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_widgetReplayLookKey, value);
   }
 
   Future<bool> getLyricsMatchAudioFilename() async {

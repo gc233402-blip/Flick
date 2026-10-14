@@ -1,131 +1,77 @@
 package com.mossapps.flick.widgets
 
 import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.graphics.Color
-import android.text.Layout
+import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
 import com.mossapps.flick.R
 
-class CompactWidgetProvider : AppWidgetProvider() {
-
-    companion object {
-        private const val MARGIN_PAD_DP = 40f
-        private const val ART_BG_PX = 512
-    }
-
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray,
-    ) {
-        val prefs = WidgetPrefs.get(context)
-        val hasSong = prefs.getBoolean(WidgetPrefs.KEY_HAS_SONG, false)
-        val isPlaying = prefs.getBoolean(WidgetPrefs.KEY_IS_PLAYING, false)
-        val title = prefs.getString(WidgetPrefs.KEY_TITLE, "")?.takeIf { it.isNotEmpty() }
-            ?: context.getString(R.string.widget_nothing_playing)
-        val artist = prefs.getString(WidgetPrefs.KEY_ARTIST, "") ?: ""
-        val artPath = prefs.getString(WidgetPrefs.KEY_ALBUM_ART, "") ?: ""
+class CompactWidgetProvider : ResponsiveWidgetProvider() {
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        val state = WidgetPlaybackState.read(context)
         val showArt = WidgetPrefs.getCompactShowAlbumArt(context)
         val showArtist = WidgetPrefs.getCompactShowArtist(context)
-        val accentColor = WidgetPrefs.getCompactAccentColor(context)
+        val accent = WidgetPrefs.getCompactAccentColor(context)
         val textScale = WidgetPrefs.getCompactTextScale(context)
 
-        val dm = context.resources.displayMetrics
-
         for (id in appWidgetIds) {
-            val views = RemoteViews(context.packageName, R.layout.widget_compact)
-            views.applyBackground(context)
-            views.applyArt(context, hasSong, showArt, artPath)
-
-            val options = appWidgetManager.getAppWidgetOptions(id)
-            val widgetWidthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 0)
-            val widgetWidthPx =
-                if (widgetWidthDp > 0) (widgetWidthDp * dm.density).toInt() else dm.widthPixels
-            val textWidthPx = (widgetWidthPx - MARGIN_PAD_DP * dm.density).toInt().coerceAtLeast(100)
-            val titleSp = WidgetPrefs.scaledSp(15, widgetWidthDp, 200f, textScale)
-            val artistSp = WidgetPrefs.scaledSp(12, widgetWidthDp, 200f, textScale)
-
-            if (hasSong) {
-                views.setImageViewBitmap(
-                    R.id.compact_title,
-                    WidgetTextRenderer.createTextBitmap(
-                        context, title, R.font.product_sans_bold, titleSp, Color.WHITE,
-                        textWidthPx, Layout.Alignment.ALIGN_CENTER,
-                    ),
-                )
-                views.setContentDescription(R.id.compact_title, title)
-
-                if (showArtist && artist.isNotEmpty()) {
-                    views.setImageViewBitmap(
-                        R.id.compact_artist,
-                        WidgetTextRenderer.createTextBitmap(
-                        context, artist, R.font.product_sans_regular, artistSp, accentColor,
-                        textWidthPx, Layout.Alignment.ALIGN_CENTER,
-                        ),
-                    )
-                    views.setContentDescription(R.id.compact_artist, artist)
-                    views.setViewVisibility(R.id.compact_artist, View.VISIBLE)
-                } else {
-                    views.setViewVisibility(R.id.compact_artist, View.GONE)
+            val views = responsiveViews(appWidgetManager.getAppWidgetOptions(id), WidgetLayoutPolicy.compactDefault) { hostSize ->
+                val size = WidgetLayoutPolicy.compactCardSize(hostSize,
+                    legacySizing = Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+                val layout = WidgetLayoutPolicy.compactLayout(size)
+                val layoutId = when (layout) {
+                    CompactLayout.REGULAR -> R.layout.widget_compact
+                    CompactLayout.SHORT -> R.layout.widget_compact_short
+                    CompactLayout.NARROW -> R.layout.widget_compact_narrow
+                }
+                val view = RemoteViews(context.packageName, layoutId)
+                view.setInt(R.id.compact_root, "setBackgroundResource", WidgetPrefs.getCompactBackgroundDrawableRes(context))
+                view.setOnClickPendingIntent(R.id.compact_root, WidgetIntents.openApp(context, 50))
+                view.setViewVisibility(R.id.compact_art_bg, if (showArt) View.VISIBLE else View.GONE)
+                val foreground = Color.WHITE
+                val shadow = 0x80000000.toInt()
+                if (showArt) {
+                    // One uniform scrim keeps white metadata readable on bright artwork.
+                    view.setImageViewBitmap(R.id.compact_art_bg, WidgetArtLoader.rounded(context,
+                        state.artPath, size, 384, 24, overlayColor = 0x4D000000))
+                    view.setOnClickPendingIntent(R.id.compact_art_bg, WidgetIntents.openApp(context, 53))
+                }
+                if (layout == CompactLayout.REGULAR) {
+                    view.setInt(R.id.compact_brand, "setColorFilter", foreground)
                 }
 
-                views.setImageViewResource(
-                    R.id.compact_play_pause,
-                    if (isPlaying) R.drawable.widget_ic_lucide_pause else R.drawable.widget_ic_lucide_play,
-                )
-                views.setViewVisibility(R.id.compact_controls, View.VISIBLE)
-
-                views.setOnClickPendingIntent(R.id.compact_title, WidgetIntents.openApp(context, 50))
-                views.setOnClickPendingIntent(R.id.compact_artist, WidgetIntents.openApp(context, 51))
-                views.setOnClickPendingIntent(R.id.compact_play_pause, WidgetIntents.playerPlayPause(context))
-                views.setOnClickPendingIntent(R.id.compact_next, WidgetIntents.playerNext(context))
-                views.setOnClickPendingIntent(R.id.compact_prev, WidgetIntents.playerPrevious(context))
-            } else {
-                val tapText = context.getString(R.string.widget_tap_to_open)
-                views.setImageViewBitmap(
-                    R.id.compact_title,
-                    WidgetTextRenderer.createTextBitmap(
-                        context, tapText, R.font.product_sans_bold, titleSp, Color.WHITE,
-                        textWidthPx, Layout.Alignment.ALIGN_CENTER,
-                    ),
-                )
-                views.setContentDescription(R.id.compact_title, tapText)
-                views.setViewVisibility(R.id.compact_artist, View.GONE)
-                views.setViewVisibility(R.id.compact_controls, View.GONE)
-                views.setOnClickPendingIntent(R.id.compact_title, WidgetIntents.openApp(context, 60))
+                val width = WidgetLayoutPolicy.compactTextWidth(size, state.hasSong)
+                val artistVisible = state.hasSong && showArtist && state.artist.isNotBlank()
+                val titleHeight = if (artistVisible) 22 else if (layout == CompactLayout.NARROW) 42 else 44
+                WidgetViews.text(context, view, R.id.compact_title, state.title,
+                    WidgetPrefs.scaledSp(12, 168, 168f, textScale), width, titleHeight,
+                    true, color = foreground, shadowColor = shadow)
+                view.setViewVisibility(R.id.compact_artist, if (artistVisible) View.VISIBLE else View.GONE)
+                if (artistVisible) WidgetViews.text(context, view, R.id.compact_artist, state.artist,
+                    WidgetPrefs.scaledSp(10, 168, 168f, textScale), width, 18,
+                    false, color = WidgetViews.SECONDARY_TEXT, fakeBold = true, shadowColor = shadow)
+                view.setViewVisibility(R.id.compact_controls, if (state.hasSong) View.VISIBLE else View.GONE)
+                view.setOnClickPendingIntent(R.id.compact_title, WidgetIntents.openApp(context, 51))
+                view.setOnClickPendingIntent(R.id.compact_artist, WidgetIntents.openApp(context, 52))
+                WidgetViews.playButton(context, view, state, R.id.compact_play_pause,
+                    WidgetViews.playBackground(accent, compact = true), 0xFF111111.toInt())
+                WidgetViews.skipButtons(context, view, state, R.id.compact_prev, R.id.compact_next, foreground)
+                if (WidgetLayoutPolicy.compactShowsProgress(size)) {
+                    WidgetViews.progress(view, R.id.compact_progress, state,
+                        if (accent == Color.WHITE) foreground else accent)
+                } else {
+                    view.setViewVisibility(R.id.compact_progress, View.GONE)
+                }
+                if (size != hostSize) {
+                    RemoteViews(context.packageName, R.layout.widget_compact_square).apply {
+                        removeAllViews(R.id.compact_square_content)
+                        addView(R.id.compact_square_content, view)
+                    }
+                } else view
             }
-
             appWidgetManager.updateAppWidget(id, views)
         }
-    }
-
-    private fun RemoteViews.applyBackground(context: Context) {
-        val bgRes = WidgetPrefs.getCompactBackgroundDrawableRes(context)
-        setInt(R.id.compact_root, "setBackgroundResource", bgRes)
-    }
-
-    private fun RemoteViews.applyArt(
-        context: Context,
-        hasSong: Boolean,
-        showArt: Boolean,
-        artPath: String,
-    ) {
-        if (!showArt) {
-            setViewVisibility(R.id.compact_art_bg, View.GONE)
-            setViewVisibility(R.id.compact_scrim, View.GONE)
-            return
-        }
-        val art = if (hasSong) WidgetArtLoader.load(artPath, ART_BG_PX) else null
-        if (art != null) {
-            setImageViewBitmap(R.id.compact_art_bg, art)
-        } else {
-            setImageViewResource(R.id.compact_art_bg, R.drawable.widget_default_art)
-        }
-        setViewVisibility(R.id.compact_art_bg, View.VISIBLE)
-        setViewVisibility(R.id.compact_scrim, View.VISIBLE)
-        setOnClickPendingIntent(R.id.compact_art_bg, WidgetIntents.openApp(context, 52))
     }
 }
