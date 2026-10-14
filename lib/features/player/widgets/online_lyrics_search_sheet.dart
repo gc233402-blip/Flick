@@ -201,7 +201,7 @@ class _OnlineLyricsSearchSheetState extends State<OnlineLyricsSearchSheet>
 
   String _injectLengthTag(String lrcContent, Duration length) {
     final lengthTag = widget.lyricsService.formatLengthTag(length);
-    final metadataPattern = RegExp(r'^\s*\[[a-zA-Z]+:.*\]\s*$');
+    final metadataPattern = LyricsService.metadataTagPattern;
     final lines = lrcContent.split('\n');
     var lastMetadataIndex = -1;
     for (var i = 0; i < lines.length; i++) {

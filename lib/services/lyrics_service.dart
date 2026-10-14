@@ -74,6 +74,13 @@ class LyricsService {
     r'<(\d{1,2}:\d{2}(?::\d{2})?(?:\.\d{1,3})?)>',
   );
 
+  /// Matches a single metadata row: `[tag:value]`. Tag keys are not limited
+  /// to letters — vendor extensions such as `[x-translation:...]` carry
+  /// digits, dots, underscores, and hyphens in the key.
+  static final RegExp metadataTagPattern = RegExp(
+    r'^\s*\[[a-zA-Z][a-zA-Z0-9._-]*:.*\]\s*$',
+  );
+
   final Map<String, LyricsData?> _cache = {};
 
   Future<LyricsData?> loadLyricsForSong(
@@ -630,7 +637,6 @@ class LyricsService {
       r'^\s*\[offset:([+-]?\d+)\]\s*$',
       caseSensitive: false,
     );
-    final metadataPattern = RegExp(r'^\s*\[[a-zA-Z]+:.*\]\s*$');
 
     var offsetMs = 0;
     var hasTimestamps = false;
@@ -643,6 +649,13 @@ class LyricsService {
       final offsetMatch = offsetPattern.firstMatch(line);
       if (offsetMatch != null) {
         offsetMs = int.tryParse(offsetMatch.group(1) ?? '') ?? offsetMs;
+        continue;
+      }
+
+      // Metadata rows are dropped before the timestamp scan: vendor
+      // payloads (e.g. [x-translation:...]) can embed bracket timestamps
+      // that would otherwise leak into the track as lyrics.
+      if (metadataTagPattern.hasMatch(line)) {
         continue;
       }
 
@@ -667,10 +680,6 @@ class LyricsService {
             LyricsLine(timestamp: clamped, text: lyricText, words: words),
           );
         }
-        continue;
-      }
-
-      if (metadataPattern.hasMatch(line)) {
         continue;
       }
 
