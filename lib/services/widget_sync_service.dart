@@ -1,23 +1,35 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 
+import '../data/repositories/recently_played_repository.dart';
 import '../models/song.dart';
 import '../providers/player_provider.dart';
 import '../services/app_preferences_service.dart';
+import 'widget_replay_snapshot.dart';
 import 'package:flick/core/utils/dev_log.dart';
 
 class WidgetSyncService {
-  WidgetSyncService._();
-  static final WidgetSyncService instance = WidgetSyncService._();
+  WidgetSyncService({
+    RecentlyPlayedRepository Function()? replayRepository,
+    DateTime Function()? clock,
+  }) : _replayRepositoryFactory = replayRepository ?? RecentlyPlayedRepository.new,
+       _clock = clock ?? DateTime.now;
+  static final WidgetSyncService instance = WidgetSyncService();
+
+  final RecentlyPlayedRepository Function() _replayRepositoryFactory;
+  final DateTime Function() _clock;
+  RecentlyPlayedRepository? _replayRepository;
 
   static const String _appGroup = 'group.com.mossapps.flick.widgets';
 
   static const String miniPlayerProvider = 'com.mossapps.flick.widgets.MiniPlayerWidgetProvider';
   static const String flagshipProvider = 'com.mossapps.flick.widgets.FlagshipWidgetProvider';
   static const String compactProvider = 'com.mossapps.flick.widgets.CompactWidgetProvider';
+  static const String replayProvider = 'com.mossapps.flick.widgets.ReplayWidgetProvider';
 
   static const String keyFlagshipAccent = 'flick_widget_flagship_accent';
   static const String keyFlagshipShowArtist = 'flick_widget_flagship_show_artist';
@@ -45,6 +57,22 @@ class WidgetSyncService {
   static const String keyIsShuffle = 'flick_widget_is_shuffle';
   static const String keyLoopMode = 'flick_widget_loop_mode';
   static const String keyQueueCount = 'flick_widget_queue_count';
+  static const String keyNext1Id = 'flick_widget_next_1_id';
+  static const String keyNext1Title = 'flick_widget_next_1_title';
+  static const String keyNext1Art = 'flick_widget_next_1_art';
+  static const String keyNext2Id = 'flick_widget_next_2_id';
+  static const String keyNext2Title = 'flick_widget_next_2_title';
+  static const String keyNext2Art = 'flick_widget_next_2_art';
+
+  static const String keyReplayLook = 'flick_widget_replay_look';
+  static const String keyReplayDay = 'flick_widget_replay_day';
+  static const String keyReplayTimeMs = 'flick_widget_replay_time_ms';
+  static const String keyReplayPlays = 'flick_widget_replay_plays';
+  static const String keyReplayTimeDelta = 'flick_widget_replay_time_delta';
+  static const String keyReplayPlaysDelta = 'flick_widget_replay_plays_delta';
+  static const String keyReplayCover1 = 'flick_widget_replay_cover_1';
+  static const String keyReplayCover2 = 'flick_widget_replay_cover_2';
+  static const String keyReplayCover3 = 'flick_widget_replay_cover_3';
 
   bool _initialized = false;
   Timer? _debounce;
@@ -52,6 +80,81 @@ class WidgetSyncService {
   bool? _lastPushedIsPlaying;
   bool? _lastPushedIsShuffle;
   int? _lastPushedLoopMode;
+  List<String> _lastPushedUpcoming = const [];
+  List<String> _lastPreviewData = const [];
+  bool _hasPushedReplay = false;
+  String? _replayDayAtPush;
+  List<Object?> _lastReplayData = const [];
+  StreamSubscription<void>? _replayHistorySubscription;
+  Timer? _replayDebounce;
+  Timer? _replayDayTimer;
+  bool _replayWatching = false;
+  Future<bool>? _replayRefresh;
+  bool _replayRefreshAgain = false;
+
+  /// History is recorded after the listening threshold, not at song selection.
+  /// Observe the committed history so repeat plays and clearing it also refresh.
+  void startReplaySync() {
+    if (_replayWatching) return;
+    _replayWatching = true;
+    _watchReplayHistory();
+    _scheduleReplayDayRefresh();
+  }
+
+  void _watchReplayHistory() {
+    if (!_replayWatching || _replayHistorySubscription != null) return;
+    try {
+      _replayRepository ??= _replayRepositoryFactory();
+      _replayHistorySubscription = _replayRepository!.watchHistory().listen(
+        (_) {
+          _replayDebounce?.cancel();
+          _replayDebounce = Timer(const Duration(milliseconds: 200), () {
+            unawaited(refreshReplay());
+          });
+        },
+        onError: (Object error) {
+          devLog('WidgetSyncService replay history watch failed: $error');
+        },
+      );
+    } catch (e) {
+      // Startup can precede the database; the next successful push retries.
+      devLog('WidgetSyncService replay history watch unavailable: $e');
+    }
+  }
+
+  void _scheduleReplayDayRefresh() {
+    _replayDayTimer?.cancel();
+    if (!_replayWatching) return;
+    final now = _clock();
+    final midnight = DateTime(now.year, now.month, now.day + 1);
+    _replayDayTimer = Timer(midnight.difference(now), () {
+      unawaited(refreshReplay());
+      _scheduleReplayDayRefresh();
+    });
+  }
+
+  void stopReplaySync() {
+    _replayWatching = false;
+    _replayDebounce?.cancel();
+    _replayDayTimer?.cancel();
+    _debounce?.cancel();
+    final subscription = _replayHistorySubscription;
+    _replayHistorySubscription = null;
+    if (subscription != null) unawaited(subscription.cancel());
+  }
+
+  /// Refresh only Replay for history/day changes; ordinary progress pushes
+  /// don't query the library or republish an unchanged statistics snapshot.
+  Future<void> refreshReplay() async {
+    try {
+      await _ensureInit();
+      if (await _pushReplaySnapshot(_clock())) {
+        await HomeWidget.updateWidget(qualifiedAndroidName: replayProvider);
+      }
+    } catch (e, st) {
+      devLog('WidgetSyncService replay refresh failed: $e\n$st');
+    }
+  }
 
   Future<void> _ensureInit() async {
     if (_initialized) return;
@@ -63,6 +166,7 @@ class WidgetSyncService {
     await HomeWidget.updateWidget(qualifiedAndroidName: miniPlayerProvider);
     await HomeWidget.updateWidget(qualifiedAndroidName: flagshipProvider);
     await HomeWidget.updateWidget(qualifiedAndroidName: compactProvider);
+    await HomeWidget.updateWidget(qualifiedAndroidName: replayProvider);
   }
 
   void schedulePush(PlayerState state) {
@@ -70,8 +174,16 @@ class WidgetSyncService {
     final playingChanged = state.isPlaying != _lastPushedIsPlaying;
     final shuffleChanged = state.isShuffle != _lastPushedIsShuffle;
     final loopChanged = state.loopMode.index != _lastPushedLoopMode;
+    final upcomingChanged = !listEquals(
+      _upcomingSnapshot(state),
+      _lastPushedUpcoming,
+    );
 
-    if (songChanged || playingChanged || shuffleChanged || loopChanged) {
+    if (songChanged ||
+        playingChanged ||
+        shuffleChanged ||
+        loopChanged ||
+        upcomingChanged) {
       _debounce?.cancel();
       unawaited(_push(state));
     } else if (_debounce?.isActive != true) {
@@ -111,6 +223,33 @@ class WidgetSyncService {
         keyQueueCount,
         state.upNext.length,
       );
+      final upcoming = _upcomingSnapshot(state);
+      final previewData = _upcomingSnapshot(state, resolveArt: true);
+      if (!listEquals(previewData, _lastPreviewData)) {
+        const keys = [
+          keyNext1Id,
+          keyNext1Title,
+          keyNext1Art,
+          keyNext2Id,
+          keyNext2Title,
+          keyNext2Art,
+        ];
+        for (var index = 0; index < keys.length; index++) {
+          await HomeWidget.saveWidgetData<String>(
+            keys[index],
+            previewData[index],
+          );
+        }
+      }
+
+      final now = _clock();
+      final replayDue =
+          !_hasPushedReplay ||
+          song?.id != _lastPushedSongId ||
+          _replayDayAtPush != WidgetReplaySnapshot.dayKey(now);
+      if (replayDue) {
+        await _pushReplaySnapshot(now);
+      }
 
       await _updateAll();
 
@@ -118,15 +257,122 @@ class WidgetSyncService {
       _lastPushedIsPlaying = state.isPlaying;
       _lastPushedIsShuffle = state.isShuffle;
       _lastPushedLoopMode = state.loopMode.index;
+      _lastPushedUpcoming = upcoming;
+      _lastPreviewData = previewData;
     } catch (e, st) {
       devLog('WidgetSyncService push failed: $e\n$st');
     }
+  }
+
+  /// Refresh the Flick Replay statistics snapshot. Skips writing and keeps
+  /// the retry flag set when the database is unavailable so the next push
+  /// tries again instead of publishing misleading zeros.
+  Future<bool> _pushReplaySnapshot(DateTime now) async {
+    final active = _replayRefresh;
+    if (active != null) {
+      _replayRefreshAgain = true;
+      return active;
+    }
+    final work = _refreshReplayUntilCurrent(now);
+    _replayRefresh = work;
+    try {
+      return await work;
+    } finally {
+      _replayRefresh = null;
+    }
+  }
+
+  Future<bool> _refreshReplayUntilCurrent(DateTime now) async {
+    var changed = false;
+    do {
+      _replayRefreshAgain = false;
+      changed = await _writeReplaySnapshot(now) || changed;
+      now = _clock();
+    } while (_replayRefreshAgain);
+    return changed;
+  }
+
+  Future<bool> _writeReplaySnapshot(DateTime now) async {
+    final dayKey = WidgetReplaySnapshot.dayKey(now);
+    var timeMs = 0;
+    var plays = 0;
+    var timeDelta = WidgetReplaySnapshot.unknownDelta;
+    var playsDelta = WidgetReplaySnapshot.unknownDelta;
+    final covers = <String>['', '', ''];
+    try {
+      final repository = _replayRepository ??= _replayRepositoryFactory();
+      _watchReplayHistory();
+      final today = await repository.getListeningRecap(
+        ListeningRecapPeriod.daily,
+        now: now,
+      );
+      final yesterday = await repository.getListeningRecap(
+        ListeningRecapPeriod.daily,
+        // Calendar days, not 24 hours: DST can make yesterday shorter/longer.
+        now: DateTime(now.year, now.month, now.day - 1),
+      );
+      timeMs = today.totalListeningTime.inMilliseconds;
+      plays = today.totalPlays;
+      timeDelta = WidgetReplaySnapshot.deltaPercent(
+        current: timeMs,
+        previous: yesterday.totalListeningTime.inMilliseconds,
+      );
+      playsDelta = WidgetReplaySnapshot.deltaPercent(
+        current: plays,
+        previous: yesterday.totalPlays,
+      );
+      final albums = today.topAlbums.take(3).toList();
+      for (var index = 0; index < covers.length; index++) {
+        if (index < albums.length) {
+          covers[index] = WidgetReplaySnapshot.localCover(
+            albums[index].representativeSong.albumArt,
+          );
+        }
+      }
+    } catch (e, st) {
+      devLog('WidgetSyncService replay snapshot failed: $e\n$st');
+      return false;
+    }
+
+    final snapshot = <Object?>[
+      dayKey,
+      timeMs,
+      plays,
+      timeDelta,
+      playsDelta,
+      covers[0],
+      covers[1],
+      covers[2],
+    ];
+    final changed = !listEquals(snapshot, _lastReplayData);
+    if (changed) {
+      const coverKeys = [keyReplayCover1, keyReplayCover2, keyReplayCover3];
+      // Invalidate the old snapshot before writing, and publish its day last.
+      // A native refresh mid-write must not mix yesterday's covers with today.
+      await HomeWidget.saveWidgetData<String>(keyReplayDay, '');
+      await HomeWidget.saveWidgetData<int>(keyReplayTimeMs, timeMs);
+      await HomeWidget.saveWidgetData<int>(keyReplayPlays, plays);
+      await HomeWidget.saveWidgetData<int>(keyReplayTimeDelta, timeDelta);
+      await HomeWidget.saveWidgetData<int>(keyReplayPlaysDelta, playsDelta);
+      for (var index = 0; index < coverKeys.length; index++) {
+        await HomeWidget.saveWidgetData<String>(
+          coverKeys[index],
+          covers[index],
+        );
+      }
+      await HomeWidget.saveWidgetData<String>(keyReplayDay, dayKey);
+    }
+    _lastReplayData = snapshot;
+    _replayDayAtPush = dayKey;
+    _hasPushedReplay = true;
+    return changed;
   }
 
   Future<void> pushPaused() async {
     try {
       await _ensureInit();
       await HomeWidget.saveWidgetData<bool>(keyIsPlaying, false);
+      await _pushReplaySnapshot(_clock());
       await _updateAll();
     } catch (e, st) {
       devLog('WidgetSyncService pushPaused failed: $e\n$st');
@@ -137,6 +383,7 @@ class WidgetSyncService {
     try {
       await _ensureInit();
       await HomeWidget.saveWidgetData<bool>(keyIsPlaying, false);
+      await _pushReplaySnapshot(_clock());
       await _updateAll();
     } catch (e, st) {
       devLog('WidgetSyncService pushKilled failed: $e\n$st');
@@ -200,6 +447,12 @@ class WidgetSyncService {
         prefs.widgetCompactTextScale,
       );
 
+      // Replay widget customization
+      await HomeWidget.saveWidgetData<String>(
+        keyReplayLook,
+        prefs.widgetReplayLook,
+      );
+
       await _updateAll();
     } catch (e, st) {
       devLog('WidgetSyncService pushCustomization failed: $e\n$st');
@@ -244,6 +497,22 @@ class WidgetSyncService {
     }
   }
 
+  List<String> _upcomingSnapshot(PlayerState state, {bool resolveArt = false}) {
+    final songs = state.currentSong == null ? const <Song>[] : state.upNext;
+    return [
+      for (var index = 0; index < 2; index++) ...[
+        if (index < songs.length) songs[index].id else '',
+        if (index < songs.length) songs[index].title else '',
+        if (index < songs.length)
+          resolveArt
+              ? _resolveLocalArt(songs[index].albumArt)
+              : songs[index].albumArt ?? ''
+        else
+          '',
+      ],
+    ];
+  }
+
   String _resolveLocalArt(String? raw) {
     if (raw == null || raw.isEmpty) return '';
     if (raw.startsWith('http://') || raw.startsWith('https://')) return '';
@@ -254,6 +523,7 @@ class WidgetSyncService {
 }
 
 ProviderSubscription<PlayerState> installWidgetSync(WidgetRef ref) {
+  WidgetSyncService.instance.startReplaySync();
   unawaited(WidgetSyncService.instance.pushInitialCustomization());
   return ref.listenManual<PlayerState>(
     playerProvider,

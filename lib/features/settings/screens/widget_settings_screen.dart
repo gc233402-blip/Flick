@@ -19,7 +19,7 @@ class WidgetSettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
-  static const _tabCount = 3;
+  static const _tabCount = 4;
   int _tab = 0;
   int _dir = 1;
 
@@ -80,7 +80,9 @@ class _WidgetSettingsScreenState extends ConsumerState<WidgetSettingsScreen> {
                     ? const _MiniPlayerTab()
                     : _tab == 1
                     ? const _FlagshipTab()
-                    : const _CompactTab(),
+                    : _tab == 2
+                    ? const _CompactTab()
+                    : const _ReplayTab(),
               ),
             ),
           ),
@@ -102,7 +104,7 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final tabs = [l10n.miniPlayer, '4×3 Flagship', '2×2'];
+    final tabs = [l10n.miniPlayer, '4×3 Flagship', '2×2', 'Replay'];
     return Row(
       children: List.generate(tabs.length * 2 - 1, (i) {
         if (i.isOdd) {
@@ -651,6 +653,149 @@ class _CompactTab extends ConsumerWidget {
     final prefs = ref.read(appPreferencesProvider);
     WidgetSyncService.instance.pushCustomization(
       prefs.copyWith(widgetCompactTextScale: value),
+    );
+  }
+}
+
+class _ReplayTab extends ConsumerWidget {
+  const _ReplayTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final prefs = ref.watch(appPreferencesProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SettingsSectionHeader('Background'),
+        SettingsCard(
+          children: [
+            _ReplayLookOption(
+              label: 'Acid',
+              subtitle: 'Neon lime with signal-orange Replay accents',
+              icon: LucideIcons.sparkles,
+              value: 'acid',
+              groupValue: prefs.widgetReplayLook,
+              onChanged: (v) => _updateReplayLook(ref, v),
+            ),
+            const SettingsDivider(),
+            _ReplayLookOption(
+              label: 'Night',
+              subtitle: 'Ink card with the Replay signature accents',
+              icon: LucideIcons.moon,
+              value: 'night',
+              groupValue: prefs.widgetReplayLook,
+              onChanged: (v) => _updateReplayLook(ref, v),
+            ),
+            const SettingsDivider(),
+            _ReplayLookOption(
+              label: 'Signal',
+              subtitle: 'Signal orange surface from the Replay cover',
+              icon: LucideIcons.zap,
+              value: 'signal',
+              groupValue: prefs.widgetReplayLook,
+              onChanged: (v) => _updateReplayLook(ref, v),
+            ),
+            const SettingsDivider(),
+            _ReplayLookOption(
+              label: 'Album',
+              subtitle: "Tinted from today's top cover",
+              icon: LucideIcons.image,
+              value: 'artwork',
+              groupValue: prefs.widgetReplayLook,
+              onChanged: (v) => _updateReplayLook(ref, v),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _updateReplayLook(WidgetRef ref, String value) {
+    ref.read(appPreferencesProvider.notifier).setWidgetReplayLook(value);
+    final prefs = ref.read(appPreferencesProvider);
+    WidgetSyncService.instance.pushCustomization(
+      prefs.copyWith(widgetReplayLook: value),
+    );
+  }
+}
+
+class _ReplayLookOption extends StatelessWidget {
+  const _ReplayLookOption({
+    required this.label,
+    required this.subtitle,
+    required this.icon,
+    required this.value,
+    required this.groupValue,
+    required this.onChanged,
+  });
+
+  final String label;
+  final String subtitle;
+  final IconData icon;
+  final String value;
+  final String groupValue;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = value == groupValue;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => onChanged(value),
+        child: Padding(
+          padding: const EdgeInsets.all(AppConstants.spacingLg),
+          child: Row(
+            children: [
+              Container(
+                width: AppConstants.containerSizeMd,
+                height: AppConstants.containerSizeMd,
+                decoration: BoxDecoration(
+                  color: AppColors.glassBackgroundStrong,
+                  borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                ),
+                child: Icon(
+                  icon,
+                  color: selected
+                      ? context.adaptiveTextPrimary
+                      : context.adaptiveTextTertiary,
+                  size: AppConstants.iconSizeLg,
+                ),
+              ),
+              const SizedBox(width: AppConstants.spacingMd),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: context.adaptiveTextPrimary,
+                          ),
+                    ),
+                    const SizedBox(height: AppConstants.spacingXs),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: context.adaptiveTextSecondary,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                selected
+                    ? Icons.check_circle_rounded
+                    : Icons.radio_button_unchecked,
+                color: selected
+                    ? context.adaptiveTextPrimary
+                    : context.adaptiveTextTertiary,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

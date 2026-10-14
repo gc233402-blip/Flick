@@ -9,6 +9,44 @@ void main() {
 
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('Replay widgets default to Acid when no look was chosen', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    expect(container.read(appPreferencesProvider).widgetReplayLook, 'acid');
+    await pumpEventQueue();
+    expect(container.read(appPreferencesProvider).widgetReplayLook, 'acid');
+    expect(
+      await container.read(appPreferencesServiceProvider).getWidgetReplayLook(),
+      'acid',
+    );
+  });
+
+  for (final look in ['night', 'signal', 'artwork', 'acid']) {
+    test('Replay widgets preserve a saved $look selection', () async {
+      SharedPreferences.setMockInitialValues({'widget_replay_look': look});
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      container.read(appPreferencesProvider);
+      await pumpEventQueue();
+      expect(container.read(appPreferencesProvider).widgetReplayLook, look);
+    });
+  }
+
+  test('Replay Acid selection persists after changing from Night', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    container.read(appPreferencesProvider);
+    await pumpEventQueue();
+    final notifier = container.read(appPreferencesProvider.notifier);
+    await notifier.setWidgetReplayLook('night');
+    await notifier.setWidgetReplayLook('acid');
+    final restored = ProviderContainer();
+    addTearDown(restored.dispose);
+    restored.read(appPreferencesProvider);
+    await pumpEventQueue();
+    expect(restored.read(appPreferencesProvider).widgetReplayLook, 'acid');
+  });
+
   test(
     'visualizer colors default to album art on existing installations',
     () async {

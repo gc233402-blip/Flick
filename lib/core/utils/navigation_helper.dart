@@ -4,6 +4,7 @@ import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/navigation/root_navigator.dart';
 import 'package:flick/features/player/screens/full_player_screen.dart';
 import 'package:flick/features/queue/screens/queue_screen.dart';
+import 'package:flick/features/recap/screens/listening_recap_screen.dart';
 
 /// Helper class to prevent duplicate navigation to FullPlayerScreen
 class NavigationHelper {
@@ -129,6 +130,38 @@ class NavigationHelper {
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             const QueueScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          if (AppConstants.animationNormal == Duration.zero) {
+            return child;
+          }
+
+          final curvedAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.12, 0.0),
+              end: Offset.zero,
+            ).animate(curvedAnimation),
+            child: FadeTransition(opacity: curvedAnimation, child: child),
+          );
+        },
+        transitionDuration: AppConstants.animationNormal,
+      ),
+    );
+  }
+
+  /// Open today's listening recap, the destination of the Flick Replay widget.
+  static Future<T?> navigateToRecap<T>(BuildContext context) {
+    final navigator = rootNavigatorKey.currentState != null
+        ? rootNavigatorKey.currentState!
+        : Navigator.of(context);
+    return navigator.push<T>(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const ListeningRecapScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           if (AppConstants.animationNormal == Duration.zero) {
             return child;

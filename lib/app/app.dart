@@ -192,6 +192,18 @@ class _MainShellState extends ConsumerState<MainShell>
     _widgetIntentHandler = WidgetIntentHandler(
       ref,
       onOpenQueue: () => NavigationHelper.navigateToQueue(context),
+      onOpenRecap: () {
+        if (!mounted) return;
+        if (rootNavigatorKey.currentState != null) {
+          NavigationHelper.navigateToRecap(context);
+          return;
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          NavigationHelper.navigateToRecap(context);
+        });
+        WidgetsBinding.instance.scheduleFrame();
+      },
     );
     unawaited(_widgetIntentHandler.attach());
 
@@ -529,6 +541,7 @@ class _MainShellState extends ConsumerState<MainShell>
     _currentSongSubscription.close();
     _navigationIndexSubscription.close();
     _widgetSyncSubscription.close();
+    WidgetSyncService.instance.stopReplaySync();
     _appPreferencesSubscription?.close();
     unawaited(_widgetIntentHandler.detach());
     _pageController.removeListener(_onPageScroll);
