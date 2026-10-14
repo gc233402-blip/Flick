@@ -42,6 +42,67 @@ void main() {
     });
   });
 
+  group('metadata tag filtering', () {
+    final service = LyricsService();
+
+    test('skips vendor tags with hyphens, underscores, and digits', () {
+      final lyrics = service.parseLyricsText(
+        '[ti:MOONLIGHT]\n'
+        '[x-translation:163517:U2hlJ3MgaG90IGFzIGhlbGw=]\n'
+        '[x_translation:113735:TWlkLWZ1Y2s=]\n'
+        '[00:10.00]Real line\n',
+      );
+
+      expect(lyrics.isSynchronized, isTrue);
+      expect(lyrics.lines, hasLength(1));
+      expect(lyrics.lines.single.text, 'Real line');
+      expect(lyrics.lines.single.timestamp, const Duration(seconds: 10));
+    });
+
+    test('ignores bracket timestamps embedded in metadata payloads', () {
+      final lyrics = service.parseLyricsText(
+        '[x-translation:123456:[00:05.00]spam [00:06.00]spam]\n'
+        '[00:10.00]Real line\n',
+      );
+
+      expect(lyrics.lines, hasLength(1));
+      expect(lyrics.lines.single.text, 'Real line');
+    });
+
+    test('drops large single-line payloads in one go', () {
+      final payload = List.filled(5000, 'QUJDRA==').join();
+      final lyrics = service.parseLyricsText(
+        '[x-translation:999999:$payload]\n'
+        '[00:10.00]Real line\n',
+      );
+
+      expect(lyrics.lines, hasLength(1));
+      expect(lyrics.lines.single.text, 'Real line');
+    });
+
+    test('metadata-only lyrics parse to an empty list', () {
+      final lyrics = service.parseLyricsText(
+        '[x-translation:1:QUJDRA==]\n'
+        '[x-translation:2:QUJDRA==]\n',
+      );
+
+      expect(lyrics.lines, isEmpty);
+      expect(lyrics.isSynchronized, isFalse);
+    });
+
+    test('keeps enhanced word timings and translation lines intact', () {
+      final lyrics = service.parseLyricsText(
+        '[x-translation:163517:U2hlJ3MgaG90IGFzIGhlbGw=]\n'
+        '[00:10.00]<00:10.00>Hello <00:10.50>world\n'
+        '[00:12.00]Hola mundo\n',
+      );
+
+      expect(lyrics.lines, hasLength(2));
+      expect(lyrics.lines.first.words, hasLength(2));
+      expect(lyrics.lines.last.text, 'Hola mundo');
+    });
+  });
+
   group('resolveWords', () {
     final service = LyricsService();
 
