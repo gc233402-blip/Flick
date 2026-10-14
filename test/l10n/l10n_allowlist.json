@@ -108,7 +108,5 @@
     "underruns": "unused in lib/ before this guard was added",
     "urbPacket": "unused in lib/ before this guard was added"
   },
-  "source_guard": {
-    "lib/features/settings/screens/network_sources_screen.dart::if (songCount > 0) '$songCount ${songCount == 1 ? 'song' : 'songs'}',": "already fixed by the open PR #306 (uses the song2 ICU plural)"
-  }
+  "source_guard": {}
 }
