@@ -1,6 +1,7 @@
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/l10n/l10n.dart';
 
 /// Flick's standard dialog entrance: fade + scale-up with a slight
 /// overshoot, on top of the shared scrim.
@@ -317,18 +318,24 @@ class FlickDialogs {
   FlickDialogs._();
 
   /// Confirmation dialog. Returns true only when [confirmLabel] was tapped.
+  ///
+  /// [cancelLabel] defaults to the active locale. It used to default to the
+  /// literal 'Cancel', which is why the cancel button stayed English in a
+  /// translated app: of the 18 `confirm()` call sites in `lib/`, every one
+  /// passes its own `confirmLabel` but 17 pass no `cancelLabel`.
   static Future<bool> confirm(
     BuildContext context, {
     required String title,
     String? message,
     String confirmLabel = 'Confirm',
-    String cancelLabel = 'Cancel',
+    String? cancelLabel,
     bool destructive = false,
     IconData? icon,
     Color? iconColor,
   }) {
     final effectiveIcon =
         icon ?? (destructive ? Icons.warning_amber_rounded : null);
+    final cancelText = cancelLabel ?? l10n.cancel;
     return showFlickDialog<bool>(
       context: context,
       barrierLabel: title,
@@ -345,7 +352,7 @@ class FlickDialogs {
               ),
         actions: [
           FlickDialogButton(
-            label: cancelLabel,
+            label: cancelText,
             onPressed: () => Navigator.of(dialogContext).pop(false),
           ),
           FlickDialogButton(
@@ -362,6 +369,10 @@ class FlickDialogs {
 
   /// Text input dialog. Returns the trimmed value, or null when dismissed.
   /// Empty submits stay open unless [validator] allows them.
+  ///
+  /// [cancelLabel] defaults to the active locale, for the same reason as
+  /// [confirm]: all 7 `input()` call sites pass their own `confirmLabel` and
+  /// none passes a `cancelLabel`.
   static Future<String?> input(
     BuildContext context, {
     required String title,
@@ -369,7 +380,7 @@ class FlickDialogs {
     String? hintText,
     String? initialValue,
     String confirmLabel = 'Save',
-    String cancelLabel = 'Cancel',
+    String? cancelLabel,
     IconData? icon,
     TextInputType? keyboardType,
     TextCapitalization textCapitalization = TextCapitalization.none,
@@ -385,7 +396,7 @@ class FlickDialogs {
         hintText: hintText,
         initialValue: initialValue,
         confirmLabel: confirmLabel,
-        cancelLabel: cancelLabel,
+        cancelLabel: cancelLabel ?? l10n.cancel,
         icon: icon,
         keyboardType: keyboardType,
         textCapitalization: textCapitalization,
