@@ -311,9 +311,23 @@ impl EngineManager {
 
                 #[cfg(target_os = "android")]
                 {
+                    let strategy = handle.output_runtime().strategy.as_str();
+                    // A caller-provided exclusion (e.g. the DoP -> PCM
+                    // decimation fallback) must force a recreate even when
+                    // the rate/strategy checks below would reuse the handle.
+                    if excluded_strategies
+                        .iter()
+                        .any(|excluded| excluded.as_str() == strategy)
+                    {
+                        crate::dev_eprintln!(
+                            "[MANAGER] rust engine strategy={} is caller-excluded; forcing recreation",
+                            strategy
+                        );
+                        return false;
+                    }
+
                     // Don't reuse across DSD mode changes (Dop vs native
                     // backends corrupt the bitstream).
-                    let strategy = handle.output_runtime().strategy.as_str();
                     let desired_dsd_dop = desired_signature.contains(":dsd-dop:");
                     let desired_dsd_native = desired_signature.contains(":dsd-native:");
                     if (desired_dsd_dop && strategy != "dsd_dop")
