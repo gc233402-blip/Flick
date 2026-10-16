@@ -75,6 +75,19 @@ unsafe impl Send for SendContext {}
 
 const CHUNK_FRAMES: u32 = 4096;
 
+/// libwavpack returns integer samples right-justified at the source's native
+/// bit depth (a 24-bit file yields ±2^23 even though it is stored in three
+/// bytes), so normalize by the real bit depth, not the container width.
+fn wavpack_pcm_scale(bits_per_sample: usize, bytes_per_sample: usize) -> f64 {
+    let bits = if bits_per_sample == 0 {
+        bytes_per_sample * 8
+    } else {
+        bits_per_sample
+    }
+    .clamp(1, 32);
+    2f64.powi(bits as i32 - 1)
+}
+
 pub struct WavpackDecoderThread {
     handle: Option<JoinHandle<Result<()>>>,
     stop_signal: Arc<AtomicBool>,
@@ -234,7 +247,7 @@ fn wavpack_pcm_decode_thread(
     output_sample_rate: u32,
     output_channels: usize,
     bytes_per_sample: usize,
-    _bits_per_sample: usize,
+    bits_per_sample: usize,
     is_float: bool,
     stop_signal: Arc<AtomicBool>,
     seek_sample: Option<i64>,
@@ -275,12 +288,13 @@ fn wavpack_pcm_decode_thread(
     let mut resample_out = Vec::new();
 
     log::info!(
-        "[WV-PCM] Starting: rate={}/{} ch={}/{} bps={} float={}",
+        "[WV-PCM] Starting: rate={}/{} ch={}/{} bytes={} bits={} float={}",
         file_sample_rate,
         output_sample_rate,
         file_channels,
         output_channels,
         bytes_per_sample,
+        bits_per_sample,
         is_float,
     );
 
@@ -306,12 +320,7 @@ fn wavpack_pcm_decode_thread(
                 interleaved.push(f.clamp(-1.0, 1.0));
             }
         } else {
-            let scale = match bytes_per_sample {
-                1 => 128.0,
-                2 => 32768.0,
-                3 | 4 => 2147483648.0,
-                _ => 2147483648.0,
-            };
+            let scale = wavpack_pcm_scale(bits_per_sample, bytes_per_sample);
             for &sample in &int_buf[..total_samples] {
                 interleaved.push((sample as f64 / scale) as f32);
             }
@@ -407,5 +416,24 @@ fn write_to_ring_buffer(samples: &[f32], producer: &mut SourceProducer, stop_sig
         if written == 0 {
             producer.wait_for_space(chunk.len().min(1024), 100);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::wavpack_pcm_scale;
+
+    #[test]
+    fn pcm_scale_normalizes_to_native_bit_depth() {
+        assert_eq!(wavpack_pcm_scale(8, 1), 128.0);
+        assert_eq!(wavpack_pcm_scale(16, 2), 32768.0);
+        assert_eq!(wavpack_pcm_scale(24, 3), 8388608.0);
+        assert_eq!(wavpack_pcm_scale(32, 4), 2147483648.0);
+        // Wasted-bit files: 20-bit audio stored in a 24-bit container.
+        assert_eq!(wavpack_pcm_scale(20, 3), 524288.0);
+        // Missing depth falls back to the container width; values clamp.
+        assert_eq!(wavpack_pcm_scale(0, 2), 32768.0);
+        assert_eq!(wavpack_pcm_scale(0, 3), 8388608.0);
+        assert_eq!(wavpack_pcm_scale(0, 8), 2147483648.0);
     }
 }

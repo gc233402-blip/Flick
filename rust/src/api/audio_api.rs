@@ -222,11 +222,25 @@ pub(crate) fn effective_dsd_output_mode_for_rate_and_channels(
             let profile = crate::audio::device::current_device_profile();
             let is_dap = profile.as_ref().is_some_and(|p| p.is_dap());
             if is_dap {
+                // A managed stream can only carry a verifiable DoP carrier
+                // when the engine may request an exclusive route, which on
+                // DAPs is gated by DAP bit-perfect mode (mirrors
+                // managed_prefer_exclusive in create_audio_engine). Without
+                // it the shared mixer route fails DoP verification, and the
+                // DoP-configured stream would then misinterpret decimated
+                // PCM, so go straight to the PCM decimation fallback.
+                if ENGINE_MANAGER.get_dap_bit_perfect_enabled() {
+                    log_info!(
+                        "[AUDIO] Auto DSD: device is DAP with bit-perfect mode; \
+                         attempting DoP"
+                    );
+                    return DsdOutputMode::Dop;
+                }
                 log_info!(
-                    "[AUDIO] Auto DSD: device is DAP but native DSD unavailable; \
-                     falling back to DoP"
+                    "[AUDIO] Auto DSD: device is DAP but the managed route cannot \
+                     verify a DoP carrier (bit-perfect mode off); using PCM decimation"
                 );
-                return DsdOutputMode::Dop;
+                return DsdOutputMode::PcmDecimation;
             }
         }
 
@@ -241,6 +255,17 @@ pub(crate) fn effective_dsd_output_mode_for_rate_and_channels(
         log_info!(
             "[AUDIO] Auto DSD: no native DSD or DoP path available; \
              falling back to PCM decimation"
+        );
+        return DsdOutputMode::PcmDecimation;
+    }
+
+    #[cfg(target_os = "android")]
+    if !(ENGINE_MANAGER.get_dap_bit_perfect_enabled()
+        && crate::audio::device::current_device_profile().is_some_and(|p| p.is_dap()))
+    {
+        log_info!(
+            "[AUDIO] Native DSD requested but no direct DSD path available and the \
+             managed route cannot verify a DoP carrier; falling back to PCM decimation"
         );
         return DsdOutputMode::PcmDecimation;
     }
@@ -1290,8 +1315,15 @@ pub fn audio_play(path: String) -> Result<(), String> {
             verify_dsd_engine_rate(&path, effective_mode, output_sample_rate)?;
             if effective_mode == DsdOutputMode::Dop {
                 if let Err(dop_err) = verify_dop_passthrough(output_sample_rate) {
+                    // Hard-fail only when a direct USB session is actually
+                    // carrying the stream; Android-managed/DAP routes
+                    // degrade to PCM decimation below.
                     #[cfg(all(feature = "uac2", target_os = "android"))]
-                    if crate::uac2::android_direct_usb_enabled() { return Err(dop_err); }
+                    if read_audio_engine(|handle| handle.output_runtime().direct_usb_active)
+                        .unwrap_or(false)
+                    {
+                        return Err(dop_err);
+                    }
                     log::info!(
                         "[AUDIO] DoP pre-flight failed ({}), degrading to PCM decimation",
                         dop_err
@@ -1304,9 +1336,11 @@ pub fn audio_play(path: String) -> Result<(), String> {
                             .ok_or_else(|| format!("Unsupported DSD rate"))?;
                         resolve_dsd_pcm_sample_rate(dsd_rate, 0)
                     };
+                    // DsdDoP must be excluded so the manager cannot reuse
+                    // (or recreate) the DoP-configured engine.
                     ensure_audio_engine_excluded(
                         resolve_requested_output_sample_rate(Some(pcm_rate))?,
-                        vec![OutputStrategy::DsdNative],
+                        vec![OutputStrategy::DsdNative, OutputStrategy::DsdDoP],
                     )?;
                     output_sample_rate = with_audio_engine(|handle| Ok(handle.sample_rate()))?;
                     output_channels = with_audio_engine(|handle| Ok(handle.channels()))?;
@@ -1428,8 +1462,15 @@ pub fn audio_queue_next(path: String) -> Result<(), String> {
                 verify_dsd_engine_rate(&path, effective_mode, output_sample_rate)?;
                 if effective_mode == DsdOutputMode::Dop {
                     if let Err(dop_err) = verify_dop_passthrough(output_sample_rate) {
+                        // Hard-fail only when a direct USB session is actually
+                        // carrying the stream; Android-managed/DAP routes
+                        // degrade to PCM decimation below.
                         #[cfg(all(feature = "uac2", target_os = "android"))]
-                        if crate::uac2::android_direct_usb_enabled() { return Err(dop_err); }
+                        if read_audio_engine(|handle| handle.output_runtime().direct_usb_active)
+                            .unwrap_or(false)
+                        {
+                            return Err(dop_err);
+                        }
                         log::info!(
                             "[AUDIO] DoP pre-flight failed ({}), degrading to PCM decimation",
                             dop_err
@@ -1442,9 +1483,11 @@ pub fn audio_queue_next(path: String) -> Result<(), String> {
                                 .ok_or_else(|| format!("Unsupported DSD rate"))?;
                             resolve_dsd_pcm_sample_rate(dsd_rate, 0)
                         };
+                        // DsdDoP must be excluded so the manager cannot reuse
+                        // (or recreate) the DoP-configured engine.
                         ensure_audio_engine_excluded(
                             resolve_requested_output_sample_rate(Some(pcm_rate))?,
-                            vec![OutputStrategy::DsdNative],
+                            vec![OutputStrategy::DsdNative, OutputStrategy::DsdDoP],
                         )?;
                         output_sample_rate = with_audio_engine(|handle| Ok(handle.sample_rate()))?;
                         output_channels = with_audio_engine(|handle| Ok(handle.channels()))?;

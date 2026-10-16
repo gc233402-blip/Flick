@@ -123,6 +123,33 @@ pub(crate) enum PipelineMode {
     Dop = 2,
 }
 
+/// Payload format the DSD decoder pipeline must emit into the live engine.
+///
+/// This is the *encoding*, not a processing flag: a DAP-native engine runs
+/// [`PipelineMode::Dop`] (raw bypass) while still consuming raw native-DSD
+/// bytes. In-engine respawns (seek, next track, requeue) must therefore read
+/// the payload format fixed when the engine was created instead of inferring
+/// it from the pipeline mode — inferring DoP from [`PipelineMode::Dop`] spawns
+/// a DoP decoder into a native stream, whose wire bytes are all zero.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[repr(u8)]
+pub(crate) enum EngineDsdMode {
+    Pcm = 0,
+    Dop = 1,
+    Native = 2,
+}
+
+impl From<crate::audio::dsd_engine::dsd::DsdOutputMode> for EngineDsdMode {
+    fn from(mode: crate::audio::dsd_engine::dsd::DsdOutputMode) -> Self {
+        use crate::audio::dsd_engine::dsd::DsdOutputMode;
+        match mode {
+            DsdOutputMode::Native | DsdOutputMode::Auto => EngineDsdMode::Native,
+            DsdOutputMode::Dop => EngineDsdMode::Dop,
+            DsdOutputMode::PcmDecimation => EngineDsdMode::Pcm,
+        }
+    }
+}
+
 /// Audio callback data shared between engine and audio thread.
 ///
 /// This struct contains only lock-free or atomic data to ensure
@@ -216,6 +243,10 @@ pub struct AudioCallbackData {
     /// the stream so playback resumes at the interrupted position instead of
     /// jumping to another time.
     stream_needs_restart: AtomicBool,
+    /// Payload format of the DSD stream this engine was created for. Fixed
+    /// for the lifetime of the engine (the format is burned into the stream),
+    /// so respawned DSD decoders can match it. See [`EngineDsdMode`].
+    engine_dsd_mode: AtomicU8,
     /// Native-DSD transport active: silence fills emit the SACD silence byte
     /// 0x69 (a 0.0 f32 packs to wire 0x00 = DC = pops).
     dsd_wire_silence: AtomicBool,
@@ -250,6 +281,7 @@ impl AudioCallbackData {
         channels: usize,
         finished_tracks: Sender<AudioSource>,
         pipeline_mode: PipelineMode,
+        engine_dsd_mode: EngineDsdMode,
     ) -> Self {
         // Pre-allocate mix buffers for 1 second of audio — large enough
         // for any platform's output callback (cpal can deliver up to 8k
@@ -296,6 +328,7 @@ impl AudioCallbackData {
             crossfade_active: AtomicBool::new(false),
             next_ready_reported: AtomicBool::new(true),
             stream_needs_restart: AtomicBool::new(false),
+            engine_dsd_mode: AtomicU8::new(engine_dsd_mode as u8),
             dsd_wire_silence: AtomicBool::new(false),
             dop_wire_silence: AtomicBool::new(false),
             dop_marker_phase: AtomicBool::new(false),
@@ -305,6 +338,17 @@ impl AudioCallbackData {
             oboe_burst_frames_max: AtomicU32::new(0),
             oboe_burst_chunked_count: AtomicU64::new(0),
             dsp_burst_frames_cap: AtomicUsize::new((buffer_size / channels.max(1)).max(1)),
+        }
+    }
+
+    /// Payload format the live engine consumes: native DSD bytes, DoP
+    /// carrier words, or the PCM-decimation fallback.
+    #[inline]
+    pub(crate) fn engine_dsd_mode(&self) -> EngineDsdMode {
+        match self.engine_dsd_mode.load(Ordering::Relaxed) {
+            1 => EngineDsdMode::Dop,
+            2 => EngineDsdMode::Native,
+            _ => EngineDsdMode::Pcm,
         }
     }
 
@@ -1021,12 +1065,13 @@ pub fn create_audio_engine(
     // Create finished tracks channel (from audio callback to command thread)
     let (finished_tx, finished_rx) = bounded::<AudioSource>(32);
 
-    // Create shared data
+    // Create shared data. Desktop/cpal output is never a DSD carrier.
     let callback_data = Arc::new(AudioCallbackData::new(
         target_sample_rate,
         channels,
         finished_tx,
         PipelineMode::Dsp,
+        EngineDsdMode::Pcm,
     ));
     let callback_data_clone = Arc::clone(&callback_data);
 
@@ -1811,11 +1856,21 @@ pub fn create_audio_engine(
         | OutputStrategy::UsbDsdNative => PipelineMode::Passthrough,
         _ => PipelineMode::Dsp,
     };
+    // Payload format is fixed for the engine's lifetime: a DSD strategy can
+    // only carry its own encoding (native bytes or DoP carrier words), and
+    // everything else runs PCM. In-engine DSD respawns (seek/next/requeue)
+    // read this instead of inferring an encoding from the pipeline flags.
+    let initial_dsd_mode = match desired_strategy {
+        OutputStrategy::DsdNative | OutputStrategy::UsbDsdNative => EngineDsdMode::Native,
+        OutputStrategy::DsdDoP => EngineDsdMode::Dop,
+        _ => EngineDsdMode::Pcm,
+    };
     let callback_data = Arc::new(AudioCallbackData::new(
         requested_sample_rate,
         channels,
         finished_tx,
         initial_pipeline_mode,
+        initial_dsd_mode,
     ));
     let callback_data_clone = Arc::clone(&callback_data);
 
@@ -4126,12 +4181,23 @@ fn spawn_decoder(
     sample_rate: u32,
     channels: usize,
     seek_secs: Option<f64>,
+    callback_data: &AudioCallbackData,
 ) -> anyhow::Result<(AudioSource, DecoderHandle)> {
     let file_type = detect_file_type(&path);
     match file_type {
         FileType::Dsd => {
-            let requested = crate::api::audio_api::current_dsd_output_mode();
-            let output_mode = crate::api::audio_api::effective_dsd_output_mode(requested);
+            // Match the payload format the live engine was created for — the
+            // format cannot change without recreating the engine, so the
+            // preference-derived mode may differ (e.g. a DAP-native engine,
+            // or DoP after the host degraded the same file to PCM
+            // decimation). Inferring this from the pipeline flags spawned a
+            // DoP decoder into a native stream: every DoP word's low byte is
+            // 0x00, which is silence on the native wire.
+            let output_mode = match callback_data.engine_dsd_mode() {
+                EngineDsdMode::Native => crate::audio::dsd_engine::dsd::DsdOutputMode::Native,
+                EngineDsdMode::Dop => crate::audio::dsd_engine::dsd::DsdOutputMode::Dop,
+                EngineDsdMode::Pcm => crate::audio::dsd_engine::dsd::DsdOutputMode::PcmDecimation,
+            };
             let (source, thread) = if let Some(seek) = seek_secs {
                 DsdDecoderThread::spawn_with_seek(
                     path,
@@ -4216,7 +4282,7 @@ fn handle_play(
     callback_data.crossfader.lock().reset();
     callback_data.crossfade_active.store(false, Ordering::Relaxed);
 
-    match spawn_decoder(path.clone(), sample_rate, callback_data.channels(), None) {
+    match spawn_decoder(path.clone(), sample_rate, callback_data.channels(), None, callback_data) {
         Ok((source, handle)) => {
             source.set_replaygain_db(callback_data.get_replaygain_db());
             start_playback_source(source, handle, callback_data, state, decoders, event_tx);
@@ -4300,7 +4366,7 @@ fn handle_queue_next(
     event_tx: &Sender<AudioEvent>,
     sample_rate: u32,
 ) {
-    match spawn_decoder(path.clone(), sample_rate, callback_data.channels(), None) {
+    match spawn_decoder(path.clone(), sample_rate, callback_data.channels(), None, callback_data) {
         Ok((source, handle)) => {
             source.set_replaygain_db(callback_data.get_replaygain_db());
             queue_playback_source(source, handle, callback_data, decoders);
@@ -4528,7 +4594,7 @@ fn requeue_successor_from_info(
                     .map_err(|e| anyhow::anyhow!("{}", e))
             })
     } else {
-        spawn_decoder(info.path.clone(), sample_rate, channels, None)
+        spawn_decoder(info.path.clone(), sample_rate, channels, None, callback_data)
     };
 
     match spawn_result {
@@ -4723,6 +4789,7 @@ fn handle_seek(
             sample_rate,
             callback_data.channels(),
             Some(target_secs),
+            callback_data,
         )
     };
 
@@ -4828,7 +4895,13 @@ mod tests {
 
     fn build_callback_data(sample_rate: u32, channels: usize) -> AudioCallbackData {
         let (finished_tx, _finished_rx) = bounded::<AudioSource>(8);
-        AudioCallbackData::new(sample_rate, channels, finished_tx, PipelineMode::Dsp)
+        AudioCallbackData::new(
+            sample_rate,
+            channels,
+            finished_tx,
+            PipelineMode::Dsp,
+            EngineDsdMode::Pcm,
+        )
     }
 
     fn build_passthrough_callback_data(sample_rate: u32, channels: usize) -> AudioCallbackData {
@@ -4838,7 +4911,55 @@ mod tests {
             channels,
             finished_tx,
             PipelineMode::Passthrough,
+            EngineDsdMode::Pcm,
         )
+    }
+
+    fn build_dsd_engine_callback_data(mode: EngineDsdMode) -> AudioCallbackData {
+        let (finished_tx, _finished_rx) = bounded::<AudioSource>(8);
+        // Native-DSD DAP engines run their (raw bypass) pipeline as Dop.
+        let pipeline = if mode == EngineDsdMode::Pcm {
+            PipelineMode::Dsp
+        } else {
+            PipelineMode::Dop
+        };
+        let data = AudioCallbackData::new(352_800, 2, finished_tx, pipeline, mode);
+        data.reconfigure_sample_rate(352_800);
+        data
+    }
+
+    fn put_u32_le(buf: &mut [u8], offset: usize, value: u32) {
+        buf[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
+    }
+
+    fn put_u64_le(buf: &mut [u8], offset: usize, value: u64) {
+        buf[offset..offset + 8].copy_from_slice(&value.to_le_bytes());
+    }
+
+    /// Minimal stereo DSD64 DSF container. Mirrors the fixture the decoder
+    /// integration tests build; the engine respawn tests need a real DSD
+    /// file so `spawn_decoder` takes the DSD path.
+    fn write_dsd_stereo_dsf(path: &std::path::Path, audio: &[u8]) {
+        let mut buf = vec![0u8; 92];
+        buf[0..4].copy_from_slice(b"DSD ");
+        put_u64_le(&mut buf, 4, 28);
+        put_u64_le(&mut buf, 12, 92 + audio.len() as u64);
+        put_u64_le(&mut buf, 20, 0);
+        buf[28..32].copy_from_slice(b"fmt ");
+        put_u64_le(&mut buf, 32, 52);
+        put_u32_le(&mut buf, 40, 1);
+        put_u32_le(&mut buf, 44, 0);
+        put_u32_le(&mut buf, 48, 2);
+        put_u32_le(&mut buf, 52, 2);
+        put_u32_le(&mut buf, 56, 2_822_400);
+        put_u32_le(&mut buf, 60, 1);
+        put_u64_le(&mut buf, 64, ((audio.len() / 2) * 8) as u64);
+        put_u32_le(&mut buf, 72, 4096);
+        put_u32_le(&mut buf, 76, 0);
+        buf[80..84].copy_from_slice(b"data");
+        put_u64_le(&mut buf, 84, 12 + audio.len() as u64);
+        buf.extend_from_slice(audio);
+        std::fs::write(path, &buf).unwrap();
     }
 
     fn run_callback(data: &AudioCallbackData, output_len: usize) -> Vec<f32> {
@@ -4846,6 +4967,75 @@ mod tests {
         let mut output = vec![123.0; output_len];
         audio_callback(&mut output, data, &event_tx);
         output
+    }
+
+    #[test]
+    fn engine_dsd_mode_roundtrips_and_defaults_to_pcm() {
+        assert_eq!(
+            build_callback_data(48_000, 2).engine_dsd_mode(),
+            EngineDsdMode::Pcm
+        );
+        assert_eq!(
+            build_dsd_engine_callback_data(EngineDsdMode::Native).engine_dsd_mode(),
+            EngineDsdMode::Native
+        );
+        assert_eq!(
+            build_dsd_engine_callback_data(EngineDsdMode::Dop).engine_dsd_mode(),
+            EngineDsdMode::Dop
+        );
+    }
+
+    /// Regression for DSD silence after seeking on a native-DSD DAP.
+    ///
+    /// A native-DSD engine runs its raw bypass as [`PipelineMode::Dop`], so a
+    /// respawn that infers DoP from the pipeline flag spawns a DoP decoder
+    /// into a native stream. The native render loop reads only each word's low
+    /// byte, and a DoP word's low byte is always 0x00 — silence. The respawn
+    /// must follow the payload format recorded at engine creation instead.
+    #[test]
+    fn dsd_respawn_matches_engine_payload_format_not_pipeline_flags() {
+        let path = std::env::temp_dir().join(format!(
+            "flick_engine_dsd_respawn_{}.dsf",
+            std::process::id()
+        ));
+        write_dsd_stereo_dsf(&path, &[0x69u8; 16_384]);
+
+        let native_engine = build_dsd_engine_callback_data(EngineDsdMode::Native);
+        // The bug required this combination: native payload, Dop pipeline.
+        assert!(native_engine.is_dop());
+        assert_eq!(native_engine.engine_dsd_mode(), EngineDsdMode::Native);
+
+        let (source, handle) =
+            spawn_decoder(path.clone(), 352_800, 2, Some(0.25), &native_engine).unwrap();
+        assert_eq!(
+            source.info.output_sample_rate, 352_800,
+            "a native engine must respawn a native decoder after seek"
+        );
+        assert_ne!(
+            source.info.output_sample_rate, 176_400,
+            "176 400 Hz is the DoP carrier the old inference selected"
+        );
+        drop(handle);
+
+        let dop_engine = build_dsd_engine_callback_data(EngineDsdMode::Dop);
+        let (dop_source, dop_handle) =
+            spawn_decoder(path.clone(), 176_400, 2, Some(0.25), &dop_engine).unwrap();
+        assert_eq!(
+            dop_source.info.output_sample_rate, 176_400,
+            "a DoP engine must still respawn a DoP decoder"
+        );
+        drop(dop_handle);
+
+        let pcm_engine = build_dsd_engine_callback_data(EngineDsdMode::Pcm);
+        let (pcm_source, pcm_handle) =
+            spawn_decoder(path.clone(), 176_400, 2, None, &pcm_engine).unwrap();
+        assert_eq!(
+            pcm_source.info.output_sample_rate, 176_400,
+            "a PCM-decimation engine respawns the PCM decimation pipeline"
+        );
+        drop(pcm_handle);
+
+        let _ = std::fs::remove_file(&path);
     }
 
     #[test]
@@ -4901,7 +5091,13 @@ mod tests {
     #[test]
     fn crossfade_lock_contention_must_not_consume_or_hard_advance_sources() {
         let (finished_tx, finished_rx) = bounded::<AudioSource>(8);
-        let data = AudioCallbackData::new(48_000, 2, finished_tx, PipelineMode::Dsp);
+        let data = AudioCallbackData::new(
+            48_000,
+            2,
+            finished_tx,
+            PipelineMode::Dsp,
+            EngineDsdMode::Pcm,
+        );
         {
             let mut sources = data.sources.lock();
             sources.set_current(build_source(&[0.25, 0.25], 48_000, 2));
@@ -5131,12 +5327,12 @@ mod tests {
         successor_path: &Path,
     ) {
         let (current, current_handle) =
-            spawn_decoder(current_path.to_path_buf(), 48_000, 2, None).unwrap();
+            spawn_decoder(current_path.to_path_buf(), 48_000, 2, None, data).unwrap();
         data.sources.lock().set_current(current);
         decoders.lock().push(current_handle);
 
         let (successor, successor_handle) =
-            spawn_decoder(successor_path.to_path_buf(), 48_000, 2, None).unwrap();
+            spawn_decoder(successor_path.to_path_buf(), 48_000, 2, None, data).unwrap();
         data.sources.lock().queue_next(successor);
         decoders.lock().push(successor_handle);
     }
@@ -5444,7 +5640,13 @@ mod tests {
 
     fn build_dop_callback_data() -> AudioCallbackData {
         let (finished_tx, _finished_rx) = bounded::<AudioSource>(8);
-        let data = AudioCallbackData::new(48_000, 2, finished_tx, PipelineMode::Dop);
+        let data = AudioCallbackData::new(
+            48_000,
+            2,
+            finished_tx,
+            PipelineMode::Dop,
+            EngineDsdMode::Dop,
+        );
         data.set_dop_wire_silence(true);
         data
     }
