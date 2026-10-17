@@ -37,7 +37,6 @@ import 'package:flick/features/player/widgets/add_to_playlist_sheet.dart';
 import 'package:flick/features/player/widgets/sleep_timer_bottom_sheet.dart';
 import 'package:flick/features/songs/widgets/song_actions_button.dart';
 import 'package:flick/providers/favorites_provider.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/providers/app_preferences_provider.dart';
 import 'package:flick/l10n/l10n.dart';
 
@@ -583,239 +582,237 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
   Widget build(BuildContext context) {
     final bgColor = _tintBackground(_backgroundBlend);
 
-    return DisplayModeWrapper(
-      child: TweenAnimationBuilder<Color?>(
-        tween: ColorTween(begin: AppColors.background, end: bgColor),
-        duration: AppConstants.animationSlow,
-        curve: Curves.easeOut,
-        builder: (context, animatedBg, _) {
-        final resolvedBg = animatedBg ?? AppColors.background;
-        final prefs = ref.watch(appPreferencesProvider);
-        final appleMusic = ref
-            .watch(appleMusicArtistProvider(widget.artistName))
-            .value;
-        final appleBio = appleMusic?.info?.biography?.trim();
-        final similarArtists =
-            appleMusic?.info?.similarArtists ??
-            const <AppleMusicSimilarArtist>[];
-        final topSongs =
-            appleMusic?.topSongs ?? const <AppleMusicTopSong>[];
-          return Stack(
-            children: [
-              Scaffold(
+    return TweenAnimationBuilder<Color?>(
+      tween: ColorTween(begin: AppColors.background, end: bgColor),
+      duration: AppConstants.animationSlow,
+      curve: Curves.easeOut,
+      builder: (context, animatedBg, _) {
+      final resolvedBg = animatedBg ?? AppColors.background;
+      final prefs = ref.watch(appPreferencesProvider);
+      final appleMusic = ref
+          .watch(appleMusicArtistProvider(widget.artistName))
+          .value;
+      final appleBio = appleMusic?.info?.biography?.trim();
+      final similarArtists =
+          appleMusic?.info?.similarArtists ??
+          const <AppleMusicSimilarArtist>[];
+      final topSongs =
+          appleMusic?.topSongs ?? const <AppleMusicTopSong>[];
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: resolvedBg,
+              body: AdaptiveColorProvider(
                 backgroundColor: resolvedBg,
-                body: AdaptiveColorProvider(
-                  backgroundColor: resolvedBg,
-                  albumDominantColor: _artistColor,
-                  child: NotificationListener<ScrollNotification>(
-                    onNotification: onScrollNotification,
-                    child: CustomScrollView(
-                      controller: _scrollController,
-                      slivers: [
-                        DetailHeader(
-                          expanded: prefs.detailHeaderArtExpanded,
-                          centeredTitle: prefs.detailHeaderCenteredTitle,
-                          artBuilder: _buildArtLayer,
-                          title: widget.artistName,
-                          subtitle:
-                              l10n.albumsSongs(_albumGroups.length, widget.songs.length),
-                          meta: _metaLine,
-                          lossless: _hasLossless,
-                          fadeTo: resolvedBg,
-                          onBack: () => Navigator.of(context).pop(),
+                albumDominantColor: _artistColor,
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: onScrollNotification,
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      DetailHeader(
+                        expanded: prefs.detailHeaderArtExpanded,
+                        centeredTitle: prefs.detailHeaderCenteredTitle,
+                        artBuilder: _buildArtLayer,
+                        title: widget.artistName,
+                        subtitle:
+                            l10n.albumsSongs(_albumGroups.length, widget.songs.length),
+                        meta: _metaLine,
+                        lossless: _hasLossless,
+                        fadeTo: resolvedBg,
+                        onBack: () => Navigator.of(context).pop(),
+                      ),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: AppConstants.spacingMd),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppConstants.spacingLg,
+                            vertical: AppConstants.spacingXxs,
+                          ),
+                          child: DetailActionCapsule(
+                            isFavorite: _isAllFavorites,
+                            onToggleFavorite: _toggleFavoriteAll,
+                            onShuffle: _shuffleAll,
+                            onPlay: _playAll,
+                            onQueue: _queueAll,
+                            onMore: _showMore,
+                            primaryColor: _artistColor,
+                           ),
+                         ),
+                       ),
+                       SliverToBoxAdapter(
+                         child:
+                             DetailDescription(descriptionKey: _descriptionKey),
                         ),
                         const SliverToBoxAdapter(
                           child: SizedBox(height: AppConstants.spacingMd),
                         ),
+                        if (appleBio != null && appleBio.isNotEmpty)
+                          _buildSectionTitle(context, l10n.about),
+                       if (appleBio != null && appleBio.isNotEmpty)
+                         SliverToBoxAdapter(
+                           child: FetchedDescription(
+                             text: appleBio,
+                             sheetTitle: l10n.about,
+                           ),
+                         ),
+                       const SliverToBoxAdapter(
+                         child: SizedBox(height: AppConstants.spacingLg),
+                       ),
+                       if (_artistAlbums.length > 1)
+                         _buildSectionTitle(context, l10n.albums),
+                      if (_artistAlbums.length > 1)
+                        SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: 200,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppConstants.spacingLg,
+                              ),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _artistAlbums.length,
+                              separatorBuilder: (_, __) => const SizedBox(
+                                width: AppConstants.spacingMd,
+                              ),
+                              itemBuilder: (context, index) {
+                                final album = _artistAlbums[index];
+                                return _AlbumCard(
+                                  albumName: album.albumName,
+                                  albumArtist: album.albumArtist,
+                                  songCount: album.songs.length,
+                                  albumArt: _getArt(album.songs),
+                                  albumArtSourcePath: _getSourcePath(
+                                    album.songs,
+                                  ),
+                                  onTap: () => _openAlbum(album),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      if (_artistAlbums.length > 1)
+                        const SliverToBoxAdapter(
+                          child: SizedBox(height: AppConstants.spacingLg),
+                        ),
+                      if (!_isLoadingExtras && _mostPlayedSongs.isNotEmpty)
+                        _buildSectionTitle(context, l10n.mostPlayed),
+                      if (!_isLoadingExtras && _mostPlayedSongs.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: 72,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppConstants.spacingLg,
+                              ),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _mostPlayedSongs.length,
+                              separatorBuilder: (_, __) => const SizedBox(
+                                width: AppConstants.spacingMd,
+                              ),
+                              itemBuilder: (context, index) {
+                                final song = _mostPlayedSongs[index];
+                                return _MostPlayedCard(
+                                  song: song,
+                                  onTap: () => _playSong(song),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      if (!_isLoadingExtras && _mostPlayedSongs.isNotEmpty)
+                        const SliverToBoxAdapter(
+                          child: SizedBox(height: AppConstants.spacingLg),
+                        ),
+                      if (similarArtists.isNotEmpty)
+                        _buildSectionTitle(context, l10n.similarArtists),
+                      if (similarArtists.isNotEmpty)
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppConstants.spacingLg,
-                              vertical: AppConstants.spacingXxs,
                             ),
-                            child: DetailActionCapsule(
-                              isFavorite: _isAllFavorites,
-                              onToggleFavorite: _toggleFavoriteAll,
-                              onShuffle: _shuffleAll,
-                              onPlay: _playAll,
-                              onQueue: _queueAll,
-                              onMore: _showMore,
-                              primaryColor: _artistColor,
-                             ),
-                           ),
-                         ),
-                         SliverToBoxAdapter(
-                           child:
-                               DetailDescription(descriptionKey: _descriptionKey),
-                          ),
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: AppConstants.spacingMd),
-                          ),
-                          if (appleBio != null && appleBio.isNotEmpty)
-                            _buildSectionTitle(context, l10n.about),
-                         if (appleBio != null && appleBio.isNotEmpty)
-                           SliverToBoxAdapter(
-                             child: FetchedDescription(
-                               text: appleBio,
-                               sheetTitle: l10n.about,
-                             ),
-                           ),
-                         const SliverToBoxAdapter(
-                           child: SizedBox(height: AppConstants.spacingLg),
-                         ),
-                         if (_artistAlbums.length > 1)
-                           _buildSectionTitle(context, l10n.albums),
-                        if (_artistAlbums.length > 1)
-                          SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: 200,
-                              child: ListView.separated(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppConstants.spacingLg,
-                                ),
-                                scrollDirection: Axis.horizontal,
-                                itemCount: _artistAlbums.length,
-                                separatorBuilder: (_, __) => const SizedBox(
-                                  width: AppConstants.spacingMd,
-                                ),
-                                itemBuilder: (context, index) {
-                                  final album = _artistAlbums[index];
-                                  return _AlbumCard(
-                                    albumName: album.albumName,
-                                    albumArtist: album.albumArtist,
-                                    songCount: album.songs.length,
-                                    albumArt: _getArt(album.songs),
-                                    albumArtSourcePath: _getSourcePath(
-                                      album.songs,
-                                    ),
-                                    onTap: () => _openAlbum(album),
-                                  );
-                                },
-                              ),
+                            child: Wrap(
+                              spacing: AppConstants.spacingXs,
+                              runSpacing: AppConstants.spacingXs,
+                              children: [
+                                for (final artist in similarArtists)
+                                  _SimilarArtistChip(
+                                    name: artist.name,
+                                    onTap: () =>
+                                        _openSimilarArtist(artist.name),
+                                  ),
+                              ],
                             ),
                           ),
-                        if (_artistAlbums.length > 1)
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: AppConstants.spacingLg),
-                          ),
-                        if (!_isLoadingExtras && _mostPlayedSongs.isNotEmpty)
-                          _buildSectionTitle(context, l10n.mostPlayed),
-                        if (!_isLoadingExtras && _mostPlayedSongs.isNotEmpty)
-                          SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: 72,
-                              child: ListView.separated(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppConstants.spacingLg,
-                                ),
-                                scrollDirection: Axis.horizontal,
-                                itemCount: _mostPlayedSongs.length,
-                                separatorBuilder: (_, __) => const SizedBox(
-                                  width: AppConstants.spacingMd,
-                                ),
-                                itemBuilder: (context, index) {
-                                  final song = _mostPlayedSongs[index];
-                                  return _MostPlayedCard(
-                                    song: song,
-                                    onTap: () => _playSong(song),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        if (!_isLoadingExtras && _mostPlayedSongs.isNotEmpty)
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: AppConstants.spacingLg),
-                          ),
-                        if (similarArtists.isNotEmpty)
-                          _buildSectionTitle(context, l10n.similarArtists),
-                        if (similarArtists.isNotEmpty)
-                          SliverToBoxAdapter(
-                            child: Padding(
+                        ),
+                      if (similarArtists.isNotEmpty)
+                        const SliverToBoxAdapter(
+                          child: SizedBox(height: AppConstants.spacingLg),
+                        ),
+                      if (topSongs.isNotEmpty)
+                        _buildSectionTitle(context, l10n.topSongs),
+                      if (topSongs.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: 72,
+                            child: ListView.separated(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: AppConstants.spacingLg,
                               ),
-                              child: Wrap(
-                                spacing: AppConstants.spacingXs,
-                                runSpacing: AppConstants.spacingXs,
-                                children: [
-                                  for (final artist in similarArtists)
-                                    _SimilarArtistChip(
-                                      name: artist.name,
-                                      onTap: () =>
-                                          _openSimilarArtist(artist.name),
-                                    ),
-                                ],
+                              scrollDirection: Axis.horizontal,
+                              itemCount: topSongs.length,
+                              separatorBuilder: (_, __) => const SizedBox(
+                                width: AppConstants.spacingMd,
                               ),
-                            ),
-                          ),
-                        if (similarArtists.isNotEmpty)
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: AppConstants.spacingLg),
-                          ),
-                        if (topSongs.isNotEmpty)
-                          _buildSectionTitle(context, l10n.topSongs),
-                        if (topSongs.isNotEmpty)
-                          SliverToBoxAdapter(
-                            child: SizedBox(
-                              height: 72,
-                              child: ListView.separated(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppConstants.spacingLg,
-                                ),
-                                scrollDirection: Axis.horizontal,
-                                itemCount: topSongs.length,
-                                separatorBuilder: (_, __) => const SizedBox(
-                                  width: AppConstants.spacingMd,
-                                ),
-                                itemBuilder: (context, index) {
-                                  final song = topSongs[index];
-                                  return _AppleTopSongCard(
-                                    rank: index + 1,
-                                    song: song,
-                                    onTap: () => _openAppleMusic(
-                                      _appleMusicSearchUri(
-                                        '${song.artistName} ${song.trackName}',
-                                      ),
+                              itemBuilder: (context, index) {
+                                final song = topSongs[index];
+                                return _AppleTopSongCard(
+                                  rank: index + 1,
+                                  song: song,
+                                  onTap: () => _openAppleMusic(
+                                    _appleMusicSearchUri(
+                                      '${song.artistName} ${song.trackName}',
                                     ),
-                                  );
-                                },
-                              ),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                        if (topSongs.isNotEmpty)
-                          const SliverToBoxAdapter(
-                            child: SizedBox(height: AppConstants.spacingLg),
-                          ),
-                        _buildSectionTitle(context, l10n.songs14),
-                        SliverPadding(
-                          padding: EdgeInsets.only(
-                            bottom: AppConstants.navBarHeight + 120,
-                          ),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate((
-                              context,
-                              index,
-                            ) {
-                              final albumEntry = _albumGroups[index];
-                              return _AlbumSection(
-                                albumName: albumEntry.key,
-                                songs: albumEntry.value,
-                                onSongTap: _playSong,
-                              );
-                            }, childCount: _albumGroups.length),
                           ),
                         ),
-                      ],
-                    ),
+                      if (topSongs.isNotEmpty)
+                        const SliverToBoxAdapter(
+                          child: SizedBox(height: AppConstants.spacingLg),
+                        ),
+                      _buildSectionTitle(context, l10n.songs14),
+                      SliverPadding(
+                        padding: EdgeInsets.only(
+                          bottom: AppConstants.navBarHeight + 120,
+                        ),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final albumEntry = _albumGroups[index];
+                            return _AlbumSection(
+                              albumName: albumEntry.key,
+                              songs: albumEntry.value,
+                              onSongTap: _playSong,
+                            );
+                          }, childCount: _albumGroups.length),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              _buildOverlayTopBar(context, resolvedBg),
-            ],
-          );
-        },
-      ),
+            ),
+            _buildOverlayTopBar(context, resolvedBg),
+          ],
+        );
+      },
     );
   }
 

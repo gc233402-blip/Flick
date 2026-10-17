@@ -7,16 +7,16 @@ final appPreferencesServiceProvider = Provider<AppPreferencesService>((ref) {
 });
 
 class AppPreferencesNotifier extends Notifier<AppPreferences> {
-  bool _initialized = false;
+  Future<void>? _loadFuture;
 
   @override
   AppPreferences build() {
-    if (!_initialized) {
-      _initialized = true;
-      Future<void>.microtask(_loadPreferences);
-    }
+    _loadFuture ??= Future<void>.microtask(_loadPreferences);
     return const AppPreferences();
   }
+
+  /// Completes once persisted preferences have replaced the startup defaults.
+  Future<void> get loaded => _loadFuture!;
 
   Future<void> _loadPreferences() async {
     final preferences = await ref
@@ -720,6 +720,8 @@ class AppPreferencesNotifier extends Notifier<AppPreferences> {
   }
 
   Future<void> setRefreshRateMode(String value) async {
+    await loaded;
+    if (!ref.mounted) return;
     if (state.refreshRateMode == value) return;
     state = state.copyWith(refreshRateMode: value);
     await ref.read(appPreferencesServiceProvider).setRefreshRateMode(value);

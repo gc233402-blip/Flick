@@ -19,7 +19,6 @@ import 'package:flick/services/player_service.dart';
 import 'package:flick/services/motion_art/animated_artwork_service.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
 
@@ -195,32 +194,30 @@ class _AlbumsScreenState extends ConsumerState<AlbumsScreen> {
       if (next.hasValue) _loadAlbums();
     });
 
-    return DisplayModeWrapper(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: AmbientBackground(song: currentSong),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: AmbientBackground(song: currentSong),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                Expanded(
+                  child: _isLoading
+                      ? _buildLoadingState()
+                      : _sortedAlbums.isEmpty
+                      ? _buildEmptyState()
+                      : _buildAlbumsGrid(),
+                ),
+              ],
             ),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  Expanded(
-                    child: _isLoading
-                        ? _buildLoadingState()
-                        : _sortedAlbums.isEmpty
-                        ? _buildEmptyState()
-                        : _buildAlbumsGrid(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

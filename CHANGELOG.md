@@ -4,8 +4,11 @@
 
 ### Display Modes
 - **New installs follow the system refresh rate by default**: a fresh installation now starts on the Adaptive refresh-rate mode instead of forcing the highest rate. Existing installations keep the mode they already use, and Settings → Interface → Refresh Rate still offers Adaptive, 60 Hz, and maximum.
+- **60 Hz now means an actual 60 Hz mode**: the Standard option picks the advertised mode closest to 60 Hz at the current resolution, instead of the panel's lowest rate (10 Hz on displays with low-power modes). If no ~60 Hz mode exists, Flick follows the system instead.
+- **Refresh-rate changes apply immediately**: the selected mode is applied app-wide when it changes in Settings, instead of waiting for the next screen to mount.
+- **Saved refresh rate is restored on reopening**: Flick waits for saved preferences and checks the current Android window before skipping a repeated request. Background refresh-rate changes no longer trigger a false rejection or session fallback.
 - **Forced refresh rates are verified after they are applied**: if the system ignores or downgrades the request (seen on some Fairphone 6 firmware), Flick returns to the system default, logs the mismatch in the developer log, and stops re-forcing for the session.
-- Refresh-rate requests are no longer re-sent on every screen mount and resume; redundant applies are skipped.
+- Re-applying a mode already preferred by the current window is skipped.
 
 ## 0.22.1-beta.3 (2026-09-30)
 

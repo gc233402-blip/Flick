@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/repositories/recently_played_repository.dart';
 import '../../../providers/app_preferences_provider.dart';
-import '../../../widgets/common/display_mode_wrapper.dart';
 import '../../../widgets/common/flick_artwork_placeholder.dart';
 import '../widgets/replay_card_options.dart';
 import '../widgets/replay_poster.dart';
@@ -163,29 +162,27 @@ class _ListeningRecapScreenState extends ConsumerState<ListeningRecapScreen>
     final animations = ref.watch(
       appPreferencesProvider.select((p) => p.animationsEnabled),
     );
-    return DisplayModeWrapper(
-      child: MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          disableAnimations:
-              MediaQuery.disableAnimationsOf(context) || !animations,
-        ),
-        child: TickerMode(
-          enabled: _active && !_editing,
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  _header(),
-                  ReplayPeriodPicker(
-                    selected: _period,
-                    onSelected: _selectPeriod,
-                  ),
-                  const SizedBox(height: 4),
-                  Expanded(child: Builder(builder: _body)),
-                ],
-              ),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        disableAnimations:
+            MediaQuery.disableAnimationsOf(context) || !animations,
+      ),
+      child: TickerMode(
+        enabled: _active && !_editing,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                _header(),
+                ReplayPeriodPicker(
+                  selected: _period,
+                  onSelected: _selectPeriod,
+                ),
+                const SizedBox(height: 4),
+                Expanded(child: Builder(builder: _body)),
+              ],
             ),
           ),
         ),

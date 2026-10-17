@@ -18,7 +18,6 @@ import 'package:flick/core/theme/app_theme.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/utils/app_haptics.dart';
 import 'package:flick/core/utils/app_log.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/l10n/l10n.dart';
 
 class LogsScreen extends ConsumerStatefulWidget {
@@ -242,19 +241,17 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DisplayModeWrapper(
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          bottom: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              _buildControls(context),
-              Expanded(child: _buildList(context)),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            _buildControls(context),
+            Expanded(child: _buildList(context)),
+          ],
         ),
       ),
     );

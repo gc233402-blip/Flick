@@ -31,7 +31,6 @@ import 'package:flick/services/music_folder_service.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/models/nav_bar_config.dart';
 import 'package:flick/widgets/common/glass_search_bar.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
@@ -146,208 +145,206 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
     final shouldReserveOrbitBottomSpace =
         viewMode != SongViewMode.list && navBarVisible && !isAlbumMode;
 
-    return DisplayModeWrapper(
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                // Header with sort option
-                AnimatedSwitcher(
-                  duration: AppConstants.animationNormal,
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  transitionBuilder: (child, animation) =>
-                      FadeTransition(opacity: animation, child: child),
-                  child: _selectionMode
-                      ? KeyedSubtree(
-                          key: const ValueKey('selection_header'),
-                          child: _buildSelectionHeader(),
-                        )
-                      : KeyedSubtree(
-                          key: const ValueKey('normal_header'),
-                          child: _buildHeader(songsAsync),
-                        ),
-                ),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              // Header with sort option
+              AnimatedSwitcher(
+                duration: AppConstants.animationNormal,
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) =>
+                    FadeTransition(opacity: animation, child: child),
+                child: _selectionMode
+                    ? KeyedSubtree(
+                        key: const ValueKey('selection_header'),
+                        child: _buildSelectionHeader(),
+                      )
+                    : KeyedSubtree(
+                        key: const ValueKey('normal_header'),
+                        child: _buildHeader(songsAsync),
+                      ),
+              ),
 
-                // Search Bar (hidden when Search tab is in the nav bar)
-                if (!searchInNavBar) ...[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppConstants.spacingLg,
-                    ),
-                    child: TutorialTargetAnchor(
-                      target: TutorialTarget.songsSearchBar,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.surfaceLight.withValues(alpha: 0.75),
-                              AppColors.surface.withValues(alpha: 0.85),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            AppConstants.radiusXl,
-                          ),
-                          border: Border.all(
-                            color: AppColors.glassBorder,
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 16,
-                              spreadRadius: 1,
-                              offset: const Offset(0, 4),
-                            ),
+              // Search Bar (hidden when Search tab is in the nav bar)
+              if (!searchInNavBar) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.spacingLg,
+                  ),
+                  child: TutorialTargetAnchor(
+                    target: TutorialTarget.songsSearchBar,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.surfaceLight.withValues(alpha: 0.75),
+                            AppColors.surface.withValues(alpha: 0.85),
                           ],
                         ),
-                        child: GlassSearchBar(
-                          controller: _searchController,
-                          hintText: l10n.searchSongsArtists,
-                          showBackground: false,
-                          onChanged: (value) {
-                            setState(() {
-                              _searchQuery = value.toLowerCase();
-                              _selectedIndex = 0;
-                              _lastSyncedSong = null;
-                            });
-                          },
+                        borderRadius: BorderRadius.circular(
+                          AppConstants.radiusXl,
                         ),
+                        border: Border.all(
+                          color: AppColors.glassBorder,
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 16,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: GlassSearchBar(
+                        controller: _searchController,
+                        hintText: l10n.searchSongsArtists,
+                        showBackground: false,
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value.toLowerCase();
+                            _selectedIndex = 0;
+                            _lastSyncedSong = null;
+                          });
+                        },
                       ),
                     ),
                   ),
-                  const SizedBox(height: AppConstants.spacingMd),
-                ],
+                ),
+                const SizedBox(height: AppConstants.spacingMd),
+              ],
 
-                // Content based on async state
-                Expanded(
-                  child: songsAsync.when(
-                    loading: () => _buildLoadingState(),
-                    error: (error, stack) => _buildErrorState(error),
-                    data: (songsState) {
-                      final isAlbumMode =
-                          songsState.sortOption == SongSortOption.album;
-                      final allSongs = songsState.sortedSongs;
-                      var songs = allSongs;
-                      if (_cachedSongs != songsState.songs) {
-                        _cachedSongs = songsState.songs;
-                        _lastSyncedSong = null;
+              // Content based on async state
+              Expanded(
+                child: songsAsync.when(
+                  loading: () => _buildLoadingState(),
+                  error: (error, stack) => _buildErrorState(error),
+                  data: (songsState) {
+                    final isAlbumMode =
+                        songsState.sortOption == SongSortOption.album;
+                    final allSongs = songsState.sortedSongs;
+                    var songs = allSongs;
+                    if (_cachedSongs != songsState.songs) {
+                      _cachedSongs = songsState.songs;
+                      _lastSyncedSong = null;
+                    }
+
+                    if (_searchQuery.isNotEmpty) {
+                      songs = songs.where((song) {
+                        return song.title.toLowerCase().contains(
+                              _searchQuery,
+                            ) ||
+                            song.artist.toLowerCase().contains(_searchQuery);
+                      }).toList();
+                    }
+                    _cachedDisplaySongs = songs;
+
+                    if (!isAlbumMode) {
+                      _wasInAlbumMode = false;
+                      final sig =
+                          '${songs.length}:${songs.isNotEmpty ? songs.first.id : ''}';
+                      if (sig != _listPaginationSignature) {
+                        _listPaginationSignature = sig;
+                        _resetListPagination();
                       }
+                    }
 
+                    if (songs.isEmpty && _searchQuery.isEmpty) {
+                      return _buildEmptyState();
+                    }
+
+                    if (songs.isEmpty && _searchQuery.isNotEmpty) {
+                      return _buildNoSearchResultsState();
+                    }
+
+                    if (isAlbumMode) {
+                      if (!_wasInAlbumMode) {
+                        _wasInAlbumMode = true;
+                        _visibleAlbumCount = _getAlbumPageSize();
+                        _albumPaginationSignature = '';
+                      }
+                      final albumGroups = songsState.albumGroups;
                       if (_searchQuery.isNotEmpty) {
-                        songs = songs.where((song) {
-                          return song.title.toLowerCase().contains(
-                                _searchQuery,
-                              ) ||
-                              song.artist.toLowerCase().contains(_searchQuery);
-                        }).toList();
-                      }
-                      _cachedDisplaySongs = songs;
-
-                      if (!isAlbumMode) {
-                        _wasInAlbumMode = false;
-                        final sig =
-                            '${songs.length}:${songs.isNotEmpty ? songs.first.id : ''}';
-                        if (sig != _listPaginationSignature) {
-                          _listPaginationSignature = sig;
-                          _resetListPagination();
+                        final filteredGroups = <AlbumGroup>[];
+                        for (final group in albumGroups) {
+                          final filtered = group.songs.where((song) {
+                            return song.title.toLowerCase().contains(
+                                  _searchQuery,
+                                ) ||
+                                song.artist.toLowerCase().contains(
+                                  _searchQuery,
+                                );
+                          }).toList();
+                          if (filtered.isNotEmpty) {
+                            filteredGroups.add(
+                              AlbumGroup(
+                                key: group.key,
+                                albumName: group.albumName,
+                                albumArtist: group.albumArtist,
+                                songs: filtered,
+                              ),
+                            );
+                          }
                         }
+                        if (filteredGroups.isEmpty) {
+                          return _buildNoSearchResultsState();
+                        }
+                        return _buildAlbumGridView(filteredGroups);
                       }
-
-                      if (songs.isEmpty && _searchQuery.isEmpty) {
+                      if (albumGroups.isEmpty) {
                         return _buildEmptyState();
                       }
+                      return _buildAlbumGridView(albumGroups);
+                    }
 
-                      if (songs.isEmpty && _searchQuery.isNotEmpty) {
-                        return _buildNoSearchResultsState();
-                      }
+                    _alignCurrentSongAfterSongsLoad(songs);
 
-                      if (isAlbumMode) {
-                        if (!_wasInAlbumMode) {
-                          _wasInAlbumMode = true;
-                          _visibleAlbumCount = _getAlbumPageSize();
-                          _albumPaginationSignature = '';
+                    if (_selectedIndex >= songs.length) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          setState(() => _selectedIndex = 0);
                         }
-                        final albumGroups = songsState.albumGroups;
-                        if (_searchQuery.isNotEmpty) {
-                          final filteredGroups = <AlbumGroup>[];
-                          for (final group in albumGroups) {
-                            final filtered = group.songs.where((song) {
-                              return song.title.toLowerCase().contains(
-                                    _searchQuery,
-                                  ) ||
-                                  song.artist.toLowerCase().contains(
-                                    _searchQuery,
-                                  );
-                            }).toList();
-                            if (filtered.isNotEmpty) {
-                              filteredGroups.add(
-                                AlbumGroup(
-                                  key: group.key,
-                                  albumName: group.albumName,
-                                  albumArtist: group.albumArtist,
-                                  songs: filtered,
-                                ),
-                              );
-                            }
-                          }
-                          if (filteredGroups.isEmpty) {
-                            return _buildNoSearchResultsState();
-                          }
-                          return _buildAlbumGridView(filteredGroups);
-                        }
-                        if (albumGroups.isEmpty) {
-                          return _buildEmptyState();
-                        }
-                        return _buildAlbumGridView(albumGroups);
-                      }
+                      });
+                    }
 
-                      _alignCurrentSongAfterSongsLoad(songs);
+                    _syncSelectedTokenForIndex(songs, _selectedIndex);
 
-                      if (_selectedIndex >= songs.length) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (mounted) {
-                            setState(() => _selectedIndex = 0);
-                          }
-                        });
-                      }
+                    final tokenToIndexMap = _buildFastIndexMap(songs);
+                    final appPrefs = ref.watch(appPreferencesProvider);
 
-                      _syncSelectedTokenForIndex(songs, _selectedIndex);
-
-                      final tokenToIndexMap = _buildFastIndexMap(songs);
-                      final appPrefs = ref.watch(appPreferencesProvider);
-
-                      return _buildSongsView(
-                        songs,
-                        viewMode,
-                        tokenToIndexMap,
-                        navBarVisible,
-                        swipeActionsEnabled,
-                        appPrefs.fastIndexEnabled,
-                      );
-                    },
-                  ),
+                    return _buildSongsView(
+                      songs,
+                      viewMode,
+                      tokenToIndexMap,
+                      navBarVisible,
+                      swipeActionsEnabled,
+                      appPrefs.fastIndexEnabled,
+                    );
+                  },
                 ),
+              ),
 
-                // Reserve space only when needed for orbit view.
-                // List view handles its own bottom padding.
-                AnimatedContainer(
-                  duration: AppConstants.animationNormal,
-                  curve: Curves.easeOutCubic,
-                  height: shouldReserveOrbitBottomSpace
-                      ? AppConstants.navBarHeight + AppConstants.spacingLg
-                      : 0,
-                ),
-              ],
-            ),
+              // Reserve space only when needed for orbit view.
+              // List view handles its own bottom padding.
+              AnimatedContainer(
+                duration: AppConstants.animationNormal,
+                curve: Curves.easeOutCubic,
+                height: shouldReserveOrbitBottomSpace
+                    ? AppConstants.navBarHeight + AppConstants.spacingLg
+                    : 0,
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

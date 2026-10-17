@@ -17,7 +17,6 @@ import 'package:flick/services/uac2_service.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/src/rust/api/audio_api.dart' as rust_audio;
 import 'package:flick/src/rust/audio/engine.dart' show AudioApiPreference;
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/engine_restart_notice.dart';
 import 'package:flick/widgets/uac2/uac2_volume_control.dart';
 import 'package:flick/features/settings/screens/logs_screen.dart';
@@ -54,94 +53,92 @@ class _Uac2PreferencesScreenState extends ConsumerState<Uac2PreferencesScreen> {
                     final dsdOutputModeAsync = ref.watch(dsdOutputModeProvider);
                     final currentSong = ref.watch(currentSongProvider);
 
-    return DisplayModeWrapper(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: AppColors.backgroundGradient,
-              ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: AppColors.backgroundGradient,
             ),
-            Positioned.fill(
-              child: AmbientBackground(song: currentSong),
-            ),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: AppConstants.spacingMd),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppConstants.spacingMd,
-                      ),
-                        child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_pendingEngineRestart) ...[
-                            const EngineRestartNotice(),
-                            const SizedBox(height: AppConstants.spacingLg),
-                          ],
-                          _buildSectionHeader(context, l10n.audioFormat),
-                          _buildFormatPreferences(
-                            context,
-                            preferencesService,
-                            formatPrefAsync,
-                            preferredFormatAsync,
-                            audioFormatAsync,
-                          ),
+          ),
+          Positioned.fill(
+            child: AmbientBackground(song: currentSong),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                const SizedBox(height: AppConstants.spacingMd),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.spacingMd,
+                    ),
+                      child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_pendingEngineRestart) ...[
+                          const EngineRestartNotice(),
                           const SizedBox(height: AppConstants.spacingLg),
-                          _buildSectionHeader(context, l10n.experimental),
-                          _buildExperimentalWarning(context),
-                          _buildDsdOptions(
-                            context,
-                            preferencesService,
-                            dsdOutputModeAsync,
-                          ),
-                          const SizedBox(height: AppConstants.spacingSm),
-                          _build432HzTuningTile(
-                            context,
-                            preferencesService,
-                            tuning432HzAsync,
-                          ),
-                          const SizedBox(height: AppConstants.spacingLg),
-                          _buildSectionHeader(context, l10n.advanced),
-                          _buildAdvancedOptions(
-                            context,
-                            preferencesService,
-                            audioEngineAsync,
-                            androidAudioApiAsync,
-                            developerModeAsync,
-                            bitPerfectAsync,
-                            dapBitPerfectAsync,
-                            killIsochronousUsbOnQuitAsync,
-                            autoEngageUsbDacAsync,
-                            declinedUsbDevicesAsync,
-                            diagnostics,
-                          ),
-                          if (audioEngineAsync.when(
-                            data: (e) => e == AudioEnginePreference.isochronousUsb,
-                            loading: () => false,
-                            error: (_, _) => false,
-                          )) ...[
-                            const SizedBox(height: AppConstants.spacingLg),
-                            _buildSectionHeader(context, l10n.volume),
-                            const Uac2VolumeControl(),
-                          ],
-                          const SizedBox(height: AppConstants.navBarHeight + 120),
                         ],
-                      ),
+                        _buildSectionHeader(context, l10n.audioFormat),
+                        _buildFormatPreferences(
+                          context,
+                          preferencesService,
+                          formatPrefAsync,
+                          preferredFormatAsync,
+                          audioFormatAsync,
+                        ),
+                        const SizedBox(height: AppConstants.spacingLg),
+                        _buildSectionHeader(context, l10n.experimental),
+                        _buildExperimentalWarning(context),
+                        _buildDsdOptions(
+                          context,
+                          preferencesService,
+                          dsdOutputModeAsync,
+                        ),
+                        const SizedBox(height: AppConstants.spacingSm),
+                        _build432HzTuningTile(
+                          context,
+                          preferencesService,
+                          tuning432HzAsync,
+                        ),
+                        const SizedBox(height: AppConstants.spacingLg),
+                        _buildSectionHeader(context, l10n.advanced),
+                        _buildAdvancedOptions(
+                          context,
+                          preferencesService,
+                          audioEngineAsync,
+                          androidAudioApiAsync,
+                          developerModeAsync,
+                          bitPerfectAsync,
+                          dapBitPerfectAsync,
+                          killIsochronousUsbOnQuitAsync,
+                          autoEngageUsbDacAsync,
+                          declinedUsbDevicesAsync,
+                          diagnostics,
+                        ),
+                        if (audioEngineAsync.when(
+                          data: (e) => e == AudioEnginePreference.isochronousUsb,
+                          loading: () => false,
+                          error: (_, _) => false,
+                        )) ...[
+                          const SizedBox(height: AppConstants.spacingLg),
+                          _buildSectionHeader(context, l10n.volume),
+                          const Uac2VolumeControl(),
+                        ],
+                        const SizedBox(height: AppConstants.navBarHeight + 120),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
