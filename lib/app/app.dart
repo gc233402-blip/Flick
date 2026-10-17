@@ -39,6 +39,7 @@ import 'package:flick/providers/mini_player_config_provider.dart';
 import 'package:flick/widgets/common/floating_mini_player.dart';
 import 'package:flick/widgets/common/floating_scan_progress.dart';
 import 'package:flick/widgets/common/connection_notice_host.dart';
+import 'package:flick/widgets/common/display_mode_controller.dart';
 import 'package:flick/widgets/uac2/usb_bit_perfect_prompt.dart';
 import 'package:flick/models/song.dart';
 import 'package:flick/services/library_scanner_service.dart';
@@ -1082,11 +1083,13 @@ class _RootRouter extends ConsumerWidget {
         ? const MainShell()
         : const OnboardingScreen();
 
-    return MediaQuery(
-      data: MediaQuery.of(
-        context,
-      ).copyWith(disableAnimations: !animationsEnabled),
-      child: child,
+    return DisplayModeController(
+      child: MediaQuery(
+        data: MediaQuery.of(
+          context,
+        ).copyWith(disableAnimations: !animationsEnabled),
+        child: child,
+      ),
     );
   }
 }

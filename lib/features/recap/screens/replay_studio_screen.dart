@@ -16,7 +16,6 @@ import '../../../providers/app_preferences_provider.dart';
 import '../../../services/color_extraction_service.dart';
 import '../../../services/csv_export_service.dart';
 import '../../../services/gallery_save_service.dart';
-import '../../../widgets/common/display_mode_wrapper.dart';
 import '../widgets/replay_card_options.dart';
 import '../widgets/replay_poster.dart';
 import '../widgets/replay_style.dart';
@@ -276,14 +275,12 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
     final animations = ref.watch(
       appPreferencesProvider.select((p) => p.animationsEnabled),
     );
-    return DisplayModeWrapper(
-      child: MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          disableAnimations:
-              MediaQuery.disableAnimationsOf(context) || !animations,
-        ),
-        child: Builder(builder: _studio),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        disableAnimations:
+            MediaQuery.disableAnimationsOf(context) || !animations,
       ),
+      child: Builder(builder: _studio),
     );
   }
 

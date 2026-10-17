@@ -11,7 +11,6 @@ import 'package:flick/models/song.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/services/favorites_service.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/providers/providers.dart';
@@ -195,35 +194,33 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         ref.watch(appPreferencesProvider).favoriteRemovalMode;
     final currentSong = ref.watch(currentSongProvider);
 
-    return DisplayModeWrapper(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: AmbientBackground(song: currentSong),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: AmbientBackground(song: currentSong),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_selectionMode)
+                  _buildSelectionHeader(context)
+                else
+                  _buildHeader(context),
+                Expanded(
+                  child: _isLoading
+                      ? _buildLoadingState()
+                      : _favorites.isEmpty
+                          ? _buildEmptyState()
+                          : _buildFavoritesList(removalMode),
+                ),
+              ],
             ),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_selectionMode)
-                    _buildSelectionHeader(context)
-                  else
-                    _buildHeader(context),
-                  Expanded(
-                    child: _isLoading
-                        ? _buildLoadingState()
-                        : _favorites.isEmpty
-                            ? _buildEmptyState()
-                            : _buildFavoritesList(removalMode),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -12,7 +12,6 @@ import 'package:flick/models/song.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/data/repositories/song_repository.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/l10n/l10n.dart';
@@ -194,25 +193,23 @@ class _RecentlyAddedScreenState extends State<RecentlyAddedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DisplayModeWrapper(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: BlurredSongBackground(
-          child: SafeArea(
-            bottom: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(context),
-                Expanded(
-                  child: _isLoading
-                      ? _buildLoadingState()
-                      : _groupedSongs.isEmpty
-                      ? _buildEmptyState()
-                      : _buildList(),
-                ),
-              ],
-            ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: BlurredSongBackground(
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context),
+              Expanded(
+                child: _isLoading
+                    ? _buildLoadingState()
+                    : _groupedSongs.isEmpty
+                    ? _buildEmptyState()
+                    : _buildList(),
+              ),
+            ],
           ),
         ),
       ),

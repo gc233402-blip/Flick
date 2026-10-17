@@ -30,7 +30,6 @@ import 'package:flick/services/lyrics_service.dart';
 import 'package:flick/services/player_screen_mode_preference_service.dart';
 import 'package:flick/widgets/common/animated_album_art.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/uac2/iso_volume_popup.dart';
 import 'package:flick/widgets/uac2/uac2_error_notification.dart';
@@ -870,92 +869,90 @@ class _FullPlayerScreenState extends ConsumerState<FullPlayerScreen>
         if (didPop) return;
         _close(context);
       },
-      child: DisplayModeWrapper(
-        child: Scaffold(
-          backgroundColor: AppColors.background,
-          body: ValueListenableBuilder<Song?>(
-            valueListenable: _playerService.currentSongNotifier,
-            builder: (context, song, _) {
-              if (song == null) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (context.mounted) Navigator.of(context).pop();
-                });
-                return const SizedBox.shrink();
-              }
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: ValueListenableBuilder<Song?>(
+          valueListenable: _playerService.currentSongNotifier,
+          builder: (context, song, _) {
+            if (song == null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (context.mounted) Navigator.of(context).pop();
+              });
+              return const SizedBox.shrink();
+            }
 
-              final isShortHeight = MediaQuery.sizeOf(context).height < 620.0;
-              final showImmersiveFullView =
-                  _isImmersiveFullView &&
-                  _playerScreenMode == PlayerScreenMode.immersive &&
-                  !isShortHeight;
-              final showVisualizerOnly =
-                  _isVisualizationMode &&
-                  appPrefs.visualizerEnabled &&
-                  showImmersiveFullView;
+            final isShortHeight = MediaQuery.sizeOf(context).height < 620.0;
+            final showImmersiveFullView =
+                _isImmersiveFullView &&
+                _playerScreenMode == PlayerScreenMode.immersive &&
+                !isShortHeight;
+            final showVisualizerOnly =
+                _isVisualizationMode &&
+                appPrefs.visualizerEnabled &&
+                showImmersiveFullView;
 
-              // Outer vertical-dismiss gesture (kept). Horizontal is now inside carousel.
-              return GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: _handleImmersiveSceneTap,
-                onVerticalDragStart: (details) {
-                  if (_isVinylRotationActive || _isCarouselDragging) return;
-                  final screenHeight = MediaQuery.sizeOf(context).height;
-                  if (details.globalPosition.dy >=
-                      screenHeight - _backGestureEdgeWidth) {
-                    _dragOffset = 0.0;
-                    return;
-                  }
-                  _dragController.stop();
-                },
-                onVerticalDragUpdate: (details) {
-                  if (_isVinylRotationActive || _isCarouselDragging) return;
-                  if (details.delta.dy > 0) {
-                    final now = DateTime.now();
-                    if (now.difference(_lastDragUpdate).inMilliseconds < 16) {
-                      return;
-                    }
-                    _lastDragUpdate = now;
-                    _dragOffset = (_dragOffset + details.delta.dy).clamp(
-                      0.0,
-                      1000.0,
-                    );
-                    _dragController.value = _dragOffset;
-                  }
-                },
-                onVerticalDragEnd: (details) {
-                  if (_isVinylRotationActive || _isCarouselDragging) return;
-                  if (_dragOffset > 100 || details.primaryVelocity! > 500) {
-                    _close(context);
-                    return;
-                  }
+            // Outer vertical-dismiss gesture (kept). Horizontal is now inside carousel.
+            return GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _handleImmersiveSceneTap,
+              onVerticalDragStart: (details) {
+                if (_isVinylRotationActive || _isCarouselDragging) return;
+                final screenHeight = MediaQuery.sizeOf(context).height;
+                if (details.globalPosition.dy >=
+                    screenHeight - _backGestureEdgeWidth) {
                   _dragOffset = 0.0;
-                  _dragController.animateTo(0.0);
+                  return;
+                }
+                _dragController.stop();
+              },
+              onVerticalDragUpdate: (details) {
+                if (_isVinylRotationActive || _isCarouselDragging) return;
+                if (details.delta.dy > 0) {
+                  final now = DateTime.now();
+                  if (now.difference(_lastDragUpdate).inMilliseconds < 16) {
+                    return;
+                  }
+                  _lastDragUpdate = now;
+                  _dragOffset = (_dragOffset + details.delta.dy).clamp(
+                    0.0,
+                    1000.0,
+                  );
+                  _dragController.value = _dragOffset;
+                }
+              },
+              onVerticalDragEnd: (details) {
+                if (_isVinylRotationActive || _isCarouselDragging) return;
+                if (_dragOffset > 100 || details.primaryVelocity! > 500) {
+                  _close(context);
+                  return;
+                }
+                _dragOffset = 0.0;
+                _dragController.animateTo(0.0);
+              },
+              child: AnimatedBuilder(
+                animation: _dragController,
+                builder: (context, child) {
+                  final offset = _dragController.value * 0.5;
+                  return Transform.translate(
+                    offset: Offset(0, offset),
+                    child: child!,
+                  );
                 },
-                child: AnimatedBuilder(
-                  animation: _dragController,
-                  builder: (context, child) {
-                    final offset = _dragController.value * 0.5;
-                    return Transform.translate(
-                      offset: Offset(0, offset),
-                      child: child!,
-                    );
-                  },
-                  child: _buildPlayerBody(
-                    context,
-                    song,
-                    appPrefs,
-                    colorMode,
-                    albumColor,
-                    visStyle,
-                    visFreq,
-                    visMove,
-                    showImmersiveFullView,
-                    showVisualizerOnly,
-                  ),
+                child: _buildPlayerBody(
+                  context,
+                  song,
+                  appPrefs,
+                  colorMode,
+                  albumColor,
+                  visStyle,
+                  visFreq,
+                  visMove,
+                  showImmersiveFullView,
+                  showVisualizerOnly,
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

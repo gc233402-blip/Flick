@@ -16,7 +16,6 @@ import 'package:flick/providers/providers.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/glass_search_bar.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
@@ -196,32 +195,30 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
       if (next.hasValue) _loadArtists();
     });
 
-    return DisplayModeWrapper(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: AmbientBackground(song: currentSong),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: AmbientBackground(song: currentSong),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                Expanded(
+                  child: _isLoading
+                      ? _buildLoadingState()
+                      : _artists.isEmpty
+                      ? _buildEmptyState()
+                      : _buildArtistsList(),
+                ),
+              ],
             ),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  Expanded(
-                    child: _isLoading
-                        ? _buildLoadingState()
-                        : _artists.isEmpty
-                        ? _buildEmptyState()
-                        : _buildArtistsList(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

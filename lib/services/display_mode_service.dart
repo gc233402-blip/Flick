@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flick/core/utils/dev_log.dart';
@@ -6,15 +8,20 @@ import 'package:flick/core/utils/dev_log.dart';
 ///
 /// The preference values mirror the `refreshRateMode` app preference:
 ///  * `adaptive` — leave the mode to the system (no preferred mode set);
-///  * `standard` — request the lowest refresh rate at the current resolution;
+///  * `standard` — request the advertised mode closest to 60 Hz at the
+///    current resolution;
 ///  * `high` — request the highest refresh rate at the current resolution.
+///
+/// `standard` deliberately avoids the lowest advertised rate: panels with
+/// 10/20/30 Hz low-power modes would otherwise cap at 10 Hz. When no mode
+/// within 5 Hz of 60 Hz exists, the system keeps control instead.
 ///
 /// Forced modes are verified shortly after they are requested. Some firmware
 /// acknowledges the request and then drops the panel into a low-power state
 /// (reported on the Fairphone 6, see moss-apps/Flick#210); when the active
 /// mode does not match the request the service falls back to `auto` and stops
-/// forcing for the rest of the session, so later screen mounts and resumes do
-/// not keep poking the display driver.
+/// forcing for the rest of the session, so later screens and resumes do not
+/// keep poking the display driver.
 class DisplayModeService {
   /// Preference value: follow the system refresh rate.
   static const String adaptive = 'adaptive';
@@ -44,8 +51,8 @@ class DisplayModeService {
   @visibleForTesting
   Duration verificationDelay = const Duration(milliseconds: 1500);
 
-  /// Last mode id handed to the platform; lets mounts and resumes skip
-  /// redundant requests.
+  /// Last requested mode. The current window's preference must still match
+  /// before skipping: Android can recreate a window without restarting Dart.
   int? _lastRequestedModeId;
 
   /// True once a forced mode was rejected. Automatic applies then leave the
@@ -54,6 +61,24 @@ class DisplayModeService {
 
   /// Invalidates a pending verification when a newer request takes over.
   int _verificationToken = 0;
+  Timer? _verificationTimer;
+  bool _isForeground = true;
+
+  /// Background/closing windows can run at a lower rate without rejecting the
+  /// preference. Only verify requests while the app is in the foreground.
+  void setForeground(bool isForeground) {
+    _isForeground = isForeground;
+    if (!isForeground) _cancelVerification();
+  }
+
+  void _cancelVerification() {
+    _verificationTimer?.cancel();
+    _verificationTimer = null;
+    _verificationToken++;
+  }
+
+  bool _isCurrentRequest(int token) =>
+      token == _verificationToken && _isForeground && isSupported;
 
   static String _describe(DisplayMode? mode) {
     if (mode == null) return 'unknown';
@@ -97,17 +122,21 @@ class DisplayModeService {
   /// Applies the refresh-rate [mode] preference.
   ///
   /// [reason] is used for logging and to distinguish automatic applies
-  /// ('mount', 'resume') from an explicit user selection ('preference').
+  /// ('startup', 'resume') from an explicit user selection ('preference').
   Future<void> applyRefreshRateMode(
     String mode, {
     String reason = 'apply',
   }) async {
-    if (!isSupported) return;
+    if (!isSupported || !_isForeground) return;
+
+    _cancelVerification();
+    final token = _verificationToken;
 
     final requested = await _resolveTargetMode(mode);
-    if (requested == null) return;
+    if (requested == null || !_isCurrentRequest(token)) return;
 
     final isForced = requested.id != DisplayMode.auto.id;
+    if (reason == 'preference') _forceSuppressed = false;
     if (isForced && _forceSuppressed && reason != 'preference') {
       devLog(
         'DisplayMode[apply]: forced modes suppressed for this session, '
@@ -116,47 +145,55 @@ class DisplayModeService {
       return;
     }
 
-    if (_lastRequestedModeId == requested.id) {
+    final alreadyPreferred = await _hasCurrentRequest(requested);
+    if (!_isCurrentRequest(token)) return;
+    if (alreadyPreferred) {
       devLog(
-        'DisplayMode[apply]: ${_describe(requested)} already requested, '
+        'DisplayMode[apply]: ${_describe(requested)} already preferred by '
+        'the current window, '
         'skipping ($reason)',
       );
+      if (isForced) _scheduleVerification(requested, token);
       return;
     }
 
-    _verificationToken++;
     try {
       await FlutterDisplayMode.setPreferredMode(requested);
     } catch (e) {
       devLog('DisplayMode[apply]: failed to set ${_describe(requested)}: $e');
       return;
     }
+    if (!_isCurrentRequest(token)) return;
     _lastRequestedModeId = requested.id;
     await _logState('apply $mode ($reason)');
-    if (isForced) {
-      _scheduleVerification(requested);
+    if (isForced && _isCurrentRequest(token)) {
+      _scheduleVerification(requested, token);
+    }
+  }
+
+  Future<bool> _hasCurrentRequest(DisplayMode requested) async {
+    if (_lastRequestedModeId != requested.id) return false;
+    try {
+      _preferredMode = await FlutterDisplayMode.preferred;
+      return _preferredMode?.id == requested.id;
+    } catch (e) {
+      devLog('DisplayMode[apply]: failed to check the current window: $e');
+      return false;
     }
   }
 
   /// Clears any forced display mode so the system decides again.
-  Future<void> resetToAuto({String reason = 'resetAuto'}) async {
-    if (!isSupported) return;
-    _verificationToken++;
-    if (_lastRequestedModeId == DisplayMode.auto.id) {
-      devLog('DisplayMode[resetAuto]: already auto ($reason)');
-      return;
-    }
-    try {
-      await FlutterDisplayMode.setPreferredMode(DisplayMode.auto);
-      _lastRequestedModeId = DisplayMode.auto.id;
-      await _logState('resetAuto ($reason)');
-    } catch (e) {
-      devLog('Failed to reset display mode: $e');
-    }
-  }
+  Future<void> resetToAuto({String reason = 'resetAuto'}) =>
+      applyRefreshRateMode(adaptive, reason: reason);
 
-  /// Picks the platform mode matching [mode] at the current resolution,
-  /// mirroring the plugin's high/low refresh-rate helpers.
+  /// The refresh rate that the `standard` preference aims for.
+  static const double _standardRefreshRate = 60;
+
+  /// How far a mode may be from [_standardRefreshRate] and still count as
+  /// "60 Hz" (covers panels that report 59.94 Hz).
+  static const double _standardTolerance = 5;
+
+  /// Picks the platform mode matching [mode] at the current resolution.
   Future<DisplayMode?> _resolveTargetMode(String mode) async {
     if (mode == adaptive) return DisplayMode.auto;
 
@@ -172,16 +209,17 @@ class DisplayModeService {
     try {
       final modes = await FlutterDisplayMode.supported;
       final active = await FlutterDisplayMode.active;
+      if (effectiveMode == standard) {
+        return _closestToStandard(active, modes);
+      }
+
       var target = active;
       for (final candidate in modes) {
         if (candidate.width != active.width ||
             candidate.height != active.height) {
           continue;
         }
-        final better = effectiveMode == standard
-            ? candidate.refreshRate < target.refreshRate
-            : candidate.refreshRate > target.refreshRate;
-        if (better) {
+        if (candidate.refreshRate > target.refreshRate) {
           target = candidate;
         }
       }
@@ -192,10 +230,38 @@ class DisplayModeService {
     }
   }
 
-  void _scheduleVerification(DisplayMode requested) {
-    final token = ++_verificationToken;
-    Future<void>.delayed(verificationDelay, () async {
-      if (token != _verificationToken || !isSupported) return;
+  /// Returns the mode closest to 60 Hz at [active]'s resolution, or `auto`
+  /// when the panel has no such mode.
+  DisplayMode _closestToStandard(DisplayMode active, List<DisplayMode> modes) {
+    DisplayMode? best;
+    var bestDistance = double.infinity;
+    for (final candidate in modes) {
+      if (candidate.width != active.width ||
+          candidate.height != active.height) {
+        continue;
+      }
+      final distance = (candidate.refreshRate - _standardRefreshRate).abs();
+      if (distance <= _standardTolerance && distance < bestDistance) {
+        best = candidate;
+        bestDistance = distance;
+      }
+    }
+    if (best == null) {
+      devLog(
+        'DisplayMode[resolve]: no mode within '
+        '${_standardTolerance.toStringAsFixed(0)} Hz of '
+        '${_standardRefreshRate.toStringAsFixed(0)} Hz at '
+        '${active.width}x${active.height}; following the system',
+      );
+      return DisplayMode.auto;
+    }
+    return best;
+  }
+
+  void _scheduleVerification(DisplayMode requested, int token) {
+    _verificationTimer = Timer(verificationDelay, () async {
+      _verificationTimer = null;
+      if (!_isCurrentRequest(token)) return;
       final DisplayMode active;
       try {
         active = await FlutterDisplayMode.active;
@@ -203,7 +269,7 @@ class DisplayModeService {
         devLog('DisplayMode[verify]: failed to read the active mode: $e');
         return;
       }
-      if (token != _verificationToken) return;
+      if (!_isCurrentRequest(token)) return;
       _currentMode = active;
       if (active.id == requested.id) {
         devLog('DisplayMode[verify]: ${_describe(requested)} is active');
@@ -222,12 +288,13 @@ class DisplayModeService {
   /// Clears session state; call between tests.
   @visibleForTesting
   void debugReset() {
+    _cancelVerification();
     _availableModes = [];
     _currentMode = null;
     _preferredMode = null;
     _lastRequestedModeId = null;
     _forceSuppressed = false;
-    _verificationToken = 0;
+    _isForeground = true;
     verificationDelay = const Duration(milliseconds: 1500);
   }
 

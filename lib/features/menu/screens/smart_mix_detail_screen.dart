@@ -23,7 +23,6 @@ import 'package:flick/features/player/widgets/add_to_playlist_sheet.dart';
 import 'package:flick/features/player/widgets/sleep_timer_bottom_sheet.dart';
 import 'package:flick/features/songs/widgets/song_actions_button.dart';
 import 'package:flick/providers/favorites_provider.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/l10n/l10n.dart';
 
 /// Detail screen for generated smart mixes (On Repeat, Heavy Rotation, etc.),
@@ -288,90 +287,88 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
   Widget build(BuildContext context) {
     final bgColor = _tintBackground(_backgroundBlend);
 
-    return DisplayModeWrapper(
-      child: TweenAnimationBuilder<Color?>(
-        tween: ColorTween(begin: AppColors.background, end: bgColor),
-        duration: AppConstants.animationSlow,
-        curve: Curves.easeOut,
-        builder: (context, animatedBg, _) {
-          final resolvedBg = animatedBg ?? AppColors.background;
-          final prefs = ref.watch(appPreferencesProvider);
-          return Stack(
-            children: [
-              Scaffold(
+    return TweenAnimationBuilder<Color?>(
+      tween: ColorTween(begin: AppColors.background, end: bgColor),
+      duration: AppConstants.animationSlow,
+      curve: Curves.easeOut,
+      builder: (context, animatedBg, _) {
+        final resolvedBg = animatedBg ?? AppColors.background;
+        final prefs = ref.watch(appPreferencesProvider);
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: resolvedBg,
+              body: AdaptiveColorProvider(
                 backgroundColor: resolvedBg,
-                body: AdaptiveColorProvider(
-                  backgroundColor: resolvedBg,
-                  albumDominantColor: _mixColor,
-                  child: NotificationListener<ScrollNotification>(
-                    onNotification: onScrollNotification,
-                    child: CustomScrollView(
-                      controller: _scrollController,
-                      slivers: [
-                        DetailHeader(
-                          expanded: prefs.detailHeaderArtExpanded,
-                          centeredTitle: prefs.detailHeaderCenteredTitle,
-                          artBuilder: _buildArtLayer,
-                          title: widget.title,
-                          subtitle: widget.description,
-                          subtitleMaxLines: 2,
-                          meta: _metaLine,
-                          lossless: _hasLossless,
-                          fadeTo: resolvedBg,
-                          onBack: () => Navigator.of(context).pop(),
-                        ),
-                        const SliverToBoxAdapter(
-                          child: SizedBox(height: AppConstants.spacingMd),
-                        ),
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppConstants.spacingLg,
-                              vertical: AppConstants.spacingXxs,
-                            ),
-                            child: DetailActionCapsule(
-                              isFavorite: _isAllFavorites,
-                              onToggleFavorite: _toggleFavoriteAll,
-                              onShuffle: _shuffleAll,
-                              onPlay: _playAll,
-                              onQueue: _queueAll,
-                              onMore: _showMore,
-                              primaryColor: _mixColor,
-                            ),
+                albumDominantColor: _mixColor,
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: onScrollNotification,
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      DetailHeader(
+                        expanded: prefs.detailHeaderArtExpanded,
+                        centeredTitle: prefs.detailHeaderCenteredTitle,
+                        artBuilder: _buildArtLayer,
+                        title: widget.title,
+                        subtitle: widget.description,
+                        subtitleMaxLines: 2,
+                        meta: _metaLine,
+                        lossless: _hasLossless,
+                        fadeTo: resolvedBg,
+                        onBack: () => Navigator.of(context).pop(),
+                      ),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: AppConstants.spacingMd),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppConstants.spacingLg,
+                            vertical: AppConstants.spacingXxs,
+                          ),
+                          child: DetailActionCapsule(
+                            isFavorite: _isAllFavorites,
+                            onToggleFavorite: _toggleFavoriteAll,
+                            onShuffle: _shuffleAll,
+                            onPlay: _playAll,
+                            onQueue: _queueAll,
+                            onMore: _showMore,
+                            primaryColor: _mixColor,
                           ),
                         ),
-                        const SliverToBoxAdapter(
-                          child: SizedBox(height: AppConstants.spacingLg),
+                      ),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(height: AppConstants.spacingLg),
+                      ),
+                      _buildSectionTitle(context, l10n.songs14),
+                      SliverPadding(
+                        padding: EdgeInsets.only(
+                          bottom: AppConstants.navBarHeight + 80,
                         ),
-                        _buildSectionTitle(context, l10n.songs14),
-                        SliverPadding(
-                          padding: EdgeInsets.only(
-                            bottom: AppConstants.navBarHeight + 80,
-                          ),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate((
-                              context,
-                              index,
-                            ) {
-                              final song = widget.songs[index];
-                              return _SongTile(
-                                song: song,
-                                index: index,
-                                onTap: () => _playSong(song),
-                              );
-                            }, childCount: widget.songs.length),
-                          ),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final song = widget.songs[index];
+                            return _SongTile(
+                              song: song,
+                              index: index,
+                              onTap: () => _playSong(song),
+                            );
+                          }, childCount: widget.songs.length),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              _buildOverlayTopBar(context, resolvedBg),
-            ],
-          );
-        },
-      ),
+            ),
+            _buildOverlayTopBar(context, resolvedBg),
+          ],
+        );
+      },
     );
   }
 

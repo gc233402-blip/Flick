@@ -18,7 +18,6 @@ import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/widgets/common/blurred_song_background.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/glass_bottom_sheet.dart';
 import 'package:flick/l10n/l10n.dart';
@@ -263,36 +262,34 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
   Widget build(BuildContext context) {
     final currentSong = ref.watch(currentSongProvider);
 
-    return DisplayModeWrapper(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            Positioned.fill(child: AmbientBackground(song: currentSong)),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  Expanded(
-                    child: _isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.textSecondary,
-                            ),
-                          )
-                        : _folders.isEmpty
-                        ? _buildEmptyState()
-                        : _viewMode == FolderViewMode.tree
-                        ? _buildFoldersTree()
-                        : _buildRootFoldersGrid(),
-                  ),
-                ],
-              ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Positioned.fill(child: AmbientBackground(song: currentSong)),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                Expanded(
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.textSecondary,
+                          ),
+                        )
+                      : _folders.isEmpty
+                      ? _buildEmptyState()
+                      : _viewMode == FolderViewMode.tree
+                      ? _buildFoldersTree()
+                      : _buildRootFoldersGrid(),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

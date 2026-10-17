@@ -8,7 +8,6 @@ import 'package:flick/core/utils/responsive.dart';
 import 'package:flick/models/audio_output_diagnostics.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
-import 'package:flick/widgets/common/display_mode_wrapper.dart';
 import 'package:flick/features/settings/screens/uac2_preferences_screen.dart';
 import 'package:flick/widgets/uac2/uac2_volume_control.dart';
 import 'package:flick/widgets/uac2/uac2_hotplug_monitor.dart';
@@ -33,81 +32,79 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
     final currentSong = ref.watch(currentSongProvider);
     final appPreferences = ref.watch(appPreferencesProvider);
 
-    return DisplayModeWrapper(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: AppColors.backgroundGradient,
-              ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: AppColors.backgroundGradient,
             ),
-            Positioned.fill(
-              child: AmbientBackground(song: currentSong),
-            ),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: AppConstants.spacingMd),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppConstants.spacingMd,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (!isAvailable) _buildUnavailableCard(context),
-                          if (isAvailable) ...[
-                            const Uac2HotplugMonitor(),
-                            _buildSectionHeader(context, l10n.usbAudioDevices),
-                            devicesAsync.when(
-                              data: (devices) => _buildDevicesList(
-                                context,
-                                devices,
-                                selectedDevice,
-                                deviceStatus,
-                              ),
-                              loading: () => _buildLoadingCard(context),
-                              error: (error, _) => _buildErrorCard(context, error),
+          ),
+          Positioned.fill(
+            child: AmbientBackground(song: currentSong),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                const SizedBox(height: AppConstants.spacingMd),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.spacingMd,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!isAvailable) _buildUnavailableCard(context),
+                        if (isAvailable) ...[
+                          const Uac2HotplugMonitor(),
+                          _buildSectionHeader(context, l10n.usbAudioDevices),
+                          devicesAsync.when(
+                            data: (devices) => _buildDevicesList(
+                              context,
+                              devices,
+                              selectedDevice,
+                              deviceStatus,
                             ),
-                            if (selectedDevice != null) ...[
-                              const SizedBox(height: AppConstants.spacingLg),
-                              _buildSectionHeader(context, l10n.deviceInformation),
-                              _buildDeviceInfoCard(context, selectedDevice),
-                              const SizedBox(height: AppConstants.spacingLg),
-                              _buildSectionHeader(context, l10n.capabilities),
-                              _buildCapabilitiesCard(context, selectedDevice),
-                            ],
-                            if (deviceStatus != null) ...[
-                              const SizedBox(height: AppConstants.spacingLg),
-                              _buildSectionHeader(context, l10n.status),
-                              _buildStatusCard(context, deviceStatus),
-                            ],
-                            if (deviceStatus != null &&
-                                deviceStatus.state != Uac2State.idle &&
-                                deviceStatus.hasVolumeControl &&
-                                appPreferences.showUsbVolumeOnSettings) ...[
-                              const SizedBox(height: AppConstants.spacingLg),
-                              _buildSectionHeader(context, l10n.volumeControl),
-                              const Uac2VolumeControl(),
-                            ],
-
+                            loading: () => _buildLoadingCard(context),
+                            error: (error, _) => _buildErrorCard(context, error),
+                          ),
+                          if (selectedDevice != null) ...[
+                            const SizedBox(height: AppConstants.spacingLg),
+                            _buildSectionHeader(context, l10n.deviceInformation),
+                            _buildDeviceInfoCard(context, selectedDevice),
+                            const SizedBox(height: AppConstants.spacingLg),
+                            _buildSectionHeader(context, l10n.capabilities),
+                            _buildCapabilitiesCard(context, selectedDevice),
                           ],
-                          const SizedBox(height: AppConstants.navBarHeight + 120),
+                          if (deviceStatus != null) ...[
+                            const SizedBox(height: AppConstants.spacingLg),
+                            _buildSectionHeader(context, l10n.status),
+                            _buildStatusCard(context, deviceStatus),
+                          ],
+                          if (deviceStatus != null &&
+                              deviceStatus.state != Uac2State.idle &&
+                              deviceStatus.hasVolumeControl &&
+                              appPreferences.showUsbVolumeOnSettings) ...[
+                            const SizedBox(height: AppConstants.spacingLg),
+                            _buildSectionHeader(context, l10n.volumeControl),
+                            const Uac2VolumeControl(),
+                          ],
+
                         ],
-                      ),
+                        const SizedBox(height: AppConstants.navBarHeight + 120),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
