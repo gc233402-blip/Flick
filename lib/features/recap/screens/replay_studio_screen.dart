@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -242,7 +243,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
       }
       if (!mounted) return;
       setState(() => _saved = format == null);
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(
             format == null
@@ -797,7 +798,7 @@ class _ReplayStudioScreenState extends ConsumerState<ReplayStudioScreen> {
       if (!opened) throw StateError('Could not open Ko-fi');
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(
             content: Text(l10n.couldNotOpenKoFiPlease),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flick/core/constants/app_constants.dart';
@@ -588,7 +589,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
       await widget.onConnect(token);
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(
             content: Text(l10n.listenbrainzConnected2),
             behavior: SnackBarBehavior.floating,
@@ -668,7 +669,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
                             mode: LaunchMode.externalApplication,
                           );
                           if (!launched && context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            ScaffoldMessenger.of(context).showFlickSnackBar(
                               SnackBar(
                                 content: Text(l10n.couldNotOpenBrowser),
                                 behavior: SnackBarBehavior.floating,
@@ -677,7 +678,7 @@ class _TokenInputSheetState extends State<_TokenInputSheet> {
                           }
                         } catch (e) {
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            ScaffoldMessenger.of(context).showFlickSnackBar(
                               SnackBar(
                                 content: Text(l10n.couldNotOpenLink2(e)),
                                 behavior: SnackBarBehavior.floating,

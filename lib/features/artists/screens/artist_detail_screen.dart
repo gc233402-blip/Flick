@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:path_provider/path_provider.dart';
@@ -362,7 +363,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
       await widget.playerService.addToQueue(song);
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Text(l10n.queuedSongs(widget.songs.length)),
         action: SnackBarAction(
@@ -396,7 +397,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
       }
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Text(
           isAll
@@ -489,15 +490,14 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
 
   Future<void> _refreshAppleMusic() async {
     final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(
+    messenger.showFlickSnackBar(
       SnackBar(content: Text(l10n.refreshingAppleMusicData)),
     );
     final updated = await ref
         .read(appleMusicArtistProvider(widget.artistName).notifier)
         .refresh();
     if (!mounted) return;
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
+    messenger.showFlickSnackBar(
       SnackBar(
         content: Text(
           updated

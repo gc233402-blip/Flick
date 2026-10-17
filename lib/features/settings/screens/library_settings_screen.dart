@@ -4,6 +4,7 @@ import 'dart:math' show pi;
 import 'dart:ui';
 
 import 'package:flick/widgets/common/flick_dialog.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -235,8 +236,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
 
   void _showToast(String message) {
     final messenger = ScaffoldMessenger.of(context);
-    messenger.removeCurrentSnackBar();
-    messenger.showSnackBar(
+    messenger.showFlickSnackBar(
       SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
@@ -453,7 +453,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
         final granted = await permissionService.requestStoragePermission();
         if (!granted) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            ScaffoldMessenger.of(context).showFlickSnackBar(
               SnackBar(
                 content: Text(
                   l10n.storagePermissionIsRequiredToAdd,
@@ -472,7 +472,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
       }
     } on FolderAlreadyExistsException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(
             content: Text(e.message),
             duration: const Duration(seconds: 3),
@@ -483,7 +483,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(l10n.failedToAddFolder(e))));
+        ).showFlickSnackBar(SnackBar(content: Text(l10n.failedToAddFolder(e))));
       }
     }
   }
@@ -496,7 +496,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(l10n.failedToRemoveFolder(e))));
+        ).showFlickSnackBar(SnackBar(content: Text(l10n.failedToRemoveFolder(e))));
       }
     }
   }
@@ -550,7 +550,7 @@ class _LibrarySettingsScreenState extends ConsumerState<LibrarySettingsScreen>
     } catch (error, stackTrace) {
       debugPrint('Scan session "$title" failed: $error\n$stackTrace');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(content: Text(l10n.scanFailedPleaseTryAgain)),
         );
       }

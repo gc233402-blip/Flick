@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -58,8 +59,7 @@ class IdentifyAlbumSheet extends ConsumerStatefulWidget {
     }
     final artworkNote = result.artworkApplied ? l10n.andArtwork : '';
     messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(
           content: Text(
             l10n.identified(result.updatedSongs, artworkNote),

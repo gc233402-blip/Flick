@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -206,7 +207,7 @@ class _RecentlyPlayedScreenState extends State<RecentlyPlayedScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(l10n.historyCleared)));
+        ).showFlickSnackBar(SnackBar(content: Text(l10n.historyCleared)));
       }
     }
   }

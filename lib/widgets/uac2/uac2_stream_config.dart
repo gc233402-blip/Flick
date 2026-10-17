@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/app_colors.dart';
@@ -266,7 +267,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
 
     final success = await deviceStatusNotifier.startStreaming(format);
     if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(l10n.failedToStartStreaming),
           backgroundColor: Colors.red,
@@ -279,7 +280,7 @@ class _Uac2StreamConfigState extends ConsumerState<Uac2StreamConfig> {
     final deviceStatusNotifier = ref.read(uac2DeviceStatusProvider.notifier);
     final success = await deviceStatusNotifier.stopStreaming();
     if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(l10n.failedToStopStreaming),
           backgroundColor: Colors.red,

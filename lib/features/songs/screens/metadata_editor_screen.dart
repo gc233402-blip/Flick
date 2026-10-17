@@ -1,4 +1,5 @@
 import 'package:flick/widgets/common/flick_dialog.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/core/constants/app_constants.dart';
@@ -183,7 +184,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
       ref.invalidate(songsProvider);
       Navigator.of(context).pop(true);
       if (result.verified) {
-        messenger.showSnackBar(
+        messenger.showFlickSnackBar(
           SnackBar(
             content: Text(l10n.savedAndVerified),
             behavior: SnackBarBehavior.floating,
@@ -191,7 +192,7 @@ class _MetadataEditorScreenState extends ConsumerState<MetadataEditorScreen> {
           ),
         );
       } else {
-        messenger.showSnackBar(
+        messenger.showFlickSnackBar(
           SnackBar(
             content: Text(result.message ?? l10n.savedVerificationPending),
             behavior: SnackBarBehavior.floating,

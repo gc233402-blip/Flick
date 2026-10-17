@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/features/songs/widgets/album_art_picker_bottom_sheet.dart';
@@ -115,7 +116,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
               await ref.read(playerProvider.notifier).addToQueue(song);
               if (context.mounted) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(context).showFlickSnackBar(
                   SnackBar(
                     content: Text(l10n.queued(song.title)),
                     duration: const Duration(seconds: 2),
@@ -488,7 +489,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
                                       .addSongToPlaylist(playlist.id, song.id, song: song);
                                   if (context.mounted) {
                                     Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                    ScaffoldMessenger.of(context).showFlickSnackBar(
                                       SnackBar(
                                         content: Text(
                                           l10n.addedTo(playlist.name),
@@ -531,7 +532,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             .createPlaylist(name);
 
         if (playlist == null) {
-          messenger.showSnackBar(
+          messenger.showFlickSnackBar(
             SnackBar(
               content: Text(l10n.aPlaylistWithThisNameAlready),
             ),
@@ -543,7 +544,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
             .read(playlistsProvider.notifier)
             .addSongToPlaylist(playlist.id, song.id, song: song);
 
-        messenger.showSnackBar(
+        messenger.showFlickSnackBar(
           SnackBar(content: Text(l10n.createdAndAddedSong(playlist.name))),
         );
       }),
@@ -823,7 +824,7 @@ class SongActionsBottomSheet extends ConsumerWidget {
     }
 
     if (rootContext.mounted) {
-      ScaffoldMessenger.of(rootContext).showSnackBar(
+      ScaffoldMessenger.of(rootContext).showFlickSnackBar(
         SnackBar(
           content: Text(
             deleteFile

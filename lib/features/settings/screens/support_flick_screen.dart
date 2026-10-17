@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -107,7 +108,7 @@ class _SupportFlickScreenState extends ConsumerState<SupportFlickScreen>
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(l10n.couldNotOpenLink),
           behavior: SnackBarBehavior.floating,

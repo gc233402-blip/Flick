@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/theme/adaptive_color_provider.dart';
@@ -131,8 +132,7 @@ class _AutoEqSearchSheetState extends State<_AutoEqSearchSheet> {
   void _toast(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
       );
   }

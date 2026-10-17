@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -140,14 +141,14 @@ class _BluetoothSettingsScreenState
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
     if (result.ok) {
-      messenger.showSnackBar(
+      messenger.showFlickSnackBar(
         SnackBar(
           content: Text(l10n.codecApplied(BluetoothCodecType.label(codecType))),
           duration: const Duration(seconds: 2),
         ),
       );
     } else {
-      messenger.showSnackBar(
+      messenger.showFlickSnackBar(
         SnackBar(
           content: Text(
             l10n.codecForcingUnavailableOnThisDevice,
@@ -167,7 +168,7 @@ class _BluetoothSettingsScreenState
     if (!mounted) return;
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (!ok && messenger != null) {
-      messenger.showSnackBar(
+      messenger.showFlickSnackBar(
         SnackBar(
           content: Text(
             l10n.developerOptionsIsDisabledEnableIt,

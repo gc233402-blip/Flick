@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/app_colors.dart';
@@ -482,7 +483,7 @@ class _PlayerActionButtonRowState extends ConsumerState<PlayerActionButtonRow> {
             setState(() {});
             widget.playerService.refreshNotificationState();
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
+              ScaffoldMessenger.of(context).showFlickSnackBar(
                 SnackBar(
                   content: Text(
                     newState ? l10n.addedToFavorites : l10n.removedFromFavorites3,

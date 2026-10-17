@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flick/widgets/common/flick_dialog.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -512,8 +513,7 @@ class _PresetsSheetState extends ConsumerState<_PresetsSheet> {
   void _showMessage(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
       );
   }
@@ -3714,13 +3714,13 @@ class _ConvolverSection extends ConsumerWidget {
           .setConvolverIr(storedPath, displayName);
       await loadConvolverIr(storedPath);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(content: Text(l10n.loadedIr(displayName))),
         );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(content: Text(l10n.couldNotLoadIr(e))),
         );
       }
@@ -4408,5 +4408,3 @@ class _Divider extends StatelessWidget {
     );
   }
 }
-
-

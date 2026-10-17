@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -67,7 +68,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
     final success = await service.attemptReconnect();
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(
             success ? l10n.reconnectionSuccessful : l10n.reconnectionFailed,
@@ -88,7 +89,7 @@ class _Uac2ConnectionManagerState extends ConsumerState<Uac2ConnectionManager> {
     final formatSuffix = format != null
         ? l10n.atKhzBit((format.sampleRate ~/ 1000), format.bitDepth)
         : '';
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Text(
           '$deviceName ${isStreaming ? "streaming" : "connected"}$formatSuffix',

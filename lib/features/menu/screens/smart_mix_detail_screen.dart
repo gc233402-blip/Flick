@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -220,7 +221,7 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
       await _playerService.addToQueue(song);
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Text(l10n.queuedSongs(widget.songs.length)),
         action: SnackBarAction(
@@ -254,7 +255,7 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
       }
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Text(
           isAll

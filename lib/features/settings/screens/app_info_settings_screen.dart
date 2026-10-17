@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -68,8 +69,7 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
 
   void _showToast(String message) {
     final messenger = ScaffoldMessenger.of(context);
-    messenger.removeCurrentSnackBar();
-    messenger.showSnackBar(
+    messenger.showFlickSnackBar(
       SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }

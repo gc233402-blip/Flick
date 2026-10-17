@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -683,7 +684,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
     }
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ).showFlickSnackBar(SnackBar(content: Text(message)));
   }
 
   void _showSuccess(String message) {
@@ -692,7 +693,7 @@ class _LastFmSettingsTileState extends ConsumerState<LastFmSettingsTile>
     }
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ).showFlickSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

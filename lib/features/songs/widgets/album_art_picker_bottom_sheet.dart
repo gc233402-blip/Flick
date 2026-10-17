@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -38,8 +39,7 @@ class AlbumArtPickerBottomSheet extends StatefulWidget {
     }
 
     messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(
           content: Text(result.message),
           behavior: SnackBarBehavior.floating,
@@ -286,8 +286,7 @@ class _AlbumArtPickerBottomSheetState extends State<AlbumArtPickerBottomSheet> {
 
   void _showInlineMessage(String message) {
     ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
       );
   }

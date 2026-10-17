@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flick/widgets/common/flick_dialog.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1796,31 +1797,13 @@ class _SongsScreenState extends ConsumerState<SongsScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final messenger = ScaffoldMessenger.of(context);
-      messenger.removeCurrentSnackBar();
-      messenger.showSnackBar(
+      messenger.showFlickSnackBar(
         SnackBar(
-          content: Row(
-            children: [
-              Expanded(child: Text(message)),
-              if (onUndo != null)
-                TextButton(
-                  onPressed: onUndo,
-                  child: Text(
-                    l10n.undo,
-                    style: TextStyle(
-                      color: AppColors.accentDim,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          behavior: SnackBarBehavior.floating,
+          content: Text(message),
+          action: onUndo == null
+              ? null
+              : SnackBarAction(label: l10n.undo, onPressed: onUndo),
           duration: const Duration(seconds: 2),
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.radiusMd),
-          ),
         ),
       );
     });

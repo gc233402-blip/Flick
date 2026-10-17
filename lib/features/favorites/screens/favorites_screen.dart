@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/app_colors.dart';
@@ -58,7 +59,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     await _favoritesService.removeFavorite(song.id);
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(l10n.removedFromFavorites(song.title)),
           action: SnackBarAction(
@@ -123,7 +124,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     }
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(l10n.removedFromFavorites2(removedSongs.length)),
           action: SnackBarAction(

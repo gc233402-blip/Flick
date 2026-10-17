@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flick/core/theme/app_colors.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flick/features/player/widgets/share/share_template.dart';
 import 'package:flick/features/player/widgets/share/share_cards/lyric_share_card.dart';
 import 'package:flick/features/player/widgets/share/share_cards/solid_color_share_card.dart';
@@ -137,7 +138,7 @@ class _ShareBottomSheetState extends ConsumerState<ShareBottomSheet> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(content: Text(l10n.shareFailed(e))),
         );
       }
@@ -161,13 +162,13 @@ class _ShareBottomSheetState extends ConsumerState<ShareBottomSheet> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(content: Text(l10n.savedToGallery)),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(content: Text(e is GallerySaveException ? e.message : 'Failed to save')),
         );
       }

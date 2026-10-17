@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/providers/alac_converter_provider.dart';
 import 'package:flick/src/rust/api/alac_converter_api.dart' as alac_api;
@@ -206,7 +207,7 @@ class AlacMetadataCard extends ConsumerWidget {
 /// Snackbar helper for conversion notifications
 class AlacConversionNotifications {
   static void showConversionStarted(BuildContext context, String fileName) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Row(
           children: [
@@ -225,7 +226,7 @@ class AlacConversionNotifications {
   }
 
   static void showConversionComplete(BuildContext context, String fileName) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Row(
           children: [
@@ -241,7 +242,7 @@ class AlacConversionNotifications {
   }
 
   static void showConversionError(BuildContext context, String error) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Row(
           children: [
