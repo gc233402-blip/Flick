@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -54,7 +55,7 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
     final success = await service.activateFallback();
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(
             success
@@ -74,7 +75,7 @@ class _Uac2FallbackManagerState extends ConsumerState<Uac2FallbackManager> {
     final success = await service.deactivateFallback();
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(
             success

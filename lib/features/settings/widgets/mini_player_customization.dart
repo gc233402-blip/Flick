@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/constants/app_constants.dart';
@@ -288,7 +289,7 @@ class MiniPlayerCustomization extends ConsumerWidget {
                   .setMiniPlayerSwipeAction('visualizer'),
             ]);
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
+              ScaffoldMessenger.of(context).showFlickSnackBar(
                 SnackBar(content: Text(l10n.miniPlayerDefaultsRestored)),
               );
             }

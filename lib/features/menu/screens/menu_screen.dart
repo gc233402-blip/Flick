@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -226,7 +227,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
         launched = await launchUrl(webUri, mode: LaunchMode.platformDefault);
       }
       if (!launched && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(content: Text(l10n.couldNotOpenThePlayStore)),
         );
       }
@@ -234,7 +235,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(content: Text(l10n.couldNotOpenThePlayStore2(error))),
       );
     }
@@ -1248,8 +1249,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
             onPressed: () {
               setState(() => _showUpdateNotice = false);
               ScaffoldMessenger.of(context)
-                ..removeCurrentSnackBar()
-                ..showSnackBar(
+                .showFlickSnackBar(
                   SnackBar(
                     content: Text(
                       l10n.updateNoticeHidden,

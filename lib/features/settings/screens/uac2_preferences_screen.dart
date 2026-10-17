@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flick/widgets/common/flick_dialog.dart';
 import 'package:flick/widgets/common/flick_option_tile.dart';
@@ -421,7 +422,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                   return;
                 }
                 if (!applied && value) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(context).showFlickSnackBar(
                     SnackBar(
                       content: Text(
                         l10n.bitPerfectUsbDacCouldNot,
@@ -432,7 +433,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                 }
                 if (changed) {
                   if (value && EqEngineHint.parametricPeqActive) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    ScaffoldMessenger.of(context).showFlickSnackBar(
                       SnackBar(
                         content: Text(
                           l10n.bitPerfectEnabledParametricEqIs,
@@ -464,8 +465,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                   ref.invalidate(uac2DapBitPerfectEnabledProvider);
                   if (!context.mounted) return;
                   final messenger = ScaffoldMessenger.of(context);
-                  messenger.removeCurrentSnackBar();
-                  messenger.showSnackBar(
+                  messenger.showFlickSnackBar(
                     SnackBar(
                       content: Text(
                         value
@@ -515,7 +515,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
                           await service.clearDeclinedUsbDevices();
                           ref.invalidate(declinedUsbDevicesProvider);
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            ScaffoldMessenger.of(context).showFlickSnackBar(
                               SnackBar(
                                 content: Text(
                                   l10n.usbDacAutoBitPerfectOffers,
@@ -982,8 +982,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
 
   void _showRestartRequiredToast(BuildContext context) {
     final messenger = ScaffoldMessenger.of(context);
-    messenger.removeCurrentSnackBar();
-    messenger.showSnackBar(
+    messenger.showFlickSnackBar(
       SnackBar(
         content: Text(l10n.restartTheAppToApplyPlayback),
         behavior: SnackBarBehavior.floating,
@@ -993,8 +992,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
 
   void _showDeviceRestartRequiredToast(BuildContext context) {
     final messenger = ScaffoldMessenger.of(context);
-    messenger.removeCurrentSnackBar();
-    messenger.showSnackBar(
+    messenger.showFlickSnackBar(
       SnackBar(
         content: Text(l10n.restartYourDeviceToApplyOutput),
         behavior: SnackBarBehavior.floating,
@@ -1450,7 +1448,7 @@ ref.invalidate(uac2ExclusiveDacModeProvider);
         ref.invalidate(uac2BitPerfectEnabledProvider);
         ref.invalidate(uac2ExclusiveDacModeProvider);
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showFlickSnackBar(
             SnackBar(
               content: Text(l10n.uac2PreferencesResetSuccessfully),
             ),

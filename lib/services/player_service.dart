@@ -3419,6 +3419,31 @@ class PlayerService {
       return;
     }
 
+    // A seek that lands during a crossfade ends the overlap in the engine:
+    // the fading-out track is reported as ended while the UI (and playlist
+    // index) already moved to the incoming track. If the local handoff raced
+    // this event the engine can already be on the track this completion would
+    // advance to; advancing again would skip a song, so mirror the engine
+    // instead. Only a confirmed match may skip — a null or stale engine path
+    // keeps the normal completion path.
+    if (_usingRustBackend &&
+        endedPath != null &&
+        endedPath != _crossfadeUiHandoffFromPath) {
+      final currentSong = currentSongNotifier.value;
+      if (currentSong != null) {
+        final expectedPath = await _resolveRustPath(currentSong);
+        final enginePath = _rustAudioService.currentPath;
+        if (expectedPath != null && enginePath == expectedPath) {
+          _debugLog(
+            '[crossfade] completion for $endedPath already superseded by '
+            '${currentSong.title}; engine is on the expected track',
+          );
+          unawaited(_queueNextTrackForGapless());
+          return;
+        }
+      }
+    }
+
     if (_isGaplessActive || _isCrossfadeActive) {
       await _handleGaplessTrackEnded();
       return;

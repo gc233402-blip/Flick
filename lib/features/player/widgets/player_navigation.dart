@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/core/navigation/root_navigator.dart';
 import 'package:flick/core/utils/navigation_helper.dart';
@@ -21,7 +22,7 @@ class PlayerNavigation {
   Future<void> queueSong(BuildContext context, Song song) async {
     await playerService.addToQueue(song);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Text(l10n.queued(song.title)),
         duration: const Duration(seconds: 2),
@@ -42,7 +43,7 @@ class PlayerNavigation {
   Future<void> openArtistFromSong(BuildContext context, Song song) async {
     final artistName = song.artist.trim();
     if (artistName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(content: Text(l10n.artistIsNotAvailableForThis)),
       );
       return;
@@ -53,7 +54,7 @@ class PlayerNavigation {
     if (!context.mounted) return;
 
     if (artistSongs == null || artistSongs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(content: Text(l10n.couldNotLoadArtistSongs)),
       );
       return;
@@ -82,7 +83,7 @@ class PlayerNavigation {
     if (!context.mounted) return;
 
     if (albumGroup == null || albumGroup.songs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(content: Text(l10n.couldNotLoadAlbumSongs)),
       );
       return;

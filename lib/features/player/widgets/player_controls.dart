@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/models/song.dart';
@@ -107,8 +108,7 @@ class PlayerControls extends StatelessWidget {
                               final next =
                                   playerService.shuffleModeNotifier.value;
                               ScaffoldMessenger.of(context)
-                                ..hideCurrentSnackBar()
-                                ..showSnackBar(
+                                .showFlickSnackBar(
                                   SnackBar(
                                     content: Text(l10n.shuffle2(next.label)),
                                     behavior: SnackBarBehavior.floating,
@@ -212,8 +212,7 @@ class PlayerControls extends StatelessWidget {
                               playerService.toggleLoopMode();
                               final next = playerService.loopModeNotifier.value;
                               ScaffoldMessenger.of(context)
-                                ..hideCurrentSnackBar()
-                                ..showSnackBar(
+                                .showFlickSnackBar(
                                   SnackBar(
                                     content: Text(l10n.repeat(next.label)),
                                     behavior: SnackBarBehavior.floating,
@@ -378,4 +377,3 @@ class _PlayPauseButton extends StatelessWidget {
     );
   }
 }
-

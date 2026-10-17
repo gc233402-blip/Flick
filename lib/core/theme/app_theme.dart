@@ -153,6 +153,23 @@ class AppTheme {
       // Text theme
       textTheme: _textTheme,
 
+      // Shared transient feedback: a quiet surface with native Material motion.
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.surfaceLight,
+        contentTextStyle: _textTheme.bodyMedium?.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        actionTextColor: AppColors.accentLight,
+        closeIconColor: AppColors.textSecondary,
+        elevation: 0,
+        insetPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusMd),
+          side: const BorderSide(color: AppColors.glassBorderStrong),
+        ),
+      ),
+
       // App bar theme
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,

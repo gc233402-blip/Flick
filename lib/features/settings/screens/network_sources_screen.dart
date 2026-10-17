@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:isar_community/isar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -103,7 +104,7 @@ class _NetworkSourcesScreenState extends State<NetworkSourcesScreen> {
     } catch (e) {
       if (mounted) {
         final authFailure = _isAuthFailure(e);
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(
             duration: const Duration(seconds: 6),
             content: Text(

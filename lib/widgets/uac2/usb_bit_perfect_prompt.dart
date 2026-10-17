@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -247,8 +248,7 @@ class _UsbBitPerfectPromptState extends ConsumerState<UsbBitPerfectPrompt> {
         .retryDirectUsbForCurrentDevice();
     if (!mounted) return;
     messenger
-      ..removeCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(
           content: Text(
             recovered
@@ -266,8 +266,7 @@ class _UsbBitPerfectPromptState extends ConsumerState<UsbBitPerfectPrompt> {
     bool applied,
   ) {
     ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(
           content: Text(
             applied
@@ -285,8 +284,7 @@ class _UsbBitPerfectPromptState extends ConsumerState<UsbBitPerfectPrompt> {
 
   void _showFallbackSnackBar() {
     ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(
           content: Text(
             l10n.exclusiveUsbDroppedToTheAndroid,

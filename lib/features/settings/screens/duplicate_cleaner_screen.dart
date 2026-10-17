@@ -1,4 +1,5 @@
 import 'package:flick/core/utils/app_haptics.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/widgets/common/flick_dialog.dart';
 import 'package:flutter/material.dart';
@@ -886,7 +887,7 @@ class _BottomActionBar extends ConsumerWidget {
         await ref.read(duplicateScanProvider.notifier).removeSelected();
     if (!context.mounted) return;
     if (result != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           backgroundColor: AppColors.surfaceLight,
           behavior: SnackBarBehavior.floating,
@@ -932,7 +933,7 @@ class _BottomActionBar extends ConsumerWidget {
     if (!confirmed) return;
     await ref.read(duplicateScanProvider.notifier).removeAllDuplicates();
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         backgroundColor: AppColors.surfaceLight,
         behavior: SnackBarBehavior.floating,
@@ -1303,7 +1304,7 @@ class _DuplicateGroupCardState extends ConsumerState<_DuplicateGroupCard> {
                                       .read(duplicateScanProvider.notifier)
                                       .toggleKeep(widget.group.key, song.id);
                                   if (!ok && context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                    ScaffoldMessenger.of(context).showFlickSnackBar(
                                       SnackBar(
                                         backgroundColor:
                                             AppColors.surfaceLight,

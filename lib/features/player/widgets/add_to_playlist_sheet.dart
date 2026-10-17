@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flick/core/theme/app_colors.dart';
@@ -154,7 +155,7 @@ class AddToPlaylistSheet extends ConsumerWidget {
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(
                                       context,
-                                    ).showSnackBar(
+                                    ).showFlickSnackBar(
                                       SnackBar(
                                         content: Text(
                                           songs.length == 1

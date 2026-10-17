@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flick/widgets/common/flick_dialog.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -89,7 +90,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
     if (entries.isEmpty) return;
     await Clipboard.setData(ClipboardData(text: entries.map(_format).join('\n')));
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(content: Text(l10n.logsCopied)),
     );
   }
@@ -117,7 +118,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
 
   void _snack(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showFlickSnackBar(SnackBar(content: Text(message)));
   }
 
   // ponytail: unlisted dpaste paste, anonymous, 30-day expiry. Not private —

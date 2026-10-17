@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -294,7 +295,7 @@ Future<void> _onFloatingPlayerToggled(
     if (!canShow) {
       final granted = await playerService.requestFloatingPlayerPermission();
       if (!granted) {
-        messenger.showSnackBar(
+        messenger.showFlickSnackBar(
           SnackBar(
             content: Text(
               l10n.overlayPermissionIsRequiredToShow,

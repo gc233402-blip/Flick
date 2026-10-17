@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flick/widgets/common/flick_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -427,7 +428,7 @@ class PlaylistsScreen extends ConsumerWidget {
     int serverId = 0,
   }) async {
     if (name.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(content: Text(l10n.pleaseEnterAPlaylistName)),
       );
       return;
@@ -440,7 +441,7 @@ class PlaylistsScreen extends ConsumerWidget {
 
     if (playlist == null) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showFlickSnackBar(
           SnackBar(
             content: Text(l10n.aPlaylistWithThisNameAlready),
           ),
@@ -454,7 +455,7 @@ class PlaylistsScreen extends ConsumerWidget {
     }
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(content: Text(l10n.playlistCreated(playlist.name))),
       );
     }
@@ -466,7 +467,7 @@ class PlaylistsScreen extends ConsumerWidget {
           .read(playlistsProvider.notifier)
           .syncServerPlaylists();
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(
             synced == 0
@@ -479,7 +480,7 @@ class PlaylistsScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.serverPlaylistSyncFailed(e))));
+      ).showFlickSnackBar(SnackBar(content: Text(l10n.serverPlaylistSyncFailed(e))));
     }
   }
 
@@ -493,7 +494,7 @@ class PlaylistsScreen extends ConsumerWidget {
       final unmatchedText = result.unmatchedEntries > 0
           ? l10n.skippedUnmatchedEntr(result.unmatchedEntries)
           : '';
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(
             l10n.importedWithSongs(result.playlist.name, result.importedSongs, unmatchedText),
@@ -504,7 +505,7 @@ class PlaylistsScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.importFailed(e))));
+      ).showFlickSnackBar(SnackBar(content: Text(l10n.importFailed(e))));
     }
   }
 
@@ -520,7 +521,7 @@ class PlaylistsScreen extends ConsumerWidget {
           .exportPlaylistAsM3u(playlist.id, utf8: utf8);
       if (result == null || !context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFlickSnackBar(
         SnackBar(
           content: Text(
             l10n.exportedSongsTo(result.exportedSongs, result.fileName),
@@ -531,7 +532,7 @@ class PlaylistsScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.exportFailed(e))));
+      ).showFlickSnackBar(SnackBar(content: Text(l10n.exportFailed(e))));
     }
   }
 }

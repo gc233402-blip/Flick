@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flick/widgets/common/flick_dialog.dart';
 import 'package:flutter/material.dart';
@@ -476,12 +477,11 @@ class _MainShellState extends ConsumerState<MainShell>
     if (!mounted) return;
     final desynced = _playerService.playbackDesyncedNotifier.value;
     if (!desynced) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).hideFlickSnackBar(id: 'playback-desync');
       return;
     }
 
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: const Text('Playback desynced'),
         duration: const Duration(days: 1),
@@ -492,6 +492,7 @@ class _MainShellState extends ConsumerState<MainShell>
           },
         ),
       ),
+      id: 'playback-desync',
     );
   }
 
@@ -504,13 +505,12 @@ class _MainShellState extends ConsumerState<MainShell>
     final messenger = ScaffoldMessenger.of(context);
     if (count <= 0) {
       if (prevCount > 0) {
-        messenger.clearSnackBars();
+        messenger.hideFlickSnackBar(id: 'metadata-warmup');
       }
       return;
     }
 
-    messenger.clearSnackBars();
-    messenger.showSnackBar(
+    messenger.showFlickSnackBar(
       SnackBar(
         content: Text(
           l10n.finishingMetadataForSongs(count),
@@ -524,6 +524,7 @@ class _MainShellState extends ConsumerState<MainShell>
           },
         ),
       ),
+      id: 'metadata-warmup',
     );
   }
 
@@ -731,8 +732,7 @@ class _MainShellState extends ConsumerState<MainShell>
         now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
       _lastBackPressTime = now;
       ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
+        .showFlickSnackBar(
           const SnackBar(
             content: Text('Press back again to exit'),
             duration: Duration(seconds: 2),
@@ -761,7 +761,16 @@ class _MainShellState extends ConsumerState<MainShell>
       onPopInvokedWithResult: _handleBackPress,
       child: AdaptiveColorProvider(
         backgroundColor: backgroundColor,
-        child: Scaffold(
+        // The player/navigation bar is a body overlay, so Scaffold cannot
+        // infer its snackbar clearance. Reuse the content's reserved geometry
+        // without moving the bar or changing its tutorial/gesture layering.
+        child: SnackBarTheme(
+          data: Theme.of(context).snackBarTheme.copyWith(
+            insetPadding: EdgeInsets.fromLTRB(
+              16, 8, 16, _kNestedBarClearance + extraClearance + 12,
+            ),
+          ),
+          child: Scaffold(
           backgroundColor: AppColors.background,
           extendBody: true,
           body: NotificationListener<ScrollNotification>(
@@ -947,6 +956,7 @@ class _MainShellState extends ConsumerState<MainShell>
             ),
           ),
           ),
+        ),
         ),
       ),
     );

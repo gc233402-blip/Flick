@@ -1,4 +1,5 @@
 import 'package:flick/widgets/common/flick_dialog.dart';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/core/constants/app_constants.dart';
@@ -56,8 +57,7 @@ class MetadataEditorBottomSheet extends ConsumerStatefulWidget {
     // ScaffoldMessenger after pop – per spec, show after sheet is dismissed
     // using the caller's messenger so it survives the sheet's context disposal.
     messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
+      .showFlickSnackBar(
         SnackBar(
           content: Text(
             result.verified

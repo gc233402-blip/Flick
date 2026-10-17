@@ -4716,18 +4716,42 @@ fn handle_seek(
 ) {
     let target_secs = position_secs.max(0.0);
 
-    let (path, http_origin, replaygain_db, successor) = {
+    // The Dart UI hands the playlist over to the incoming track the moment a
+    // crossfade starts (and progress follows it via `progress_source`), so a
+    // seek during the fade must land in the incoming track, not the fading-out
+    // one. As a side effect the seek then ends the fade: the outgoing source is
+    // retired and the incoming source becomes the sole current.
+    let (path, http_origin, replaygain_db, successor, retire_current) = {
         let sources = callback_data.sources.lock();
-        match sources.current() {
-            Some(s) => (
-                s.info.path.clone(),
-                s.info.http_origin.clone(),
-                s.replaygain_db(),
-                sources
-                    .next()
-                    .map(|next| (next.info.clone(), next.replaygain_db())),
-            ),
-            None => (PathBuf::new(), None, 0.0, None),
+        // Same predicate `progress_source` uses for progress: while the fade is
+        // in flight the incoming source is the audible track, so the seek must
+        // target it and retire the fading-out current (identity, not path: a
+        // repeated path must not silently change which source is replaced).
+        let crossfading =
+            callback_data.crossfade_active.load(Ordering::Relaxed) && sources.next().is_some();
+        let successor = sources
+            .next()
+            .map(|next| (next.info.clone(), next.replaygain_db()));
+        if crossfading {
+            let incoming = sources.next().unwrap();
+            (
+                incoming.info.path.clone(),
+                incoming.info.http_origin.clone(),
+                incoming.replaygain_db(),
+                successor,
+                true,
+            )
+        } else {
+            match sources.current() {
+                Some(s) => (
+                    s.info.path.clone(),
+                    s.info.http_origin.clone(),
+                    s.replaygain_db(),
+                    successor,
+                    false,
+                ),
+                None => (PathBuf::new(), None, 0.0, None, false),
+            }
         }
     };
 
@@ -4743,22 +4767,34 @@ fn handle_seek(
     state.store(PlaybackState::Buffering as u8, Ordering::Relaxed);
     let _ = event_tx.try_send(AudioEvent::StateChanged(PlaybackState::Buffering));
 
-    // A seek replaces only the current source. The queued successor (and its
-    // decoder) must survive: the Dart side keeps its queued-track state across
-    // a seek and never re-queues, so dropping the successor here turned the
-    // end-of-track handoff into a full reload instead of a crossfade/gapless
-    // swap.
+    // A seek that targets the current source replaces only it. The queued
+    // successor (and its decoder) must survive: the Dart side keeps its
+    // queued-track state across a seek and never re-queues, so dropping the
+    // successor here turned the end-of-track handoff into a full reload
+    // instead of a crossfade/gapless swap. A mid-fade seek instead targets the
+    // successor, so both slots are cleared and the successor is respawned as
+    // the new current below.
     let fade_was_active = callback_data.crossfade_active.load(Ordering::Relaxed)
         || callback_data.crossfader.lock().is_active();
-    callback_data.sources.lock().take_current();
+    let retired_source = if retire_current {
+        let mut sources = callback_data.sources.lock();
+        let retired = sources.take_current();
+        sources.clear_next();
+        retired
+    } else {
+        callback_data.sources.lock().take_current()
+    };
     callback_data.crossfader.lock().reset();
     callback_data.crossfade_active.store(false, Ordering::Relaxed);
     *callback_data.speed_frac_pos.lock() = 0.0;
 
     // The old current decoder exits on its source's stop signal and is reaped
     // by the command loop. When a fade was in flight the successor already
-    // consumed part of its source, so stop every decoder now and respawn the
-    // successor from its beginning once the new current is installed.
+    // consumed part of its source, so stop every decoder now and respawn it
+    // from the beginning once the new current is installed. A mid-fade seek
+    // promotes that successor to current, so the respawn picks up the seek
+    // target and the faded-out source's completion is reported explicitly
+    // below (the Dart handoff bookkeeping keys on that TrackEnded).
     if fade_was_active {
         let mut active_decoders = decoders.lock();
         for decoder in active_decoders.drain(..) {
@@ -4805,7 +4841,18 @@ fn handle_seek(
             callback_data.set_paused(was_paused);
             decoders.lock().push(handle);
 
-            if fade_was_active {
+            if retire_current {
+                // A mid-fade seek retires the outgoing track. Publish its
+                // completion so the Dart handoff bookkeeping observes the same
+                // TrackEnded it would get from a naturally finished crossfade
+                // (the fade is already reset, so this cannot finish it twice).
+                // The seek consumed the incoming source instead of leaving it
+                // queued, so only the successor check below may re-queue the
+                // following track.
+                if let Some(retired) = retired_source {
+                    let _ = callback_data.finished_tracks.try_send(retired);
+                }
+            } else if fade_was_active {
                 if let Some((next_info, next_replaygain_db)) = successor {
                     requeue_successor_from_info(
                         next_info,
@@ -5365,14 +5412,26 @@ mod tests {
         let _ = std::fs::remove_file(&successor_path);
     }
 
-    #[test]
-    fn seek_during_fade_respawns_successor() {
-        let (current_path, successor_path) = seek_test_fixtures("fade");
-        let data = build_callback_data(48_000, 2);
-        let (event_tx, _event_rx) = bounded::<AudioEvent>(8);
-        let decoders = Arc::new(Mutex::new(Vec::new()));
-        let state = Arc::new(AtomicU8::new(PlaybackState::Playing as u8));
-        load_current_and_successor(&data, &decoders, &current_path, &successor_path);
+    /// Like [`build_callback_data`] but returns the `finished_tracks` receiver
+    /// so a test can assert that a seek retired its old source. The command
+    /// loop is what turns that channel into `AudioEvent::TrackEnded`, and it is
+    /// not running in unit tests.
+    fn build_callback_data_with_finished(
+        sample_rate: u32,
+        channels: usize,
+    ) -> (AudioCallbackData, Receiver<AudioSource>) {
+        let (finished_tx, finished_rx) = bounded::<AudioSource>(8);
+        let data = AudioCallbackData::new(
+            sample_rate,
+            channels,
+            finished_tx,
+            PipelineMode::Dsp,
+            EngineDsdMode::Pcm,
+        );
+        (data, finished_rx)
+    }
+
+    fn start_test_fade(data: &AudioCallbackData) {
         {
             let mut fade = data.crossfader.lock();
             fade.set_enabled(true);
@@ -5380,23 +5439,110 @@ mod tests {
             fade.start();
         }
         data.crossfade_active.store(true, Ordering::Relaxed);
+    }
+
+    #[test]
+    fn seek_during_fade_targets_incoming_track_and_ends_the_fade() {
+        let (current_path, successor_path) = seek_test_fixtures("fade");
+        let (data, finished_rx) = build_callback_data_with_finished(48_000, 2);
+        let (event_tx, _event_rx) = bounded::<AudioEvent>(8);
+        let decoders = Arc::new(Mutex::new(Vec::new()));
+        let state = Arc::new(AtomicU8::new(PlaybackState::Crossfading as u8));
+        load_current_and_successor(&data, &decoders, &current_path, &successor_path);
+        start_test_fade(&data);
 
         handle_seek(0.25, &data, &state, &decoders, &event_tx, 48_000);
 
         {
             let sources = data.sources.lock();
-            assert!(sources.current().is_some());
-            assert!(
-                sources.has_next(),
-                "the mid-fade successor must be respawned from its beginning"
+            let current = sources.current().expect("seek installs the incoming track");
+            assert_eq!(
+                current.info.path, successor_path,
+                "a mid-fade seek must land in the incoming track, not the fading-out one"
             );
-            assert_eq!(sources.next().unwrap().info.path, successor_path);
+            assert!(
+                !sources.has_next(),
+                "the seek consumed the incoming track; the old current must not come back"
+            );
         }
         assert!(!data.crossfade_active.load(Ordering::Relaxed));
+        assert!(
+            !data.crossfader.lock().is_active(),
+            "the seek completes the fade instead of mixing into a retired source"
+        );
+        assert_eq!(state.load(Ordering::Relaxed), PlaybackState::Playing as u8);
         assert_eq!(
             decoders.lock().len(),
-            2,
-            "seek installs the new current plus the respawned successor decoder"
+            1,
+            "the seek stops both fade decoders and installs one decoder for the incoming track"
+        );
+
+        // The retired source is published as finished so the Dart handoff
+        // bookkeeping completes the exact-once handoff for the fade.
+        let retired = finished_rx
+            .try_recv()
+            .expect("mid-fade seek must report the retired outgoing track as finished");
+        assert_eq!(retired.info.path, current_path);
+
+        let _ = std::fs::remove_file(&current_path);
+        let _ = std::fs::remove_file(&successor_path);
+    }
+
+    #[test]
+    fn seek_during_paused_fade_keeps_playback_paused() {
+        let (current_path, successor_path) = seek_test_fixtures("fadepaused");
+        let (data, finished_rx) = build_callback_data_with_finished(48_000, 2);
+        let (event_tx, _event_rx) = bounded::<AudioEvent>(8);
+        let decoders = Arc::new(Mutex::new(Vec::new()));
+        let state = Arc::new(AtomicU8::new(PlaybackState::Crossfading as u8));
+        load_current_and_successor(&data, &decoders, &current_path, &successor_path);
+        start_test_fade(&data);
+        data.set_paused(true);
+
+        handle_seek(0.4, &data, &state, &decoders, &event_tx, 48_000);
+
+        assert_eq!(state.load(Ordering::Relaxed), PlaybackState::Paused as u8);
+        assert!(
+            !data.crossfade_active.load(Ordering::Relaxed),
+            "a paused mid-fade seek still ends the fade overlap"
+        );
+        {
+            let sources = data.sources.lock();
+            assert_eq!(sources.current().unwrap().info.path, successor_path);
+            assert!(!sources.has_next());
+        }
+        let retired = finished_rx
+            .try_recv()
+            .expect("the paused mid-fade seek must still report the retired track");
+        assert_eq!(retired.info.path, current_path);
+
+        let _ = std::fs::remove_file(&current_path);
+        let _ = std::fs::remove_file(&successor_path);
+    }
+
+    /// A plain seek (no fade) must leave the queued successor untouched and
+    /// must not retire any source: only a mid-fade seek retires a track.
+    #[test]
+    fn plain_seek_keeps_successor_and_retires_nothing() {
+        let (current_path, successor_path) = seek_test_fixtures("nofade");
+        let (data, finished_rx) = build_callback_data_with_finished(48_000, 2);
+        let (event_tx, _event_rx) = bounded::<AudioEvent>(8);
+        let decoders = Arc::new(Mutex::new(Vec::new()));
+        let state = Arc::new(AtomicU8::new(PlaybackState::Playing as u8));
+        load_current_and_successor(&data, &decoders, &current_path, &successor_path);
+
+        handle_seek(0.1, &data, &state, &decoders, &event_tx, 48_000);
+
+        {
+            let sources = data.sources.lock();
+            assert_eq!(sources.current().unwrap().info.path, current_path);
+            assert!(sources.has_next());
+            assert_eq!(sources.next().unwrap().info.path, successor_path);
+        }
+        assert_eq!(state.load(Ordering::Relaxed), PlaybackState::Playing as u8);
+        assert!(
+            finished_rx.try_recv().is_err(),
+            "a plain seek retires nothing"
         );
 
         let _ = std::fs::remove_file(&current_path);

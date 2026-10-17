@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flick/widgets/common/flick_snackbar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -320,7 +321,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
       await _playerService.addToQueue(song);
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Text(l10n.queuedSongs(_songs.length)),
         action: SnackBarAction(
@@ -354,7 +355,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
       }
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFlickSnackBar(
       SnackBar(
         content: Text(
           isAll
