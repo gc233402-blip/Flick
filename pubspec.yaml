@@ -128,6 +128,7 @@ flutter:
     - assets/autoeq/autoeq_brands.json
     - assets/fonts/GoogleSansFlex-OFL.txt
     - assets/fonts/NotoSansSC-OFL.txt
+    - assets/fonts/NotoSansTagalog-OFL.txt
 
   fonts:
     # Google Sans Flex replaces Product Sans, which was not licensed for
@@ -176,3 +177,11 @@ flutter:
         - asset: assets/fonts/NotoSansSC-Bold.ttf
           weight: 700
           style: normal
+
+    # Full, unmodified OFL font (~52 KB), including both vowel-cancelling marks.
+    # Explicitly requested by AppTheme.fontFamilyFallback, including in Latin UI
+    # so the language selector can display Baybayin before it is selected.
+    - family: NotoSansTagalog
+      fonts:
+        - asset: assets/fonts/NotoSansTagalog-Regular.ttf
+          weight: 400
