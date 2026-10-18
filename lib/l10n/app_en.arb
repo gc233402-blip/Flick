@@ -1098,6 +1098,10 @@
       }
     }
   },
+  "baybayinPilotDescription": "Experimental draft; untranslated text stays in English.",
+  "@baybayinPilotDescription": {
+    "description": "Language selector warning for the partial, opt-in Tagalog-in-Baybayin pilot."
+  },
   "beLsbBigEndianSubslotLsb": "BE-LSB — big-endian subslot, LSB first",
   "@beLsbBigEndianSubslotLsb": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1722"

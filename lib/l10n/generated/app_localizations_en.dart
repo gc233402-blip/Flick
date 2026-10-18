@@ -811,6 +811,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get baybayinPilotDescription =>
+      'Experimental draft; untranslated text stays in English.';
+
+  @override
   String get beLsbBigEndianSubslotLsb =>
       'BE-LSB — big-endian subslot, LSB first';
 

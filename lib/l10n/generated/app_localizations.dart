@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_tl.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +96,8 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('tl'),
+    Locale.fromSubtags(languageCode: 'tl', scriptCode: 'Tglg'),
     Locale('zh'),
   ];
 
@@ -1465,6 +1468,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{battery}% battery'**
   String battery(Object battery);
+
+  /// Language selector warning for the partial, opt-in Tagalog-in-Baybayin pilot.
+  ///
+  /// In en, this message translates to:
+  /// **'Experimental draft; untranslated text stays in English.'**
+  String get baybayinPilotDescription;
 
   /// lib/features/settings/screens/uac2_preferences_screen.dart:1722
   ///
@@ -13487,17 +13496,31 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'zh'].contains(locale.languageCode);
+      <String>['en', 'tl', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when language+script codes are specified.
+  switch (locale.languageCode) {
+    case 'tl':
+      {
+        switch (locale.scriptCode) {
+          case 'Tglg':
+            return AppLocalizationsTlTglg();
+        }
+        break;
+      }
+  }
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'tl':
+      return AppLocalizationsTl();
     case 'zh':
       return AppLocalizationsZh();
   }

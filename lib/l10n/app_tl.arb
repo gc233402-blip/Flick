@@ -1,0 +1,4 @@
+{
+  "@@locale": "tl",
+  "@@comment": "Generator-only base for tl_Tglg. Intentionally empty: all missing pilot messages inherit the English template. Plain tl is not offered by the app."
+}

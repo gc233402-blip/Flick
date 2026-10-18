@@ -79,8 +79,9 @@ class FlickPlayerApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: AppTheme.darkTheme,
           navigatorKey: rootNavigatorKey,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: kAppLocalizationsDelegates,
           supportedLocales: kSupportedLocales,
+          localeResolutionCallback: resolveAppLocale,
           // null means "follow the device locale".
           locale: selectedLocale,
           home: const _RootRouter(),

@@ -547,6 +547,10 @@ class _AppInfoSettingsScreenState extends ConsumerState<AppInfoSettingsScreen>
           ['Noto Sans SC'],
           await rootBundle.loadString('assets/fonts/NotoSansSC-OFL.txt'),
         );
+        yield LicenseEntryWithLineBreaks(
+          ['Noto Sans Tagalog'],
+          await rootBundle.loadString('assets/fonts/NotoSansTagalog-OFL.txt'),
+        );
       });
     }
     Navigator.of(context).push(
