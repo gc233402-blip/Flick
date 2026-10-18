@@ -13,9 +13,11 @@
 // MaterialApp.builder on every build, and once from main() before the first
 // frame so that strings produced during startup already use the right locale.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:flick/l10n/generated/app_localizations.dart';
+import 'package:flick/l10n/generated/app_localizations_tl.dart';
 import 'package:flick/services/app_preferences_service.dart';
 
 export 'package:flick/l10n/generated/app_localizations.dart';
@@ -27,7 +29,13 @@ export 'package:flick/l10n/generated/app_localizations.dart';
 // 调用方只要 import 本文件就能拿到，无需额外 import。
 export 'package:flick/l10n/model_labels.dart';
 
-/// Locales the app ships translations for.
+/// The opt-in Tagalog-in-Baybayin pilot. `Tglg` is a script, not a language.
+const Locale kBaybayinLocale = Locale.fromSubtags(
+  languageCode: 'tl',
+  scriptCode: 'Tglg',
+);
+
+/// Locales the app ships translations for (including the partial pilot).
 ///
 /// English is listed first so that a device locale we do not translate falls
 /// back to English rather than to Chinese. Chinese devices still resolve to
@@ -35,10 +43,49 @@ export 'package:flick/l10n/model_labels.dart';
 const List<Locale> kSupportedLocales = <Locale>[
   Locale('en'),
   Locale('zh', 'CN'),
+  kBaybayinLocale,
 ];
 
 /// Used when nothing else matches.
 const Locale kFallbackLocale = Locale('en');
+
+/// Override only the pilot; keep Flutter's stock delegates for everything else.
+/// The first supported delegate of each type wins.
+const List<LocalizationsDelegate<dynamic>> kAppLocalizationsDelegates = [
+  _BaybayinLocalizationsDelegate(),
+  ...AppLocalizations.localizationsDelegates,
+];
+
+/// The partial pilot needs English ICU rules for its inherited English text.
+/// Otherwise, Tagalog rules make e.g. an untranslated `songUnit(0)` say "song".
+/// `localeName` here is the formatting locale; Localizations.localeOf(context)
+/// still returns tl_Tglg and Flutter's built-in controls still use Tagalog.
+AppLocalizations lookupFlickLocalizations(Locale requested) {
+  final locale = resolveSupportedLocale(requested);
+  return locale == kBaybayinLocale
+      ? _BaybayinWithEnglishFallback()
+      : lookupAppLocalizations(locale);
+}
+
+class _BaybayinWithEnglishFallback extends AppLocalizationsTlTglg {
+  @override
+  String get localeName => 'en';
+}
+
+class _BaybayinLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _BaybayinLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => locale == kBaybayinLocale;
+
+  @override
+  Future<AppLocalizations> load(Locale locale) =>
+      SynchronousFuture(lookupFlickLocalizations(locale));
+
+  @override
+  bool shouldReload(_BaybayinLocalizationsDelegate old) => false;
+}
 
 /// The current localizations. Initialized to English so that reads before the
 /// first frame cannot throw.
@@ -55,12 +102,31 @@ extension AppLocalizationsX on BuildContext {
 /// Maps [requested] onto the closest locale we actually support.
 Locale resolveSupportedLocale(Locale requested) {
   for (final supported in kSupportedLocales) {
-    if (supported.languageCode == requested.languageCode) {
+    if (supported == requested) return supported;
+  }
+  // A script-specific translation must never be selected by language alone.
+  // In particular, an ordinary tl/tl_PH device must not opt into Baybayin.
+  if (requested.scriptCode != null) {
+    for (final supported in kSupportedLocales) {
+      if (supported.languageCode == requested.languageCode &&
+          supported.scriptCode == requested.scriptCode) {
+        return supported;
+      }
+    }
+  }
+  for (final supported in kSupportedLocales) {
+    if (supported.languageCode == requested.languageCode &&
+        supported.scriptCode == null) {
       return supported;
     }
   }
   return kFallbackLocale;
 }
+
+/// MaterialApp must use the same script-aware resolution as startup/services.
+/// Flutter's default language-only fallback could otherwise select the pilot.
+Locale resolveAppLocale(Locale? requested, Iterable<Locale> _) =>
+    resolveSupportedLocale(requested ?? kFallbackLocale);
 
 /// Holds the user's language choice and keeps the global [l10n] in sync.
 ///
@@ -87,6 +153,7 @@ class LocaleController extends ValueNotifier<Locale?> {
 
   /// Selects [locale], or `null` to follow the device locale.
   Future<void> select(Locale? locale) async {
+    locale = locale == null ? null : resolveSupportedLocale(locale);
     if (locale == value) return;
     value = locale;
     await AppPreferencesService().setAppLocale(_storedFromLocale(locale));
@@ -100,7 +167,7 @@ class LocaleController extends ValueNotifier<Locale?> {
   /// Points the global accessor at [locale] without a BuildContext. Used during
   /// startup, before any Localizations widget exists.
   void bindLocale(Locale locale) {
-    _current = lookupAppLocalizations(resolveSupportedLocale(locale));
+    _current = lookupFlickLocalizations(locale);
   }
 
   Locale _deviceLocale() {
@@ -112,20 +179,22 @@ class LocaleController extends ValueNotifier<Locale?> {
 
   Locale? _localeFromStored(String? stored) {
     if (stored == null || stored.isEmpty || stored == systemValue) return null;
-    final parts = stored.split('_');
-    final language = parts.first;
-    if (language.isEmpty) return null;
-    final country = parts.length > 1 && parts[1].isNotEmpty ? parts[1] : null;
+    // Accept both the existing en/zh_CN values and script-aware locale tags.
+    final match = RegExp(
+      r'^([A-Za-z]{2,3})(?:[_-]([A-Za-z]{4}))?(?:[_-]([A-Za-z]{2}|[0-9]{3}))?$',
+    ).firstMatch(stored);
+    if (match == null) return kFallbackLocale;
+    final script = match.group(2);
     return resolveSupportedLocale(
-      country == null ? Locale(language) : Locale(language, country),
+      Locale.fromSubtags(
+        languageCode: match.group(1)!.toLowerCase(),
+        scriptCode: script == null
+            ? null
+            : '${script[0].toUpperCase()}${script.substring(1).toLowerCase()}',
+        countryCode: match.group(3)?.toUpperCase(),
+      ),
     );
   }
 
-  String _storedFromLocale(Locale? locale) {
-    if (locale == null) return systemValue;
-    final country = locale.countryCode;
-    return country == null || country.isEmpty
-        ? locale.languageCode
-        : '${locale.languageCode}_$country';
-  }
+  String _storedFromLocale(Locale? locale) => locale?.toString() ?? systemValue;
 }

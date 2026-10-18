@@ -227,6 +227,10 @@
   "bassMidTreble": "低音、中音与高音",
   "bassTreble": "低频 + 高频",
   "battery": "电量 {battery}%",
+  "baybayinPilotDescription": "实验性草稿；未翻译的内容仍显示英文。",
+  "@baybayinPilotDescription": {
+    "description": "Language selector warning for the partial, opt-in Tagalog-in-Baybayin pilot."
+  },
   "beLsbBigEndianSubslotLsb": "BE-LSB — 大端子槽，LSB 在前",
   "beMsbBigEndianSubslotMsb": "BE-MSB —— 大端子槽，MSB 优先（默认）",
   "beMsbPackingTheDefaultWire": "BE-MSB 打包 — 默认传输约定",

@@ -768,6 +768,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get baybayinPilotDescription => '实验性草稿；未翻译的内容仍显示英文。';
+
+  @override
   String get beLsbBigEndianSubslotLsb => 'BE-LSB — 大端子槽，LSB 在前';
 
   @override
