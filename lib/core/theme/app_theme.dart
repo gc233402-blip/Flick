@@ -14,8 +14,11 @@ class AppTheme {
   /// Google Sans Flex has no CJK glyphs, so Chinese comes from the bundled
   /// Noto Sans SC subset (see pubspec.yaml). Skia does not search bundled fonts
   /// for missing characters, so the fallback has to be declared explicitly
-  /// here.
-  static const List<String> fontFamilyFallback = <String>['NotoSansSC'];
+  /// here. The same applies to the Baybayin pilot's Noto Sans Tagalog.
+  static const List<String> fontFamilyFallback = <String>[
+    'NotoSansSC',
+    'NotoSansTagalog',
+  ];
 
   /// Primary text theme using Google Sans Flex
   static TextTheme get _textTheme {
