@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../core/utils/dev_log.dart';
 import '../data/database.dart';
+import '../data/repositories/artist_repository.dart';
 import '../data/repositories/song_repository.dart';
 import '../src/rust/api/scanner.dart' as rust_scanner;
 import 'music_folder_service.dart';
@@ -34,8 +35,10 @@ class AlbumArtService {
   // Lazy so constructing the singleton (or resolving for skipped songs) does
   // not require an initialized database.
   late final SongRepository _songRepository = SongRepository();
+  late final ArtistRepository _artistRepository = ArtistRepository();
   final MusicFolderService _musicFolderService = MusicFolderService();
   final Map<String, Future<String?>> _inFlightResolutions = {};
+  final Map<String, Future<String?>> _inFlightArtistResolutions = {};
 
   // ponytail: album tracks share one folder cover; cache the raw bytes so a
   // 20-track album reads cover.jpg once, not 20 times.
@@ -63,24 +66,9 @@ class AlbumArtService {
         return null;
       }
 
-      // Extension is irrelevant: Flutter's image decoder sniffs magic bytes,
-      // so keying the file on the content hash alone keeps lookup O(1) with
-      // no glob and no raw-vs-normalized format mismatch.
-      final cacheKey = _cacheKey(raw);
-      final dir = await _ensureArtworkDir();
-      final cachedFile = File('${dir.path}/$cacheKey');
-      if (await _isUsableImagePath(cachedFile.path)) {
-        unawaited(_persistArtworkPath(audioSourcePath, cachedFile.path));
-        unawaited(_pruneIfNeeded(dir));
-        return cachedFile.path;
-      }
-
-      final bytes = await _normalizeArtworkBytes(raw);
-      await cachedFile.writeAsBytes(bytes, flush: true);
-
-      await _persistArtworkPath(audioSourcePath, cachedFile.path);
-      unawaited(_pruneIfNeeded(dir));
-      return cachedFile.path;
+      final cachedPath = await _cacheArtworkBytes(raw);
+      await _persistArtworkPath(audioSourcePath, cachedPath);
+      return cachedPath;
     });
 
     try {
@@ -88,6 +76,45 @@ class AlbumArtService {
     } finally {
       _inFlightResolutions.remove(audioSourcePath);
     }
+  }
+
+  /// Resolve an explicitly tagged artist portrait from [audioSourcePath].
+  /// Only ID3/APE picture types 7, 8 and 10 qualify; album covers and folder
+  /// images are intentionally not used here.
+  Future<String?> resolveArtistArtworkPath({
+    required String audioSourcePath,
+  }) async {
+    if (audioSourcePath.isEmpty) return null;
+
+    final future = _inFlightArtistResolutions.putIfAbsent(
+      audioSourcePath,
+      () async {
+        final raw = await _loadArtistArtworkBytes(audioSourcePath);
+        if (raw == null || raw.isEmpty) return null;
+        return _cacheArtworkBytes(raw);
+      },
+    );
+
+    try {
+      return await future;
+    } finally {
+      _inFlightArtistResolutions.remove(audioSourcePath);
+    }
+  }
+
+  /// Extension is irrelevant: Flutter's image decoder sniffs magic bytes, so
+  /// keying the file on the content hash alone keeps lookup O(1) with no glob
+  /// and no raw-vs-normalized format mismatch.
+  Future<String> _cacheArtworkBytes(Uint8List raw) async {
+    final cacheKey = _cacheKey(raw);
+    final dir = await _ensureArtworkDir();
+    final cachedFile = File('${dir.path}/$cacheKey');
+    if (!await _isUsableImagePath(cachedFile.path)) {
+      final bytes = await _normalizeArtworkBytes(raw);
+      await cachedFile.writeAsBytes(bytes, flush: true);
+    }
+    unawaited(_pruneIfNeeded(dir));
+    return cachedFile.path;
   }
 
   /// Resolves artwork for [songs] that have no usable pointer yet. Safe to
@@ -172,6 +199,7 @@ class AlbumArtService {
 
     try {
       final referenced = await _songRepository.getReferencedAlbumArtPaths();
+      referenced.addAll(await _artistRepository.getReferencedArtPaths());
 
       final files = <({File file, DateTime modified})>[];
       await for (final entity in dir.list(followLinks: false)) {
@@ -265,6 +293,20 @@ class AlbumArtService {
     }
   }
 
+  Future<Uint8List?> _loadArtistArtworkBytes(String audioSourcePath) async {
+    if (Platform.isAndroid && audioSourcePath.startsWith('content://')) {
+      return _loadStagedRustArtworkBytes(audioSourcePath, artistOnly: true);
+    }
+
+    try {
+      return await rust_scanner.extractArtistArtwork(
+        path: _plainPathOf(audioSourcePath),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Embedded-art lookup for SAF `content://` rows. WavPack/DSD skip the
   /// retriever (it cannot decode their covers anywhere); everything else
   /// tries the retriever first and falls back to the Rust tag parser when it
@@ -299,7 +341,10 @@ class AlbumArtService {
   /// Stages [audioSourcePath] into the shared playback cache and parses its
   /// embedded art with the Rust tag reader. Null when staging is refused
   /// (size cap) or the parser finds nothing.
-  Future<Uint8List?> _loadStagedRustArtworkBytes(String audioSourcePath) async {
+  Future<Uint8List?> _loadStagedRustArtworkBytes(
+    String audioSourcePath, {
+    bool artistOnly = false,
+  }) async {
     final staged = await _musicFolderService.cacheUriForPlayback(
       audioSourcePath,
       extensionHint: _extensionOf(audioSourcePath),
@@ -307,7 +352,9 @@ class AlbumArtService {
     );
     if (staged == null) return null;
     try {
-      return await rust_scanner.extractEmbeddedArtwork(path: staged);
+      return artistOnly
+          ? await rust_scanner.extractArtistArtwork(path: staged)
+          : await rust_scanner.extractEmbeddedArtwork(path: staged);
     } catch (_) {
       return null;
     }
