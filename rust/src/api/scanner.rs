@@ -4,7 +4,7 @@ use dsf_meta::DsfFile;
 use id3::TagLike;
 use lofty::config::ParseOptions;
 use lofty::file::FileType;
-use lofty::picture::PictureType;
+use lofty::picture::{Picture, PictureType};
 use lofty::prelude::*;
 use lofty::probe::Probe;
 use rayon::prelude::*;
@@ -276,6 +276,133 @@ pub fn extract_embedded_artwork(path: String) -> Option<Vec<u8>> {
         "dff" => extract_dff_artwork(&p),
         _ => extract_lofty_artwork(&p),
     }
+}
+
+/// Artist/performer portrait pictures, strongest first. Album covers are
+/// deliberately excluded: they belong to the album-artwork path.
+const ARTIST_PICTURE_PRIORITY: [PictureType; 3] = [
+    PictureType::LeadArtist,
+    PictureType::Artist,
+    PictureType::Band,
+];
+
+fn artist_picture_rank(kind: PictureType) -> Option<usize> {
+    ARTIST_PICTURE_PRIORITY
+        .iter()
+        .position(|wanted| *wanted == kind)
+}
+
+fn pick_artist_picture<'a>(pictures: impl Iterator<Item = &'a Picture>) -> Option<&'a Picture> {
+    let mut best: Option<(usize, &Picture)> = None;
+    for picture in pictures {
+        let Some(rank) = artist_picture_rank(picture.pic_type()) else {
+            continue;
+        };
+        if best.map_or(true, |(best_rank, _)| rank < best_rank) {
+            best = Some((rank, picture));
+            if rank == 0 {
+                break;
+            }
+        }
+    }
+    best.map(|(_, picture)| picture)
+}
+
+fn pick_artist_id3_picture(tag: &id3::Tag) -> Option<&id3::frame::Picture> {
+    use id3::frame::PictureType as Id3PictureType;
+    const PRIORITY: [Id3PictureType; 3] = [
+        Id3PictureType::LeadArtist,
+        Id3PictureType::Artist,
+        Id3PictureType::Band,
+    ];
+    for wanted in PRIORITY {
+        if let Some(picture) = tag.pictures().find(|p| p.picture_type == wanted) {
+            return Some(picture);
+        }
+    }
+    None
+}
+
+/// Extract an explicitly tagged artist portrait (ID3/APE picture types 7, 8
+/// or 10). Returns None when the file only has album artwork.
+pub fn extract_artist_artwork(path: String) -> Option<Vec<u8>> {
+    let p = PathBuf::from(&path);
+    let ext = p
+        .extension()
+        .and_then(|s| s.to_str())
+        .unwrap_or("")
+        .to_ascii_lowercase();
+
+    match ext.as_str() {
+        "dsf" => extract_dsf_artist_artwork(&p),
+        "dff" => extract_dff_artist_artwork(&p),
+        _ => extract_lofty_artist_artwork(&p),
+    }
+}
+
+fn extract_lofty_artist_artwork(path: &Path) -> Option<Vec<u8>> {
+    let parse_options = ParseOptions::new().read_properties(false);
+    let tagged_file = Probe::open(path)
+        .ok()?
+        .options(parse_options.clone())
+        .guess_file_type()
+        .ok()?
+        .read()
+        .ok()?;
+    let tag = tagged_file
+        .primary_tag()
+        .or_else(|| tagged_file.first_tag())?;
+    if let Some(picture) = pick_artist_picture(tag.pictures().iter()) {
+        return Some(picture.data().to_vec());
+    }
+    if tagged_file.file_type() == FileType::WavPack {
+        return extract_ape_artist_artwork(path, parse_options);
+    }
+    None
+}
+
+fn extract_ape_artist_artwork(path: &Path, parse_options: ParseOptions) -> Option<Vec<u8>> {
+    use lofty::ape::APE_PICTURE_TYPES;
+    use lofty::tag::ItemValue;
+    use lofty::wavpack::WavPackFile;
+
+    let mut file = std::fs::File::open(path).ok()?;
+    let wavpack = WavPackFile::read_from(&mut file, parse_options).ok()?;
+    let ape = wavpack.ape()?;
+
+    let mut best: Option<(usize, Vec<u8>)> = None;
+    for key in APE_PICTURE_TYPES {
+        let Some(item) = ape.get(key) else {
+            continue;
+        };
+        let ItemValue::Binary(bytes) = item.value() else {
+            continue;
+        };
+        let Ok(picture) = Picture::from_ape_bytes(key, bytes.as_slice()) else {
+            continue;
+        };
+        let Some(rank) = artist_picture_rank(picture.pic_type()) else {
+            continue;
+        };
+        if best
+            .as_ref()
+            .map_or(true, |(best_rank, _)| rank < *best_rank)
+        {
+            best = Some((rank, picture.into_data()));
+        }
+    }
+    best.map(|(_, data)| data)
+}
+
+fn extract_dsf_artist_artwork(path: &Path) -> Option<Vec<u8>> {
+    let dsf = DsfFile::open(path).ok()?;
+    let tag = dsf.id3_tag().as_ref()?;
+    Some(pick_artist_id3_picture(tag)?.data.clone())
+}
+
+fn extract_dff_artist_artwork(path: &Path) -> Option<Vec<u8>> {
+    let tag = find_dff_id3_tag(path)?;
+    Some(pick_artist_id3_picture(&tag)?.data.clone())
 }
 
 fn extract_lofty_artwork(path: &Path) -> Option<Vec<u8>> {
@@ -1105,6 +1232,7 @@ mod tests {
         let dir = TestDir::new("dff-art");
         let path = dir.path().join("track.dff");
         let cover_data = b"\x89PNG\r\n\x1a\nfake-cover-bytes".to_vec();
+        let artist_data = b"\x89PNG\r\n\x1a\nfake-artist-bytes".to_vec();
         let mut tag = id3::Tag::new();
         tag.set_title("Dff Title");
         tag.set_genre("Jazz");
@@ -1115,12 +1243,20 @@ mod tests {
             description: String::new(),
             data: cover_data.clone(),
         });
+        tag.add_frame(id3::frame::Picture {
+            mime_type: "image/png".to_string(),
+            picture_type: id3::frame::PictureType::Artist,
+            description: String::new(),
+            data: artist_data.clone(),
+        });
         let mut id3_bytes = Vec::new();
         tag.write_to(&mut id3_bytes, id3::Version::Id3v24).unwrap();
         write_bytes(&path, &build_dff_bytes(&id3_bytes));
 
         let artwork = extract_embedded_artwork(path.to_string_lossy().to_string());
         assert_eq!(artwork.as_deref(), Some(cover_data.as_slice()));
+        let artist_art = extract_artist_artwork(path.to_string_lossy().to_string());
+        assert_eq!(artist_art.as_deref(), Some(artist_data.as_slice()));
 
         // dff-meta cannot open this fixture (no FVER/PROP), so the metadata
         // result only carries tags through the recovery walker.
@@ -1133,35 +1269,80 @@ mod tests {
         assert_eq!(meta.sample_rate, None);
     }
 
+    #[test]
+    fn extract_artist_artwork_from_mp3_id3() {
+        let dir = TestDir::new("mp3-artist-art");
+        let path = dir.path().join("track.mp3");
+        let cover_data = b"\x89PNG\r\n\x1a\nmp3-cover-payload".to_vec();
+        let artist_data = b"\x89PNG\r\n\x1a\nmp3-artist-payload".to_vec();
+
+        let mut tag = id3::Tag::new();
+        tag.add_frame(id3::frame::Picture {
+            mime_type: "image/png".to_string(),
+            picture_type: id3::frame::PictureType::CoverFront,
+            description: String::new(),
+            data: cover_data.clone(),
+        });
+        tag.add_frame(id3::frame::Picture {
+            mime_type: "image/png".to_string(),
+            picture_type: id3::frame::PictureType::Artist,
+            description: String::new(),
+            data: artist_data.clone(),
+        });
+
+        let mut bytes = Vec::new();
+        tag.write_to(&mut bytes, id3::Version::Id3v24).unwrap();
+        // One silent MPEG-1 Layer III frame so the probe recognizes the file
+        // as MP3 after the ID3 tag.
+        bytes.extend_from_slice(&[0xFF, 0xFB, 0x90, 0x00]);
+        bytes.extend(std::iter::repeat_n(0u8, 413));
+        write_bytes(&path, &bytes);
+
+        let artwork = extract_embedded_artwork(path.to_string_lossy().to_string());
+        let artist_art = extract_artist_artwork(path.to_string_lossy().to_string());
+
+        assert_eq!(artwork.as_deref(), Some(cover_data.as_slice()));
+        assert_eq!(artist_art.as_deref(), Some(artist_data.as_slice()));
+    }
+
     /// WavPack file with a footer-only APEv2 tag containing a binary
     /// "Cover Art (Front)" item. The wvpk prefix is padding: lofty never
     /// parses audio blocks when properties are disabled.
-    fn build_wv_bytes_with_ape_cover(cover_data: &[u8]) -> Vec<u8> {
+    fn build_wv_bytes_with_ape_items(items: &[(&str, &[u8])]) -> Vec<u8> {
         let mut bytes = vec![0u8; 32];
         bytes[..4].copy_from_slice(b"wvpk");
 
-        let mut value = Vec::new();
-        value.extend_from_slice(b"cover\x00");
-        value.extend_from_slice(cover_data);
+        let mut encoded_items = Vec::new();
+        for (key, data) in items {
+            let mut value = Vec::new();
+            value.extend_from_slice(b"cover\x00");
+            value.extend_from_slice(data);
 
-        let mut item = Vec::new();
-        item.extend_from_slice(&(value.len() as u32).to_le_bytes());
-        item.extend_from_slice(&2u32.to_le_bytes());
-        item.extend_from_slice(b"Cover Art (Front)\x00");
-        item.extend_from_slice(&value);
+            let mut item = Vec::new();
+            item.extend_from_slice(&(value.len() as u32).to_le_bytes());
+            item.extend_from_slice(&2u32.to_le_bytes());
+            item.extend_from_slice(key.as_bytes());
+            item.push(0);
+            item.extend_from_slice(&value);
+            encoded_items.extend_from_slice(&item);
+        }
 
-        let tag_size = item.len() + 32;
+        let tag_size = encoded_items.len() + 32;
         let mut footer = Vec::new();
         footer.extend_from_slice(b"APETAGEX");
         footer.extend_from_slice(&2000u32.to_le_bytes());
         footer.extend_from_slice(&(tag_size as u32).to_le_bytes());
-        footer.extend_from_slice(&1u32.to_le_bytes());
+        footer.extend_from_slice(&(items.len() as u32).to_le_bytes());
         footer.extend_from_slice(&0u32.to_le_bytes());
         footer.extend_from_slice(&[0u8; 8]);
 
-        bytes.extend_from_slice(&item);
+        bytes.extend_from_slice(&encoded_items);
         bytes.extend_from_slice(&footer);
         bytes
+    }
+
+    fn build_wv_bytes_with_ape_cover(cover_data: &[u8]) -> Vec<u8> {
+        build_wv_bytes_with_ape_items(&[("Cover Art (Front)", cover_data)])
     }
 
     #[test]
@@ -1172,7 +1353,30 @@ mod tests {
         write_bytes(&path, &build_wv_bytes_with_ape_cover(&cover_data));
 
         let artwork = extract_embedded_artwork(path.to_string_lossy().to_string());
+        let artist_art = extract_artist_artwork(path.to_string_lossy().to_string());
 
         assert_eq!(artwork.as_deref(), Some(cover_data.as_slice()));
+        assert_eq!(artist_art, None);
+    }
+
+    #[test]
+    fn extract_artist_artwork_from_wavpack_ape_item() {
+        let dir = TestDir::new("wv-artist-art");
+        let path = dir.path().join("track.wv");
+        let cover_data = b"\x89PNG\r\n\x1a\nape-cover-payload".to_vec();
+        let artist_data = b"\x89PNG\r\n\x1a\nape-artist-payload".to_vec();
+        write_bytes(
+            &path,
+            &build_wv_bytes_with_ape_items(&[
+                ("Cover Art (Front)", &cover_data),
+                ("Cover Art (Lead Artist)", &artist_data),
+            ]),
+        );
+
+        let artwork = extract_embedded_artwork(path.to_string_lossy().to_string());
+        let artist_art = extract_artist_artwork(path.to_string_lossy().to_string());
+
+        assert_eq!(artwork.as_deref(), Some(cover_data.as_slice()));
+        assert_eq!(artist_art.as_deref(), Some(artist_data.as_slice()));
     }
 }
