@@ -1792,16 +1792,20 @@ class _MenuScreenState extends ConsumerState<MenuScreen>
           .whereType<Song>()
           .toList();
 
+      final coverPath = playlist.coverPath;
+
       return _PlaylistPreview(
         playlist: playlist,
-        coverArtPath: songs.firstOrNull?.albumArt,
-        coverArtPaths: songs
-            .map((song) => song.albumArt)
-            .whereType<String>()
-            .where((path) => path.isNotEmpty)
-            .toSet()
-            .take(4)
-            .toList(),
+        coverArtPath: coverPath ?? songs.firstOrNull?.albumArt,
+        coverArtPaths: coverPath != null
+            ? [coverPath]
+            : songs
+                  .map((song) => song.albumArt)
+                  .whereType<String>()
+                  .where((path) => path.isNotEmpty)
+                  .toSet()
+                  .take(4)
+                  .toList(),
         subtitle: _buildPlaylistSubtitle(songs),
         songCount: songs.length,
         updatedAt: playlist.updatedAt ?? playlist.createdAt,

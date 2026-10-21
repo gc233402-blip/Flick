@@ -120,6 +120,31 @@ class PlaylistsNotifier extends AsyncNotifier<PlaylistsState> {
     return false;
   }
 
+  Future<bool> setPlaylistCover(
+    String playlistId,
+    String sourceImagePath,
+  ) async {
+    final service = ref.read(playlistServiceProvider);
+    final success = await service.setPlaylistCover(playlistId, sourceImagePath);
+
+    if (success && ref.mounted) {
+      ref.invalidateSelf();
+    }
+
+    return success;
+  }
+
+  Future<bool> removePlaylistCover(String playlistId) async {
+    final service = ref.read(playlistServiceProvider);
+    final success = await service.removePlaylistCover(playlistId);
+
+    if (success && ref.mounted) {
+      ref.invalidateSelf();
+    }
+
+    return success;
+  }
+
   Future<bool> addSongToPlaylist(String playlistId, String songId, {Song? song}) async {
     final service = ref.read(playlistServiceProvider);
     final success = await service.addSongToPlaylist(playlistId, songId);

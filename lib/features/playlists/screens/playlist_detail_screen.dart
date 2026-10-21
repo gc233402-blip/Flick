@@ -31,6 +31,7 @@ import 'package:flick/providers/detail_description_provider.dart';
 import 'package:flick/features/player/widgets/sleep_timer_bottom_sheet.dart';
 import 'package:flick/providers/favorites_provider.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
+import 'package:flick/features/playlists/playlist_cover_actions.dart';
 import 'package:flick/features/playlists/widgets/playlist_sort_bottom_sheet.dart';
 import 'package:flick/features/songs/widgets/song_actions_button.dart';
 import 'package:flick/l10n/l10n.dart';
@@ -210,6 +211,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
           _songs = [];
           _isLoading = false;
         });
+        unawaited(_extractPlaylistColor(playlist));
       }
       return;
     }
@@ -238,10 +240,19 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
       });
     }
 
-    unawaited(_extractPlaylistColor(playlist.songIds));
+    unawaited(_extractPlaylistColor(playlist));
   }
 
-  Future<void> _extractPlaylistColor(List<String> songIds) async {
+  Future<void> _extractPlaylistColor(Playlist playlist) async {
+    final coverPath = playlist.coverPath;
+    if (coverPath != null && coverPath.isNotEmpty) {
+      final color = await _colorService.extractDominantColor(coverPath);
+      if (!mounted) return;
+      setState(() => _playlistColor = color);
+      return;
+    }
+
+    final songIds = playlist.songIds;
     if (songIds.isEmpty) return;
 
     final mostPlayed = await _recentlyPlayedRepository.getMostPlayedSongAmong(
@@ -267,7 +278,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
       if (source == null || !mounted) return;
     }
     final color = await _colorService.extractDominantColor(source);
-    if (!mounted || color == null) return;
+    if (!mounted) return;
     setState(() => _playlistColor = color);
   }
 
@@ -385,10 +396,50 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
         .save(_descriptionKey, result);
   }
 
+  Future<void> _refreshCoverColor() async {
+    final playlist = await ref
+        .read(playlistServiceProvider)
+        .getPlaylist(widget.playlist.id);
+    if (!mounted) return;
+    unawaited(_extractPlaylistColor(playlist ?? _currentPlaylist));
+  }
+
+  Future<void> _changeCover() async {
+    final changed = await PlaylistCoverActions.choose(
+      context,
+      ref,
+      _currentPlaylist,
+    );
+    if (!mounted || !changed) return;
+    unawaited(_refreshCoverColor());
+  }
+
+  Future<void> _removeCover() async {
+    final changed = await PlaylistCoverActions.remove(
+      context,
+      ref,
+      _currentPlaylist,
+    );
+    if (!mounted || !changed) return;
+    unawaited(_refreshCoverColor());
+  }
+
   void _showMore() {
+    final hasCover = _currentPlaylist.coverPath != null;
     DetailMoreSheet.show(
       context,
       items: [
+        DetailMoreSheetItem(
+          icon: LucideIcons.imagePlus,
+          label: hasCover ? l10n.changeCover : l10n.setCover,
+          onTap: _changeCover,
+        ),
+        if (hasCover)
+          DetailMoreSheetItem(
+            icon: LucideIcons.imageOff,
+            label: l10n.removeCover,
+            onTap: _removeCover,
+          ),
         DetailMoreSheetItem(
           icon: LucideIcons.alignLeft,
           label: ref.read(detailDescriptionProvider(_descriptionKey)).isEmpty
@@ -727,6 +778,16 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
         color: context.adaptiveTextTertiary,
       ),
     );
+    final coverPath = _currentPlaylist.coverPath;
+    if (coverPath != null) {
+      return CachedImageWidget(
+        imagePath: coverPath,
+        fit: BoxFit.cover,
+        placeholder: fallback,
+        errorWidget: fallback,
+      );
+    }
+
     if (_songs.isEmpty) {
       return fallback;
     }
@@ -930,10 +991,28 @@ class _PlaylistCard extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppConstants.radiusLg),
-                  child: Icon(
-                    LucideIcons.listMusic,
-                    color: context.adaptiveTextTertiary,
-                  ),
+                  child: playlist.coverPath == null
+                      ? Icon(
+                          LucideIcons.listMusic,
+                          color: context.adaptiveTextTertiary,
+                        )
+                      : SizedBox.expand(
+                          child: CachedImageWidget(
+                            imagePath: playlist.coverPath,
+                            fit: BoxFit.cover,
+                            useThumbnail: true,
+                            thumbnailWidth: 300,
+                            thumbnailHeight: 300,
+                            placeholder: Icon(
+                              LucideIcons.listMusic,
+                              color: context.adaptiveTextTertiary,
+                            ),
+                            errorWidget: Icon(
+                              LucideIcons.listMusic,
+                              color: context.adaptiveTextTertiary,
+                            ),
+                          ),
+                        ),
                 ),
               ),
             ),

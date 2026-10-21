@@ -994,9 +994,27 @@ class _PlaylistTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final name = playlist.name as String;
     final count = (playlist.songIds as List).length;
+    final coverPath = playlist.coverPath as String?;
     final songsState = ref.watch(songsProvider).value;
     Widget leading;
-    if (songsState != null) {
+    if (coverPath != null && coverPath.isNotEmpty) {
+      leading = ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: CachedImageWidget(
+            imagePath: coverPath,
+            fit: BoxFit.cover,
+            useThumbnail: true,
+            thumbnailWidth: 96,
+            thumbnailHeight: 96,
+            placeholder: Container(color: AppColors.surfaceLight),
+            errorWidget: Container(color: AppColors.surfaceLight),
+          ),
+        ),
+      );
+    } else if (songsState != null) {
       final ids = (playlist.songIds as List).cast<String>().toSet();
       final playlistSongs =
           songsState.songs.where((s) => ids.contains(s.id)).toList();

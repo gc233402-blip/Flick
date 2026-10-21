@@ -10,6 +10,10 @@ class Playlist {
   final DateTime? updatedAt;
   final String? sourcePath;
 
+  /// Local path to a user-chosen cover image. Null means the playlist uses the
+  /// automatic album-art collage.
+  final String? coverPath;
+
   /// Timestamp of when each song was added to this playlist, keyed by song id.
   /// Songs without an entry (legacy playlists, imported lists) fall back to
   /// their position in [songIds] when sorting by "Date Added".
@@ -51,6 +55,7 @@ class Playlist {
     required this.createdAt,
     this.updatedAt,
     this.sourcePath,
+    this.coverPath,
     this.songAddedAt = const {},
   });
 
@@ -61,6 +66,8 @@ class Playlist {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? sourcePath,
+    String? coverPath,
+    bool clearCoverPath = false,
     Map<String, DateTime>? songAddedAt,
   }) {
     return Playlist(
@@ -70,6 +77,7 @@ class Playlist {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       sourcePath: sourcePath ?? this.sourcePath,
+      coverPath: clearCoverPath ? null : coverPath ?? this.coverPath,
       songAddedAt: songAddedAt ?? this.songAddedAt,
     );
   }
@@ -82,6 +90,7 @@ class Playlist {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       'sourcePath': sourcePath,
+      'coverPath': coverPath,
       'songAddedAt': {
         for (final entry in songAddedAt.entries)
           entry.key: entry.value.toIso8601String(),
@@ -100,6 +109,7 @@ class Playlist {
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
       sourcePath: json['sourcePath'] as String?,
+      coverPath: json['coverPath'] as String?,
       songAddedAt: {
         for (final entry in rawAddedAt.entries)
           entry.key: DateTime.parse(entry.value as String),

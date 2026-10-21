@@ -1997,6 +1997,12 @@ abstract class AppLocalizations {
   /// **'{arg1} / {arg2}ch'**
   String ch3(Object arg1, Object arg2);
 
+  /// lib/features/playlists/screens/playlists_screen.dart:610
+  ///
+  /// In en, this message translates to:
+  /// **'Change cover'**
+  String get changeCover;
+
   /// lib/features/settings/screens/uac2_preferences_screen.dart:1234
   ///
   /// In en, this message translates to:
@@ -2705,6 +2711,12 @@ abstract class AppLocalizations {
   /// **'Could not save your recap. Please try again.'**
   String get couldNotSaveYourRecapPlease;
 
+  /// lib/features/playlists/playlist_cover_actions.dart:57
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update the playlist cover. Try another image.'**
+  String get couldNotUpdatePlaylistCover;
+
   /// lib/features/player/widgets/inline_lyrics_panel.dart:142
   ///
   /// In en, this message translates to:
@@ -2728,6 +2740,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{done} / {total} covers'**
   String covers(Object done, Object total);
+
+  /// lib/features/playlists/screens/playlist_cover_crop_screen.dart:151
+  ///
+  /// In en, this message translates to:
+  /// **'Crop cover'**
+  String get cropCover;
+
+  /// lib/features/playlists/screens/playlist_cover_crop_screen.dart:207
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom, drag to reposition'**
+  String get cropCoverHint;
 
   /// lib/features/playlists/screens/playlists_screen.dart:403
   ///
@@ -8362,6 +8386,18 @@ abstract class AppLocalizations {
   /// **'Playlist'**
   String get playlist2;
 
+  /// lib/features/playlists/playlist_cover_actions.dart:93
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist cover removed'**
+  String get playlistCoverRemoved;
+
+  /// lib/features/playlists/playlist_cover_actions.dart:58
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist cover updated'**
+  String get playlistCoverUpdated;
+
   /// lib/features/playlists/screens/playlists_screen.dart:457
   ///
   /// In en, this message translates to:
@@ -8901,6 +8937,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove Custom Art'**
   String get removeCustomArt;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:651
+  ///
+  /// In en, this message translates to:
+  /// **'Remove cover'**
+  String get removeCover;
 
   /// lib/features/settings/screens/library_settings_screen.dart:2147
   ///
@@ -10065,6 +10107,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set Album Art'**
   String get setAlbumArt;
+
+  /// lib/features/playlists/screens/playlists_screen.dart:608
+  ///
+  /// In en, this message translates to:
+  /// **'Set cover'**
+  String get setCover;
 
   /// lib/features/player/screens/lyrics_sync_screen.dart:1589
   ///

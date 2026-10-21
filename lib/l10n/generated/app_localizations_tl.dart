@@ -1124,6 +1124,9 @@ class AppLocalizationsTl extends AppLocalizations {
   }
 
   @override
+  String get changeCover => 'Change cover';
+
+  @override
   String get changingSampleRateBitDepthOr =>
       'Changing sample rate, bit depth, or channel handling can resample songs and may affect playback quality, pitch, speed, or stability on some devices.';
 
@@ -1528,6 +1531,10 @@ class AppLocalizationsTl extends AppLocalizations {
       'Could not save your recap. Please try again.';
 
   @override
+  String get couldNotUpdatePlaylistCover =>
+      'Could not update the playlist cover. Try another image.';
+
+  @override
   String get couldNotUseTheSelectedLyrics =>
       'Could not use the selected lyrics file.';
 
@@ -1542,6 +1549,12 @@ class AppLocalizationsTl extends AppLocalizations {
   String covers(Object done, Object total) {
     return '$done / $total covers';
   }
+
+  @override
+  String get cropCover => 'Crop cover';
+
+  @override
+  String get cropCoverHint => 'Pinch to zoom, drag to reposition';
 
   @override
   String get create => 'Create';
@@ -4876,6 +4889,12 @@ class AppLocalizationsTl extends AppLocalizations {
   String get playlist2 => 'Playlist';
 
   @override
+  String get playlistCoverRemoved => 'Playlist cover removed';
+
+  @override
+  String get playlistCoverUpdated => 'Playlist cover updated';
+
+  @override
   String playlistCreated(Object arg1) {
     return 'Playlist \"$arg1\" created';
   }
@@ -5192,6 +5211,9 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get removeCustomArt => 'Remove Custom Art';
+
+  @override
+  String get removeCover => 'Remove cover';
 
   @override
   String get removeDuplicates => 'Remove Duplicates';
@@ -5872,6 +5894,9 @@ class AppLocalizationsTl extends AppLocalizations {
 
   @override
   String get setAlbumArt => 'Set Album Art';
+
+  @override
+  String get setCover => 'Set cover';
 
   @override
   String get setToNow => 'Set to Now';

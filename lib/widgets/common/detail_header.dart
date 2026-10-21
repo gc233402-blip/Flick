@@ -327,6 +327,7 @@ class DetailMoreSheet extends StatelessWidget {
       useRootNavigator: true,
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) => DetailMoreSheet(items: items),
     );
   }
@@ -335,48 +336,86 @@ class DetailMoreSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: AppBottomSheetSurface.decoration,
-      // Surface reaches the bottom edge; content clears the system
-      // gesture/navigation inset.
-      padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        24 + MediaQuery.paddingOf(context).bottom,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.7,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Text(
-              l10n.more,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: context.adaptiveTextPrimary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          for (final item in items)
-            ListTile(
-              leading: Icon(
-                item.icon,
-                color: context.adaptiveTextSecondary,
-                size: 22,
-              ),
-              title: Text(
-                item.label,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: context.adaptiveTextPrimary,
+      child: SingleChildScrollView(
+        // Surface reaches the bottom edge; content clears the system
+        // gesture/navigation inset.
+        padding: EdgeInsets.fromLTRB(
+          AppConstants.spacingMd,
+          AppConstants.spacingSm,
+          AppConstants.spacingMd,
+          AppConstants.spacingLg + MediaQuery.paddingOf(context).bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.textTertiary,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              onTap: () {
-                Navigator.pop(context);
-                item.onTap();
-              },
             ),
-        ],
+            const SizedBox(height: AppConstants.spacingMd),
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Text(
+                l10n.more.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: context.adaptiveTextTertiary,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingXs),
+            for (final item in items) _buildItem(context, item),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItem(BuildContext context, DetailMoreSheetItem item) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppConstants.radiusMd),
+        onTap: () {
+          Navigator.pop(context);
+          item.onTap();
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          child: Row(
+            children: [
+              Icon(
+                item.icon,
+                color: context.adaptiveTextSecondary,
+                size: 20,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  item.label,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal,
+                    color: context.adaptiveTextPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

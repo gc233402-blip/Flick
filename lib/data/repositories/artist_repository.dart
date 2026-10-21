@@ -18,7 +18,15 @@ class ArtistRepository {
   }
 
   /// Set or clear the cached art path for an artist.
-  Future<void> setArt(String name, String? artPath) async {
+  ///
+  /// [source] and [checkedAt] are only written when provided, so callers that
+  /// only refresh the path do not erase provenance.
+  Future<void> setArt(
+    String name,
+    String? artPath, {
+    String? source,
+    DateTime? checkedAt,
+  }) async {
     if (name.isEmpty) return;
     await _isar.writeTxn(() async {
       final existing = await _isar.artistEntitys
@@ -27,18 +35,56 @@ class ArtistRepository {
           .findFirst();
 
       if (existing != null) {
-        if (existing.artPath == artPath) return;
-        existing.artPath = artPath;
+        final pathChanged = existing.artPath != artPath;
+        final sourceChanged = source != null && existing.artSource != source;
+        final checkedChanged =
+            checkedAt != null && existing.artCheckedAt != checkedAt;
+        if (!pathChanged && !sourceChanged && !checkedChanged) return;
+
+        if (pathChanged) {
+          existing.artPath = artPath;
+          // A missing file is no longer a usable fallback; drop its stale
+          // provenance unless the caller is explicitly assigning a new one.
+          if (artPath == null && source == null) existing.artSource = null;
+        }
+        if (source != null) existing.artSource = source;
+        if (checkedAt != null) existing.artCheckedAt = checkedAt;
         await _isar.artistEntitys.put(existing);
         return;
       }
 
       final entity = ArtistEntity()
         ..name = name
-        ..artPath = artPath;
+        ..artPath = artPath
+        ..artSource = source
+        ..artCheckedAt = checkedAt;
       await _isar.artistEntitys.put(entity);
     });
   }
 
-  Future<void> clearArt(String name) => setArt(name, null);
+  /// Artwork paths still referenced by artist records. The artwork cache uses
+  /// this so embedded portraits are not pruned as unreferenced files.
+  Future<Set<String>> getReferencedArtPaths() async {
+    final entities = await _isar.artistEntitys.where().findAll();
+    return entities
+        .map((entity) => entity.artPath)
+        .whereType<String>()
+        .where((path) => path.isNotEmpty)
+        .toSet();
+  }
+
+  Future<void> clearArt(String name) async {
+    if (name.isEmpty) return;
+    await _isar.writeTxn(() async {
+      final existing = await _isar.artistEntitys
+          .filter()
+          .nameEqualTo(name, caseSensitive: false)
+          .findFirst();
+      if (existing == null) return;
+      existing.artPath = null;
+      existing.artSource = null;
+      existing.artCheckedAt = null;
+      await _isar.artistEntitys.put(existing);
+    });
+  }
 }

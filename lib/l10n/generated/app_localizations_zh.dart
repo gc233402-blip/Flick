@@ -1064,6 +1064,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get changeCover => '更换封面';
+
+  @override
   String get changingSampleRateBitDepthOr =>
       '更改采样率、位深或声道处理可能导致歌曲被重采样，并在某些设备上影响播放音质、音调、速度或稳定性。';
 
@@ -1449,6 +1452,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotSaveYourRecapPlease => '无法保存回顾，请重试。';
 
   @override
+  String get couldNotUpdatePlaylistCover => '无法更新播放列表封面，请换一张图片重试。';
+
+  @override
   String get couldNotUseTheSelectedLyrics => '无法使用所选歌词文件。';
 
   @override
@@ -1462,6 +1468,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String covers(Object done, Object total) {
     return '$done / $total 张封面';
   }
+
+  @override
+  String get cropCover => '裁剪封面';
+
+  @override
+  String get cropCoverHint => '双指缩放，拖动调整位置';
 
   @override
   String get create => '创建';
@@ -4577,6 +4589,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get playlist2 => '播放列表';
 
   @override
+  String get playlistCoverRemoved => '播放列表封面已移除';
+
+  @override
+  String get playlistCoverUpdated => '播放列表封面已更新';
+
+  @override
   String playlistCreated(Object arg1) {
     return '播放列表“$arg1”已创建';
   }
@@ -4874,6 +4892,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get removeCustomArt => '移除自定义封面';
+
+  @override
+  String get removeCover => '移除封面';
 
   @override
   String get removeDuplicates => '移除重复项';
@@ -5514,6 +5535,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setAlbumArt => '设置专辑封面';
+
+  @override
+  String get setCover => '设置封面';
 
   @override
   String get setToNow => '设为当前';

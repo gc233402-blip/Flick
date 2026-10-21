@@ -15,6 +15,7 @@ import 'package:flick/services/sources/network_source_service.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
+import 'package:flick/features/playlists/playlist_cover_actions.dart';
 import 'package:flick/features/playlists/screens/playlist_detail_screen.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/providers/player_provider.dart';
@@ -314,6 +315,10 @@ class PlaylistsScreen extends ConsumerWidget {
                   .deletePlaylist(playlist.id);
             }
           },
+          onSetCover: () =>
+              PlaylistCoverActions.choose(context, ref, playlist),
+          onRemoveCover: () =>
+              PlaylistCoverActions.remove(context, ref, playlist),
           onExportM3u: () =>
               _exportPlaylist(context, ref, playlist, utf8: false),
           onExportM3u8: () =>
@@ -542,6 +547,8 @@ class _PlaylistCard extends StatelessWidget {
   final String? serverLabel;
   final VoidCallback onTap;
   final VoidCallback onDelete;
+  final VoidCallback onSetCover;
+  final VoidCallback onRemoveCover;
   final VoidCallback onExportM3u;
   final VoidCallback onExportM3u8;
 
@@ -551,6 +558,8 @@ class _PlaylistCard extends StatelessWidget {
     this.serverLabel,
     required this.onTap,
     required this.onDelete,
+    required this.onSetCover,
+    required this.onRemoveCover,
     required this.onExportM3u,
     required this.onExportM3u8,
   });
@@ -609,6 +618,12 @@ class _PlaylistCard extends StatelessWidget {
                   color: AppColors.surface,
                   onSelected: (value) {
                     switch (value) {
+                      case 'set_cover':
+                        onSetCover();
+                        break;
+                      case 'remove_cover':
+                        onRemoveCover();
+                        break;
                       case 'export_m3u':
                         onExportM3u();
                         break;
@@ -621,6 +636,32 @@ class _PlaylistCard extends StatelessWidget {
                     }
                   },
                   itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'set_cover',
+                      child: Row(
+                        children: [
+                          Icon(LucideIcons.imagePlus, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            playlist.coverPath == null
+                                ? l10n.setCover
+                                : l10n.changeCover,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (playlist.coverPath != null)
+                      PopupMenuItem(
+                        value: 'remove_cover',
+                        child: Row(
+                          children: [
+                            Icon(LucideIcons.imageOff, size: 18),
+                            const SizedBox(width: 8),
+                            Text(l10n.removeCover),
+                          ],
+                        ),
+                      ),
+                    const PopupMenuDivider(),
                     PopupMenuItem(
                       value: 'export_m3u',
                       child: Row(
@@ -670,6 +711,11 @@ class _PlaylistCover extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final coverPath = playlist.coverPath;
+    if (coverPath != null) {
+      return _buildCustomCover(context, coverPath);
+    }
+
     final songsAsync = ref.watch(songsProvider);
 
     return songsAsync.when(
@@ -693,6 +739,26 @@ class _PlaylistCover extends ConsumerWidget {
 
         return _buildCoverGrid(context, artworkPaths);
       },
+    );
+  }
+
+  Widget _buildCustomCover(BuildContext context, String coverPath) {
+    final size = context.scaleSize(56);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppConstants.radiusMd),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: CachedImageWidget(
+          imagePath: coverPath,
+          fit: BoxFit.cover,
+          useThumbnail: true,
+          thumbnailWidth: 112,
+          thumbnailHeight: 112,
+          placeholder: _buildPlaceholderIcon(context),
+          errorWidget: _buildPlaceholderIcon(context),
+        ),
+      ),
     );
   }
 
