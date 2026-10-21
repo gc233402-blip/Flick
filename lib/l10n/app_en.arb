@@ -1524,6 +1524,10 @@
       }
     }
   },
+  "changeCover": "Change cover",
+  "@changeCover": {
+    "description": "lib/features/playlists/screens/playlists_screen.dart:610"
+  },
   "changingSampleRateBitDepthOr": "Changing sample rate, bit depth, or channel handling can resample songs and may affect playback quality, pitch, speed, or stability on some devices.",
   "@changingSampleRateBitDepthOr": {
     "description": "lib/features/settings/screens/uac2_preferences_screen.dart:1234"
@@ -2064,6 +2068,10 @@
   "@couldNotSaveYourRecapPlease": {
     "description": "lib/features/recap/screens/replay_studio_screen.dart:259"
   },
+  "couldNotUpdatePlaylistCover": "Could not update the playlist cover. Try another image.",
+  "@couldNotUpdatePlaylistCover": {
+    "description": "lib/features/playlists/playlist_cover_actions.dart:57"
+  },
   "couldNotUseTheSelectedLyrics": "Could not use the selected lyrics file.",
   "@couldNotUseTheSelectedLyrics": {
     "description": "lib/features/player/widgets/inline_lyrics_panel.dart:142"
@@ -2087,6 +2095,14 @@
         "type": "Object"
       }
     }
+  },
+  "cropCover": "Crop cover",
+  "@cropCover": {
+    "description": "lib/features/playlists/screens/playlist_cover_crop_screen.dart:151"
+  },
+  "cropCoverHint": "Pinch to zoom, drag to reposition",
+  "@cropCoverHint": {
+    "description": "lib/features/playlists/screens/playlist_cover_crop_screen.dart:207"
   },
   "create": "Create",
   "@create": {
@@ -6564,6 +6580,14 @@
   "@playlist2": {
     "description": "lib/models/playback_context.dart:14"
   },
+  "playlistCoverRemoved": "Playlist cover removed",
+  "@playlistCoverRemoved": {
+    "description": "lib/features/playlists/playlist_cover_actions.dart:93"
+  },
+  "playlistCoverUpdated": "Playlist cover updated",
+  "@playlistCoverUpdated": {
+    "description": "lib/features/playlists/playlist_cover_actions.dart:58"
+  },
   "playlistCreated": "Playlist \"{arg1}\" created",
   "@playlistCreated": {
     "description": "lib/features/playlists/screens/playlists_screen.dart:457",
@@ -7002,6 +7026,10 @@
   "removeCustomArt": "Remove Custom Art",
   "@removeCustomArt": {
     "description": "lib/features/songs/widgets/album_art_picker_bottom_sheet.dart:357"
+  },
+  "removeCover": "Remove cover",
+  "@removeCover": {
+    "description": "lib/features/playlists/screens/playlists_screen.dart:651"
   },
   "removeDuplicates": "Remove Duplicates",
   "@removeDuplicates": {
@@ -7919,6 +7947,10 @@
   "setAlbumArt": "Set Album Art",
   "@setAlbumArt": {
     "description": "lib/features/player/widgets/song_actions_sheet.dart:220"
+  },
+  "setCover": "Set cover",
+  "@setCover": {
+    "description": "lib/features/playlists/screens/playlists_screen.dart:608"
   },
   "setToNow": "Set to Now",
   "@setToNow": {
