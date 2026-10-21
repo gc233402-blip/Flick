@@ -13,6 +13,7 @@ import 'package:flick/data/repositories/song_repository.dart';
 import 'package:flick/features/artists/screens/artist_detail_screen.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/providers/providers.dart';
+import 'package:flick/services/artist_artwork_service.dart';
 import 'package:flick/services/player_service.dart';
 import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
@@ -40,6 +41,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
   bool _isLoading = true;
   ArtistSortOption _sortOption = ArtistSortOption.name;
   int _loadGeneration = 0;
+  int _artistArtRevision = 0;
 
   @override
   void initState() {
@@ -172,8 +174,8 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
     );
   }
 
-  void _openArtistDetail(String artistName, List<Song> songs) {
-    NavigationHelper.pushFade(
+  Future<void> _openArtistDetail(String artistName, List<Song> songs) async {
+    await NavigationHelper.pushFade(
       context,
       (_) => ArtistDetailScreen(
         artistName: artistName,
@@ -183,6 +185,10 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
         playerService: _playerService,
       ),
     );
+    if (!mounted) return;
+    // Detail may have saved a newly found portrait; let tiles re-read it.
+    setState(() => _artistArtRevision++);
+    _loadArtists();
   }
 
   @override
@@ -551,6 +557,7 @@ class _ArtistsScreenState extends ConsumerState<ArtistsScreen> {
                       songs: entry.value,
                       artistArt: _getArtistArt(entry.value),
                       artistArtSourcePath: _getArtworkSourcePath(entry.value),
+                      artRevision: _artistArtRevision,
                       initials: _getArtistInitials(entry.key),
                       onTap: () => _openArtistDetail(entry.key, entry.value),
                     );
@@ -568,6 +575,7 @@ class _ArtistCard extends StatefulWidget {
   final List<Song> songs;
   final String? artistArt;
   final String? artistArtSourcePath;
+  final int artRevision;
   final String initials;
   final VoidCallback onTap;
 
@@ -576,6 +584,7 @@ class _ArtistCard extends StatefulWidget {
     required this.songs,
     required this.artistArt,
     required this.artistArtSourcePath,
+    required this.artRevision,
     required this.initials,
     required this.onTap,
   });
@@ -588,10 +597,15 @@ class _ArtistCardState extends State<_ArtistCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  String? _artistArt;
+  String? _artistArtSourcePath;
+  int _resolveGeneration = 0;
 
   @override
   void initState() {
     super.initState();
+    _artistArt = widget.artistArt;
+    _artistArtSourcePath = widget.artistArtSourcePath;
     _controller = AnimationController(
       duration: AppConstants.animationFast,
       vsync: this,
@@ -600,6 +614,40 @@ class _ArtistCardState extends State<_ArtistCard>
       begin: 1.0,
       end: 0.97,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _resolveArtistArt();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ArtistCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.artistName == widget.artistName &&
+        oldWidget.artRevision == widget.artRevision) {
+      return;
+    }
+    _artistArt = widget.artistArt;
+    _artistArtSourcePath = widget.artistArtSourcePath;
+    _resolveArtistArt();
+  }
+
+  Future<void> _resolveArtistArt() async {
+    final generation = ++_resolveGeneration;
+    final artistName = widget.artistName;
+    final art = await ArtistArtworkService.instance.resolveForArtist(
+      artistName: artistName,
+      songs: widget.songs,
+      thorough: false,
+    );
+    if (!mounted ||
+        generation != _resolveGeneration ||
+        artistName != widget.artistName ||
+        art == null ||
+        art == _artistArt) {
+      return;
+    }
+    setState(() {
+      _artistArt = art;
+      _artistArtSourcePath = null;
+    });
   }
 
   @override
@@ -646,8 +694,8 @@ class _ArtistCardState extends State<_ArtistCard>
                     ),
                     child: ClipOval(
                       child: CachedImageWidget(
-                        imagePath: widget.artistArt,
-                        audioSourcePath: widget.artistArtSourcePath,
+                        imagePath: _artistArt,
+                        audioSourcePath: _artistArtSourcePath,
                         fit: BoxFit.cover,
                         placeholder: _buildInitials(context),
                         errorWidget: _buildInitials(context),

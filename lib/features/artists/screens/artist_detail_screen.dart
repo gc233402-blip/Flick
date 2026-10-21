@@ -18,8 +18,8 @@ import 'package:flick/features/albums/screens/album_detail_screen.dart';
 import 'package:flick/models/playback_context.dart';
 import 'package:flick/models/song.dart';
 import 'package:flick/providers/apple_music_provider.dart';
-import 'package:flick/services/album_art_service.dart';
 import 'package:flick/services/apple_music/apple_music_metadata_service.dart';
+import 'package:flick/services/artist_artwork_service.dart';
 import 'package:flick/services/apple_music/apple_music_models.dart';
 import 'package:flick/services/color_extraction_service.dart';
 import 'package:flick/services/player_service.dart';
@@ -130,35 +130,28 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
   }
 
   Future<void> _resolveAndSaveArtistArt() async {
-    final saved = await _artistRepository.getByName(widget.artistName);
+    final resolved = await ArtistArtworkService.instance.resolveForArtist(
+      artistName: widget.artistName,
+      songs: widget.songs,
+    );
     if (!mounted) return;
 
-    if (saved?.artPath != null && saved!.artPath!.isNotEmpty) {
-      if (saved.artPath != _artistArt && mounted) {
-        setState(() => _artistArt = saved.artPath);
+    if (resolved != null && resolved.isNotEmpty) {
+      if (resolved != _artistArt) {
+        setState(() {
+          _artistArt = resolved;
+          // The embedded portrait is not any song's album cover, so do not
+          // match it to a song for the hero transition.
+          _artistArtSourcePath = null;
+        });
+        _extractArtistColor();
       }
       return;
     }
 
-    if (_artistArt != null && _artistArt!.isNotEmpty) {
-      await _artistRepository.setArt(widget.artistName, _artistArt);
-      return;
-    }
-
-    final sourcePath = _artistArtSourcePath;
-    if (sourcePath != null && sourcePath.isNotEmpty) {
-      final resolved = await AlbumArtService.instance.resolveArtworkPath(
-        existingPath: null,
-        audioSourcePath: sourcePath,
-      );
-      if (!mounted) return;
-      if (resolved != null && resolved.isNotEmpty) {
-        setState(() => _artistArt = resolved);
-        await _artistRepository.setArt(widget.artistName, resolved);
-        return;
-      }
-    }
-
+    // Keep the album cover passed by the artists list. Only fetch an online
+    // portrait when the artist has no local artwork at all.
+    if (_artistArt != null && _artistArt!.isNotEmpty) return;
     await _applyAppleMusicArtistArt();
   }
 
@@ -186,8 +179,16 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
       final file = File('${dir.path}/$name.jpg');
       await file.writeAsBytes(bytes);
       if (!mounted) return;
-      setState(() => _artistArt = file.path);
-      await _artistRepository.setArt(widget.artistName, file.path);
+      setState(() {
+        _artistArt = file.path;
+        _artistArtSourcePath = null;
+      });
+      await _artistRepository.setArt(
+        widget.artistName,
+        file.path,
+        source: ArtistArtSource.appleMusic,
+        checkedAt: DateTime.now(),
+      );
     } catch (error) {
       devLog('Apple Music artist art fallback failed: $error');
     }
