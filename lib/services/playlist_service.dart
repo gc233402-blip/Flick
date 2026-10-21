@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flick/data/database.dart';
 import 'package:flick/data/repositories/song_repository.dart';
@@ -48,6 +49,7 @@ class PlaylistSourceFile {
 
 class PlaylistService {
   static const String _playlistsKey = 'playlists';
+  static const String _playlistCoversDirectoryName = 'playlist_covers';
   static const MethodChannel _storageChannel = MethodChannel(
     'com.mossapps.flick/storage',
   );
@@ -203,6 +205,111 @@ class PlaylistService {
     return updated;
   }
 
+  /// Copy [sourceImagePath] into durable app storage and use it as [playlistId]'s
+  /// cover. Covers are local-only; they are never sent to a Subsonic server.
+  Future<bool> setPlaylistCover(
+    String playlistId,
+    String sourceImagePath,
+  ) async {
+    await _ensureLoaded();
+
+    final index = _playlists.indexWhere((p) => p.id == playlistId);
+    if (index == -1) return false;
+
+    final source = File(sourceImagePath);
+    if (!await source.exists()) return false;
+
+    final original = _playlists[index];
+    final oldCoverPath = original.coverPath;
+    File? copiedFile;
+    try {
+      final directory = await _playlistCoversDirectory();
+      final safeId = playlistId.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+      final extension = _coverFileExtension(sourceImagePath);
+      final stamp = DateTime.now().microsecondsSinceEpoch;
+      copiedFile = File(
+        '${directory.path}${Platform.pathSeparator}${safeId}_$stamp$extension',
+      );
+      await source.copy(copiedFile.path);
+
+      _playlists[index] = _playlists[index].copyWith(
+        coverPath: copiedFile.path,
+        updatedAt: DateTime.now(),
+      );
+      await _savePlaylists();
+    } catch (e) {
+      devLog('[PlaylistService] Could not set playlist cover: $e');
+      _playlists[index] = original;
+      if (copiedFile != null) {
+        await _deleteCoverFile(copiedFile.path);
+      }
+      return false;
+    }
+
+    final newCoverPath = _playlists[index].coverPath;
+    if (oldCoverPath != null && oldCoverPath != newCoverPath) {
+      await _deleteCoverFile(oldCoverPath);
+    }
+    return true;
+  }
+
+  /// Clear [playlistId]'s custom cover and delete its stored image.
+  Future<bool> removePlaylistCover(String playlistId) async {
+    await _ensureLoaded();
+
+    final index = _playlists.indexWhere((p) => p.id == playlistId);
+    if (index == -1) return false;
+
+    final original = _playlists[index];
+    final oldCoverPath = original.coverPath;
+    _playlists[index] = original.copyWith(clearCoverPath: true);
+    try {
+      await _savePlaylists();
+    } catch (e) {
+      devLog('[PlaylistService] Could not remove playlist cover: $e');
+      _playlists[index] = original;
+      return false;
+    }
+
+    await _deleteCoverFile(oldCoverPath);
+    return true;
+  }
+
+  Future<Directory> _playlistCoversDirectory() async {
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final directory = Directory(
+      '${documentsDirectory.path}${Platform.pathSeparator}'
+      '$_playlistCoversDirectoryName',
+    );
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    return directory;
+  }
+
+  String _coverFileExtension(String sourcePath) {
+    final normalized = sourcePath.replaceAll('\\', '/');
+    final fileName = normalized.substring(normalized.lastIndexOf('/') + 1);
+    final dot = fileName.lastIndexOf('.');
+    if (dot <= 0) return '.jpg';
+    final extension = fileName.substring(dot).toLowerCase();
+    return RegExp(r'^\.[a-z0-9]{1,5}$').hasMatch(extension)
+        ? extension
+        : '.jpg';
+  }
+
+  Future<void> _deleteCoverFile(String? path) async {
+    if (path == null || path.isEmpty) return;
+    try {
+      final file = File(path);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (e) {
+      devLog('[PlaylistService] Could not delete playlist cover: $e');
+    }
+  }
+
   Future<bool> deletePlaylist(String id) async {
     await _ensureLoaded();
 
@@ -228,6 +335,7 @@ class PlaylistService {
 
     _playlists.removeWhere((p) => p.id == id);
     await _savePlaylists();
+    await _deleteCoverFile(playlist.coverPath);
     return true;
   }
 
@@ -420,6 +528,16 @@ class PlaylistService {
   ) async {
     await _ensureLoaded();
     final prefix = '${Playlist.networkSourceScheme}://$serverId/';
+    final removedCovers = _playlists
+        .where(
+          (p) =>
+              p.sourcePath != null &&
+              p.sourcePath!.startsWith(prefix) &&
+              !keepPaths.contains(p.sourcePath),
+        )
+        .map((p) => p.coverPath)
+        .whereType<String>()
+        .toList();
     final before = _playlists.length;
     _playlists.removeWhere(
       (p) =>
@@ -429,6 +547,9 @@ class PlaylistService {
     );
     if (_playlists.length != before) {
       await _savePlaylists();
+      for (final path in removedCovers) {
+        await _deleteCoverFile(path);
+      }
     }
   }
 
@@ -1089,8 +1210,15 @@ class PlaylistService {
   }
 
   Future<void> clearAll() async {
+    final coverPaths = _playlists
+        .map((playlist) => playlist.coverPath)
+        .whereType<String>()
+        .toList();
     _playlists.clear();
     await _savePlaylists();
+    for (final path in coverPaths) {
+      await _deleteCoverFile(path);
+    }
   }
 }
 
