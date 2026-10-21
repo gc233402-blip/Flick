@@ -19,6 +19,16 @@ const ArtistEntitySchema = CollectionSchema(
   properties: {
     r'artPath': PropertySchema(id: 0, name: r'artPath', type: IsarType.string),
     r'name': PropertySchema(id: 1, name: r'name', type: IsarType.string),
+    r'zArtCheckedAt': PropertySchema(
+      id: 2,
+      name: r'zArtCheckedAt',
+      type: IsarType.dateTime,
+    ),
+    r'zArtSource': PropertySchema(
+      id: 3,
+      name: r'zArtSource',
+      type: IsarType.string,
+    ),
   },
 
   estimateSize: _artistEntityEstimateSize,
@@ -63,6 +73,12 @@ int _artistEntityEstimateSize(
     }
   }
   bytesCount += 3 + object.name.length * 3;
+  {
+    final value = object.artSource;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -74,6 +90,8 @@ void _artistEntitySerialize(
 ) {
   writer.writeString(offsets[0], object.artPath);
   writer.writeString(offsets[1], object.name);
+  writer.writeDateTime(offsets[2], object.artCheckedAt);
+  writer.writeString(offsets[3], object.artSource);
 }
 
 ArtistEntity _artistEntityDeserialize(
@@ -86,6 +104,8 @@ ArtistEntity _artistEntityDeserialize(
   object.artPath = reader.readStringOrNull(offsets[0]);
   object.id = id;
   object.name = reader.readString(offsets[1]);
+  object.artCheckedAt = reader.readDateTimeOrNull(offsets[2]);
+  object.artSource = reader.readStringOrNull(offsets[3]);
   return object;
 }
 
@@ -100,6 +120,10 @@ P _artistEntityDeserializeProp<P>(
       return (reader.readStringOrNull(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
+    case 2:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 3:
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -680,6 +704,238 @@ extension ArtistEntityQueryFilter
       );
     });
   }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artCheckedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'zArtCheckedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artCheckedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'zArtCheckedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artCheckedAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'zArtCheckedAt', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artCheckedAtGreaterThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'zArtCheckedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artCheckedAtLessThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'zArtCheckedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artCheckedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'zArtCheckedAt',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'zArtSource'),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'zArtSource'),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'zArtSource',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'zArtSource',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'zArtSource',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'zArtSource',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'zArtSource',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'zArtSource',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'zArtSource',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'zArtSource',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'zArtSource', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterFilterCondition>
+  artSourceIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'zArtSource', value: ''),
+      );
+    });
+  }
 }
 
 extension ArtistEntityQueryObject
@@ -711,6 +967,31 @@ extension ArtistEntityQuerySortBy
   QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy> sortByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy> sortByArtCheckedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'zArtCheckedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy>
+  sortByArtCheckedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'zArtCheckedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy> sortByArtSource() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'zArtSource', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy> sortByArtSourceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'zArtSource', Sort.desc);
     });
   }
 }
@@ -752,6 +1033,31 @@ extension ArtistEntityQuerySortThenBy
       return query.addSortBy(r'name', Sort.desc);
     });
   }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy> thenByArtCheckedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'zArtCheckedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy>
+  thenByArtCheckedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'zArtCheckedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy> thenByArtSource() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'zArtSource', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QAfterSortBy> thenByArtSourceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'zArtSource', Sort.desc);
+    });
+  }
 }
 
 extension ArtistEntityQueryWhereDistinct
@@ -769,6 +1075,20 @@ extension ArtistEntityQueryWhereDistinct
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QDistinct> distinctByArtCheckedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'zArtCheckedAt');
+    });
+  }
+
+  QueryBuilder<ArtistEntity, ArtistEntity, QDistinct> distinctByArtSource({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'zArtSource', caseSensitive: caseSensitive);
     });
   }
 }
@@ -790,6 +1110,19 @@ extension ArtistEntityQueryProperty
   QueryBuilder<ArtistEntity, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<ArtistEntity, DateTime?, QQueryOperations>
+  artCheckedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'zArtCheckedAt');
+    });
+  }
+
+  QueryBuilder<ArtistEntity, String?, QQueryOperations> artSourceProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'zArtSource');
     });
   }
 }
