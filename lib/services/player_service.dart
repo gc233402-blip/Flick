@@ -2646,6 +2646,8 @@ class PlayerService {
             'usb_dsd_native' when effectiveBitPerfect =>
               'USB DSD native (clock/framing checked)',
             'usb_dsd_native' => 'USB DSD native',
+            'usb_direct' when dsdTransport == 'usb-pcm-folddown' =>
+              'USB direct (stereo fold-down)',
             'usb_direct' when effectiveBitPerfect => 'USB direct (clock/payload checked)',
             'usb_direct' => 'USB direct',
             'dsd_native' when passthroughAllowed => 'Verified DSD native',

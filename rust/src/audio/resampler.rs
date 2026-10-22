@@ -414,6 +414,30 @@ mod tests {
     }
 
     #[test]
+    fn test_resampler_preserves_sine_frequency_ratio_at_dsd_family_rates() {
+        for input_rate in [176_400, 352_800] {
+            let freq_hz = 750.0;
+            let analysis = resample_sine_segment(input_rate, 48_000, freq_hz);
+            let (detected_freq_hz, magnitude) =
+                detect_dominant_frequency(&analysis, 48_000, freq_hz, 20.0, 0.25);
+            let frequency_ratio = detected_freq_hz / freq_hz;
+
+            assert!(
+                magnitude > 0.7,
+                "{input_rate} -> 48000 Hz: fundamental collapsed: {magnitude}"
+            );
+            assert!(
+                (frequency_ratio - 1.0).abs() < 0.005,
+                "{input_rate} -> 48000 Hz: sample-rate mismatch: expected {:.3} Hz, \
+                 measured {:.3} Hz (ratio {:.6})",
+                freq_hz,
+                detected_freq_hz,
+                frequency_ratio,
+            );
+        }
+    }
+
+    #[test]
     fn test_resampler_keeps_sine_harmonics_low() {
         let freq_hz = 750.0;
         let analysis = resample_sine_segment(44_100, 48_000, freq_hz);
