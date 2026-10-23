@@ -32,6 +32,7 @@ import 'package:flick/features/player/widgets/sleep_timer_bottom_sheet.dart';
 import 'package:flick/providers/favorites_provider.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/features/playlists/playlist_cover_actions.dart';
+import 'package:flick/features/playlists/playlist_rename_action.dart';
 import 'package:flick/features/playlists/widgets/playlist_sort_bottom_sheet.dart';
 import 'package:flick/features/songs/widgets/song_actions_button.dart';
 import 'package:flick/l10n/l10n.dart';
@@ -287,11 +288,15 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
     return Color.lerp(_darkBase, _playlistColor!, blend)!;
   }
 
-  PlaybackContext get _playlistContext => PlaybackContext(
-    source: PlaybackSource.playlist,
-    sourceId: widget.playlist.id,
-    sourceName: widget.playlist.name,
-  );
+  PlaybackContext get _playlistContext {
+    final playlist =
+        ref.read(playlistProvider(widget.playlist.id)) ?? widget.playlist;
+    return PlaybackContext(
+      source: PlaybackSource.playlist,
+      sourceId: playlist.id,
+      sourceName: playlist.name,
+    );
+  }
 
   void _playSong(Song song) {
     if (_songs.isEmpty) return;
@@ -351,7 +356,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
 
   Future<void> _toggleFavoriteAll() async {
     if (_songs.isEmpty) return;
-    final favIds = ref.read(favoritesProvider).value?.favoriteIds ?? const <String>{};
+    final favIds =
+        ref.read(favoritesProvider).value?.favoriteIds ?? const <String>{};
     final notifier = ref.read(favoritesProvider.notifier);
     final isAll = _songs.every((s) => favIds.contains(s.id));
     if (isAll) {
@@ -396,12 +402,26 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
         .save(_descriptionKey, result);
   }
 
+  Future<void> _renamePlaylist() async {
+    await PlaylistRenameAction.show(context, ref, _currentPlaylist);
+  }
+
   Future<void> _refreshCoverColor() async {
     final playlist = await ref
         .read(playlistServiceProvider)
         .getPlaylist(widget.playlist.id);
     if (!mounted) return;
     unawaited(_extractPlaylistColor(playlist ?? _currentPlaylist));
+  }
+
+  Future<void> _editCover() async {
+    final changed = await PlaylistCoverActions.edit(
+      context,
+      ref,
+      _currentPlaylist,
+    );
+    if (!mounted || !changed) return;
+    unawaited(_refreshCoverColor());
   }
 
   Future<void> _changeCover() async {
@@ -429,6 +449,17 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
     DetailMoreSheet.show(
       context,
       items: [
+        DetailMoreSheetItem(
+          icon: LucideIcons.pencilLine,
+          label: l10n.rename,
+          onTap: _renamePlaylist,
+        ),
+        if (hasCover)
+          DetailMoreSheetItem(
+            icon: LucideIcons.pencil,
+            label: l10n.editCover,
+            onTap: _editCover,
+          ),
         DetailMoreSheetItem(
           icon: LucideIcons.imagePlus,
           label: hasCover ? l10n.changeCover : l10n.setCover,
@@ -514,6 +545,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                         expanded: prefs.detailHeaderArtExpanded,
                         centeredTitle: prefs.detailHeaderCenteredTitle,
                         artBuilder: (_) => _buildCollageBackground(),
+                        artColor: _playlistColor,
                         title: playlist.name,
                         subtitle: null,
                         meta: meta,
@@ -542,8 +574,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                         ),
                       ),
                       SliverToBoxAdapter(
-                        child:
-                            DetailDescription(descriptionKey: _descriptionKey),
+                        child: DetailDescription(
+                          descriptionKey: _descriptionKey,
+                        ),
                       ),
                       const SliverToBoxAdapter(
                         child: SizedBox(height: AppConstants.spacingLg),
@@ -727,10 +760,11 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                         alignment: Alignment.centerLeft,
                         child: Text(
                           playlist.name,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: context.adaptiveTextPrimary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: context.adaptiveTextPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
                           maxLines: 1,
                         ),
                       ),
@@ -955,10 +989,7 @@ class _SongTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              SongActionsButton(
-                song: song,
-                onRemoveFromPlaylist: onRemove,
-              ),
+              SongActionsButton(song: song, onRemoveFromPlaylist: onRemove),
             ],
           ),
         ),

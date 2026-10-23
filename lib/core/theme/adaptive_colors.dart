@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flick/core/theme/app_colors.dart';
 
+/// Resolved colors for a frosted control floating over artwork.
+typedef FrostedControlColors = ({
+  Color background,
+  Color border,
+  Color foreground,
+});
+
 /// Utility class for computing contrast-aware colors based on background luminance.
 ///
 /// This ensures text and UI elements remain readable regardless of the
@@ -70,6 +77,46 @@ class AdaptiveColors {
     return isDark(backgroundColor)
         ? AppColors.glassBackground
         : const Color(0x0D000000); // 5% black for light backgrounds
+  }
+
+  /// Returns a legible frosted-glass palette for a control drawn directly on
+  /// top of [backdropColor], such as album artwork.
+  ///
+  /// The usual white frost disappears over bright covers, so when it cannot
+  /// provide enough contrast for the icon the fill becomes a smoked tint. The
+  /// icon and glass edge are then tuned to that surface, keeping both the
+  /// glass and the glyph visible on light and dark artwork alike.
+  static FrostedControlColors frostedControlOn(Color backdropColor) {
+    const whiteIcon = _whiteSmokeLight;
+    const darkIcon = Color(0xFF1A1A1A);
+    // WCAG minimum for graphical objects and large text.
+    const minimumIconContrast = 3.0;
+
+    final frostSurface = Color.alphaBlend(
+      AppColors.glassBackgroundStrong,
+      backdropColor,
+    );
+    if (_contrastRatio(whiteIcon, frostSurface) >= minimumIconContrast) {
+      return (
+        background: AppColors.glassBackgroundStrong,
+        border: AppColors.glassBorder,
+        foreground: whiteIcon,
+      );
+    }
+
+    const smoke = Color(0x61000000); // 38% black
+    final smokedSurface = Color.alphaBlend(smoke, backdropColor);
+    final foreground =
+        _contrastRatio(whiteIcon, smokedSurface) >=
+            _contrastRatio(darkIcon, smokedSurface)
+        ? whiteIcon
+        : darkIcon;
+
+    return (
+      background: smoke,
+      border: Colors.white.withValues(alpha: 0.24),
+      foreground: foreground,
+    );
   }
 
   /// Computes a contrasting color that ensures minimum WCAG contrast ratio.

@@ -23,6 +23,13 @@ class DetailHeader extends StatelessWidget {
   final Color fadeTo;
   final VoidCallback onBack;
 
+  /// Dominant color of the artwork behind the header.
+  ///
+  /// When provided, the floating back button adapts its frosted fill, border,
+  /// and icon so it stays visible over brightly colored covers. Falls back to
+  /// the page-adaptive glass when null.
+  final Color? artColor;
+
   const DetailHeader({
     super.key,
     required this.expanded,
@@ -33,6 +40,7 @@ class DetailHeader extends StatelessWidget {
     required this.meta,
     required this.fadeTo,
     required this.onBack,
+    this.artColor,
     this.subtitleMaxLines = 1,
     this.lossless = false,
   });
@@ -89,27 +97,9 @@ class DetailHeader extends StatelessWidget {
             Positioned(
               top: MediaQuery.of(context).padding.top + 20,
               left: 16,
-              child: ClipOval(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: AppConstants.glassBlurSigma,
-                    sigmaY: AppConstants.glassBlurSigma,
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.glassBackgroundStrong,
-                      border: Border.all(color: AppColors.glassBorder),
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        LucideIcons.chevronLeft,
-                        color: context.adaptiveTextPrimary,
-                      ),
-                      onPressed: onBack,
-                    ),
-                  ),
-                ),
+              child: _GlassBackButton(
+                onPressed: onBack,
+                artColor: artColor,
               ),
             ),
             Positioned(
@@ -414,6 +404,46 @@ class DetailMoreSheet extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Circular frosted-glass back button that stays legible over artwork.
+class _GlassBackButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final Color? artColor;
+
+  const _GlassBackButton({required this.onPressed, this.artColor});
+
+  @override
+  Widget build(BuildContext context) {
+    final artColor = this.artColor;
+    final FrostedControlColors colors = artColor == null
+        ? (
+            background: AppColors.glassBackgroundStrong,
+            border: AppColors.glassBorder,
+            foreground: context.adaptiveTextPrimary,
+          )
+        : AdaptiveColors.frostedControlOn(artColor);
+
+    return ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: AppConstants.glassBlurSigma,
+          sigmaY: AppConstants.glassBlurSigma,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: colors.background,
+            border: Border.all(color: colors.border),
+          ),
+          child: IconButton(
+            icon: Icon(LucideIcons.chevronLeft, color: colors.foreground),
+            onPressed: onPressed,
           ),
         ),
       ),

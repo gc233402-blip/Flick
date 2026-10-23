@@ -394,4 +394,48 @@ void main() {
       }
     });
   });
+
+  group('playlist rename', () {
+    test('renames a local playlist and persists the new name', () async {
+      final service = PlaylistService();
+      final created = (await service.createPlaylist('Old name'))!;
+
+      final updated = await service.updatePlaylist(
+        created.copyWith(name: '  New name  '),
+      );
+
+      expect(updated?.name, 'New name');
+      final reloaded = await PlaylistService().getPlaylists();
+      expect(reloaded.single.name, 'New name');
+    });
+
+    test('rejects a name already used by another playlist', () async {
+      final service = PlaylistService();
+      final first = (await service.createPlaylist('One'))!;
+      await service.upsertNetworkPlaylist(
+        serverId: 7,
+        remoteId: 'pl-2',
+        name: 'Two',
+      );
+
+      final updated = await service.updatePlaylist(
+        first.copyWith(name: 'two'),
+      );
+
+      expect(updated, isNull);
+      final playlists = await service.getPlaylists();
+      expect(playlists.map((p) => p.name), ['One', 'Two']);
+    });
+
+    test('rejects an empty name', () async {
+      final service = PlaylistService();
+      final created = (await service.createPlaylist('Old'))!;
+
+      expect(
+        await service.updatePlaylist(created.copyWith(name: '   ')),
+        isNull,
+      );
+      expect((await service.getPlaylist(created.id))!.name, 'Old');
+    });
+  });
 }

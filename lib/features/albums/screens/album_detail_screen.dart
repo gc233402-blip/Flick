@@ -483,6 +483,7 @@ class _AlbumDetailScreenState extends ConsumerState<AlbumDetailScreen>
                   expanded: prefs.detailHeaderArtExpanded,
                   centeredTitle: prefs.detailHeaderCenteredTitle,
                   artBuilder: _buildArtLayer,
+                  artColor: _albumColor,
                   title: widget.albumName,
                   subtitle: widget.albumArtist,
                   meta: _metaLine,

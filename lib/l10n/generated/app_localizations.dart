@@ -2699,6 +2699,12 @@ abstract class AppLocalizations {
   /// **'Could not read the selected lyrics file.'**
   String get couldNotReadTheSelectedLyrics;
 
+  /// lib/features/playlists/playlist_rename_action.dart:31
+  ///
+  /// In en, this message translates to:
+  /// **'Could not rename the playlist.'**
+  String get couldNotRenamePlaylist;
+
   /// lib/features/player/screens/lyrics_sync_screen.dart:565
   ///
   /// In en, this message translates to:
@@ -2741,17 +2747,131 @@ abstract class AppLocalizations {
   /// **'{done} / {total} covers'**
   String covers(Object done, Object total);
 
-  /// lib/features/playlists/screens/playlist_cover_crop_screen.dart:151
-  ///
-  /// In en, this message translates to:
-  /// **'Crop cover'**
-  String get cropCover;
-
-  /// lib/features/playlists/screens/playlist_cover_crop_screen.dart:207
+  /// lib/features/playlists/screens/playlist_cover_editor_screen.dart
   ///
   /// In en, this message translates to:
   /// **'Pinch to zoom, drag to reposition'**
   String get cropCoverHint;
+
+  /// No description provided for @editCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit cover'**
+  String get editCover;
+
+  /// No description provided for @crop.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop'**
+  String get crop;
+
+  /// No description provided for @adjust.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust'**
+  String get adjust;
+
+  /// No description provided for @filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filters;
+
+  /// No description provided for @brightness.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightness'**
+  String get brightness;
+
+  /// No description provided for @contrast.
+  ///
+  /// In en, this message translates to:
+  /// **'Contrast'**
+  String get contrast;
+
+  /// No description provided for @saturation.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturation'**
+  String get saturation;
+
+  /// No description provided for @warmth.
+  ///
+  /// In en, this message translates to:
+  /// **'Warmth'**
+  String get warmth;
+
+  /// No description provided for @vignette.
+  ///
+  /// In en, this message translates to:
+  /// **'Vignette'**
+  String get vignette;
+
+  /// No description provided for @rotateLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate left'**
+  String get rotateLeft;
+
+  /// No description provided for @rotateRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate right'**
+  String get rotateRight;
+
+  /// No description provided for @flipHorizontal.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip horizontal'**
+  String get flipHorizontal;
+
+  /// No description provided for @flipVertical.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip vertical'**
+  String get flipVertical;
+
+  /// No description provided for @filterOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get filterOriginal;
+
+  /// No description provided for @filterMono.
+  ///
+  /// In en, this message translates to:
+  /// **'Mono'**
+  String get filterMono;
+
+  /// No description provided for @filterWarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm'**
+  String get filterWarm;
+
+  /// No description provided for @filterCool.
+  ///
+  /// In en, this message translates to:
+  /// **'Cool'**
+  String get filterCool;
+
+  /// No description provided for @filterFade.
+  ///
+  /// In en, this message translates to:
+  /// **'Fade'**
+  String get filterFade;
+
+  /// No description provided for @filterPunch.
+  ///
+  /// In en, this message translates to:
+  /// **'Punch'**
+  String get filterPunch;
+
+  /// No description provided for @filterNoir.
+  ///
+  /// In en, this message translates to:
+  /// **'Noir'**
+  String get filterNoir;
 
   /// lib/features/playlists/screens/playlists_screen.dart:403
   ///
@@ -8409,6 +8529,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Playlist name'**
   String get playlistName;
+
+  /// lib/features/playlists/playlist_rename_action.dart:34
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist renamed to \"{arg1}\"'**
+  String playlistRenamed(Object arg1);
 
   /// lib/features/menu/screens/menu_screen.dart:1446
   ///

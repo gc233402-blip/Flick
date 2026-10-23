@@ -331,6 +331,22 @@ class Uac2Service {
     }
   }
 
+  /// Re-query the Android route after native has discovered the DAC's
+  /// hardware volume control. Callers restoring a saved level need this
+  /// before deciding whether the hardware or software tier is active.
+  Future<void> refreshAndroidRouteStatus({
+    Uac2AudioFormat? formatOverride,
+    bool? isPlaying,
+    bool? hasActiveSong,
+  }) async {
+    if (!Platform.isAndroid) return;
+    await _refreshAndroidRouteStatus(
+      formatOverride: formatOverride ?? _lastKnownFormat,
+      isPlaying: isPlaying ?? _lastKnownIsPlaying,
+      hasActiveSong: hasActiveSong ?? _lastKnownHasSong,
+    );
+  }
+
   Future<void> _initializeInternal() async {
     if (Platform.isAndroid) {
       _configureAndroidChannel();
@@ -613,9 +629,26 @@ class Uac2Service {
           }
         }
 
+        // Android can hide the real serial until USB permission is granted.
+        final authorizedDevice = hasPermission
+            ? androidDevice
+            : await _resolveConnectedAndroidDevice(androidDevice) ?? androidDevice;
+        final bitPerfectEnabled = await _preferencesService
+            .getBitPerfectEnabled();
+        // Hand the saved level to native before the Rust stream is created.
+        // Only do this when the DAC's Feature Unit is the volume authority;
+        // with bit-perfect off, the Rust gain path applies the same level and
+        // writing both would attenuate it twice. DSD restores in PlayerService
+        // once the active wire path is known.
+        final restoreVolume = bitPerfectEnabled
+            ? await _preferencesService.getUsbVolumeForDevice(authorizedDevice)
+            : null;
         final activated = await _channel.invokeMethod<bool>(
           'activateDirectUsb',
-          {'deviceName': deviceIdentifier},
+          {
+            'deviceName': deviceIdentifier,
+            'restoreVolume': ?restoreVolume,
+          },
         );
         if (activated != true) {
           _updateStatus(
@@ -628,15 +661,13 @@ class Uac2Service {
           return false;
         }
 
-        final bitPerfectEnabled = await _preferencesService
-            .getBitPerfectEnabled();
         await _channel.invokeMethod<bool>('setExclusiveDacMode', {
           'enabled': bitPerfectEnabled,
         });
 
-        await _preferencesService.saveSelectedDevice(androidDevice);
+        await _preferencesService.saveSelectedDevice(authorizedDevice);
         await _refreshAndroidRouteStatus(
-          preferredDevice: androidDevice,
+          preferredDevice: authorizedDevice,
           formatOverride: _lastKnownFormat,
           isPlaying: _lastKnownIsPlaying,
           hasActiveSong: _lastKnownHasSong,
@@ -1094,7 +1125,11 @@ Future<void> stopPriorityAnchor() async {
     }
   }
 
-  Future<bool> setVolume(double volume) async {
+  /// Set the active route volume.
+  ///
+  /// [persist] is false for startup restoration: a remembered level is being
+  /// replayed, not chosen by the user, and must not overwrite the preference.
+  Future<bool> setVolume(double volume, {bool persist = true}) async {
     final status = _currentDeviceStatus;
     if (status == null || !volume.isFinite) return false;
     if (volume < 0.0 || volume > 1.0) return false;
@@ -1120,6 +1155,9 @@ Future<void> stopPriorityAnchor() async {
         // quantized level, not the slider's unachievable requested value.
         final actual = await getVolume();
         if (hardwareOnly) await getMute();
+        if (hardwareOnly && persist && actual != null) {
+          await _preferencesService.setUsbVolumeForDevice(status.device, actual);
+        }
         return actual != null;
       }
       if (!rust_uac2.uac2IsAvailable()) return false;

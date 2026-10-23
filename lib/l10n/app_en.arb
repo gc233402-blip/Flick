@@ -2060,6 +2060,10 @@
   "@couldNotReadTheSelectedLyrics": {
     "description": "lib/features/player/widgets/inline_lyrics_panel.dart:129"
   },
+  "couldNotRenamePlaylist": "Could not rename the playlist.",
+  "@couldNotRenamePlaylist": {
+    "description": "lib/features/playlists/playlist_rename_action.dart:31"
+  },
   "couldNotSaveTheLyricsFile": "Could not save the lyrics file.",
   "@couldNotSaveTheLyricsFile": {
     "description": "lib/features/player/screens/lyrics_sync_screen.dart:565"
@@ -2096,14 +2100,30 @@
       }
     }
   },
-  "cropCover": "Crop cover",
-  "@cropCover": {
-    "description": "lib/features/playlists/screens/playlist_cover_crop_screen.dart:151"
-  },
   "cropCoverHint": "Pinch to zoom, drag to reposition",
   "@cropCoverHint": {
-    "description": "lib/features/playlists/screens/playlist_cover_crop_screen.dart:207"
+    "description": "lib/features/playlists/screens/playlist_cover_editor_screen.dart"
   },
+  "editCover": "Edit cover",
+  "crop": "Crop",
+  "adjust": "Adjust",
+  "filters": "Filters",
+  "brightness": "Brightness",
+  "contrast": "Contrast",
+  "saturation": "Saturation",
+  "warmth": "Warmth",
+  "vignette": "Vignette",
+  "rotateLeft": "Rotate left",
+  "rotateRight": "Rotate right",
+  "flipHorizontal": "Flip horizontal",
+  "flipVertical": "Flip vertical",
+  "filterOriginal": "Original",
+  "filterMono": "Mono",
+  "filterWarm": "Warm",
+  "filterCool": "Cool",
+  "filterFade": "Fade",
+  "filterPunch": "Punch",
+  "filterNoir": "Noir",
   "create": "Create",
   "@create": {
     "description": "lib/features/playlists/screens/playlists_screen.dart:403"
@@ -6600,6 +6620,15 @@
   "playlistName": "Playlist name",
   "@playlistName": {
     "description": "lib/features/playlists/screens/playlists_screen.dart:356"
+  },
+  "playlistRenamed": "Playlist renamed to \"{arg1}\"",
+  "@playlistRenamed": {
+    "description": "lib/features/playlists/playlist_rename_action.dart:34",
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
   },
   "playlists": "Playlists",
   "@playlists": {

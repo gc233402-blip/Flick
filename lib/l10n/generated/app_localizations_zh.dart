@@ -1446,6 +1446,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotReadTheSelectedLyrics => '无法读取所选歌词文件。';
 
   @override
+  String get couldNotRenamePlaylist => '无法重命名播放列表。';
+
+  @override
   String get couldNotSaveTheLyricsFile => '无法保存歌词文件。';
 
   @override
@@ -1470,10 +1473,67 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get cropCover => '裁剪封面';
+  String get cropCoverHint => '双指缩放，拖动调整位置';
 
   @override
-  String get cropCoverHint => '双指缩放，拖动调整位置';
+  String get editCover => '编辑封面';
+
+  @override
+  String get crop => '裁剪';
+
+  @override
+  String get adjust => '调整';
+
+  @override
+  String get filters => '滤镜';
+
+  @override
+  String get brightness => '亮度';
+
+  @override
+  String get contrast => '对比度';
+
+  @override
+  String get saturation => '饱和度';
+
+  @override
+  String get warmth => '色温';
+
+  @override
+  String get vignette => '暗角';
+
+  @override
+  String get rotateLeft => '向左旋转';
+
+  @override
+  String get rotateRight => '向右旋转';
+
+  @override
+  String get flipHorizontal => '水平翻转';
+
+  @override
+  String get flipVertical => '垂直翻转';
+
+  @override
+  String get filterOriginal => '原图';
+
+  @override
+  String get filterMono => '黑白';
+
+  @override
+  String get filterWarm => '暖色';
+
+  @override
+  String get filterCool => '冷色';
+
+  @override
+  String get filterFade => '褪色';
+
+  @override
+  String get filterPunch => '鲜明';
+
+  @override
+  String get filterNoir => '暗调';
 
   @override
   String get create => '创建';
@@ -4601,6 +4661,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get playlistName => '播放列表名称';
+
+  @override
+  String playlistRenamed(Object arg1) {
+    return '播放列表已重命名为“$arg1”';
+  }
 
   @override
   String get playlists => '播放列表';

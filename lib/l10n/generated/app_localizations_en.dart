@@ -1524,6 +1524,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not read the selected lyrics file.';
 
   @override
+  String get couldNotRenamePlaylist => 'Could not rename the playlist.';
+
+  @override
   String get couldNotSaveTheLyricsFile => 'Could not save the lyrics file.';
 
   @override
@@ -1551,10 +1554,67 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get cropCover => 'Crop cover';
+  String get cropCoverHint => 'Pinch to zoom, drag to reposition';
 
   @override
-  String get cropCoverHint => 'Pinch to zoom, drag to reposition';
+  String get editCover => 'Edit cover';
+
+  @override
+  String get crop => 'Crop';
+
+  @override
+  String get adjust => 'Adjust';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get brightness => 'Brightness';
+
+  @override
+  String get contrast => 'Contrast';
+
+  @override
+  String get saturation => 'Saturation';
+
+  @override
+  String get warmth => 'Warmth';
+
+  @override
+  String get vignette => 'Vignette';
+
+  @override
+  String get rotateLeft => 'Rotate left';
+
+  @override
+  String get rotateRight => 'Rotate right';
+
+  @override
+  String get flipHorizontal => 'Flip horizontal';
+
+  @override
+  String get flipVertical => 'Flip vertical';
+
+  @override
+  String get filterOriginal => 'Original';
+
+  @override
+  String get filterMono => 'Mono';
+
+  @override
+  String get filterWarm => 'Warm';
+
+  @override
+  String get filterCool => 'Cool';
+
+  @override
+  String get filterFade => 'Fade';
+
+  @override
+  String get filterPunch => 'Punch';
+
+  @override
+  String get filterNoir => 'Noir';
 
   @override
   String get create => 'Create';
@@ -4901,6 +4961,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playlistName => 'Playlist name';
+
+  @override
+  String playlistRenamed(Object arg1) {
+    return 'Playlist renamed to \"$arg1\"';
+  }
 
   @override
   String get playlists => 'Playlists';
