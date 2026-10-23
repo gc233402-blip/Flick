@@ -38,17 +38,28 @@ impl IsoPacketScheduler {
             .collect()
     }
 
-    pub(crate) fn update_feedback_frames_per_packet(&mut self, frames_per_packet: f64) {
+    /// Update packet timing from a device feedback report.
+    ///
+    /// Returns false when the report is non-finite, non-positive, or too far
+    /// from nominal to be a real DAC clock. A 2% band comfortably covers USB
+    /// clock tolerance (typically hundreds of ppm) while rejecting decode
+    /// errors and malformed feedback values that would otherwise cause a large
+    /// audio discontinuity.
+    pub(crate) fn update_feedback_frames_per_packet(&mut self, frames_per_packet: f64) -> bool {
         if !frames_per_packet.is_finite() || frames_per_packet <= 0.0 {
-            return;
+            return false;
         }
 
         let nominal = self.nominal_frames_per_packet().max(0.001);
-        let clamped = frames_per_packet.clamp(nominal * 0.5, nominal * 1.5);
+        if frames_per_packet < nominal * 0.98 || frames_per_packet > nominal * 1.02 {
+            return false;
+        }
+
         self.feedback_frames_per_packet = Some(match self.feedback_frames_per_packet {
-            Some(previous) => previous * 0.8 + clamped * 0.2,
-            None => clamped,
+            Some(previous) => previous * 0.8 + frames_per_packet * 0.2,
+            None => frames_per_packet,
         });
+        true
     }
 
     pub(crate) fn lock_to_nominal_packet_timing(&mut self) {

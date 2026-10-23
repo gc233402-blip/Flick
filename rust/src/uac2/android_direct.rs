@@ -2,6 +2,7 @@ use crate::dev_eprintln;
 
 use crate::audio::commands::AudioEvent;
 use crate::audio::engine::{audio_callback, AudioCallbackData};
+use crate::uac2::endpoint::{select_explicit_feedback_endpoint, FeedbackEndpointCandidate};
 use crate::uac2::payload_audit_latch::PayloadAuditLatch;
 use crate::uac2::volume_control::{
     normalize_volume, parse_uac2_volume_ranges, quantize_volume, volume_bounds,
@@ -15,10 +16,11 @@ use libusb1_sys::{
         LIBUSB_TRANSFER_NO_DEVICE, LIBUSB_TRANSFER_OVERFLOW, LIBUSB_TRANSFER_STALL,
         LIBUSB_TRANSFER_TIMED_OUT,
     },
-    libusb_alloc_transfer, libusb_cancel_transfer, libusb_fill_iso_transfer, libusb_free_transfer,
-    libusb_submit_transfer, libusb_transfer, libusb_transfer_cb_fn,
+    libusb_alloc_transfer, libusb_cancel_transfer, libusb_fill_interrupt_transfer,
+    libusb_fill_iso_transfer, libusb_free_transfer, libusb_submit_transfer, libusb_transfer,
+    libusb_transfer_cb_fn,
 };
-use log::{error as log_error, info as log_info};
+use log::{error as log_error, info as log_info, warn as log_warn};
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use rusb::{
@@ -31,7 +33,7 @@ use std::collections::HashSet;
 use std::ffi::c_void;
 use std::os::fd::RawFd;
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, AtomicUsize, Ordering};
-use std::sync::{Arc, Condvar, Mutex as StdMutex, Once};
+use std::sync::{Arc, Mutex as StdMutex, Once};
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 
@@ -78,10 +80,17 @@ const ANDROID_USB_BUFFER_TARGET_MS: usize = 100;
 const ANDROID_USB_RENDER_CHUNK_MS: usize = 10;
 const ANDROID_USB_RENDER_POLL_MS: u64 = 2;
 const ANDROID_USB_STABLE_TRANSFER_THRESHOLD: usize = 64;
-const ANDROID_USB_TRANSFER_QUEUE_DEPTH: usize = 4;
+// Queued USB time = queue depth × packets_per_transfer × service interval.
+// Four 32-packet transfers at 125µs cover only ~16ms, so any host scheduling
+// hiccup larger than that starves the DAC's own FIFO even though the software
+// ring stays full (which is why underrun counters read zero). Eight transfers
+// double the bus-side cushion without changing a single audio byte.
+const ANDROID_USB_TRANSFER_QUEUE_DEPTH: usize = 8;
 const ANDROID_USB_REQUIRE_VERIFIED_RATE_DEFAULT: bool = true;
 const ANDROID_USB_CLOCK_SETTLE_DELAY_MS_DEFAULT: u64 = 20;
 const ANDROID_USB_FEEDBACK_TIMEOUT_MS: u32 = 50;
+const ANDROID_USB_FEEDBACK_POLL_WINDOW_MS: u32 = 16;
+const ANDROID_USB_FEEDBACK_STALE_WARN_MS: u64 = 500;
 const ANDROID_USB_PAYLOAD_FLICKER_GRACE_MS: u64 = 1500;
 const ANDROID_USB_LOUD_RENDER_LOG_THRESHOLD: f32 = 0.1;
 const ANDROID_USB_LOUD_TRANSFER_LOG_INTERVAL: u64 = 32;
@@ -661,6 +670,7 @@ struct AndroidIsoStreamCandidate {
     endpoint_address: u8,
     endpoint_interval: u8,
     service_interval_us: u32,
+    usb_speed: Speed,
     max_packet_bytes: usize,
     sync_type: SyncType,
     usage_type: UsageType,
@@ -714,7 +724,47 @@ struct AndroidStreamingInterfaceFormat {
 #[derive(Debug)]
 struct IsoTransferCompletion {
     status: StdMutex<Option<i32>>,
-    condvar: Condvar,
+    completed_at: StdMutex<Option<Instant>>,
+    actual_length: AtomicUsize,
+}
+
+impl IsoTransferCompletion {
+    fn new() -> Self {
+        Self {
+            status: StdMutex::new(None),
+            completed_at: StdMutex::new(None),
+            actual_length: AtomicUsize::new(0),
+        }
+    }
+
+    fn reset(&self) {
+        match self.status.lock() {
+            Ok(mut guard) => *guard = None,
+            Err(poisoned) => *poisoned.into_inner() = None,
+        }
+        match self.completed_at.lock() {
+            Ok(mut guard) => *guard = None,
+            Err(poisoned) => *poisoned.into_inner() = None,
+        }
+        self.actual_length.store(0, Ordering::Release);
+    }
+
+    fn take(&self) -> Option<(i32, Instant, usize)> {
+        let status = match self.status.lock() {
+            Ok(mut guard) => guard.take()?,
+            Err(poisoned) => poisoned.into_inner().take()?,
+        };
+        let completed_at = match self.completed_at.lock() {
+            Ok(mut guard) => guard.take(),
+            Err(poisoned) => poisoned.into_inner().take(),
+        }
+        .unwrap_or_else(Instant::now);
+        Some((
+            status,
+            completed_at,
+            self.actual_length.load(Ordering::Acquire),
+        ))
+    }
 }
 
 #[derive(Debug)]
@@ -743,10 +793,7 @@ struct IsoTransferPayload {
 
 impl IsoTransferSlot {
     fn new(packet_count: usize, buffer_capacity: usize) -> Result<Self, String> {
-        let completion = Arc::new(IsoTransferCompletion {
-            status: StdMutex::new(None),
-            condvar: Condvar::new(),
-        });
+        let completion = Arc::new(IsoTransferCompletion::new());
         let user_data = Box::new(IsoTransferUserData {
             completion,
             buffer: vec![0u8; buffer_capacity.max(1)],
@@ -801,7 +848,7 @@ impl IsoTransferSlot {
             }
             user_data.buffer[..payload.transfer_buffer.len()]
                 .copy_from_slice(&payload.transfer_buffer);
-            *user_data.completion.status.lock().unwrap() = None;
+            user_data.completion.reset();
 
             libusb_fill_iso_transfer(
                 self.transfer.as_mut(),
@@ -842,17 +889,18 @@ impl IsoTransferSlot {
         Ok(())
     }
 
-    fn take_completion_status(&mut self) -> Option<i32> {
+    fn take_completion(&mut self) -> Option<(i32, Instant, usize)> {
         let completion = unsafe { &(*self.user_data).completion };
-        match completion.status.lock() {
-            Ok(mut guard) => guard.take(),
-            Err(poisoned) => poisoned.into_inner().take(),
-        }
+        completion.take()
     }
 
-    fn turnaround_us(&self) -> Option<u64> {
-        self.submitted_at
-            .map(|submitted_at| submitted_at.elapsed().as_micros().min(u128::from(u64::MAX)) as u64)
+    fn turnaround_us(&self, completed_at: Instant) -> Option<u64> {
+        self.submitted_at.map(|submitted_at| {
+            completed_at
+                .saturating_duration_since(submitted_at)
+                .as_micros()
+                .min(u128::from(u64::MAX)) as u64
+        })
     }
 
     fn validate_packets(&self) -> Result<(), String> {
@@ -892,6 +940,317 @@ impl Drop for IsoTransferSlot {
         unsafe {
             libusb_free_transfer(self.transfer.as_ptr());
             drop(Box::from_raw(self.user_data));
+        }
+    }
+}
+
+/// Persistent asynchronous feedback IN slot.
+///
+/// The previous implementation performed a blocking feedback read from the
+/// single output thread. Four queued OUT transfers only cover ~16 ms at
+/// 125 us service intervals, so a 50 ms feedback timeout could drain the
+/// entire hardware queue even while the software ring looked full. This slot
+/// is submitted once and re-armed from the same event loop after completion.
+struct FeedbackTransferSlot {
+    transfer: std::ptr::NonNull<libusb_transfer>,
+    user_data: *mut IsoTransferUserData,
+    endpoint: AndroidUsbFeedbackEndpoint,
+    packet_count: usize,
+    packet_bytes: usize,
+    timeout_ms: u32,
+    in_flight: bool,
+}
+
+impl FeedbackTransferSlot {
+    fn new(endpoint: AndroidUsbFeedbackEndpoint) -> Result<Self, String> {
+        let packet_bytes = endpoint.max_packet_bytes.max(4);
+        let packet_count = if endpoint.transfer_type == TransferType::Isochronous {
+            let window_packets = (ANDROID_USB_FEEDBACK_POLL_WINDOW_MS * 1_000)
+                / endpoint.service_interval_us.max(125);
+            window_packets.clamp(1, 32) as usize
+        } else {
+            1
+        };
+
+        let poll_window_ms = ((packet_count as u64)
+            .saturating_mul(endpoint.service_interval_us as u64)
+            / 1_000)
+            .max(1) as u32;
+        let timeout_ms =
+            ANDROID_USB_FEEDBACK_TIMEOUT_MS.max(poll_window_ms.saturating_add(20));
+
+        let completion = Arc::new(IsoTransferCompletion::new());
+        let user_data = Box::new(IsoTransferUserData {
+            completion,
+            buffer: vec![0u8; packet_bytes.saturating_mul(packet_count).max(4)],
+        });
+        let user_data_ptr = Box::into_raw(user_data);
+        let transfer = unsafe { libusb_alloc_transfer(packet_count as i32) };
+
+        let Some(transfer) = std::ptr::NonNull::new(transfer) else {
+            unsafe {
+                drop(Box::from_raw(user_data_ptr));
+            }
+            return Err("libusb_alloc_transfer returned null for feedback transfer".to_string());
+        };
+
+        Ok(Self {
+            transfer,
+            user_data: user_data_ptr,
+            endpoint,
+            packet_count,
+            packet_bytes,
+            timeout_ms,
+            in_flight: false,
+        })
+    }
+
+    fn submit(&mut self, handle: &DeviceHandle<Context>) -> Result<(), String> {
+        if self.in_flight {
+            return Err("feedback transfer slot already in flight".to_string());
+        }
+
+        unsafe {
+            let user_data = &mut *self.user_data;
+            user_data.completion.reset();
+            let buffer_len = self.packet_bytes.saturating_mul(self.packet_count);
+            match self.endpoint.transfer_type {
+                TransferType::Isochronous => {
+                    libusb_fill_iso_transfer(
+                        self.transfer.as_mut(),
+                        handle.as_raw(),
+                        self.endpoint.address,
+                        user_data.buffer.as_mut_ptr(),
+                        buffer_len as i32,
+                        self.packet_count as i32,
+                        iso_transfer_callback,
+                        self.user_data as *mut c_void,
+                        self.timeout_ms,
+                    );
+                    for index in 0..self.packet_count {
+                        (*self
+                            .transfer
+                            .as_mut()
+                            .iso_packet_desc
+                            .as_mut_ptr()
+                            .add(index))
+                        .length = self.packet_bytes as u32;
+                    }
+                }
+                TransferType::Interrupt => {
+                    libusb_fill_interrupt_transfer(
+                        self.transfer.as_mut(),
+                        handle.as_raw(),
+                        self.endpoint.address,
+                        user_data.buffer.as_mut_ptr(),
+                        self.packet_bytes as i32,
+                        iso_transfer_callback,
+                        self.user_data as *mut c_void,
+                        self.timeout_ms,
+                    );
+                }
+                other => {
+                    return Err(format!(
+                        "Unsupported feedback transfer type {}",
+                        transfer_type_label(other)
+                    ));
+                }
+            }
+
+            let submit_result = libusb_submit_transfer(self.transfer.as_ptr());
+            if submit_result != 0 {
+                return Err(format!(
+                    "libusb_submit_transfer failed for feedback endpoint 0x{:02x} with code {}",
+                    self.endpoint.address, submit_result
+                ));
+            }
+        }
+
+        self.in_flight = true;
+        Ok(())
+    }
+
+    fn take_completion(&self) -> Option<(i32, Instant, usize)> {
+        let completion = unsafe { &(*self.user_data).completion };
+        completion.take()
+    }
+
+    fn report_bytes(&self) -> Option<Vec<u8>> {
+        let user_data = unsafe { &(*self.user_data) };
+        let buffer = &user_data.buffer;
+
+        // For iso feedback, packet payloads are laid out at fixed offsets based
+        // on the requested packet length. Read the newest packet from its own
+        // descriptor instead of assuming libusb packed a shortened actual-length
+        // prefix contiguously.
+        let (offset, available) = if self.endpoint.transfer_type == TransferType::Isochronous {
+            let transfer = unsafe { self.transfer.as_ref() };
+            (0..self.packet_count).rev().find_map(|index| {
+                let descriptor = unsafe { &*transfer.iso_packet_desc.as_ptr().add(index) };
+                (descriptor.status == LIBUSB_TRANSFER_COMPLETED && descriptor.actual_length > 0)
+                    .then_some((
+                        index * self.packet_bytes,
+                        (descriptor.actual_length as usize).min(self.packet_bytes),
+                    ))
+            })?
+        } else {
+            (
+                0,
+                user_data
+                    .completion
+                    .actual_length
+                    .load(Ordering::Acquire)
+                    .min(buffer.len()),
+            )
+        };
+
+        let available = available.min(buffer.len().saturating_sub(offset));
+        let report_len = if available >= 4 {
+            4
+        } else if available >= 3 {
+            3
+        } else {
+            return None;
+        };
+        Some(buffer[offset + available - report_len..offset + available].to_vec())
+    }
+
+    fn mark_completed(&mut self) {
+        self.in_flight = false;
+    }
+
+    fn cancel(&mut self) {
+        if self.in_flight {
+            let _ = unsafe { libusb_cancel_transfer(self.transfer.as_ptr()) };
+        }
+    }
+}
+
+impl Drop for FeedbackTransferSlot {
+    fn drop(&mut self) {
+        if self.in_flight {
+            dev_eprintln!(
+                "[USB] in-flight feedback transfer survived teardown drain; leaking slot to avoid use-after-free"
+            );
+            std::mem::forget(unsafe { Box::from_raw(self.user_data) });
+            return;
+        }
+
+        unsafe {
+            libusb_free_transfer(self.transfer.as_ptr());
+            drop(Box::from_raw(self.user_data));
+        }
+    }
+}
+
+#[derive(Default)]
+struct FeedbackCounters {
+    reports: u64,
+    timeouts: u64,
+    errors: u64,
+    rejected: u64,
+    last_report_at: Option<Instant>,
+    last_frames_per_packet: Option<f64>,
+    last_estimated_sample_rate: Option<f64>,
+    announced_report: bool,
+}
+
+fn pump_feedback_transfer(
+    handle: &DeviceHandle<Context>,
+    slot: &mut FeedbackTransferSlot,
+    scheduler: &mut IsoPacketScheduler,
+    data_service_interval_us: u32,
+    speed: Speed,
+    counters: &mut FeedbackCounters,
+    stop: &AtomicBool,
+) {
+    let endpoint = slot.endpoint;
+    if let Some((status, completed_at, _actual_length)) = slot.take_completion() {
+        slot.mark_completed();
+
+        match status {
+            LIBUSB_TRANSFER_COMPLETED => {
+                if let Some(raw_bytes) = slot.report_bytes() {
+                    if let Some((frames_per_packet, estimated_sample_rate)) =
+                        decode_feedback_report(&raw_bytes, data_service_interval_us, speed)
+                    {
+                        if scheduler.update_feedback_frames_per_packet(frames_per_packet) {
+                            counters.reports = counters.reports.saturating_add(1);
+                            counters.last_report_at = Some(completed_at);
+                            counters.last_frames_per_packet = Some(frames_per_packet);
+                            counters.last_estimated_sample_rate = Some(estimated_sample_rate);
+                            if !counters.announced_report || counters.reports % 128 == 0 {
+                                dev_eprintln!(
+                                    "[USB] Feedback endpoint 0x{:02x} {} bytes={:02x?} framesPerPacket={:.4} sampleRate≈{:.2}Hz (dataService={}us)",
+                                    endpoint.address,
+                                    transfer_type_label(endpoint.transfer_type),
+                                    raw_bytes,
+                                    frames_per_packet,
+                                    estimated_sample_rate,
+                                    data_service_interval_us,
+                                );
+                                counters.announced_report = true;
+                            }
+                        } else {
+                            counters.rejected = counters.rejected.saturating_add(1);
+                            if counters.rejected <= 4 || counters.rejected % 64 == 0 {
+                                dev_eprintln!(
+                                    "[USB] Feedback endpoint 0x{:02x} rejected implausible framesPerPacket={:.4} (nominal dataService={}us)",
+                                    endpoint.address,
+                                    frames_per_packet,
+                                    data_service_interval_us,
+                                );
+                            }
+                        }
+                    } else {
+                        counters.rejected = counters.rejected.saturating_add(1);
+                        if counters.rejected <= 4 || counters.rejected % 64 == 0 {
+                            dev_eprintln!(
+                                "[USB] Feedback endpoint 0x{:02x} rejected malformed report length={}",
+                                endpoint.address,
+                                raw_bytes.len()
+                            );
+                        }
+                    }
+                }
+            }
+            LIBUSB_TRANSFER_TIMED_OUT | LIBUSB_TRANSFER_CANCELLED => {
+                counters.timeouts = counters.timeouts.saturating_add(1);
+            }
+            LIBUSB_TRANSFER_STALL => {
+                counters.errors = counters.errors.saturating_add(1);
+                dev_eprintln!(
+                    "[USB] Feedback endpoint 0x{:02x} stalled; keeping last feedback-derived packet rate",
+                    endpoint.address
+                );
+            }
+            LIBUSB_TRANSFER_NO_DEVICE => {
+                counters.errors = counters.errors.saturating_add(1);
+            }
+            other => {
+                counters.errors = counters.errors.saturating_add(1);
+                if counters.errors <= 4 || counters.errors % 64 == 0 {
+                    dev_eprintln!(
+                        "[USB] Feedback endpoint 0x{:02x} transfer status {} ({})",
+                        endpoint.address,
+                        other,
+                        iso_transfer_status_label(other)
+                    );
+                }
+            }
+        }
+    }
+
+    if !usb_stop_requested(stop) && !slot.in_flight {
+        if let Err(error) = slot.submit(handle) {
+            counters.errors = counters.errors.saturating_add(1);
+            if counters.errors <= 4 || counters.errors % 64 == 0 {
+                dev_eprintln!(
+                    "[USB] Feedback endpoint 0x{:02x} resubmit failed: {}",
+                    endpoint.address,
+                    error
+                );
+            }
         }
     }
 }
@@ -4649,6 +5008,40 @@ fn create_android_usb_backend_inner(
         candidate.max_packet_bytes
     );
     dev_eprintln!("[USB] ============================");
+
+    // A rate-set clock that reports Clock Valid = false cannot lock its PLL to
+    // the requested carrier. The alt-setting switch above already happened, so
+    // this is the post-switch state. DoP data is then clocked against this DAC's
+    // free-running oscillator instead of the host's nominal packet timing; the
+    // resulting beat shows up as slow, periodic chop (first after tens of
+    // seconds, then every few seconds) that looks like a transport bug but is
+    // really a clock-lock refusal.
+    if let Some(clock) = clock {
+        match get_clock_validity(&claimed_handle.handle, clock.interface_number, clock.clock_id) {
+            Ok(valid) => {
+                log_info!(
+                    "[clock-diag] Clock Validity after switch: clock={} iface={} valid={} rate={}Hz",
+                    clock.clock_id,
+                    clock.interface_number,
+                    valid,
+                    playback_format.sample_rate,
+                );
+                if !valid {
+                    dev_eprintln!(
+                        "[clock-diag] DAC reports Clock Valid=false at {}Hz on clock {} — PLL has not locked to the DoP carrier; periodic dropouts are expected until it locks or accepts another rate",
+                        playback_format.sample_rate,
+                        clock.clock_id,
+                    );
+                }
+            }
+            Err(error) => dev_eprintln!(
+                "[clock-diag] Clock Validity unavailable for clock {} at {}Hz: {}",
+                clock.clock_id,
+                playback_format.sample_rate,
+                error,
+            ),
+        }
+    }
     log_info!(
         "[USB] FINAL_STREAM_FORMAT: sample_rate_hz={} dac_reported_hz={:?} clock_verified={} \
          app_bit_depth={} transport_bit_resolution={} subslot_bytes={} channels={} \
@@ -5252,7 +5645,7 @@ fn drain_iso_transfer_slots(context: &Context, slots: &mut [IsoTransferSlot]) {
     while slots.iter().any(|slot| slot.in_flight) && Instant::now() < deadline {
         let _ = context.handle_events(Some(Duration::from_millis(10)));
         for slot in slots.iter_mut() {
-            if slot.take_completion_status().is_some() {
+            if slot.take_completion().is_some() {
                 slot.mark_completed();
             }
         }
@@ -5263,6 +5656,28 @@ fn drain_iso_transfer_slots(context: &Context, slots: &mut [IsoTransferSlot]) {
         dev_eprintln!(
             "[USB] teardown drain timed out with {} isochronous transfer(s) still in flight; slots will be leaked",
             still_in_flight
+        );
+    }
+}
+
+fn drain_feedback_transfer_slot(context: &Context, slot: &mut Option<FeedbackTransferSlot>) {
+    let Some(slot) = slot.as_mut() else {
+        return;
+    };
+    slot.cancel();
+
+    let deadline = Instant::now() + Duration::from_millis(2000);
+    while slot.in_flight && Instant::now() < deadline {
+        let _ = context.handle_events(Some(Duration::from_millis(10)));
+        if slot.take_completion().is_some() {
+            slot.mark_completed();
+        }
+    }
+
+    if slot.in_flight {
+        dev_eprintln!(
+            "[USB] teardown drain timed out with feedback transfer 0x{:02x} still in flight; slot will be leaked",
+            slot.endpoint.address
         );
     }
 }
@@ -5452,7 +5867,45 @@ fn run_usb_output_loop(
         candidate.service_interval_us,
     );
     let transfer_slot_count = ANDROID_USB_TRANSFER_QUEUE_DEPTH.max(1);
+    // One-shot: prove whether the sink links a feedback endpoint at all. If this
+    // dump shows a FeedbackData IN endpoint that descriptor parsing missed, the
+    // discovery path is wrong; if it shows none, host-side feedback is
+    // impossible for this device and only bus-side cushioning can help.
+    log_iso_endpoint_descriptors(&handle, &candidate);
     let feedback_endpoint = candidate.feedback_endpoint;
+    let mut feedback_slot = None;
+    if let Some(endpoint) = feedback_endpoint {
+        if candidate.sync_type == SyncType::Asynchronous {
+            match FeedbackTransferSlot::new(endpoint) {
+                Ok(slot) => feedback_slot = Some(slot),
+                Err(error) => {
+                    dev_eprintln!(
+                        "[USB] Failed to allocate feedback transfer for endpoint 0x{:02x}: {}",
+                        endpoint.address,
+                        error
+                    );
+                }
+            }
+        } else {
+            dev_eprintln!(
+                "[USB] Ignoring feedback endpoint 0x{:02x}: data endpoint sync type is {:?}, not asynchronous",
+                endpoint.address,
+                candidate.sync_type
+            );
+        }
+    } else if candidate.sync_type == SyncType::Asynchronous {
+        let packets_per_transfer = scheduler.packets_per_transfer();
+        let bus_cushion_ms = transfer_slot_count
+            .saturating_mul(packets_per_transfer)
+            .saturating_mul(candidate.service_interval_us as usize)
+            / 1000;
+        log_warn!(
+            "[USB] Async sink exposes no feedback endpoint; host-paced nominal timing with {} \
+             queued transfers (~{}ms bus cushion). Drift beyond that cushion will still drop out.",
+            transfer_slot_count,
+            bus_cushion_ms,
+        );
+    }
     runtime_stats
         .transfer_queue_depth
         .store(transfer_slot_count, Ordering::Relaxed);
@@ -5462,7 +5915,9 @@ fn run_usb_output_loop(
     let mut successful_transfers = 0usize;
     let mut logged_usb_stabilized = false;
     let mut underrun_count = 0u64;
-    let mut feedback_report_count = 0usize;
+    let mut feedback_counters = FeedbackCounters::default();
+    let mut feedback_stale_warned = false;
+    let mut min_active_slots = transfer_slot_count;
     let mut loud_transfer_log_count = 0u64;
     let transfer_buffer_capacity = scheduler
         .packets_per_transfer()
@@ -5547,6 +6002,34 @@ fn run_usb_output_loop(
             active_slots = active_slots.saturating_add(1);
         }
     }
+    min_active_slots = min_active_slots.min(active_slots);
+
+    if let Some(slot) = feedback_slot.as_mut() {
+        let endpoint = slot.endpoint;
+        match slot.submit(&handle) {
+            Ok(()) => {
+                log_info!(
+                    "[USB] Feedback endpoint 0x{:02x} {} interval={} service={}us maxPacket={} pollPackets={} timeout={}ms (asynchronous, nonblocking)",
+                    endpoint.address,
+                    transfer_type_label(endpoint.transfer_type),
+                    endpoint.interval,
+                    endpoint.service_interval_us,
+                    endpoint.max_packet_bytes,
+                    slot.packet_count,
+                    slot.timeout_ms,
+                );
+            }
+            Err(error) => {
+                dev_eprintln!(
+                    "[USB] Feedback endpoint 0x{:02x} initial submit failed: {}",
+                    endpoint.address,
+                    error
+                );
+                feedback_counters.errors = feedback_counters.errors.saturating_add(1);
+                feedback_slot = None;
+            }
+        }
+    }
 
     while fatal_error.is_none() && (!usb_stop_requested(&stop) || active_slots > 0) {
         if active_slots == 0 {
@@ -5558,13 +6041,29 @@ fn run_usb_output_loop(
             break;
         }
 
+        if let Some(feedback_slot) = feedback_slot.as_mut() {
+            pump_feedback_transfer(
+                &handle,
+                feedback_slot,
+                &mut scheduler,
+                candidate.service_interval_us,
+                candidate.usb_speed,
+                &mut feedback_counters,
+                &stop,
+            );
+        }
+
         for slot in slots.iter_mut() {
-            let Some(status) = slot.take_completion_status() else {
+            let Some((status, completed_at, _actual_length)) = slot.take_completion() else {
                 continue;
             };
 
             active_slots = active_slots.saturating_sub(1);
-            let turnaround_us = slot.turnaround_us().unwrap_or_default();
+            min_active_slots = min_active_slots.min(active_slots);
+            runtime_stats
+                .transfer_queue_depth
+                .store(active_slots, Ordering::Relaxed);
+            let turnaround_us = slot.turnaround_us(completed_at).unwrap_or_default();
             let queued_frame_count = slot.queued_frame_count as u64;
             let completed_underrun = slot.queued_underrun;
             let transfer_result = match status {
@@ -5597,36 +6096,8 @@ fn run_usb_output_loop(
                 .consumer_frames
                 .fetch_add(queued_frame_count, Ordering::Relaxed);
 
-            if let Some(feedback_endpoint) = feedback_endpoint {
-                match read_feedback_report(&context, &handle, feedback_endpoint, device_fd) {
-                    Ok(Some(feedback_report)) => {
-                        scheduler
-                            .update_feedback_frames_per_packet(feedback_report.frames_per_packet);
-                        feedback_report_count = feedback_report_count.saturating_add(1);
-                        if feedback_report_count <= 4 || feedback_report_count % 128 == 0 {
-                            dev_eprintln!(
-                                "[USB] Feedback endpoint 0x{:02x} {} bytes={:02x?} framesPerPacket={:.4} sampleRate≈{:.2}Hz",
-                                feedback_endpoint.address,
-                                transfer_type_label(feedback_endpoint.transfer_type),
-                                feedback_report.raw_bytes,
-                                feedback_report.frames_per_packet,
-                                feedback_report.estimated_sample_rate,
-                            );
-                        }
-                    }
-                    Ok(None) => {}
-                    Err(error) => {
-                        dev_eprintln!(
-                            "[USB] Feedback endpoint 0x{:02x} read failed: {}",
-                            feedback_endpoint.address, error
-                        );
-                    }
-                }
-            }
-
             let mut submit_gap_us = 0u64;
             if !usb_stop_requested(&stop) {
-                let completion_detected_at = Instant::now();
                 match prepare_iso_transfer_payload(
                     &mut scheduler,
                     &pcm_buffer,
@@ -5659,12 +6130,15 @@ fn run_usb_output_loop(
                                 Some(format!("Android USB direct transfer failed: {}", error));
                             break;
                         }
-                        submit_gap_us = completion_detected_at
+                        submit_gap_us = completed_at
                             .elapsed()
                             .as_micros()
                             .min(u128::from(u64::MAX))
                             as u64;
                         active_slots = active_slots.saturating_add(1);
+                        runtime_stats
+                            .transfer_queue_depth
+                            .store(active_slots, Ordering::Relaxed);
                     }
                     Ok(None) => {}
                     Err(error) => {
@@ -5690,23 +6164,61 @@ fn run_usb_output_loop(
                     .load(Ordering::Relaxed)
                     as f64
                     / 1_000.0;
+                let feedback_age_ms = feedback_counters
+                    .last_report_at
+                    .map(|reported_at| reported_at.elapsed().as_millis() as i64)
+                    .unwrap_or(-1);
+                let feedback_rate_hz = feedback_counters.last_estimated_sample_rate.unwrap_or(0.0);
                 log_info!(
-                    "[USB-TIMING] completed={} queueDepth={} effectiveRateHz={:.3} lastTurnaroundUs={} maxTurnaroundUs={} lastSubmitGapUs={} maxSubmitGapUs={}",
+                    "[USB-TIMING] completed={} queueDepth={} minQueueDepth={} configuredQueueDepth={} effectiveRateHz={:.3} lastTurnaroundUs={} maxTurnaroundUs={} lastSubmitGapUs={} maxSubmitGapUs={} feedbackActive={} reports={} timeouts={} errors={} rejected={} feedbackAgeMs={} feedbackRateHz={:.2}",
                     completed_transfers,
                     runtime_stats.transfer_queue_depth.load(Ordering::Relaxed),
+                    min_active_slots,
+                    transfer_slot_count,
                     effective_consumer_rate_hz,
                     runtime_stats.last_transfer_turnaround_us.load(Ordering::Relaxed),
                     runtime_stats.max_transfer_turnaround_us.load(Ordering::Relaxed),
                     runtime_stats.last_submit_gap_us.load(Ordering::Relaxed),
                     runtime_stats.max_submit_gap_us.load(Ordering::Relaxed),
+                    feedback_slot.is_some(),
+                    feedback_counters.reports,
+                    feedback_counters.timeouts,
+                    feedback_counters.errors,
+                    feedback_counters.rejected,
+                    feedback_age_ms,
+                    feedback_rate_hz,
                 );
+                let feedback_stale = feedback_slot.is_some()
+                    && if feedback_counters.reports == 0 {
+                        stream_started_at.elapsed()
+                            >= Duration::from_millis(ANDROID_USB_FEEDBACK_STALE_WARN_MS)
+                    } else {
+                        feedback_age_ms
+                            >= ANDROID_USB_FEEDBACK_STALE_WARN_MS as i64
+                    };
+                if feedback_stale && !feedback_stale_warned {
+                    if feedback_counters.reports == 0 {
+                        dev_eprintln!(
+                            "[USB] Feedback endpoint has produced no valid report after {}ms; nominal timing remains active",
+                            stream_started_at.elapsed().as_millis()
+                        );
+                    } else {
+                        dev_eprintln!(
+                            "[USB] Feedback report is stale for {}ms; holding last feedback-derived packet timing",
+                            feedback_age_ms
+                        );
+                    }
+                    feedback_stale_warned = true;
+                } else if !feedback_stale {
+                    feedback_stale_warned = false;
+                }
             }
 
             if successful_transfers >= ANDROID_USB_STABLE_TRANSFER_THRESHOLD {
                 if !completed_underrun {
                     set_usb_stream_stable(true);
                     if !logged_usb_stabilized {
-                        if feedback_endpoint.is_none() {
+                        if feedback_slot.is_none() {
                             scheduler.lock_to_nominal_packet_timing();
                             log_info!(
                                 "[USB] USB stream stabilized after {} isochronous transfers (nominal packet timing locked)",
@@ -5714,8 +6226,10 @@ fn run_usb_output_loop(
                             );
                         } else {
                             log_info!(
-                                "[USB] USB stream stabilized after {} isochronous transfers (keeping feedback-driven packet timing active)",
-                                successful_transfers
+                                "[USB] USB stream stabilized after {} transfers (feedback-driven packet timing active, reports={}, timeouts={})",
+                                successful_transfers,
+                                feedback_counters.reports,
+                                feedback_counters.timeouts,
                             );
                         }
                         logged_usb_stabilized = true;
@@ -5740,6 +6254,7 @@ fn run_usb_output_loop(
     }
 
     drain_iso_transfer_slots(&context, &mut slots);
+    drain_feedback_transfer_slot(&context, &mut feedback_slot);
 
     cleanup_claimed_handle(
         AndroidDirectUsbClaimedHandle {
@@ -5761,103 +6276,61 @@ fn run_usb_output_loop(
     }
 }
 
-#[derive(Debug)]
-struct AndroidUsbFeedbackReport {
-    raw_bytes: Vec<u8>,
-    frames_per_packet: f64,
-    estimated_sample_rate: f64,
-}
-
-fn read_feedback_report(
-    context: &Context,
-    handle: &DeviceHandle<Context>,
-    feedback_endpoint: AndroidUsbFeedbackEndpoint,
-    _device_fd: RawFd,
-) -> Result<Option<AndroidUsbFeedbackReport>, String> {
-    let raw_bytes = match feedback_endpoint.transfer_type {
-        TransferType::Interrupt => read_interrupt_feedback_packet(handle, feedback_endpoint)?,
-        TransferType::Isochronous => read_iso_feedback_packet(context, handle, feedback_endpoint)?,
-        other => {
-            return Err(format!(
-                "Unsupported feedback transfer type {}",
-                transfer_type_label(other)
-            ));
-        }
-    };
-
-    let Some(raw_bytes) = raw_bytes else {
-        return Ok(None);
-    };
-    let Some((frames_per_packet, estimated_sample_rate)) =
-        decode_feedback_report(&raw_bytes, feedback_endpoint)
-    else {
-        return Ok(None);
-    };
-
-    Ok(Some(AndroidUsbFeedbackReport {
-        raw_bytes,
-        frames_per_packet,
-        estimated_sample_rate,
-    }))
-}
-
-#[allow(dead_code)]
-fn read_interrupt_feedback_packet(
-    handle: &DeviceHandle<Context>,
-    feedback_endpoint: AndroidUsbFeedbackEndpoint,
-) -> Result<Option<Vec<u8>>, String> {
-    let mut data = vec![0u8; feedback_endpoint.max_packet_bytes.max(4)];
-    match handle.read_interrupt(
-        feedback_endpoint.address,
-        &mut data,
-        Duration::from_millis(ANDROID_USB_FEEDBACK_TIMEOUT_MS as u64),
-    ) {
-        Ok(transferred) if transferred > 0 => {
-            data.truncate(transferred);
-            Ok(Some(data))
-        }
-        Ok(_) => Ok(None),
-        Err(UsbError::Timeout) => Ok(None),
-        Err(error) => Err(format!("interrupt feedback read failed: {}", error)),
-    }
-}
-
+/// Decode UAC feedback into frames per data-endpoint service interval.
+///
+/// UAC2 feedback reports samples per microframe on high-speed links and
+/// samples per frame on full-speed links. The feedback endpoint's own polling
+/// interval is not the data endpoint's packet interval; using it as the
+/// timebase previously produced a rate error of up to 8x at 125 us service.
 fn decode_feedback_report(
     raw_bytes: &[u8],
-    feedback_endpoint: AndroidUsbFeedbackEndpoint,
+    data_service_interval_us: u32,
+    speed: Speed,
 ) -> Option<(f64, f64)> {
     let (frames_per_base_interval, base_interval_us) = match raw_bytes.len() {
         3 => {
             let raw = u32::from(raw_bytes[0])
                 | (u32::from(raw_bytes[1]) << 8)
                 | (u32::from(raw_bytes[2]) << 16);
-            (
-                raw as f64 / 16_384.0,
-                if feedback_endpoint.service_interval_us < 1_000 {
-                    125.0
-                } else {
-                    1_000.0
-                },
-            )
+            let base_interval_us = feedback_base_interval_us(speed, data_service_interval_us);
+            (raw as f64 / 16_384.0, base_interval_us)
         }
         4.. => {
             let raw = u32::from_le_bytes([raw_bytes[0], raw_bytes[1], raw_bytes[2], raw_bytes[3]]);
-            (
-                raw as f64 / 65_536.0,
-                if feedback_endpoint.service_interval_us < 1_000 {
-                    125.0
-                } else {
-                    1_000.0
-                },
-            )
+            let base_interval_us = feedback_base_interval_us(speed, data_service_interval_us);
+            (raw as f64 / 65_536.0, base_interval_us)
         }
         _ => return None,
     };
 
-    let packet_multiplier = feedback_endpoint.service_interval_us as f64 / base_interval_us;
+    let packet_multiplier = data_service_interval_us as f64 / base_interval_us;
     let frames_per_packet = frames_per_base_interval * packet_multiplier;
     let estimated_sample_rate = frames_per_base_interval * (1_000_000.0 / base_interval_us);
     Some((frames_per_packet, estimated_sample_rate))
+}
+
+fn feedback_base_interval_us(speed: Speed, data_service_interval_us: u32) -> f64 {
+    match speed {
+        Speed::Low | Speed::Full => 1_000.0,
+        Speed::High | Speed::Super | Speed::SuperPlus => 125.0,
+        Speed::Unknown => {
+            // Isochronous audio at sub-millisecond service intervals can only
+            // exist on a high-speed link. Fall back to the data endpoint when
+            // libusb could not identify the bus speed.
+            if data_service_interval_us < 1_000 {
+                125.0
+            } else {
+                1_000.0
+            }
+        }
+        _ => {
+            if data_service_interval_us < 1_000 {
+                125.0
+            } else {
+                1_000.0
+            }
+        }
+    }
 }
 
 fn select_stream_candidate(
@@ -5964,7 +6437,7 @@ fn select_stream_candidate(
 
                 if !matches!(
                     endpoint.usage_type(),
-                    UsageType::Data | UsageType::FeedbackData
+                    UsageType::Data | UsageType::FeedbackData | UsageType::Feedback
                 ) {
                     continue;
                 }
@@ -5983,8 +6456,12 @@ fn select_stream_candidate(
                 let service_interval_us = service_interval_micros(speed, endpoint.interval());
                 let max_packet_bytes =
                     effective_iso_packet_bytes(endpoint.max_packet_size(), speed);
-                let feedback_endpoint =
-                    find_feedback_endpoint(&descriptor, endpoint.synch_address(), speed);
+                let feedback_endpoint = find_feedback_endpoint(
+                    &descriptor,
+                    endpoint.synch_address(),
+                    endpoint.sync_type(),
+                    speed,
+                );
                 let bytes_per_frame =
                     stream_format.subslot_size as usize * stream_format.channels as usize;
                 let required_max_packet_bytes = required_max_packet_bytes(
@@ -6033,6 +6510,7 @@ fn select_stream_candidate(
                     endpoint_address: endpoint.address(),
                     endpoint_interval: endpoint.interval(),
                     service_interval_us,
+                    usb_speed: speed,
                     max_packet_bytes,
                     sync_type: endpoint.sync_type(),
                     usage_type: endpoint.usage_type(),
@@ -6090,35 +6568,141 @@ fn select_stream_candidate(
     })
 }
 
+/// Log every descriptor-level endpoint that *could* be a UAC2 feedback source,
+/// plus what the selected alt setting actually advertises.
+///
+/// This is diagnostic only: it is emitted once per stream start so the log
+/// answers "does this DAC expose a feedback pipe that we failed to find?" without
+/// needing a host-side USB capture.
+fn log_iso_endpoint_descriptors(
+    handle: &DeviceHandle<Context>,
+    candidate: &AndroidIsoStreamCandidate,
+) {
+    dev_eprintln!(
+        "[USB] Endpoint audit: selected interface={} alt={} endpoint=0x{:02x}; \
+         feedback={} sync={:?}",
+        candidate.interface_number,
+        candidate.alt_setting,
+        candidate.endpoint_address,
+        candidate
+            .feedback_endpoint
+            .map(|feedback| format!(
+                "0x{:02x}/{}@interval{}",
+                feedback.address,
+                transfer_type_label(feedback.transfer_type),
+                feedback.interval,
+            ))
+            .unwrap_or_else(|| "none".to_string()),
+        candidate.sync_type,
+    );
+
+    if candidate.sync_type != SyncType::Asynchronous {
+        return;
+    }
+    if candidate.feedback_endpoint.is_some() {
+        return;
+    }
+
+    // Only reached for an async sink with no resolved feedback pipe. Report the
+    // neighbouring IN endpoints we rejected and why, so a genuine discovery gap
+    // is distinguishable from a device that simply has no feedback.
+    dev_eprintln!(
+        "[USB] Async sink on interface {} alt {} has no resolved feedback endpoint \
+         (bSynchAddress=0x{:02x}). Playback is host-paced on nominal packet timing, so DAC \
+         oscillator drift can underrun its FIFO at intervals that scale with the drift offset.",
+        candidate.interface_number,
+        candidate.alt_setting,
+        candidate.synch_address,
+    );
+
+    let config = match handle.device().active_config_descriptor() {
+        Ok(config) => config,
+        Err(_) => return,
+    };
+    for interface in config.interfaces() {
+        if interface.number() != candidate.interface_number {
+            continue;
+        }
+        for alt in interface.descriptors() {
+            for endpoint in alt.endpoint_descriptors() {
+                if endpoint.direction() != Direction::In {
+                    continue;
+                }
+                dev_eprintln!(
+                    "[USB] Endpoint audit: unused IN endpoint=0x{:02x} alt={} type={:?} usage={:?} interval={} maxPacket={} on interface {} (async data endpoint has no feedback)",
+                    endpoint.address(),
+                    alt.setting_number(),
+                    endpoint.transfer_type(),
+                    endpoint.usage_type(),
+                    endpoint.interval(),
+                    endpoint.max_packet_size(),
+                    interface.number(),
+                );
+            }
+        }
+    }
+}
+
 fn find_feedback_endpoint(
     descriptor: &rusb::InterfaceDescriptor,
     feedback_address: u8,
+    sync_type: SyncType,
     speed: Speed,
 ) -> Option<AndroidUsbFeedbackEndpoint> {
-    if feedback_address == 0 {
-        return None;
-    }
-
-    descriptor.endpoint_descriptors().find_map(|endpoint| {
-        if endpoint.address() != feedback_address || endpoint.direction() != Direction::In {
-            return None;
-        }
-
-        if !matches!(
-            endpoint.transfer_type(),
-            TransferType::Isochronous | TransferType::Interrupt
-        ) {
-            return None;
-        }
-
-        Some(AndroidUsbFeedbackEndpoint {
+    // Only the selected alt is active. Dawn Pro repeats 0x81 in alts 1..4;
+    // walking sibling alts made that valid feedback endpoint look ambiguous.
+    let endpoints = descriptor
+        .endpoint_descriptors()
+        .map(|endpoint| FeedbackEndpointCandidate {
+            alt_setting: descriptor.setting_number(),
             address: endpoint.address(),
             transfer_type: endpoint.transfer_type(),
+            usage_type: endpoint.usage_type(),
             interval: endpoint.interval(),
-            service_interval_us: service_interval_micros(speed, endpoint.interval()),
-            max_packet_bytes: effective_iso_packet_bytes(endpoint.max_packet_size(), speed),
-        })
-    })
+            max_packet_size: endpoint.max_packet_size(),
+        });
+    let endpoint = match select_explicit_feedback_endpoint(
+        descriptor.setting_number(),
+        feedback_address,
+        sync_type,
+        endpoints,
+    ) {
+        Ok(endpoint) => endpoint?,
+        Err(addresses) => {
+            dev_eprintln!(
+                "[USB] Async endpoint has {} feedback IN candidates ({:02x?}) on interface {} alt {}; refusing ambiguous feedback selection",
+                addresses.len(),
+                addresses,
+                descriptor.interface_number(),
+                descriptor.setting_number(),
+            );
+            return None;
+        }
+    };
+
+    let feedback = AndroidUsbFeedbackEndpoint {
+        address: endpoint.address,
+        transfer_type: endpoint.transfer_type,
+        interval: endpoint.interval,
+        service_interval_us: service_interval_micros(speed, endpoint.interval),
+        max_packet_bytes: effective_iso_packet_bytes(endpoint.max_packet_size, speed),
+    };
+    let resolution = if feedback_address != 0 && endpoint.address == feedback_address {
+        "bSynchAddress"
+    } else {
+        "UAC2 feedback usage"
+    };
+    dev_eprintln!(
+        "[USB] Feedback endpoint resolved from {}: 0x{:02x} {} interval={} service={}us on interface {} alt {}",
+        resolution,
+        feedback.address,
+        transfer_type_label(feedback.transfer_type),
+        feedback.interval,
+        feedback.service_interval_us,
+        descriptor.interface_number(),
+        descriptor.setting_number(),
+    );
+    Some(feedback)
 }
 
 fn discover_audio_streaming_interfaces(device: &Device<Context>) -> Result<Vec<u8>, String> {
@@ -7668,14 +8252,28 @@ extern "system" fn iso_transfer_callback(transfer: *mut libusb_transfer) {
             return;
         };
 
+        let completed_at = Instant::now();
         let status = unsafe { transfer.as_ref().status };
-        let completion = &unsafe { user_data.as_ref() }.completion;
+        let actual_length = unsafe { transfer.as_ref().actual_length } as usize;
+        // Keep the completion state alive independently of the transfer/user
+        // data so the output thread can re-arm or free the slot as soon as the
+        // status is published.
+        let completion = unsafe { user_data.as_ref() }.completion.clone();
+        completion
+            .actual_length
+            .store(actual_length, Ordering::Release);
+        match completion.completed_at.lock() {
+            Ok(mut guard) => *guard = Some(completed_at),
+            Err(poisoned) => *poisoned.into_inner() = Some(completed_at),
+        }
+        // Publish status last. Everything above is mine; after this store the
+        // slot owner may refill or release the transfer without racing this
+        // callback, because the callback no longer touches either object.
         let mut guard = match completion.status.lock() {
             Ok(guard) => guard,
             Err(poisoned) => poisoned.into_inner(),
         };
         *guard = Some(status);
-        completion.condvar.notify_all();
     }));
 }
 
@@ -7687,10 +8285,7 @@ fn submit_iso_transfer(
     packet_sizes: &[usize],
     buffer: Vec<u8>,
 ) -> Result<(), String> {
-    let completion = Arc::new(IsoTransferCompletion {
-        status: StdMutex::new(None),
-        condvar: Condvar::new(),
-    });
+    let completion = Arc::new(IsoTransferCompletion::new());
     let user_data = Box::new(IsoTransferUserData { completion, buffer });
     let user_data_ptr = Box::into_raw(user_data);
     let transfer = unsafe { libusb_alloc_transfer(packet_sizes.len() as i32) };
@@ -7778,10 +8373,7 @@ fn read_iso_feedback_packet(
     handle: &DeviceHandle<Context>,
     feedback_endpoint: AndroidUsbFeedbackEndpoint,
 ) -> Result<Option<Vec<u8>>, String> {
-    let completion = Arc::new(IsoTransferCompletion {
-        status: StdMutex::new(None),
-        condvar: Condvar::new(),
-    });
+    let completion = Arc::new(IsoTransferCompletion::new());
     let buffer = vec![0u8; feedback_endpoint.max_packet_bytes.max(4)];
     let user_data = Box::new(IsoTransferUserData { completion, buffer });
     let user_data_ptr = Box::into_raw(user_data);
@@ -8156,5 +8748,38 @@ mod dsd_bitperfect_tests {
             dsd_bit_rate: 0,
         };
         assert_eq!(effective_ring_rate(&pcm), 96_000);
+    }
+
+    #[test]
+    fn feedback_uses_usb_speed_timebase_not_feedback_poll_interval() {
+        // UAC2 high-speed feedback is samples per microframe. A report of 44.1
+        // at a 125 us data service interval is 352.8 kHz, regardless of whether
+        // the feedback endpoint itself is polled every 1 ms.
+        let raw = (44.1f64 * 65_536.0).round() as u32;
+        let (frames_per_packet, estimated_rate) =
+            decode_feedback_report(&raw.to_le_bytes(), 125, Speed::High).unwrap();
+        assert!((frames_per_packet - 44.1).abs() < 0.000_1);
+        assert!((estimated_rate - 352_800.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn feedback_full_speed_uses_one_millisecond_timebase() {
+        let raw = (48.0f64 * 16_384.0) as u32;
+        let bytes = [raw as u8, (raw >> 8) as u8, (raw >> 16) as u8];
+        let (frames_per_packet, estimated_rate) =
+            decode_feedback_report(&bytes, 1_000, Speed::Full).unwrap();
+        assert!((frames_per_packet - 48.0).abs() < 0.001);
+        assert!((estimated_rate - 48_000.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn feedback_q10_14_uses_high_speed_timebase() {
+        // 10.14 feedback is still samples per microframe on a high-speed link.
+        let raw = (44.1f64 * 16_384.0).round() as u32;
+        let bytes = [raw as u8, (raw >> 8) as u8, (raw >> 16) as u8];
+        let (frames_per_packet, estimated_rate) =
+            decode_feedback_report(&bytes, 125, Speed::High).unwrap();
+        assert!((frames_per_packet - 44.1).abs() < 0.000_1);
+        assert!((estimated_rate - 352_800.0).abs() < 0.01);
     }
 }
