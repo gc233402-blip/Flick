@@ -1524,6 +1524,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not read the selected lyrics file.';
 
   @override
+  String get couldNotRenamePlaylist => 'Could not rename the playlist.';
+
+  @override
   String get couldNotSaveTheLyricsFile => 'Could not save the lyrics file.';
 
   @override
@@ -4958,6 +4961,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playlistName => 'Playlist name';
+
+  @override
+  String playlistRenamed(Object arg1) {
+    return 'Playlist renamed to \"$arg1\"';
+  }
 
   @override
   String get playlists => 'Playlists';

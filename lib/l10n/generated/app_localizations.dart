@@ -2699,6 +2699,12 @@ abstract class AppLocalizations {
   /// **'Could not read the selected lyrics file.'**
   String get couldNotReadTheSelectedLyrics;
 
+  /// lib/features/playlists/playlist_rename_action.dart:31
+  ///
+  /// In en, this message translates to:
+  /// **'Could not rename the playlist.'**
+  String get couldNotRenamePlaylist;
+
   /// lib/features/player/screens/lyrics_sync_screen.dart:565
   ///
   /// In en, this message translates to:
@@ -8523,6 +8529,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Playlist name'**
   String get playlistName;
+
+  /// lib/features/playlists/playlist_rename_action.dart:34
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist renamed to \"{arg1}\"'**
+  String playlistRenamed(Object arg1);
 
   /// lib/features/menu/screens/menu_screen.dart:1446
   ///

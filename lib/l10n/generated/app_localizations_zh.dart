@@ -1446,6 +1446,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get couldNotReadTheSelectedLyrics => '无法读取所选歌词文件。';
 
   @override
+  String get couldNotRenamePlaylist => '无法重命名播放列表。';
+
+  @override
   String get couldNotSaveTheLyricsFile => '无法保存歌词文件。';
 
   @override
@@ -4658,6 +4661,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get playlistName => '播放列表名称';
+
+  @override
+  String playlistRenamed(Object arg1) {
+    return '播放列表已重命名为“$arg1”';
+  }
 
   @override
   String get playlists => '播放列表';
