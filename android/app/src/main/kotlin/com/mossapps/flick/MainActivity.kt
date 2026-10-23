@@ -936,8 +936,9 @@ class MainActivity: FlutterActivity() {
                 }
                 "activateDirectUsb" -> {
                     val deviceName = call.argument<String>("deviceName")
+                    val restoreVolume = call.argument<Double>("restoreVolume")
                     if (deviceName != null) {
-                        result.success(activateDirectUsb(deviceName))
+                        result.success(activateDirectUsb(deviceName, restoreVolume))
                     } else {
                         result.error("INVALID_ARGUMENT", "deviceName is required", null)
                     }
@@ -3995,7 +3996,7 @@ class MainActivity: FlutterActivity() {
         }
     }
 
-    private fun activateDirectUsb(deviceName: String): Boolean {
+    private fun activateDirectUsb(deviceName: String, restoreVolume: Double? = null): Boolean {
         return try {
             val usbManager = getSystemService(Context.USB_SERVICE) as? UsbManager ?: return false
             val device = usbManager.deviceList?.get(deviceName) ?: return false
@@ -4052,6 +4053,19 @@ class MainActivity: FlutterActivity() {
                 }
                 Log.e("UAC2", "Rust rejected direct USB registration for $deviceName")
                 return false
+            }
+
+            if (restoreVolume != null) {
+                if (restoreVolume.isFinite() && restoreVolume in 0.0..1.0) {
+                    if (!nativeQueueRustDirectUsbHardwareVolumeRestore(restoreVolume)) {
+                        Log.w(
+                            "UAC2",
+                            "Rust could not queue hardware volume restore for $deviceName",
+                        )
+                    }
+                } else {
+                    Log.w("UAC2", "Ignoring invalid volume restore value: $restoreVolume")
+                }
             }
 
             if (activeDirectUsbDeviceName != null && activeDirectUsbDeviceName != deviceName) {
@@ -5467,6 +5481,7 @@ class MainActivity: FlutterActivity() {
     private external fun nativeHasRustDirectUsbHardwareVolume(): Boolean
     private external fun nativeGetRustDirectUsbHardwareVolume(): Double
     private external fun nativeSetRustDirectUsbHardwareVolume(volume: Double): Boolean
+    private external fun nativeQueueRustDirectUsbHardwareVolumeRestore(volume: Double): Boolean
     private external fun nativeGetRustDirectUsbHardwareMute(): Int
     private external fun nativeSetRustDirectUsbHardwareMute(muted: Boolean): Boolean
     private external fun nativeVerifyRustDirectUsbHardwareVolumeHealth(): Int
