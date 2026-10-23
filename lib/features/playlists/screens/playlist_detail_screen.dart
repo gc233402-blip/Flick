@@ -32,6 +32,7 @@ import 'package:flick/features/player/widgets/sleep_timer_bottom_sheet.dart';
 import 'package:flick/providers/favorites_provider.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/features/playlists/playlist_cover_actions.dart';
+import 'package:flick/features/playlists/playlist_rename_action.dart';
 import 'package:flick/features/playlists/widgets/playlist_sort_bottom_sheet.dart';
 import 'package:flick/features/songs/widgets/song_actions_button.dart';
 import 'package:flick/l10n/l10n.dart';
@@ -287,11 +288,15 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
     return Color.lerp(_darkBase, _playlistColor!, blend)!;
   }
 
-  PlaybackContext get _playlistContext => PlaybackContext(
-    source: PlaybackSource.playlist,
-    sourceId: widget.playlist.id,
-    sourceName: widget.playlist.name,
-  );
+  PlaybackContext get _playlistContext {
+    final playlist =
+        ref.read(playlistProvider(widget.playlist.id)) ?? widget.playlist;
+    return PlaybackContext(
+      source: PlaybackSource.playlist,
+      sourceId: playlist.id,
+      sourceName: playlist.name,
+    );
+  }
 
   void _playSong(Song song) {
     if (_songs.isEmpty) return;
@@ -397,6 +402,10 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
         .save(_descriptionKey, result);
   }
 
+  Future<void> _renamePlaylist() async {
+    await PlaylistRenameAction.show(context, ref, _currentPlaylist);
+  }
+
   Future<void> _refreshCoverColor() async {
     final playlist = await ref
         .read(playlistServiceProvider)
@@ -440,6 +449,11 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
     DetailMoreSheet.show(
       context,
       items: [
+        DetailMoreSheetItem(
+          icon: LucideIcons.pencilLine,
+          label: l10n.rename,
+          onTap: _renamePlaylist,
+        ),
         if (hasCover)
           DetailMoreSheetItem(
             icon: LucideIcons.pencil,
@@ -531,6 +545,7 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                         expanded: prefs.detailHeaderArtExpanded,
                         centeredTitle: prefs.detailHeaderCenteredTitle,
                         artBuilder: (_) => _buildCollageBackground(),
+                        artColor: _playlistColor,
                         title: playlist.name,
                         subtitle: null,
                         meta: meta,

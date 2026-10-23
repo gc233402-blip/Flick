@@ -16,6 +16,7 @@ import 'package:flick/widgets/common/cached_image_widget.dart';
 import 'package:flick/widgets/common/flick_artwork_placeholder.dart';
 import 'package:flick/widgets/common/surface_icon_button.dart';
 import 'package:flick/features/playlists/playlist_cover_actions.dart';
+import 'package:flick/features/playlists/playlist_rename_action.dart';
 import 'package:flick/features/playlists/screens/playlist_detail_screen.dart';
 import 'package:flick/features/player/widgets/ambient_background.dart';
 import 'package:flick/providers/player_provider.dart';
@@ -307,6 +308,7 @@ class PlaylistsScreen extends ConsumerWidget {
               (context) => PlaylistDetailScreen(playlist: playlist),
             );
           },
+          onRename: () => PlaylistRenameAction.show(context, ref, playlist),
           onDelete: () async {
             final confirm = await _showDeleteDialog(context, ref);
             if (confirm == true) {
@@ -546,6 +548,7 @@ class _PlaylistCard extends StatelessWidget {
   final Playlist playlist;
   final String? serverLabel;
   final VoidCallback onTap;
+  final VoidCallback onRename;
   final VoidCallback onDelete;
   final VoidCallback onSetCover;
   final VoidCallback onRemoveCover;
@@ -557,6 +560,7 @@ class _PlaylistCard extends StatelessWidget {
     required this.playlist,
     this.serverLabel,
     required this.onTap,
+    required this.onRename,
     required this.onDelete,
     required this.onSetCover,
     required this.onRemoveCover,
@@ -618,6 +622,9 @@ class _PlaylistCard extends StatelessWidget {
                   color: AppColors.surface,
                   onSelected: (value) {
                     switch (value) {
+                      case 'rename':
+                        onRename();
+                        break;
                       case 'set_cover':
                         onSetCover();
                         break;
@@ -636,6 +643,17 @@ class _PlaylistCard extends StatelessWidget {
                     }
                   },
                   itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'rename',
+                      child: Row(
+                        children: [
+                          Icon(LucideIcons.pencilLine, size: 18),
+                          SizedBox(width: 8),
+                          Text(l10n.rename),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuDivider(),
                     PopupMenuItem(
                       value: 'set_cover',
                       child: Row(
