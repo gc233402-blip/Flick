@@ -4,6 +4,8 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::Path;
 
+const DSF_BLOCK_CACHE_LIMIT: usize = 64 * 1024;
+
 pub struct DsfDecoder {
     file: File,
     sample_rate: u32,
@@ -12,6 +14,7 @@ pub struct DsfDecoder {
     data_offset: u64,
     block_size: u32,
     block: Vec<u8>,
+    channel_buf: Vec<u8>,
     loaded_block: Option<u64>,
     current_position: u64,
     bit_order: DsdBitOrder,
@@ -131,6 +134,31 @@ impl DsfDecoder {
             8 => DsdBitOrder::MsbFirst,
             _ => bail!("Invalid DSF bit-order flag: {bits_per_sample}"),
         };
+        let block_bytes = block_size as usize * channels as usize;
+        let block_seconds = block_size as f64 / (sample_rate as f64 / 8.0);
+        log::info!(
+            "[DSF] opened: rate={} Hz channels={} bit_order={} samples={} duration={:.3}s block_size={}B block_seconds={:.3} data_size={}B",
+            sample_rate,
+            channels,
+            bits_per_sample,
+            total_samples,
+            total_samples as f64 / sample_rate as f64,
+            block_size,
+            block_seconds,
+            data_size
+        );
+        if block_seconds > 1.0 {
+            log::warn!(
+                "[DSF] Large block size: {} bytes/channel ({:.3}s); using bounded windowed reads",
+                block_size,
+                block_seconds
+            );
+        }
+        let block = if block_bytes <= DSF_BLOCK_CACHE_LIMIT {
+            vec![0u8; block_bytes]
+        } else {
+            Vec::new()
+        };
         if file_size != actual_size || metadata_offset > actual_size {
             log::warn!(
                 "[DSF] Stale outer size/tag pointer; complete audio chunk validated: declared={}, actual={}, metadata={}, data_end={}",
@@ -146,7 +174,8 @@ impl DsfDecoder {
             total_samples,
             data_offset,
             block_size,
-            block: vec![0u8; block_size as usize * channels as usize],
+            block,
+            channel_buf: Vec::new(),
             loaded_block: None,
             current_position: 0,
             bit_order,
@@ -199,23 +228,43 @@ impl DsdFormatDecoder for DsfDecoder {
         }
         let frames = ((buf.len() / channels) as u64)
             .min((self.total_samples - self.current_position) / 8);
+        let block_bytes = self.block_size as usize * channels;
         let mut written = 0;
         while written < frames as usize {
             let byte_position = self.current_position / 8;
             let block_index = byte_position / self.block_size as u64;
-            if self.loaded_block != Some(block_index) {
-                self.file.seek(SeekFrom::Start(self.data_offset + block_index * self.block.len() as u64))?;
-                // read_exact retries Interrupted/short FUSE reads, but rejects a
-                // genuinely truncated block instead of leaving channels skewed.
-                self.file.read_exact(&mut self.block)?;
-                self.loaded_block = Some(block_index);
-            }
             let within = (byte_position % self.block_size as u64) as usize;
             let count = (frames as usize - written).min(self.block_size as usize - within);
-            for frame in 0..count {
+            if block_bytes <= DSF_BLOCK_CACHE_LIMIT {
+                if self.loaded_block != Some(block_index) {
+                    self.file.seek(SeekFrom::Start(
+                        self.data_offset + block_index * block_bytes as u64,
+                    ))?;
+                    // read_exact retries Interrupted/short FUSE reads, but rejects a
+                    // genuinely truncated block instead of leaving channels skewed.
+                    self.file.read_exact(&mut self.block)?;
+                    self.loaded_block = Some(block_index);
+                }
+                for frame in 0..count {
+                    for channel in 0..channels {
+                        buf[(written + frame) * channels + channel] =
+                            self.block[channel * self.block_size as usize + within + frame];
+                    }
+                }
+            } else {
+                // Nonstandard DSF files can declare multi-second blocks. Reading
+                // a whole block here would issue multi-megabyte FUSE reads and can
+                // stall the decoder. Read only the requested window per channel.
+                let block_base = self.data_offset + block_index * block_bytes as u64;
                 for channel in 0..channels {
-                    buf[(written + frame) * channels + channel] =
-                        self.block[channel * self.block_size as usize + within + frame];
+                    let channel_offset = block_base
+                        + (channel * self.block_size as usize + within) as u64;
+                    self.file.seek(SeekFrom::Start(channel_offset))?;
+                    self.channel_buf.resize(count, 0);
+                    self.file.read_exact(&mut self.channel_buf)?;
+                    for frame in 0..count {
+                        buf[(written + frame) * channels + channel] = self.channel_buf[frame];
+                    }
                 }
             }
             written += count;
@@ -257,7 +306,11 @@ mod tests {
         buf[off..off + 8].copy_from_slice(&value.to_le_bytes());
     }
 
-    fn synthetic_dsf(bits_per_sample: u32, audio: &[u8]) -> Vec<u8> {
+    fn synthetic_dsf_with_block_size(
+        bits_per_sample: u32,
+        audio: &[u8],
+        block_size: u32,
+    ) -> Vec<u8> {
         let mut buf = vec![0u8; 92];
         buf[0..4].copy_from_slice(b"DSD ");
         put_u64(&mut buf, 4, 28);
@@ -272,12 +325,16 @@ mod tests {
         put_u32(&mut buf, 56, 2_822_400);
         put_u32(&mut buf, 60, bits_per_sample);
         put_u64(&mut buf, 64, ((audio.len() / 2) * 8) as u64);
-        put_u32(&mut buf, 72, 4096);
+        put_u32(&mut buf, 72, block_size);
         put_u32(&mut buf, 76, 0);
         buf[80..84].copy_from_slice(b"data");
         put_u64(&mut buf, 84, 12 + audio.len() as u64);
         buf.extend_from_slice(audio);
         buf
+    }
+
+    fn synthetic_dsf(bits_per_sample: u32, audio: &[u8]) -> Vec<u8> {
+        synthetic_dsf_with_block_size(bits_per_sample, audio, 4096)
     }
 
     fn write_temp(name: &str, bytes: &[u8]) -> std::path::PathBuf {
@@ -302,6 +359,44 @@ mod tests {
         assert_eq!(read, 8192);
         let expected: Vec<_> = (0..4096).flat_map(|i| [audio[i], audio[4096 + i]]).collect();
         assert_eq!(out, expected, "DSF audio must be de-blocked from byte 92");
+    }
+
+    #[test]
+    fn large_block_size_reads_are_windowed_and_deinterleaved() {
+        let block_size = 128 * 1024;
+        let blocks = 3;
+        let mut audio = vec![0u8; blocks * 2 * block_size];
+        for block in 0..blocks {
+            let base = block * 2 * block_size;
+            audio[base..base + block_size].fill(0x10 + block as u8);
+            audio[base + block_size..base + 2 * block_size].fill(0x80 + block as u8);
+        }
+        let path = write_temp(
+            "large_block",
+            &synthetic_dsf_with_block_size(1, &audio, block_size as u32),
+        );
+
+        let mut decoder = DsfDecoder::open(&path).unwrap();
+        let mut out = vec![0u8; audio.len()];
+        let read = decoder.read_dsd_bytes(&mut out).unwrap();
+        assert_eq!(read, audio.len());
+        assert!(decoder.is_finished());
+
+        for frame in 0..blocks * block_size {
+            let block = frame / block_size;
+            assert_eq!(out[frame * 2], 0x10 + block as u8);
+            assert_eq!(out[frame * 2 + 1], 0x80 + block as u8);
+        }
+
+        decoder.seek((block_size as u64 + 8) * 8).unwrap();
+        let mut tail = vec![0u8; 64 * 2];
+        assert_eq!(decoder.read_dsd_bytes(&mut tail).unwrap(), tail.len());
+        for frame in 0..64 {
+            assert_eq!(tail[frame * 2], 0x11);
+            assert_eq!(tail[frame * 2 + 1], 0x81);
+        }
+
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]
