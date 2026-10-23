@@ -351,7 +351,8 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
 
   Future<void> _toggleFavoriteAll() async {
     if (_songs.isEmpty) return;
-    final favIds = ref.read(favoritesProvider).value?.favoriteIds ?? const <String>{};
+    final favIds =
+        ref.read(favoritesProvider).value?.favoriteIds ?? const <String>{};
     final notifier = ref.read(favoritesProvider.notifier);
     final isAll = _songs.every((s) => favIds.contains(s.id));
     if (isAll) {
@@ -404,6 +405,16 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
     unawaited(_extractPlaylistColor(playlist ?? _currentPlaylist));
   }
 
+  Future<void> _editCover() async {
+    final changed = await PlaylistCoverActions.edit(
+      context,
+      ref,
+      _currentPlaylist,
+    );
+    if (!mounted || !changed) return;
+    unawaited(_refreshCoverColor());
+  }
+
   Future<void> _changeCover() async {
     final changed = await PlaylistCoverActions.choose(
       context,
@@ -429,6 +440,12 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
     DetailMoreSheet.show(
       context,
       items: [
+        if (hasCover)
+          DetailMoreSheetItem(
+            icon: LucideIcons.pencil,
+            label: l10n.editCover,
+            onTap: _editCover,
+          ),
         DetailMoreSheetItem(
           icon: LucideIcons.imagePlus,
           label: hasCover ? l10n.changeCover : l10n.setCover,
@@ -542,8 +559,9 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                         ),
                       ),
                       SliverToBoxAdapter(
-                        child:
-                            DetailDescription(descriptionKey: _descriptionKey),
+                        child: DetailDescription(
+                          descriptionKey: _descriptionKey,
+                        ),
                       ),
                       const SliverToBoxAdapter(
                         child: SizedBox(height: AppConstants.spacingLg),
@@ -727,10 +745,11 @@ class _PlaylistDetailScreenState extends ConsumerState<PlaylistDetailScreen>
                         alignment: Alignment.centerLeft,
                         child: Text(
                           playlist.name,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: context.adaptiveTextPrimary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: context.adaptiveTextPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
                           maxLines: 1,
                         ),
                       ),
@@ -955,10 +974,7 @@ class _SongTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              SongActionsButton(
-                song: song,
-                onRemoveFromPlaylist: onRemove,
-              ),
+              SongActionsButton(song: song, onRemoveFromPlaylist: onRemove),
             ],
           ),
         ),
