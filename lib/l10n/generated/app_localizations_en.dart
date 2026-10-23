@@ -7682,11 +7682,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get volumeIsFixedWhileBitPerfect =>
-      'Volume is fixed while bit-perfect passthrough is active and this DAC has no hardware volume control.';
+      'Volume is fixed during bit-perfect passthrough because USB hardware volume is unavailable in Flick. Use the device controls, or play PCM with bit-perfect disabled for software volume.';
 
   @override
   String get volumeIsFixedWhileBitPerfect2 =>
-      'Volume is fixed while bit-perfect passthrough is active: the stream is sent untouched and this DAC has no hardware volume control.';
+      'Volume is fixed during bit-perfect passthrough because USB hardware volume is unavailable in Flick. Use the device controls, or play PCM with bit-perfect disabled for software volume.';
+
+  @override
+  String get directUsbFormatNotice =>
+      'A direct USB DAC is registered. Direct USB bypasses Android\'s mixer and system volume. The format shown is requested content format, not a measured DAC output rate.';
+
+  @override
+  String get usbHardwareVolumeUnavailable =>
+      'USB hardware volume is unavailable in Flick. During bit-perfect passthrough, use the device\'s physical controls. For software volume, play PCM with bit-perfect disabled.';
+
+  @override
+  String usbHardwareVolumeError(String reason) {
+    return 'USB hardware volume: $reason';
+  }
 
   @override
   String wAgo(Object arg1) {
