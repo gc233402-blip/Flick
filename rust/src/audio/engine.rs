@@ -2048,6 +2048,11 @@ pub fn create_audio_engine(
                 );
             }
             Err(error) => {
+                // A volume restore refusal is a safety stop, not permission to
+                // start Android-managed output at an unrelated system level.
+                if error.contains("Failed to restore USB DAC hardware volume before playback") {
+                    return Err(error);
+                }
                 if dsd_rate.is_some() && will_attempt_usb {
                     return Err(format!("USB DSD output refused (no managed fallback): {}", error));
                 }

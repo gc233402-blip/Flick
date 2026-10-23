@@ -43,6 +43,10 @@ class Uac2PreferencesService {
   static const _keyDeveloperModeEnabled = 'developer_mode_enabled';
   static const _keyAudioFormatEnabled = 'uac2_audio_format_enabled';
   static const _keyUsbSoftwareVolume = 'uac2_usb_software_volume';
+  static const _keyUsbDeviceVolumes = 'uac2_usb_device_volumes';
+
+  /// Safe first-use level for a USB DAC that has never had a level saved.
+  static const double defaultUsbDacVolume = 0.40;
   static const _keyKillIsochronousUsbOnQuit = 'uac2_kill_isochronous_usb_on_quit';
   static const _keyGaplessPlaybackEnabled = 'gapless_playback_enabled';
   static const _keyDuckOnInterruption = 'duck_on_interruption_enabled';
@@ -398,6 +402,86 @@ class Uac2PreferencesService {
     } catch (e) {
       devLog('Failed to check USB software volume key: $e');
       return false;
+    }
+  }
+
+  /// Stable identity for a DAC's remembered volume.
+  ///
+  /// A real serial is preferred. Android may expose `/dev/bus/usb/...` as the
+  /// serial fallback, so path-like values are ignored and the device model is
+  /// used instead.
+  static String usbDeviceVolumeKey(Uac2DeviceInfo device) {
+    final serial = device.serial?.trim();
+    if (serial != null &&
+        serial.isNotEmpty &&
+        !serial.contains('/') &&
+        serial != device.deviceName) {
+      return 'serial:${device.vendorId}:${device.productId}:$serial';
+    }
+    final manufacturer = device.manufacturer.trim().toLowerCase();
+    final product = device.productName.trim().toLowerCase();
+    return 'model:${device.vendorId}:${device.productId}:$manufacturer:$product';
+  }
+
+  Future<double> getUsbVolumeForDevice(Uac2DeviceInfo device) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final volumes = _readUsbDeviceVolumes(prefs);
+      final key = usbDeviceVolumeKey(device);
+      final remembered = volumes[key];
+      if (remembered != null) {
+        return remembered.clamp(0.0, 1.0);
+      }
+
+      // Migrate the old global preference to the first DAC that uses it.
+      // Other DACs must not inherit that level, even before a slider change.
+      if (volumes.isEmpty && prefs.containsKey(_keyUsbSoftwareVolume)) {
+        final legacy = prefs.getDouble(_keyUsbSoftwareVolume);
+        if (legacy != null && legacy.isFinite) {
+          final migrated = legacy.clamp(0.0, 1.0);
+          volumes[key] = migrated;
+          await prefs.setString(_keyUsbDeviceVolumes, jsonEncode(volumes));
+          return migrated;
+        }
+      }
+      return defaultUsbDacVolume;
+    } catch (e) {
+      devLog('Failed to load USB DAC volume: $e');
+      return defaultUsbDacVolume;
+    }
+  }
+
+  Future<void> setUsbVolumeForDevice(
+    Uac2DeviceInfo device,
+    double volume,
+  ) async {
+    if (!volume.isFinite) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final volumes = _readUsbDeviceVolumes(prefs);
+      volumes[usbDeviceVolumeKey(device)] = volume.clamp(0.0, 1.0);
+      await prefs.setString(_keyUsbDeviceVolumes, jsonEncode(volumes));
+    } catch (e) {
+      devLog('Failed to save USB DAC volume: $e');
+    }
+  }
+
+  Map<String, double> _readUsbDeviceVolumes(SharedPreferences prefs) {
+    final raw = prefs.getString(_keyUsbDeviceVolumes);
+    if (raw == null || raw.isEmpty) return <String, double>{};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return <String, double>{};
+      return <String, double>{
+        for (final entry in decoded.entries)
+          if (entry.key is String &&
+              entry.value is num &&
+              (entry.value as num).isFinite)
+            entry.key as String: (entry.value as num).toDouble(),
+      };
+    } catch (e) {
+      devLog('Failed to parse USB DAC volume map: $e');
+      return <String, double>{};
     }
   }
 
@@ -817,6 +901,7 @@ await prefs.remove(_keyAudioEnginePreference);
     await prefs.remove(_keyDeveloperModeEnabled);
       await prefs.remove(_keyAudioFormatEnabled);
       await prefs.remove(_keyUsbSoftwareVolume);
+      await prefs.remove(_keyUsbDeviceVolumes);
     await prefs.remove(_keyKillIsochronousUsbOnQuit);
     await prefs.remove(_keyGaplessPlaybackEnabled);
     await prefs.remove(_keyDuckOnInterruption);

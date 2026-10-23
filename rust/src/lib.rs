@@ -360,6 +360,35 @@ pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeSetRustDirectU
 
 #[cfg(all(target_os = "android", feature = "uac2"))]
 #[no_mangle]
+pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeQueueRustDirectUsbHardwareVolumeRestore(
+    _env: JNIEnv<'_>,
+    _activity: JObject<'_>,
+    volume: jdouble,
+) -> jboolean {
+    match crate::uac2::android_direct_queue_hardware_volume_restore(volume) {
+        Ok(()) => true,
+        Err(error) => {
+            dev_eprintln!(
+                "Failed to queue Android direct USB hardware volume restore: {}",
+                error
+            );
+            false
+        }
+    }
+}
+
+#[cfg(all(target_os = "android", not(feature = "uac2")))]
+#[no_mangle]
+pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeQueueRustDirectUsbHardwareVolumeRestore(
+    _env: JNIEnv<'_>,
+    _activity: JObject<'_>,
+    _volume: jdouble,
+) -> jboolean {
+    false
+}
+
+#[cfg(all(target_os = "android", feature = "uac2"))]
+#[no_mangle]
 pub extern "system" fn Java_com_mossapps_flick_MainActivity_nativeGetRustDirectUsbHardwareMute(
     _env: JNIEnv<'_>,
     _activity: JObject<'_>,
