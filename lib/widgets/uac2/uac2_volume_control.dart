@@ -6,6 +6,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/services/player_service.dart' show VolumeTier;
 import 'package:flick/l10n/l10n.dart';
 
 /// Convert a linear volume (0.0–1.0) to decibels using the same
@@ -53,67 +54,79 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
     setState(() => _draggingVolume = null);
 
     final playerService = ref.read(playerServiceProvider);
-    final wasMuted = ref.read(uac2DeviceStatusProvider)?.muted ?? false;
-
-    if (wasMuted && volume > 0.0) {
-      await ref.read(uac2DeviceStatusProvider.notifier).setMute(false);
+    final hardwareAuthority = playerService.isHardwareVolumeAuthority;
+    if (!hardwareAuthority &&
+        volume == 0.0 &&
+        playerService.currentVolume > 0.0) {
+      _preMuteVolume = playerService.currentVolume.clamp(0.01, 1.0);
     }
-    if (!wasMuted && volume == 0.0) {
-      _preMuteVolume = playerService.currentVolume > 0.0
-          ? playerService.currentVolume
-          : 1.0;
-      await ref.read(uac2DeviceStatusProvider.notifier).setMute(true);
-    }
+    // Hardware volume and mute are independent. Moving the slider must not
+    // unmute the DAC (especially after a failed or ignored volume write).
     await playerService.setVolume(volume);
+    if (mounted) setState(() {});
   }
 
   Future<void> _toggleMute() async {
-    final notifier = ref.read(uac2DeviceStatusProvider.notifier);
     final playerService = ref.read(playerServiceProvider);
-    final currentMuted = ref.read(uac2DeviceStatusProvider)?.muted ?? false;
-    final newMuted = !currentMuted;
-
     setState(() => _muteUpdateInFlight = true);
-
-    if (newMuted) {
-      _preMuteVolume = playerService.currentVolume.clamp(0.01, 1.0);
-      await notifier.setMute(true);
-      await playerService.setVolume(0.0);
-    } else {
-      await playerService.setVolume(_preMuteVolume);
-      await notifier.setMute(false);
+    try {
+      if (playerService.isHardwareVolumeAuthority) {
+        final muted = ref.read(uac2DeviceStatusProvider)?.muted;
+        if (muted != null) {
+          // Mute must not overwrite the DAC's independent volume level.
+          await ref.read(uac2DeviceStatusProvider.notifier).setMute(!muted);
+        }
+      } else if (playerService.currentVolume > 0.0) {
+        _preMuteVolume = playerService.currentVolume.clamp(0.01, 1.0);
+        await playerService.setVolume(0.0);
+      } else {
+        await playerService.setVolume(_preMuteVolume);
+      }
+    } finally {
+      if (mounted) setState(() => _muteUpdateInFlight = false);
     }
-
-    if (mounted) setState(() => _muteUpdateInFlight = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final deviceStatus = ref.watch(uac2DeviceStatusProvider);
 
-    if (deviceStatus == null ||
-        deviceStatus.state == Uac2State.idle ||
-        !deviceStatus.hasVolumeControl) {
+    if (deviceStatus == null || deviceStatus.state == Uac2State.idle) {
       return const SizedBox.shrink();
     }
 
-    final isSoftwareVolume = deviceStatus.volumeMode == Uac2VolumeMode.software;
+    final tier = ref.watch(volumeTierProvider);
     final playerService = ref.read(playerServiceProvider);
-    final isAvailable = playerService.isVolumeAvailable;
+    final isAvailable = tier != VolumeTier.unavailable;
     final playerVolume = playerService.currentVolume;
-    final hardwareAuthority = playerService.isHardwareVolumeAuthority;
-    final effectiveVolume =
-        _draggingVolume ??
-        (hardwareAuthority
-            ? (deviceStatus.volume ?? playerVolume)
-            : playerVolume);
-    final effectiveMuted = deviceStatus.muted ?? false;
+    final hardwareAuthority = tier == VolumeTier.hardware;
+    final effectiveVolume = isAvailable
+        ? (_draggingVolume ??
+                  (hardwareAuthority
+                      ? (deviceStatus.volume ?? playerVolume)
+                      : playerVolume))
+              .clamp(0.0, 1.0)
+        : 1.0;
+    final effectiveMuted = hardwareAuthority
+        ? deviceStatus.muted == true
+        : playerVolume <= 0.0;
     final volumeControlWritable =
-        deviceStatus.volumeControlWritable &&
+        (!hardwareAuthority || deviceStatus.volumeControlWritable) &&
         isAvailable &&
         !_muteUpdateInFlight;
-    final showDb =
-        isSoftwareVolume || deviceStatus.volumeMode == Uac2VolumeMode.hardware;
+    final muteControlWritable =
+        volumeControlWritable &&
+        (!hardwareAuthority || deviceStatus.muted != null);
+    // The engine's dB curve is not the DAC Feature Unit's attenuation range.
+    final showDb = tier == VolumeTier.software;
+    final volumeLabel = !isAvailable
+        ? l10n.unavailable2
+        : showDb
+        ? l10n.db15(
+            (effectiveVolume * 100).round(),
+            _volumeToDb(effectiveVolume),
+          )
+        : '${(effectiveVolume * 100).round()}%';
 
     final useGradient = widget.useGradientBackground;
     final gradientColors =
@@ -185,7 +198,7 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
                   effectiveMuted ? LucideIcons.volumeX : LucideIcons.volume2,
                   size: 20,
                 ),
-                onPressed: volumeControlWritable ? _toggleMute : null,
+                onPressed: muteControlWritable ? _toggleMute : null,
                 color: effectiveMuted ? Colors.red.shade400 : subLabelColor,
                 tooltip: effectiveMuted ? l10n.unmute : l10n.mute,
               ),
@@ -201,9 +214,10 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
                   min: 0.0,
                   max: 1.0,
                   divisions: 100,
-                  label: showDb
-                      ? l10n.db15((effectiveVolume * 100).round(), _volumeToDb(effectiveVolume))
-                      : '${(effectiveVolume * 100).round()}%',
+                  label: volumeLabel,
+                  semanticFormatterCallback: !isAvailable
+                      ? (_) => l10n.unavailable2
+                      : null,
                   onChanged: volumeControlWritable ? _onSliderChanged : null,
                   onChangeEnd: volumeControlWritable
                       ? _onSliderChangeEnd
@@ -219,9 +233,8 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
               SizedBox(
                 width: showDb ? 82 : 40,
                 child: Text(
-                  showDb
-                      ? l10n.db15((effectiveVolume * 100).round(), _volumeToDb(effectiveVolume))
-                      : '${(effectiveVolume * 100).round()}%',
+                  !isAvailable ? '—' : volumeLabel,
+                  semanticsLabel: volumeLabel,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: subLabelColor,
                     fontWeight: FontWeight.w500,
@@ -239,7 +252,8 @@ class _Uac2VolumeControlState extends ConsumerState<Uac2VolumeControl> {
                 context,
               ).textTheme.bodySmall?.copyWith(color: tertiaryColor),
             ),
-          ] else if (!deviceStatus.volumeControlWritable) ...[
+          ] else if (hardwareAuthority &&
+              !deviceStatus.volumeControlWritable) ...[
             const SizedBox(height: AppConstants.spacingXs),
             Text(
               l10n.hardwareVolumeIsDetectedButWrites,
