@@ -538,7 +538,7 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
 
   Widget _buildInfoRows(BuildContext context) {
     final rows = <Widget>[];
-    final d = widget.diagnostics;
+    final d = ref.watch(audioOutputDiagnosticsProvider) ?? widget.diagnostics;
 
     rows.add(
       _buildRow(
@@ -636,9 +636,14 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
       rows.add(_buildRow(context, label: l10n.device, value: deviceLabel));
     }
 
-    final volMode = widget.deviceStatus?.volumeMode;
-    if (volMode != null && volMode != Uac2VolumeMode.unavailable) {
-      rows.add(_buildRow(context, label: l10n.volume, value: _formatVolumeMode(volMode)));
+    final volumeTier = ref.watch(volumeTierProvider);
+    rows.add(_buildRow(context, label: l10n.volume, value: _formatVolumeTier(volumeTier)));
+    if (d?.hardwareVolumeError != null) {
+      rows.add(_buildRow(
+        context,
+        label: l10n.hardwareUsbDac,
+        value: l10n.usbHardwareVolumeError(d!.hardwareVolumeError!),
+      ));
     }
 
     final routeLabel = d?.routeLabel;
@@ -671,6 +676,10 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
     }
 
     if (d != null) {
+      // A multichannel DSD source on a stereo DAC is deliberately folded down
+      // to PCM. That is an expected limitation, not a broken passthrough, so
+      // show an informational marker instead of the red blocked icon.
+      final isMultichannelDsdFoldDown = d.dsdTransport == 'usb-pcm-folddown';
       rows.add(
         _buildRow(
           context,
@@ -678,7 +687,13 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
           value: d.passthroughAllowed ? l10n.allowed : l10n.blocked,
           trailing: d.passthroughAllowed
               ? Icon(Icons.check_circle_rounded, size: 14, color: Colors.green.shade400)
-              : Icon(Icons.block_rounded, size: 14, color: Colors.red.shade400),
+              : isMultichannelDsdFoldDown
+                  ? Icon(
+                      Icons.info_outline_rounded,
+                      size: 14,
+                      color: Colors.amber.shade400,
+                    )
+                  : Icon(Icons.block_rounded, size: 14, color: Colors.red.shade400),
         ),
       );
     }
@@ -696,7 +711,24 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
     final verification = d?.verificationReason;
     final fallback = d?.fallbackReason;
     if (verification != null && verification.isNotEmpty) {
-      rows.add(_buildRow(context, label: l10n.verified, value: verification));
+      // `verificationReason` also carries expected limitations (for example a
+      // multichannel DSD fold-down). Only call it "Verified" when the path is
+      // actually bit-perfect; otherwise present it as the active fallback.
+      final isBitPerfect = d?.passthroughAllowed == true;
+      rows.add(
+        _buildRow(
+          context,
+          label: isBitPerfect ? l10n.verified : l10n.fallback,
+          value: verification,
+          trailing: isBitPerfect
+              ? null
+              : Icon(
+                  Icons.info_outline_rounded,
+                  size: 14,
+                  color: Colors.amber.shade400,
+                ),
+        ),
+      );
     } else if (fallback != null && fallback.isNotEmpty) {
       rows.add(_buildRow(context, label: l10n.fallback, value: fallback));
     }
@@ -906,15 +938,15 @@ class _AudioInfoBottomSheetState extends ConsumerState<_AudioInfoBottomSheet> {
     return l10n.hz(rate);
   }
 
-  static String _formatVolumeMode(Uac2VolumeMode mode) {
-    switch (mode) {
-      case Uac2VolumeMode.system:
+  static String _formatVolumeTier(VolumeTier tier) {
+    switch (tier) {
+      case VolumeTier.system:
         return l10n.systemAndroidMixer;
-      case Uac2VolumeMode.hardware:
+      case VolumeTier.hardware:
         return l10n.hardwareUsbDac;
-      case Uac2VolumeMode.software:
+      case VolumeTier.software:
         return l10n.softwareAppControlled;
-      case Uac2VolumeMode.unavailable:
+      case VolumeTier.unavailable:
         return l10n.unavailable2;
     }
   }

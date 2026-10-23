@@ -1,8 +1,6 @@
 pub mod coefficients;
 pub mod dop;
 
-use std::sync::OnceLock;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DsdOutputMode {
     PcmDecimation,
@@ -20,6 +18,11 @@ pub enum DsdRate {
 }
 
 impl DsdRate {
+    /// Highest PCM rate the software DSD decimator targets. Rates above this
+    /// (352.8/705.6 kHz) are expensive and poorly supported by Android output
+    /// paths; the output chain resamples from this rate when necessary.
+    pub const MAX_PCM_TARGET: u32 = 176_400;
+
     pub fn sample_rate(&self) -> u32 {
         match self {
             Self::Dsd64 => 2_822_400,
@@ -77,37 +80,24 @@ impl DsdRate {
 
     pub fn best_pcm_target(&self, engine_rate: u32) -> u32 {
         let targets = self.pcm_decimation_targets();
+        let ceiling = if engine_rate == 0 {
+            Self::MAX_PCM_TARGET
+        } else {
+            engine_rate.min(Self::MAX_PCM_TARGET)
+        };
 
-        // If an engine already exists, prefer a target that matches its rate
-        // to avoid expensive engine recreation.
-        if engine_rate != 0 {
-            for &target in targets.iter() {
-                if target == engine_rate {
-                    return target;
-                }
-            }
+        // Targets are ordered highest-first. Match the engine exactly when
+        // possible, otherwise use the highest family rate that fits below it.
+        // The DoP carrier is deliberately ignored: it is a wire-format rate,
+        // not a requirement for PCM decimation, and its 352.8/705.6 kHz values
+        // make the decimator run far above what managed Android outputs need.
+        if let Some(&target) = targets.iter().find(|&&target| target <= ceiling) {
+            return target;
         }
 
-        // Prefer the DoP carrier rate if it appears in the target list.
-        // Many DAPs support the DoP carrier rate via their wired output
-        // even though they don't expose it as a standard PCM rate.
-        let carrier = self.dop_carrier_rate();
-        for &target in targets.iter() {
-            if target == carrier {
-                return target;
-            }
-        }
-
-        // For new engines, cap at 176.4 kHz — the highest rate that works
-        // reliably across all Android DAP/internal paths. Higher rates
-        // (352.8 kHz / 705.6 kHz) often trigger driver bugs or CPU overload.
-        for &target in targets.iter() {
-            if target <= 176_400 {
-                return target;
-            }
-        }
-
-        targets[0]
+        // Engine rate is below the 44.1 kHz family: decode at the lowest
+        // family rate and let the output chain resample down.
+        targets.last().copied().unwrap_or(44_100)
     }
 }
 
@@ -128,8 +118,14 @@ pub struct DsdDecimationPipeline {
     cic_int_f: Vec<f64>,
     cic_comb_c: Vec<i64>,
     cic_comb_f: Vec<f64>,
+    /// Per-channel FIR history, duplicated back-to-back so the active window
+    /// is always contiguous. Avoids rotating a 512-tap buffer per input sample.
     fir_state: Vec<Vec<f64>>,
-    stage2_coeffs: OnceLock<Vec<f64>>,
+    fir_pos: Vec<usize>,
+    /// Reversed (oldest-first) and normalization-scaled FIR coefficients.
+    stage2_coeffs: Vec<f64>,
+    cic_buffer: Vec<f64>,
+    channel_buffers: Vec<Vec<f32>>,
 }
 
 impl DsdDecimationPipeline {
@@ -147,6 +143,23 @@ impl DsdDecimationPipeline {
         let total_decimation = dsd_rate.sample_rate() / target_pcm_rate.max(1);
         let cic_decimation = Self::compute_cic_decimation(total_decimation);
 
+        let intermediate_rate = dsd_rate.sample_rate() / cic_decimation as u32;
+        let cutoff = Self::AUDIO_BAND_HZ.min(intermediate_rate / 2);
+        let mut stage2_coeffs = coefficients::generate_sinc_filter(
+            Self::FIXED_FIR_TAPS,
+            cutoff as f64 / intermediate_rate as f64,
+            coefficients::WindowFunction::Kaiser { beta: 10.0 },
+        );
+        // The contiguous FIR window runs oldest -> newest. Reverse the
+        // canonical newest-first taps to match it, and fold the CIC gain
+        // normalization into the taps so the hot path needs only one dot
+        // product per output sample.
+        stage2_coeffs.reverse();
+        let norm = 1.0 / (cic_decimation as f64).powi(Self::CIC_ORDER as i32);
+        for coeff in &mut stage2_coeffs {
+            *coeff *= norm;
+        }
+
         Self {
             dsd_rate,
             target_pcm_rate,
@@ -157,8 +170,11 @@ impl DsdDecimationPipeline {
             cic_int_f: vec![0.0; channels * Self::CIC_ORDER],
             cic_comb_c: vec![0; channels * Self::CIC_ORDER],
             cic_comb_f: vec![0.0; channels * Self::CIC_ORDER],
-            fir_state: vec![vec![0.0; Self::FIXED_FIR_TAPS]; channels],
-            stage2_coeffs: OnceLock::new(),
+            fir_state: vec![vec![0.0; Self::FIXED_FIR_TAPS * 2]; channels],
+            fir_pos: vec![0; channels],
+            stage2_coeffs,
+            cic_buffer: Vec::new(),
+            channel_buffers: vec![Vec::new(); channels],
         }
     }
 
@@ -197,17 +213,29 @@ impl DsdDecimationPipeline {
         1.0 / (self.cic_decimation as f64).powi(Self::CIC_ORDER as i32)
     }
 
-    fn get_stage2_coeffs(&self) -> &Vec<f64> {
-        self.stage2_coeffs.get_or_init(|| {
-            let intermediate_rate = self.dsd_rate.sample_rate() / self.cic_decimation as u32;
-            let fir_taps = self.fir_state[0].len();
-            let cutoff = Self::AUDIO_BAND_HZ.min(intermediate_rate / 2);
-            coefficients::generate_sinc_filter(
-                fir_taps,
-                cutoff as f64 / intermediate_rate as f64,
-                coefficients::WindowFunction::Kaiser { beta: 10.0 },
-            )
-        })
+    #[inline]
+    fn dot_product(history: &[f64], coeffs: &[f64]) -> f64 {
+        debug_assert_eq!(history.len(), coeffs.len());
+
+        // Four independent accumulators give the CPU enough instruction-level
+        // parallelism without reassociating floating-point math.
+        let mut acc0 = 0.0f64;
+        let mut acc1 = 0.0f64;
+        let mut acc2 = 0.0f64;
+        let mut acc3 = 0.0f64;
+        let mut i = 0usize;
+        while i + 4 <= history.len() {
+            acc0 += history[i] * coeffs[i];
+            acc1 += history[i + 1] * coeffs[i + 1];
+            acc2 += history[i + 2] * coeffs[i + 2];
+            acc3 += history[i + 3] * coeffs[i + 3];
+            i += 4;
+        }
+        while i < history.len() {
+            acc0 += history[i] * coeffs[i];
+            i += 1;
+        }
+        (acc0 + acc1) + (acc2 + acc3)
     }
 
     pub fn process_bytes(
@@ -221,13 +249,11 @@ impl DsdDecimationPipeline {
 
         let bits_per_channel = bytes_per_channel_block * 8;
         let cic_out_count = bits_per_channel / self.cic_decimation;
-        let mut cic_buffer = vec![0.0f64; cic_out_count];
+        let mut cic_buffer = std::mem::take(&mut self.cic_buffer);
+        cic_buffer.resize(cic_out_count, 0.0);
         output.clear();
 
-        let coeffs = self.get_stage2_coeffs().clone();
         let norm = self.cic_normalization();
-
-        let mut per_channel: Vec<Vec<f32>> = Vec::with_capacity(self.channels);
 
         for ch in 0..self.channels {
             let ch_offset = channel_data_offsets
@@ -239,31 +265,42 @@ impl DsdDecimationPipeline {
             self.run_cic_stage(ch, ch_bytes, &mut cic_buffer);
 
             let stage2_count = cic_buffer.len() / stage2_decimation;
+            let coeffs = &self.stage2_coeffs;
             let fir_state = &mut self.fir_state[ch];
+            let fir_pos = &mut self.fir_pos[ch];
+            let mut pos = *fir_pos;
+            let ch_output = &mut self.channel_buffers[ch];
+            ch_output.clear();
+            ch_output.reserve(stage2_count);
 
-            let mut ch_output = Vec::with_capacity(stage2_count);
             for i in 0..stage2_count {
                 let base = i * stage2_decimation;
                 for j in 0..stage2_decimation {
-                    fir_state.rotate_right(1);
-                    fir_state[0] = cic_buffer[base + j];
+                    let sample = cic_buffer[base + j];
+                    fir_state[pos] = sample;
+                    fir_state[pos + Self::FIXED_FIR_TAPS] = sample;
+                    pos += 1;
+                    if pos == Self::FIXED_FIR_TAPS {
+                        pos = 0;
+                    }
                 }
 
-                let sample: f64 = fir_state
-                    .iter()
-                    .zip(coeffs.iter())
-                    .map(|(s, c)| s * c)
-                    .sum();
-
-                ch_output.push((sample * norm) as f32);
+                // `pos` now points at the oldest of the last 512 samples; the
+                // mirrored buffer makes that window contiguous for the dot
+                // product instead of shifting the whole history every sample.
+                let window = &fir_state[pos..pos + Self::FIXED_FIR_TAPS];
+                ch_output.push(Self::dot_product(window, coeffs) as f32);
             }
-            per_channel.push(ch_output);
+            *fir_pos = pos;
         }
 
-        let frames = per_channel.first().map_or(0, |c| c.len());
+        self.cic_buffer = cic_buffer;
+
+        let frames = self.channel_buffers.first().map_or(0, |c| c.len());
+        output.reserve(frames * self.channels);
         for i in 0..frames {
             for ch in 0..self.channels {
-                output.push(per_channel[ch][i]);
+                output.push(self.channel_buffers[ch][i]);
             }
         }
 
@@ -378,12 +415,70 @@ impl DsdDecimationPipeline {
         for state in &mut self.fir_state {
             state.fill(0.0);
         }
+        self.fir_pos.fill(0);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::f64::consts::PI;
+
+    fn tone_magnitude(samples: &[f32], sample_rate: u32, freq_hz: f64) -> f64 {
+        let omega = 2.0 * PI * freq_hz / sample_rate as f64;
+        let mut real = 0.0f64;
+        let mut imag = 0.0f64;
+
+        for (index, &sample) in samples.iter().enumerate() {
+            let phase = omega * index as f64;
+            real += sample as f64 * phase.cos();
+            imag -= sample as f64 * phase.sin();
+        }
+
+        2.0 * real.hypot(imag) / samples.len() as f64
+    }
+
+    fn detect_tone_frequency(
+        samples: &[f32],
+        sample_rate: u32,
+        center_hz: f64,
+        radius_hz: f64,
+        step_hz: f64,
+    ) -> (f64, f64) {
+        let mut best_freq = center_hz - radius_hz;
+        let mut best_mag = f64::NEG_INFINITY;
+        let steps = ((2.0 * radius_hz) / step_hz).round() as usize;
+
+        for step in 0..=steps {
+            let freq = center_hz - radius_hz + step as f64 * step_hz;
+            let magnitude = tone_magnitude(samples, sample_rate, freq);
+            if magnitude > best_mag {
+                best_freq = freq;
+                best_mag = magnitude;
+            }
+        }
+
+        (best_freq, best_mag)
+    }
+
+    /// First-order sigma-delta PDM stream for a sine, packed MSB-first.
+    fn dsd_sine_bytes(freq_hz: f64, dsd_rate: u32, seconds: f64, amplitude: f64) -> Vec<u8> {
+        let bits = (dsd_rate as f64 * seconds) as usize;
+        let mut bytes = vec![0u8; bits / 8];
+        let mut integrator = 0.0f64;
+        let mut previous = 1.0f64;
+
+        for index in 0..bits {
+            let phase = 2.0 * PI * freq_hz * index as f64 / dsd_rate as f64;
+            integrator += amplitude * phase.sin() - previous;
+            previous = if integrator >= 0.0 { 1.0 } else { -1.0 };
+            if previous > 0.0 {
+                bytes[index / 8] |= 0x80 >> (index % 8);
+            }
+        }
+
+        bytes
+    }
 
     #[test]
     fn reverse_bits_reads_lsb_first_stream_msb_first() {
@@ -405,5 +500,117 @@ mod tests {
 
         assert!(!msb_out.is_empty());
         assert_eq!(msb_out, lsb_out);
+    }
+
+    #[test]
+    fn full_scale_bits_decimate_to_full_scale_pcm() {
+        let bytes = vec![0xFFu8; 65_536];
+        let mut pipeline = DsdDecimationPipeline::new(DsdRate::Dsd64, 44_100, 1, false);
+        let mut output = Vec::new();
+        pipeline.process_bytes(&bytes, &[0], &mut output);
+
+        let tail = &output[2_048..];
+        let mean = tail.iter().map(|&sample| sample as f64).sum::<f64>() / tail.len() as f64;
+        assert!(
+            (mean - 1.0).abs() < 0.01,
+            "0xFF stream should settle at +1.0, got {mean}"
+        );
+
+        let bytes = vec![0x00u8; 65_536];
+        let mut pipeline = DsdDecimationPipeline::new(DsdRate::Dsd64, 44_100, 1, false);
+        let mut output = Vec::new();
+        pipeline.process_bytes(&bytes, &[0], &mut output);
+
+        let tail = &output[2_048..];
+        let mean = tail.iter().map(|&sample| sample as f64).sum::<f64>() / tail.len() as f64;
+        assert!(
+            (mean + 1.0).abs() < 0.01,
+            "0x00 stream should settle at -1.0, got {mean}"
+        );
+    }
+
+    #[test]
+    fn decimation_preserves_tone_frequency_and_level() {
+        let tone_hz = 1_000.0;
+        let dsd_bytes = dsd_sine_bytes(tone_hz, DsdRate::Dsd64.sample_rate(), 0.25, 0.5);
+        let mut pipeline = DsdDecimationPipeline::new(DsdRate::Dsd64, 44_100, 1, false);
+        let mut output = Vec::new();
+        pipeline.process_bytes(&dsd_bytes, &[0], &mut output);
+
+        assert!(
+            output.len() > 4_096,
+            "expected enough PCM output, got {} samples",
+            output.len()
+        );
+        let analysis = &output[2_048..];
+        let (measured_hz, magnitude) =
+            detect_tone_frequency(analysis, 44_100, tone_hz, 20.0, 0.5);
+        assert!(
+            (measured_hz - tone_hz).abs() < 1.0,
+            "tone moved from {tone_hz} Hz to {measured_hz} Hz"
+        );
+        assert!(
+            magnitude > 0.2,
+            "tone level collapsed after decimation: {magnitude}"
+        );
+    }
+
+    #[test]
+    fn decimation_keeps_stereo_channels_independent() {
+        let left_hz = 1_000.0;
+        let right_hz = 3_000.0;
+        let left = dsd_sine_bytes(left_hz, DsdRate::Dsd128.sample_rate(), 0.25, 0.5);
+        let right = dsd_sine_bytes(right_hz, DsdRate::Dsd128.sample_rate(), 0.25, 0.5);
+        let mut source = left.clone();
+        source.extend_from_slice(&right);
+
+        let mut pipeline = DsdDecimationPipeline::new(DsdRate::Dsd128, 176_400, 2, false);
+        let mut output = Vec::new();
+        pipeline.process_bytes(&source, &[0, left.len()], &mut output);
+
+        assert!(
+            output.len() > 8_192,
+            "expected enough stereo PCM output, got {} samples",
+            output.len()
+        );
+        let left_pcm: Vec<f32> = output.iter().step_by(2).copied().collect();
+        let right_pcm: Vec<f32> = output.iter().skip(1).step_by(2).copied().collect();
+        let (left_measured, left_magnitude) =
+            detect_tone_frequency(&left_pcm[2_048..], 176_400, left_hz, 20.0, 0.5);
+        let (right_measured, right_magnitude) =
+            detect_tone_frequency(&right_pcm[2_048..], 176_400, right_hz, 20.0, 0.5);
+
+        assert!(
+            (left_measured - left_hz).abs() < 1.0,
+            "left channel moved from {left_hz} Hz to {left_measured} Hz"
+        );
+        assert!(
+            (right_measured - right_hz).abs() < 1.0,
+            "right channel moved from {right_hz} Hz to {right_measured} Hz"
+        );
+        assert!(
+            left_magnitude > 0.2 && right_magnitude > 0.2,
+            "stereo tone levels collapsed: left={left_magnitude}, right={right_magnitude}"
+        );
+    }
+
+    #[test]
+    fn pcm_target_never_prefers_the_dop_carrier_above_the_cap() {
+        assert_eq!(DsdRate::Dsd64.best_pcm_target(0), 176_400);
+        assert_eq!(DsdRate::Dsd128.best_pcm_target(0), 176_400);
+        assert_eq!(DsdRate::Dsd256.best_pcm_target(0), 176_400);
+        assert_eq!(DsdRate::Dsd512.best_pcm_target(0), 176_400);
+
+        // The DoP carrier for DSD128 is 352.8 kHz; PCM decimation must not
+        // select it even though it appears in the target list.
+        assert_eq!(DsdRate::Dsd128.best_pcm_target(352_800), 176_400);
+        assert_eq!(DsdRate::Dsd256.best_pcm_target(705_600), 176_400);
+
+        // Match the engine when it is already on a supported family rate,
+        // otherwise pick the highest family rate below it.
+        assert_eq!(DsdRate::Dsd128.best_pcm_target(176_400), 176_400);
+        assert_eq!(DsdRate::Dsd128.best_pcm_target(96_000), 88_200);
+        assert_eq!(DsdRate::Dsd128.best_pcm_target(48_000), 44_100);
+        assert_eq!(DsdRate::Dsd128.best_pcm_target(44_100), 44_100);
     }
 }

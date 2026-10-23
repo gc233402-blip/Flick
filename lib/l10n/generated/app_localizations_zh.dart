@@ -7158,11 +7158,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get volumeDipsWhileNotificationSoundsPlay => '通知音播放时音量降低';
 
   @override
-  String get volumeIsFixedWhileBitPerfect => '位完美直通启用且此 DAC 没有硬件音量控制时，音量固定不变。';
+  String get volumeIsFixedWhileBitPerfect =>
+      'Flick 当前无法使用 USB 硬件音量，因此位完美直通时音量固定。请使用设备上的音量键，或关闭位完美并以 PCM 播放来使用软件音量。';
 
   @override
   String get volumeIsFixedWhileBitPerfect2 =>
-      '位完美直通启用时音量固定：音频流原样送出，而这个 DAC 没有硬件音量控制。';
+      'Flick 当前无法使用 USB 硬件音量，因此位完美直通时音量固定。请使用设备上的音量键，或关闭位完美并以 PCM 播放来使用软件音量。';
+
+  @override
+  String get directUsbFormatNotice =>
+      '直连 USB DAC 已注册。直连 USB 绕过 Android 混音器和系统音量。此处显示的是请求的音频格式，并非实测的 DAC 输出采样率。';
+
+  @override
+  String get usbHardwareVolumeUnavailable =>
+      'Flick 当前无法使用 USB 硬件音量。位完美直通时，请使用设备上的音量键。如需软件音量，请关闭位完美并以 PCM 播放。';
+
+  @override
+  String usbHardwareVolumeError(String reason) {
+    return 'USB 硬件音量：$reason';
+  }
 
   @override
   String wAgo(Object arg1) {

@@ -1342,6 +1342,12 @@ fn build_output_runtime_state(
                     "dap-dop".to_string()
                 }
             }
+            OutputStrategy::UsbDirect
+                if crate::api::audio_api::current_dsd_source_channels()
+                    .is_some_and(|channels| channels > 2) =>
+            {
+                "usb-pcm-folddown".to_string()
+            }
             OutputStrategy::UsbDirect => "usb-pcm".to_string(),
             _ => "pcm".to_string(),
         };
@@ -2015,9 +2021,9 @@ pub fn create_audio_engine(
                     let fold_down = crate::api::audio_api::current_dsd_source_channels()
                         .is_some_and(|channels| channels > 2);
                     output_runtime.verification_reason = Some(if fold_down {
-                        "Multichannel DSD converted to PCM stereo fold-down; software volume available".to_string()
+                        "Multichannel DSD folded to stereo PCM; DSD passthrough unavailable".to_string()
                     } else {
-                        "DSD explicitly converted to PCM; software volume available".to_string()
+                        "DSD explicitly converted to PCM; DSD passthrough unavailable".to_string()
                     });
                 }
                 output_signature = desired_output_signature(Some(requested_sample_rate));

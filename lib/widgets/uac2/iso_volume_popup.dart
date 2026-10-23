@@ -6,6 +6,7 @@ import 'package:flick/core/theme/adaptive_color_provider.dart';
 import 'package:flick/core/constants/app_constants.dart';
 import 'package:flick/providers/providers.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/services/player_service.dart' show VolumeTier;
 import 'package:flick/l10n/l10n.dart';
 
 String _volumeToDb(double volume) {
@@ -134,70 +135,79 @@ class _IsoVolumePopupOverlayState extends ConsumerState<_IsoVolumePopupOverlay>
     setState(() => _draggingVolume = null);
 
     final playerService = ref.read(playerServiceProvider);
-    final wasMuted = ref.read(uac2DeviceStatusProvider)?.muted ?? false;
-
-    if (wasMuted && volume > 0.0) {
-      await ref.read(uac2DeviceStatusProvider.notifier).setMute(false);
+    final hardwareAuthority = playerService.isHardwareVolumeAuthority;
+    if (!hardwareAuthority &&
+        volume == 0.0 &&
+        playerService.currentVolume > 0.0) {
+      _preMuteVolume = playerService.currentVolume.clamp(0.01, 1.0);
     }
-    if (!wasMuted && volume == 0.0) {
-      _preMuteVolume = playerService.currentVolume > 0.0
-          ? playerService.currentVolume
-          : 1.0;
-      await ref.read(uac2DeviceStatusProvider.notifier).setMute(true);
-    }
+    // Do not couple a hardware volume write to an implicit unmute.
     await playerService.setVolume(volume);
+    if (mounted) setState(() {});
   }
 
   Future<void> _toggleMute() async {
-    final notifier = ref.read(uac2DeviceStatusProvider.notifier);
     final playerService = ref.read(playerServiceProvider);
-    final currentMuted = ref.read(uac2DeviceStatusProvider)?.muted ?? false;
-    final newMuted = !currentMuted;
-
     setState(() => _muteUpdateInFlight = true);
-
-    if (newMuted) {
-      _preMuteVolume = playerService.currentVolume.clamp(0.01, 1.0);
-      await notifier.setMute(true);
-      await playerService.setVolume(0.0);
-    } else {
-      await playerService.setVolume(_preMuteVolume);
-      await notifier.setMute(false);
+    try {
+      if (playerService.isHardwareVolumeAuthority) {
+        final muted = ref.read(uac2DeviceStatusProvider)?.muted;
+        if (muted != null) {
+          await ref.read(uac2DeviceStatusProvider.notifier).setMute(!muted);
+        }
+      } else if (playerService.currentVolume > 0.0) {
+        _preMuteVolume = playerService.currentVolume.clamp(0.01, 1.0);
+        await playerService.setVolume(0.0);
+      } else {
+        await playerService.setVolume(_preMuteVolume);
+      }
+    } finally {
+      if (mounted) setState(() => _muteUpdateInFlight = false);
     }
-
-    if (mounted) setState(() => _muteUpdateInFlight = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final deviceStatus = ref.watch(uac2DeviceStatusProvider);
 
-    if (deviceStatus == null ||
-        deviceStatus.state == Uac2State.idle ||
-        !deviceStatus.hasVolumeControl) {
+    if (deviceStatus == null || deviceStatus.state == Uac2State.idle) {
       if (!_isDismissing) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _dismiss());
       }
       return const SizedBox.shrink();
     }
 
-    final isSoftwareVolume = deviceStatus.volumeMode == Uac2VolumeMode.software;
+    final tier = ref.watch(volumeTierProvider);
     final playerService = ref.read(playerServiceProvider);
-    final isAvailable = playerService.isVolumeAvailable;
+    final isAvailable = tier != VolumeTier.unavailable;
     final playerVolume = playerService.currentVolume;
-    final hardwareAuthority = playerService.isHardwareVolumeAuthority;
-    final effectiveVolume =
-        _draggingVolume ??
-        (hardwareAuthority
-            ? (deviceStatus.volume ?? playerVolume)
-            : playerVolume);
-    final effectiveMuted = deviceStatus.muted ?? false;
+    final hardwareAuthority = tier == VolumeTier.hardware;
+    final effectiveVolume = isAvailable
+        ? (_draggingVolume ??
+                  (hardwareAuthority
+                      ? (deviceStatus.volume ?? playerVolume)
+                      : playerVolume))
+              .clamp(0.0, 1.0)
+        : 1.0;
+    final effectiveMuted = hardwareAuthority
+        ? deviceStatus.muted == true
+        : playerVolume <= 0.0;
     final volumeControlWritable =
-        deviceStatus.volumeControlWritable &&
+        (!hardwareAuthority || deviceStatus.volumeControlWritable) &&
         isAvailable &&
         !_muteUpdateInFlight;
-    final showDb =
-        isSoftwareVolume || deviceStatus.volumeMode == Uac2VolumeMode.hardware;
+    final muteControlWritable =
+        volumeControlWritable &&
+        (!hardwareAuthority || deviceStatus.muted != null);
+    final showDb = tier == VolumeTier.software;
+    final volumeLabel = !isAvailable
+        ? l10n.unavailable2
+        : showDb
+        ? l10n.db15(
+            (effectiveVolume * 100).round(),
+            _volumeToDb(effectiveVolume),
+          )
+        : '${(effectiveVolume * 100).round()}%';
 
     final isLeft = widget.buttonPosition.dx < widget.screenSize.width / 2;
     final popupLeft = isLeft ? widget.buttonPosition.dx : null;
@@ -228,88 +238,100 @@ class _IsoVolumePopupOverlayState extends ConsumerState<_IsoVolumePopupOverlay>
                   child: ScaleTransition(
                     scale: _scaleAnimation,
                     alignment: isLeft ? Alignment.topLeft : Alignment.topRight,
-                    child: Container(
-                      width: 56,
-                      height: 260,
-                      decoration: BoxDecoration(
-                        color: AppColors.surface.withValues(alpha: 0.92),
-                        borderRadius: BorderRadius.circular(
-                          AppConstants.radiusLg,
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Container(
+                        width: 56,
+                        height: 260,
+                        decoration: BoxDecoration(
+                          color: AppColors.surface.withValues(alpha: 0.92),
+                          borderRadius: BorderRadius.circular(
+                            AppConstants.radiusLg,
+                          ),
+                          border: Border.all(color: AppColors.glassBorder),
                         ),
-                        border: Border.all(color: AppColors.glassBorder),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 44,
-                            height: 44,
-                            child: IconButton(
-                              icon: Icon(
-                                effectiveMuted
-                                    ? LucideIcons.volumeX
-                                    : LucideIcons.volume2,
-                                size: 18,
-                              ),
-                              onPressed: volumeControlWritable
-                                  ? _toggleMute
-                                  : null,
-                              color: effectiveMuted
-                                  ? Colors.red.shade400
-                                  : context.adaptiveTextPrimary,
-                              padding: EdgeInsets.zero,
-                              tooltip: effectiveMuted ? l10n.unmute : l10n.mute,
-                            ),
-                          ),
-                          const SizedBox(height: AppConstants.spacingXs),
-                          SizedBox(
-                            height: 140,
-                            width: 40,
-                            child: RotatedBox(
-                              quarterTurns: 3,
-                              child: Slider(
-                                value: effectiveVolume,
-                                min: 0.0,
-                                max: 1.0,
-                                divisions: 100,
-                                label: showDb
-                                    ? l10n.db15((effectiveVolume * 100).round(), _volumeToDb(effectiveVolume))
-                                    : '${(effectiveVolume * 100).round()}%',
-                                onChanged: volumeControlWritable
-                                    ? _onSliderChanged
-                                    : null,
-                                onChangeEnd: volumeControlWritable
-                                    ? _onSliderChangeEnd
-                                    : null,
-                                activeColor: AppColors.accent,
-                                inactiveColor: AppColors.textTertiary
-                                    .withValues(alpha: 0.3),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: AppConstants.spacingXs),
-                          Text(
-                            showDb
-                                ? l10n.nDb((effectiveVolume * 100).round(), _volumeToDb(effectiveVolume))
-                                : '${(effectiveVolume * 100).round()}%',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: context.adaptiveTextSecondary,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 10,
-                                  height: 1.2,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: IconButton(
+                                icon: Icon(
+                                  effectiveMuted
+                                      ? LucideIcons.volumeX
+                                      : LucideIcons.volume2,
+                                  size: 18,
                                 ),
-                          ),
-                          if (!volumeControlWritable) ...[
-                            const SizedBox(height: 2),
-                            Icon(
-                              LucideIcons.lock,
-                              size: 10,
-                              color: context.adaptiveTextTertiary,
+                                onPressed: muteControlWritable
+                                    ? _toggleMute
+                                    : null,
+                                color: effectiveMuted
+                                    ? Colors.red.shade400
+                                    : context.adaptiveTextPrimary,
+                                padding: EdgeInsets.zero,
+                                tooltip: effectiveMuted
+                                    ? l10n.unmute
+                                    : l10n.mute,
+                              ),
                             ),
+                            const SizedBox(height: AppConstants.spacingXs),
+                            SizedBox(
+                              height: 140,
+                              width: 40,
+                              child: RotatedBox(
+                                quarterTurns: 3,
+                                child: Slider(
+                                  value: effectiveVolume,
+                                  min: 0.0,
+                                  max: 1.0,
+                                  divisions: 100,
+                                  label: volumeLabel,
+                                  semanticFormatterCallback: !isAvailable
+                                      ? (_) => l10n.unavailable2
+                                      : null,
+                                  onChanged: volumeControlWritable
+                                      ? _onSliderChanged
+                                      : null,
+                                  onChangeEnd: volumeControlWritable
+                                      ? _onSliderChangeEnd
+                                      : null,
+                                  activeColor: AppColors.accent,
+                                  inactiveColor: AppColors.textTertiary
+                                      .withValues(alpha: 0.3),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppConstants.spacingXs),
+                            Text(
+                              !isAvailable
+                                  ? '—'
+                                  : showDb
+                                  ? l10n.nDb(
+                                      (effectiveVolume * 100).round(),
+                                      _volumeToDb(effectiveVolume),
+                                    )
+                                  : '${(effectiveVolume * 100).round()}%',
+                              semanticsLabel: volumeLabel,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: context.adaptiveTextSecondary,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 10,
+                                    height: 1.2,
+                                  ),
+                            ),
+                            if (!volumeControlWritable) ...[
+                              const SizedBox(height: 2),
+                              Icon(
+                                LucideIcons.lock,
+                                size: 10,
+                                color: context.adaptiveTextTertiary,
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ),

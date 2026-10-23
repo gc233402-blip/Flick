@@ -583,7 +583,8 @@ class PlayerService {
   String? _activeUsbDsdMode;
   String? _activeUsbDsdSongId;
   bool _switchingDsdForVolume = false;
-  VolumeTier _activeTier = VolumeTier.system;
+  final ValueNotifier<VolumeTier> volumeTierNotifier =
+      ValueNotifier(VolumeTier.system);
 
   // Timer to periodically save position
   Timer? _positionSaveTimer;
@@ -918,18 +919,16 @@ class PlayerService {
     }
     if (!Platform.isAndroid) return;
     if (currentEngineType != AudioEngineType.usbDacExperimental) return;
-    if (!status.hasVolumeControl) return;
-
-    if (status.volumeMode == Uac2VolumeMode.hardware) {
-      if (!isHardwareVolumeAuthority) return;
+    if (status.volumeMode == Uac2VolumeMode.hardware &&
+        isHardwareVolumeAuthority) {
       final v = status.volume;
-      if (v == null || !v.isFinite) return;
-      if ((v - _currentVolume).abs() <= 0.000001) return;
-      _currentVolume = v.clamp(0.0, 1.0);
-      unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
-    } else {
-      unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
+      if (v != null && v.isFinite) {
+        _currentVolume = v.clamp(0.0, 1.0);
+      }
     }
+    // Missing native controls still require a policy update: passthrough is
+    // fixed, while a DSP path may use the engine's own software gain.
+    unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
   }
 
   Future<void> _handleBitPerfectPreferenceChanged() async {
@@ -2365,7 +2364,7 @@ class PlayerService {
   );
 
   Future<void> _reconcileVolumeForTier(VolumeTier tier) async {
-    _activeTier = tier;
+    volumeTierNotifier.value = tier;
     if (tier == VolumeTier.hardware) {
       _startHwVolumeHealthTimer();
     } else {
@@ -2646,6 +2645,8 @@ class PlayerService {
             'usb_dsd_native' when effectiveBitPerfect =>
               'USB DSD native (clock/framing checked)',
             'usb_dsd_native' => 'USB DSD native',
+            'usb_direct' when dsdTransport == 'usb-pcm-folddown' =>
+              'USB direct (stereo fold-down)',
             'usb_direct' when effectiveBitPerfect => 'USB direct (clock/payload checked)',
             'usb_direct' => 'USB direct',
             'dsd_native' when passthroughAllowed => 'Verified DSD native',
@@ -2840,6 +2841,9 @@ class PlayerService {
       urbTransport: urbTransport,
       dsdEffectiveMode: dsdEffectiveMode,
       dsdTransport: dsdTransport,
+      hardwareVolumeError: usesRustDiagnostics && directUsbRegistered
+          ? _stringValue(directUsbState?['hardware_volume_error'])
+          : null,
     );
     unawaited(_reconcileVolumeForTier(_determineCurrentTier()));
 
@@ -6034,7 +6038,7 @@ class PlayerService {
       return;
     }
 
-    _activeTier = tier;
+    volumeTierNotifier.value = tier;
     switch (tier) {
       case VolumeTier.hardware:
         _debugLog('[VolFlow] HW path: uac2 setVolume($clampedVolume)');
@@ -6618,7 +6622,9 @@ class PlayerService {
   }
 
   void _startHwVolumeHealthTimer() {
-    _hwVolumeHealthTimer?.cancel();
+    // Route snapshots can arrive faster than the interval. Reconciliation must
+    // not continually postpone the next hardware readback.
+    if (_hwVolumeHealthTimer?.isActive ?? false) return;
     _hwVolumeHealthTimer = Timer.periodic(
       const Duration(seconds: 5),
       (_) => _checkHwVolumeHealth(),
@@ -6631,7 +6637,7 @@ class PlayerService {
   }
 
   Future<void> _checkHwVolumeHealth() async {
-    if (_activeTier != VolumeTier.hardware) return;
+    if (volumeTierNotifier.value != VolumeTier.hardware) return;
     final healthy = await _uac2Service.verifyHardwareVolumeHealth();
     if (healthy == false) {
       _debugLog(
@@ -6707,6 +6713,7 @@ class PlayerService {
     }
     _sessionManager.dispose();
     audioOutputDiagnosticsNotifier.dispose();
+    volumeTierNotifier.dispose();
     bitPerfectProcessingLockedNotifier.dispose();
 
     currentSongNotifier.dispose();

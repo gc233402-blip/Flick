@@ -92,7 +92,7 @@ impl DsdDecoderThread {
                     source_channels,
                     output_channels,
                     source_config,
-                );
+                )?;
                 (engine_rate, decimation_rate, chain)
             }
             DsdOutputMode::Dop => (
@@ -102,6 +102,17 @@ impl DsdDecoderThread {
             ),
             DsdOutputMode::Native => (dsd_rate.byte_rate(), dsd_rate.byte_rate(), None),
         };
+
+        // A rate mismatch without a conversion chain means the decoder would
+        // stamp its samples with the wrong rate. That is a pitch bug, not a
+        // recoverable condition, so fail before the thread starts.
+        if output_sample_rate != router_rate && pcm_chain.is_none() {
+            return Err(anyhow!(
+                "DSD PCM output rate mismatch: decoded at {} Hz but engine runs at {} Hz",
+                router_rate,
+                output_sample_rate
+            ));
+        }
 
         log::info!(
             "[DSD-DECODER] spawn: path={}, file_rate={} Hz, dsd_rate={:?}, output_mode={:?}, target_rate={} Hz, output_rate={} Hz",
@@ -453,13 +464,23 @@ fn write_to_ring_buffer(samples: &[f32], producer: &mut SourceProducer, stop_sig
 /// Prefers an exact engine-rate match, then the highest family rate that
 /// fits below the engine rate, and falls back to the smallest family rate
 /// (the output chain then upsamples to the engine rate).
+///
+/// Rates above 176.4 kHz are capped even if the engine reports one: the
+/// decimator's FIR cost doubles at 352.8 kHz and again at 705.6 kHz, and the
+/// managed Android path may accept the rate without providing a reliable
+/// clock. The output chain resamples from the capped rate when needed.
 fn select_decimation_target(dsd_rate: DsdRate, engine_rate: u32) -> u32 {
     let targets = dsd_rate.pcm_decimation_targets();
-    if engine_rate != 0 {
-        if let Some(&exact) = targets.iter().find(|&&t| t == engine_rate) {
+    let ceiling = if engine_rate == 0 {
+        0
+    } else {
+        engine_rate.min(DsdRate::MAX_PCM_TARGET)
+    };
+    if ceiling != 0 {
+        if let Some(&exact) = targets.iter().find(|&&t| t == ceiling) {
             return exact;
         }
-        if let Some(&below) = targets.iter().find(|&&t| t <= engine_rate) {
+        if let Some(&below) = targets.iter().find(|&&t| t <= ceiling) {
             return below;
         }
     }
@@ -485,26 +506,25 @@ impl PcmOutputChain {
         source_channels: usize,
         output_channels: usize,
         source_config: Option<DsdChannelConfig>,
-    ) -> Option<Self> {
+    ) -> Result<Option<Self>> {
         let needs_resample = decimation_rate != engine_rate;
         let needs_remix = source_channels != output_channels;
         if !needs_resample && !needs_remix {
-            return None;
+            return Ok(None);
         }
 
         let resampler = if needs_resample {
-            match AudioResampler::new(decimation_rate, engine_rate, output_channels.max(1), 4096) {
-                Ok(r) => Some(r),
-                Err(e) => {
-                    log::error!(
-                        "[DSD-PCM] failed to create output resampler {} -> {} Hz: {}",
-                        decimation_rate,
-                        engine_rate,
-                        e
-                    );
-                    return None;
-                }
-            }
+            Some(
+                AudioResampler::new(decimation_rate, engine_rate, output_channels.max(1), 4096)
+                    .map_err(|error| {
+                        anyhow!(
+                            "Failed to create DSD PCM resampler {} -> {} Hz: {}",
+                            decimation_rate,
+                            engine_rate,
+                            error
+                        )
+                    })?,
+            )
         } else {
             None
         };
@@ -519,14 +539,14 @@ impl PcmOutputChain {
             needs_resample,
         );
 
-        Some(Self {
+        Ok(Some(Self {
             source_channels,
             output_channels,
             source_config,
             resampler,
             remix_buf: Vec::new(),
             resample_buf: Vec::new(),
-        })
+        }))
     }
 
     fn process(&mut self, input: &[f32]) -> &[f32] {
@@ -616,6 +636,63 @@ impl PcmOutputChain {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::audio::dsd_engine::dsd::DsdDecimationPipeline;
+    use std::f64::consts::PI;
+
+    fn tone_magnitude(samples: &[f32], sample_rate: u32, freq_hz: f64) -> f64 {
+        let omega = 2.0 * PI * freq_hz / sample_rate as f64;
+        let mut real = 0.0f64;
+        let mut imag = 0.0f64;
+
+        for (index, &sample) in samples.iter().enumerate() {
+            let phase = omega * index as f64;
+            real += sample as f64 * phase.cos();
+            imag -= sample as f64 * phase.sin();
+        }
+
+        2.0 * real.hypot(imag) / samples.len() as f64
+    }
+
+    fn detect_tone_frequency(
+        samples: &[f32],
+        sample_rate: u32,
+        center_hz: f64,
+        radius_hz: f64,
+        step_hz: f64,
+    ) -> (f64, f64) {
+        let mut best_freq = center_hz - radius_hz;
+        let mut best_mag = f64::NEG_INFINITY;
+        let steps = ((2.0 * radius_hz) / step_hz).round() as usize;
+
+        for step in 0..=steps {
+            let freq = center_hz - radius_hz + step as f64 * step_hz;
+            let magnitude = tone_magnitude(samples, sample_rate, freq);
+            if magnitude > best_mag {
+                best_freq = freq;
+                best_mag = magnitude;
+            }
+        }
+
+        (best_freq, best_mag)
+    }
+
+    fn dsd_sine_bytes(freq_hz: f64, dsd_rate: u32, seconds: f64, amplitude: f64) -> Vec<u8> {
+        let bits = (dsd_rate as f64 * seconds) as usize;
+        let mut bytes = vec![0u8; bits / 8];
+        let mut integrator = 0.0f64;
+        let mut previous = 1.0f64;
+
+        for index in 0..bits {
+            let phase = 2.0 * PI * freq_hz * index as f64 / dsd_rate as f64;
+            integrator += amplitude * phase.sin() - previous;
+            previous = if integrator >= 0.0 { 1.0 } else { -1.0 };
+            if previous > 0.0 {
+                bytes[index / 8] |= 0x80 >> (index % 8);
+            }
+        }
+
+        bytes
+    }
 
     #[test]
     fn decimation_target_prefers_family_rate_below_engine_rate() {
@@ -625,8 +702,50 @@ mod tests {
         assert_eq!(select_decimation_target(DsdRate::Dsd64, 96_000), 88_200);
         assert_eq!(select_decimation_target(DsdRate::Dsd64, 8_000), 44_100);
         assert_eq!(select_decimation_target(DsdRate::Dsd64, 0), 44_100);
-        assert_eq!(select_decimation_target(DsdRate::Dsd128, 352_800), 352_800);
+        assert_eq!(select_decimation_target(DsdRate::Dsd128, 352_800), 176_400);
+        assert_eq!(select_decimation_target(DsdRate::Dsd256, 705_600), 176_400);
         assert_eq!(select_decimation_target(DsdRate::Dsd128, 192_000), 176_400);
+    }
+
+    #[test]
+    fn dsd128_pcm_chain_preserves_pitch_at_48k() {
+        let tone_hz = 1_000.0;
+        let dsd_bytes = dsd_sine_bytes(
+            tone_hz,
+            DsdRate::Dsd128.sample_rate(),
+            0.25,
+            0.5,
+        );
+        let mut pipeline = DsdDecimationPipeline::new(DsdRate::Dsd128, 176_400, 1, false);
+        let mut pcm = Vec::new();
+        pipeline.process_bytes(&dsd_bytes, &[0], &mut pcm);
+        assert!(pcm.len() > 8_000, "decimator produced {} samples", pcm.len());
+
+        let mut chain = PcmOutputChain::new(176_400, 48_000, 1, 1, None)
+            .expect("resampler setup should succeed")
+            .expect("rate change needs a chain");
+        let mut output = Vec::new();
+        output.extend_from_slice(chain.process(&pcm));
+        loop {
+            let flushed = chain.flush();
+            if flushed.is_empty() {
+                break;
+            }
+            output.extend_from_slice(flushed);
+        }
+
+        assert!(output.len() > 4_096, "resampler produced {} samples", output.len());
+        let analysis = &output[2_048..];
+        let (measured_hz, magnitude) =
+            detect_tone_frequency(analysis, 48_000, tone_hz, 20.0, 0.5);
+        assert!(
+            (measured_hz - tone_hz).abs() < 1.0,
+            "tone moved from {tone_hz} Hz to {measured_hz} Hz through the DSD chain"
+        );
+        assert!(
+            magnitude > 0.2,
+            "tone level collapsed through the DSD chain: {magnitude}"
+        );
     }
 
     #[test]
@@ -638,6 +757,7 @@ mod tests {
             2,
             Some(DsdChannelConfig::FivePointOne),
         )
+        .expect("resampler setup should succeed")
         .expect("six-to-two needs a chain");
         // FL=1, FR=1, C=1, LFE=0, BL=1, BR=1; normalized to 1.0.
         let output = chain.process(&[1.0, 1.0, 1.0, 0.0, 1.0, 1.0]);
@@ -649,6 +769,7 @@ mod tests {
     #[test]
     fn pcm_chain_refuses_unknown_multichannel_layouts() {
         let mut chain = PcmOutputChain::new(176_400, 176_400, 8, 2, None)
+            .expect("resampler setup should succeed")
             .expect("channel count change forces a chain");
         assert!(chain.process(&[0.0f32; 16]).is_empty());
     }

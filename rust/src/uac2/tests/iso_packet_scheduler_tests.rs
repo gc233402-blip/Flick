@@ -119,13 +119,74 @@ fn test_scheduler_96000_hz_full_speed_frames_accumulate_exact_second() {
 }
 
 #[test]
-fn test_scheduler_feedback_clamps_to_nominal_band() {
+fn test_scheduler_rejects_implausible_feedback() {
     let bytes_per_frame = 6usize;
     let mut scheduler = IsoPacketScheduler::new(96_000, bytes_per_frame, 125);
-    scheduler.update_feedback_frames_per_packet(10_000.0);
+    assert!(!scheduler.update_feedback_frames_per_packet(10_000.0));
 
     let frames = transfer_frames(&scheduler.next_transfer_packet_bytes(), bytes_per_frame);
-    let nominal = 96_000.0f64 * 125.0 / 1_000_000.0;
-    let max_allowed = (nominal * 1.5).ceil() as usize + 1;
-    assert!(frames.iter().all(|frames| *frames <= max_allowed));
+    assert!(frames.iter().all(|frames| *frames == 12));
+}
+
+#[test]
+fn test_scheduler_352800_hz_dop_carrier_accumulates_exact_second() {
+    let bytes_per_frame = 6usize;
+    let mut scheduler = IsoPacketScheduler::new(352_800, bytes_per_frame, 125);
+    let mut frames = Vec::new();
+    for _ in 0..250 {
+        frames.extend(transfer_frames(
+            &scheduler.next_transfer_packet_bytes(),
+            bytes_per_frame,
+        ));
+    }
+
+    assert_eq!(frames.len(), 8_000);
+    assert_eq!(frames.iter().sum::<usize>(), 352_800);
+    assert!(frames.iter().all(|frames| *frames == 44 || *frames == 45));
+    assert_eq!(frames.iter().filter(|frames| **frames == 45).count(), 800);
+}
+
+#[test]
+fn test_scheduler_feedback_tracks_small_dac_clock_skew() {
+    let bytes_per_frame = 6usize;
+    let mut scheduler = IsoPacketScheduler::new(352_800, bytes_per_frame, 125);
+    let nominal = 352_800.0 * 125.0 / 1_000_000.0;
+    let skewed = nominal * 1.000_2;
+    assert!(scheduler.update_feedback_frames_per_packet(skewed));
+
+    let total_frames: usize = (0..8_000)
+        .map(|_| {
+            scheduler
+                .next_transfer_packet_bytes()
+                .first()
+                .copied()
+                .unwrap()
+                / bytes_per_frame
+        })
+        .sum();
+    let expected = (skewed * 8_000.0) as usize;
+    assert!(total_frames.abs_diff(expected) <= 2);
+    assert!(total_frames > 352_800);
+}
+
+#[test]
+fn test_scheduler_feedback_rejects_and_recovers_from_outlier() {
+    let bytes_per_frame = 6usize;
+    let mut scheduler = IsoPacketScheduler::new(352_800, bytes_per_frame, 125);
+    assert!(!scheduler.update_feedback_frames_per_packet(0.0));
+    assert!(!scheduler.update_feedback_frames_per_packet(f64::NAN));
+    assert!(!scheduler.update_feedback_frames_per_packet(44.1 * 1.5));
+    assert!(scheduler.update_feedback_frames_per_packet(44.1 * 1.000_1));
+
+    let total_frames: usize = (0..8_000)
+        .map(|_| {
+            scheduler
+                .next_transfer_packet_bytes()
+                .first()
+                .copied()
+                .unwrap()
+                / bytes_per_frame
+        })
+        .sum();
+    assert!(total_frames > 352_800);
 }

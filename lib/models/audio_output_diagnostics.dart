@@ -100,6 +100,7 @@ class AudioOutputDiagnostics {
     this.urbTransport,
     this.dsdEffectiveMode,
     this.dsdTransport,
+    this.hardwareVolumeError,
   });
 
   final AudioEngineType selectedMode;
@@ -134,4 +135,6 @@ class AudioOutputDiagnostics {
   /// Actual wire DSD transport label (e.g. `usb-dop-24-bit`, `usb-dsd-native`);
   /// null for PCM.
   final String? dsdTransport;
+  /// Native USB volume discovery/control failure; not an audio-path failure.
+  final String? hardwareVolumeError;
 }

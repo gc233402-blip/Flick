@@ -13049,14 +13049,32 @@ abstract class AppLocalizations {
   /// lib/features/player/widgets/volume_bottom_sheet.dart:112
   ///
   /// In en, this message translates to:
-  /// **'Volume is fixed while bit-perfect passthrough is active and this DAC has no hardware volume control.'**
+  /// **'Volume is fixed during bit-perfect passthrough because USB hardware volume is unavailable in Flick. Use the device controls, or play PCM with bit-perfect disabled for software volume.'**
   String get volumeIsFixedWhileBitPerfect;
 
   /// lib/widgets/uac2/uac2_volume_control.dart:236
   ///
   /// In en, this message translates to:
-  /// **'Volume is fixed while bit-perfect passthrough is active: the stream is sent untouched and this DAC has no hardware volume control.'**
+  /// **'Volume is fixed during bit-perfect passthrough because USB hardware volume is unavailable in Flick. Use the device controls, or play PCM with bit-perfect disabled for software volume.'**
   String get volumeIsFixedWhileBitPerfect2;
+
+  /// Direct USB route notice; registration does not prove streaming or DAC output rate.
+  ///
+  /// In en, this message translates to:
+  /// **'A direct USB DAC is registered. Direct USB bypasses Android\'s mixer and system volume. The format shown is requested content format, not a measured DAC output rate.'**
+  String get directUsbFormatNotice;
+
+  /// USB control capability notice, without claiming the DAC physically lacks volume controls or software gain is active.
+  ///
+  /// In en, this message translates to:
+  /// **'USB hardware volume is unavailable in Flick. During bit-perfect passthrough, use the device\'s physical controls. For software volume, play PCM with bit-perfect disabled.'**
+  String get usbHardwareVolumeUnavailable;
+
+  /// Native USB volume discovery/control error in audio diagnostics.
+  ///
+  /// In en, this message translates to:
+  /// **'USB hardware volume: {reason}'**
+  String usbHardwareVolumeError(String reason);
 
   /// lib/features/menu/screens/menu_screen.dart:3200
   ///

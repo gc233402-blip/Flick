@@ -11,6 +11,7 @@ import 'package:flick/src/rust/api/uac2_api.dart' as rust_uac2;
 import 'package:flick/services/uac2_preferences_service.dart';
 import 'package:flick/services/uac2_exception.dart';
 import 'package:flick/core/utils/dev_log.dart';
+import 'package:flick/l10n/l10n.dart';
 
 const Object _unset = Object();
 
@@ -145,6 +146,51 @@ class Uac2DeviceStatus {
     this.volume,
     this.muted,
   });
+
+  /// Native route capabilities, not the player's software-volume policy.
+  factory Uac2DeviceStatus.fromAndroidRoute({
+    required Map<String, dynamic> routeStatus,
+    required Uac2DeviceInfo device,
+    required Uac2State state,
+    Uac2AudioFormat? currentFormat,
+  }) {
+    final routeType = _routeTypeFromString(routeStatus['routeType'] as String?);
+    final preferredUsbDetected = routeStatus['preferredUsbDeviceDetected'] == true;
+    final directUsbRegistered = routeStatus['directUsbRegistered'] == true;
+    final volumeMode = _volumeModeFromString(routeStatus['volumeMode'] as String?);
+    final hasVolumeControl = volumeMode != Uac2VolumeMode.unavailable &&
+        routeStatus['hasVolumeControl'] == true;
+    final volume = (routeStatus['volume'] as num?)?.toDouble();
+
+    return Uac2DeviceStatus(
+      device: device,
+      state: state,
+      currentFormat: currentFormat,
+      routeType: routeType,
+      routeLabel: routeStatus['routeLabel'] as String?,
+      isExternalRoute: routeStatus['isExternal'] == true ||
+          preferredUsbDetected || directUsbRegistered,
+      warningMessage: _androidRouteWarningMessage(
+        routeType,
+        preferredUsbDetected: preferredUsbDetected,
+        directUsbRegistered: directUsbRegistered,
+      ),
+      compatibilityNotice: _deviceCompatibilityNotice(
+        routeDevice: device,
+        routeType: routeType,
+        hasVolumeControl: hasVolumeControl,
+        directUsbRegistered: directUsbRegistered,
+      ),
+      volumeMode: volumeMode,
+      hasVolumeControl: hasVolumeControl,
+      volumeControlWritable: hasVolumeControl &&
+          routeStatus['volumeControlWritable'] != false,
+      volume: hasVolumeControl && volume != null && volume.isFinite
+          ? volume.clamp(0.0, 1.0)
+          : null,
+      muted: hasVolumeControl ? routeStatus['muted'] as bool? : null,
+    );
+  }
 
   Uac2DeviceStatus copyWith({
     Uac2DeviceInfo? device,
@@ -1072,7 +1118,9 @@ Future<void> stopPriorityAnchor() async {
         }
         // Native success includes GET_CUR verification. Display that actual,
         // quantized level, not the slider's unachievable requested value.
-        return await getVolume() != null;
+        final actual = await getVolume();
+        if (hardwareOnly) await getMute();
+        return actual != null;
       }
       if (!rust_uac2.uac2IsAvailable()) return false;
       await rust_uac2.uac2SetVolume(volume: volume);
@@ -1093,7 +1141,12 @@ Future<void> stopPriorityAnchor() async {
     try {
       final result = await _channel.invokeMethod<int>('verifyHardwareVolumeHealth');
       if (result == null) return null;
-      if (result == 1) return await getVolume() != null;
+      if (result == 1) {
+        final volume = await getVolume();
+        // Mute may be absent or fail independently of a healthy volume control.
+        await getMute();
+        return volume != null;
+      }
       if (result == 0) return false;
       return null; // -1 or any other value
     } catch (e) {
@@ -1147,11 +1200,14 @@ Future<void> stopPriorityAnchor() async {
           'hardwareOnly': hardwareOnly,
           if (hardwareOnly) 'deviceName': status.device.deviceName,
         });
-        if (result != true || _currentDeviceStatus?.device != status.device ||
+        if (_currentDeviceStatus?.device != status.device ||
             _currentDeviceStatus?.volumeMode != status.volumeMode) {
           return false;
         }
-        return await getMute() == muted;
+        // A failed mute write can still produce a fresh (possibly unknown)
+        // snapshot. Do not leave the previous mute state displayed as verified.
+        final actual = await getMute();
+        return result == true && actual == muted;
       }
       if (!rust_uac2.uac2IsAvailable()) return false;
       await rust_uac2.uac2SetMute(muted: muted);
@@ -1175,7 +1231,7 @@ Future<void> stopPriorityAnchor() async {
           if (hardwareOnly) 'deviceName': status.device.deviceName,
         });
         final current = _currentDeviceStatus;
-        if (muted == null || current == null || current.device != status.device ||
+        if (current == null || current.device != status.device ||
             current.volumeMode != status.volumeMode) {
           return null;
         }
@@ -1186,6 +1242,11 @@ Future<void> stopPriorityAnchor() async {
       return rust_uac2.uac2GetMute();
     } catch (e) {
       devLog('Uac2Service.getMute failed: $e');
+      final current = _currentDeviceStatus;
+      if (Platform.isAndroid && current != null &&
+          current.device == status.device && current.volumeMode == status.volumeMode) {
+        _updateStatus(current.copyWith(muted: null));
+      }
       return null;
     }
   }
@@ -1459,23 +1520,10 @@ Future<void> stopPriorityAnchor() async {
     }
 
     final routeType = _routeTypeFromString(routeStatus['routeType'] as String?);
-    final routeLabel = routeStatus['routeLabel'] as String?;
     final isExternal = routeStatus['isExternal'] == true;
     final preferredUsbDetected =
         routeStatus['preferredUsbDeviceDetected'] == true;
     final directUsbRegistered = routeStatus['directUsbRegistered'] == true;
-    final volumeMode = directUsbRegistered &&
-            _volumeModeFromString(routeStatus['volumeMode'] as String?) ==
-                Uac2VolumeMode.unavailable
-        ? Uac2VolumeMode.software
-        : _volumeModeFromString(routeStatus['volumeMode'] as String?);
-    final isSwVolumeOverride = volumeMode == Uac2VolumeMode.software;
-    final hasVolumeControl = isSwVolumeOverride ||
-        routeStatus['hasVolumeControl'] == true;
-    final volumeControlWritable = isSwVolumeOverride ||
-        (hasVolumeControl && routeStatus['volumeControlWritable'] != false);
-    final volume = (routeStatus['volume'] as num?)?.toDouble();
-    final muted = routeStatus['muted'] as bool?;
 
     if (!effectiveHasSong &&
         !effectiveIsPlaying &&
@@ -1509,32 +1557,11 @@ Future<void> stopPriorityAnchor() async {
         : Uac2State.connected;
 
     _updateStatus(
-      Uac2DeviceStatus(
+      Uac2DeviceStatus.fromAndroidRoute(
+        routeStatus: routeStatus,
         device: routeDevice,
         state: resolvedState,
-        errorMessage: null,
-        warningMessage: _androidRouteWarningMessage(
-          routeType,
-          preferredUsbDetected: preferredUsbDetected,
-          directUsbRegistered: directUsbRegistered,
-        ),
-        compatibilityNotice: _deviceCompatibilityNotice(
-          routeDevice: routeDevice,
-          routeType: routeType,
-          volumeMode: volumeMode,
-          hasVolumeControl: hasVolumeControl,
-          directUsbRegistered: directUsbRegistered,
-        ),
         currentFormat: effectiveFormat,
-        routeType: routeType,
-        routeLabel: routeLabel,
-        isExternalRoute:
-            isExternal || preferredUsbDetected || directUsbRegistered,
-        volumeMode: volumeMode,
-        hasVolumeControl: hasVolumeControl,
-        volumeControlWritable: volumeControlWritable,
-        volume: volume,
-        muted: muted,
       ),
     );
   }
@@ -2233,6 +2260,10 @@ String? _androidRouteWarningMessage(
     return 'An experimental direct USB DAC is registered, but Android still reports ${routeType.name} as the current system route. Direct USB bypasses Android system volume and mixer controls, so the format shown below is requested content format, not verified hardware output.';
   }
 
+  if (directUsbRegistered) {
+    return l10n.directUsbFormatNotice;
+  }
+
   if (preferredUsbDetected && routeType != Uac2RouteType.externalUsb) {
     return 'A preferred USB DAC is attached, but Android does not report it as the current shared route. Direct USB output is only confirmed when the experimental direct path becomes active.';
   }
@@ -2253,7 +2284,6 @@ String? _androidRouteWarningMessage(
 String? _deviceCompatibilityNotice({
   required Uac2DeviceInfo routeDevice,
   required Uac2RouteType routeType,
-  required Uac2VolumeMode volumeMode,
   required bool hasVolumeControl,
   required bool directUsbRegistered,
 }) {
@@ -2263,19 +2293,7 @@ String? _deviceCompatibilityNotice({
   final isUsb = routeType == Uac2RouteType.externalUsb || directUsbRegistered;
 
   if (!hasVolumeControl && isUsb) {
-    notices.add(
-      'This device does not report hardware volume control. '
-      'Volume changes or track switches may cause audio muting in bit-perfect mode. '
-      'Use the device\'s physical controls if available.',
-    );
-  }
-
-  if (volumeMode == Uac2VolumeMode.software && isUsb) {
-    notices.add(
-      'Software volume control is active. Adjusting volume during bit-perfect '
-      'playback may interrupt the audio stream. Use hardware volume on the DAC '
-      'if available.',
-    );
+    notices.add(l10n.usbHardwareVolumeUnavailable);
   }
 
   final mayHaveInput = name.contains('mic') ||

@@ -97,6 +97,42 @@ pub(crate) fn quantize_volume(volume: f64, ranges: &[VolumeRange]) -> i16 {
     }).unwrap_or(min)
 }
 
+#[derive(Debug, PartialEq)]
+pub(crate) struct HardwareVolumeSnapshot {
+    pub(crate) volume: f64,
+    pub(crate) muted: Option<bool>,
+    pub(crate) mute_error: Option<String>,
+}
+
+/// Volume readback is mandatory; an optional mute control has independent health.
+pub(crate) fn read_hardware_volume_snapshot(
+    channels: &[u16],
+    ranges: &[VolumeRange],
+    mut read_volume: impl FnMut(u16) -> Result<i16, String>,
+    read_mute: impl FnOnce() -> Result<Option<bool>, String>,
+) -> Result<HardwareVolumeSnapshot, String> {
+    let (&first, remaining) = channels.split_first()
+        .ok_or_else(|| "USB volume has no playback channels".to_string())?;
+    let raw = read_volume(first)?;
+    for &channel in remaining {
+        if read_volume(channel)? != raw {
+            return Err("USB volume readback channels disagree".to_string());
+        }
+    }
+    if !ranges.iter().any(|range| raw >= range.min && raw <= range.max) {
+        return Err("USB volume readback is out of range".to_string());
+    }
+    let (muted, mute_error) = match read_mute() {
+        Ok(muted) => (muted, None),
+        Err(error) => (None, Some(error)),
+    };
+    Ok(HardwareVolumeSnapshot {
+        volume: normalize_volume(raw, ranges),
+        muted,
+        mute_error,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -140,5 +176,76 @@ mod tests {
     fn quantization_never_emits_an_unaligned_maximum() {
         let ranges = [VolumeRange { min: -1000, max: 0, resolution: 256 }];
         assert_eq!(quantize_volume(1.0, &ranges), -232);
+    }
+
+    const TEST_RANGES: [VolumeRange; 1] = [VolumeRange {
+        min: -25600, max: 0, resolution: 256,
+    }];
+
+    #[test]
+    fn optional_mute_failure_does_not_disable_master_volume() {
+        let snapshot = read_hardware_volume_snapshot(
+            &[0], &TEST_RANGES,
+            |channel| { assert_eq!(channel, 0); Ok(-12800) },
+            || Err("mute GET_CUR stalled".to_string()),
+        ).unwrap();
+        assert_eq!(snapshot.volume, 0.5);
+        assert_eq!(snapshot.muted, None);
+        assert_eq!(snapshot.mute_error.as_deref(), Some("mute GET_CUR stalled"));
+    }
+
+    #[test]
+    fn stereo_volume_readback_preserves_optional_mute_state() {
+        let mut read_channels = Vec::new();
+        let snapshot = read_hardware_volume_snapshot(
+            &[1, 2], &TEST_RANGES,
+            |channel| { read_channels.push(channel); Ok(-6400) },
+            || Ok(Some(true)),
+        ).unwrap();
+        assert_eq!(read_channels, vec![1, 2]);
+        assert_eq!(snapshot.volume, 0.75);
+        assert_eq!(snapshot.muted, Some(true));
+        assert_eq!(snapshot.mute_error, None);
+    }
+
+    #[test]
+    fn volume_without_mute_remains_usable_and_mute_can_recover() {
+        for muted in [None, Some(false), Some(true)] {
+            let snapshot = read_hardware_volume_snapshot(
+                &[0], &TEST_RANGES, |_| Ok(-25600), || Ok(muted),
+            ).unwrap();
+            assert_eq!(snapshot.volume, 0.0);
+            assert_eq!(snapshot.muted, muted);
+            assert_eq!(snapshot.mute_error, None);
+        }
+    }
+
+    #[test]
+    fn failed_or_inconsistent_volume_never_probes_mute() {
+        for (channels, values) in [
+            (vec![], vec![]),
+            (vec![0], vec![Err("volume GET_CUR stalled".to_string())]),
+            (vec![0], vec![Ok(1)]),
+            (vec![1, 2], vec![Ok(-12800), Ok(-6400)]),
+            (vec![1, 2], vec![Ok(-12800), Err("right channel stalled".to_string())]),
+        ] {
+            let mut values = values.into_iter();
+            let result = read_hardware_volume_snapshot(
+                &channels, &TEST_RANGES, |_| values.next().unwrap(),
+                || panic!("mute must not mask a volume failure"),
+            );
+            assert!(result.is_err());
+        }
+    }
+
+    #[test]
+    fn readback_in_a_gap_between_volume_ranges_is_rejected() {
+        let ranges = [
+            VolumeRange { min: -25600, max: -12800, resolution: 256 },
+            VolumeRange { min: -6400, max: 0, resolution: 256 },
+        ];
+        assert!(read_hardware_volume_snapshot(
+            &[0], &ranges, |_| Ok(-9600), || panic!("invalid volume"),
+        ).is_err());
     }
 }

@@ -20,9 +20,16 @@ class VolumeBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<VolumeTier>(
+      valueListenable: playerService.volumeTierNotifier,
+      builder: (context, tier, _) => _buildVolumeSheet(context, tier),
+    );
+  }
+
+  Widget _buildVolumeSheet(BuildContext context, VolumeTier tier) {
     final maxVolume = playerService.maxVolume;
     final initialVolume = playerService.currentVolume.clamp(0.0, maxVolume);
-    final isAvailable = playerService.isVolumeAvailable;
+    final isAvailable = tier != VolumeTier.unavailable;
     double currentVolume = initialVolume;
     return StatefulBuilder(
       builder: (context, setSheetState) {
@@ -59,7 +66,8 @@ class VolumeBottomSheet extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    '${(currentVolume * 100).round()}%',
+                    isAvailable ? '${(currentVolume * 100).round()}%' : '—',
+                    semanticsLabel: isAvailable ? null : l10n.unavailable2,
                     style: const TextStyle(
                       fontFamily: 'GoogleSansFlex',
                       fontSize: 16,
@@ -79,11 +87,16 @@ class VolumeBottomSheet extends StatelessWidget {
                   ),
                   Expanded(
                     child: Slider(
-                      value: currentVolume,
+                      value: isAvailable ? currentVolume : 1.0,
                       min: 0.0,
                       max: maxVolume,
                       divisions: (maxVolume * 100).round(),
-                      label: '${(currentVolume * 100).round()}%',
+                      label: isAvailable
+                          ? '${(currentVolume * 100).round()}%'
+                          : l10n.unavailable2,
+                      semanticFormatterCallback: !isAvailable
+                          ? (_) => l10n.unavailable2
+                          : null,
                       onChanged: isAvailable
                           ? (value) {
                               setSheetState(() {
@@ -94,6 +107,12 @@ class VolumeBottomSheet extends StatelessWidget {
                       onChangeEnd: isAvailable
                           ? (value) async {
                               await playerService.setVolume(value);
+                              if (context.mounted) {
+                                setSheetState(() {
+                                  currentVolume = playerService.currentVolume
+                                      .clamp(0.0, maxVolume);
+                                });
+                              }
                             }
                           : null,
                       activeColor: AppColors.accent,

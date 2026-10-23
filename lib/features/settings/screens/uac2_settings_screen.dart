@@ -88,7 +88,6 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
                           ],
                           if (deviceStatus != null &&
                               deviceStatus.state != Uac2State.idle &&
-                              deviceStatus.hasVolumeControl &&
                               appPreferences.showUsbVolumeOnSettings) ...[
                             const SizedBox(height: AppConstants.spacingLg),
                             _buildSectionHeader(context, l10n.volumeControl),
@@ -726,6 +725,13 @@ class _Uac2SettingsScreenState extends ConsumerState<Uac2SettingsScreen> {
           if (diagnostics?.fallbackReason != null) ...[
             _buildDivider(),
             _buildWarningMessage(context, diagnostics!.fallbackReason!),
+          ],
+          if (diagnostics?.hardwareVolumeError != null) ...[
+            _buildDivider(),
+            _buildWarningMessage(
+              context,
+              l10n.usbHardwareVolumeError(diagnostics!.hardwareVolumeError!),
+            ),
           ],
           if (status.warningMessage != null) ...[
             _buildDivider(),

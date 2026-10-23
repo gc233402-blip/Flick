@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flick/models/audio_engine_type.dart';
 import 'package:flick/models/audio_output_diagnostics.dart';
 import 'package:flick/services/uac2_service.dart';
+import 'package:flick/services/player_service.dart' show VolumeTier;
 import 'package:flick/services/uac2_preferences_service.dart';
 import 'package:flick/providers/player_provider.dart';
 import 'package:flick/src/rust/audio/engine.dart' show AudioApiPreference;
@@ -133,6 +134,16 @@ final currentPlaybackModeProvider = Provider<AudioEngineType>((ref) {
   final notifier = ref
       .watch(playerServiceProvider)
       .selectedPlaybackModeNotifier;
+  void listener() => ref.invalidateSelf();
+  notifier.addListener(listener);
+  ref.onDispose(() => notifier.removeListener(listener));
+  return notifier.value;
+});
+
+/// Effective volume authority, including passthrough and hardware read failures.
+/// Native device capabilities alone cannot tell whether software gain is active.
+final volumeTierProvider = Provider<VolumeTier>((ref) {
+  final notifier = ref.watch(playerServiceProvider).volumeTierNotifier;
   void listener() => ref.invalidateSelf();
   notifier.addListener(listener);
   ref.onDispose(() => notifier.removeListener(listener));
