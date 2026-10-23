@@ -5,7 +5,7 @@ use crate::audio::engine::{audio_callback, AudioCallbackData};
 use crate::uac2::endpoint::{select_explicit_feedback_endpoint, FeedbackEndpointCandidate};
 use crate::uac2::payload_audit_latch::PayloadAuditLatch;
 use crate::uac2::volume_control::{
-    normalize_volume, parse_uac2_volume_ranges, quantize_volume, volume_bounds,
+    normalize_volume, parse_uac2_volume_ranges, quantize_volume, read_hardware_volume_snapshot, volume_bounds,
     AudioControlProtocol, VolumeRange,
 };
 use crate::uac2::{iso_packet_scheduler::IsoPacketScheduler, AudioControlParser, DescriptorIter};
@@ -2176,7 +2176,8 @@ pub fn android_direct_debug_state() -> AndroidDirectUsbDebugState {
         hardware_mute_supported: state
             .hardware_volume_control
             .as_ref()
-            .is_some_and(|control| control.mute_channel.is_some()),
+            .is_some_and(|control| control.mute_channel.is_some())
+            && state.hardware_mute_active.is_some(),
         hardware_volume_normalized: state.hardware_volume_normalized,
         hardware_mute_active: state.hardware_mute_active,
         hardware_volume_min_raw: state
@@ -3320,10 +3321,12 @@ fn read_feature_unit_i16_control(
             &mut data,
             Duration::from_secs(1),
         )
-        .map_err(|error| format!("feature-unit control read failed: {}", error))?;
+        .map_err(|error| format!(
+            "USB volume read request=0x{request:02x} interface={interface_number} unit={feature_unit_id} channel={channel} selector=0x{control_selector:04x}: {error}"
+        ))?;
     if transferred < data.len() {
         return Err(format!(
-            "feature-unit control read returned {} bytes, expected {}",
+            "USB volume read request=0x{request:02x} interface={interface_number} unit={feature_unit_id} channel={channel} returned {} bytes, expected {}",
             transferred,
             data.len()
         ));
@@ -3352,9 +3355,13 @@ fn write_feature_unit_i16_control(
             &data,
             Duration::from_secs(1),
         )
-        .map_err(|error| format!("feature-unit control write failed: {}", error))?;
+        .map_err(|error| format!(
+            "USB volume SET_CUR interface={interface_number} unit={feature_unit_id} channel={channel} selector=0x{control_selector:04x}: {error}"
+        ))?;
     if transferred != data.len() {
-        return Err("short feature-unit volume write".to_string());
+        return Err(format!(
+            "short USB volume SET_CUR interface={interface_number} unit={feature_unit_id} channel={channel}: {transferred}/{} bytes", data.len()
+        ));
     }
     Ok(())
 }
@@ -3380,10 +3387,12 @@ fn read_feature_unit_bool_control(
             &mut data,
             Duration::from_secs(1),
         )
-        .map_err(|error| format!("feature-unit mute read failed: {}", error))?;
+        .map_err(|error| format!(
+            "USB mute {protocol:?} GET_CUR interface={interface_number} unit={feature_unit_id} channel={channel}: {error}"
+        ))?;
     if transferred < data.len() {
         return Err(format!(
-            "feature-unit mute read returned {} bytes, expected {}",
+            "USB mute {protocol:?} GET_CUR interface={interface_number} unit={feature_unit_id} channel={channel} returned {} bytes, expected {}",
             transferred,
             data.len()
         ));
@@ -3412,9 +3421,13 @@ fn write_feature_unit_bool_control(
             &data,
             Duration::from_secs(1),
         )
-        .map_err(|error| format!("feature-unit mute write failed: {}", error))?;
+        .map_err(|error| format!(
+            "USB mute SET_CUR interface={interface_number} unit={feature_unit_id} channel={channel}: {error}"
+        ))?;
     if transferred != data.len() {
-        return Err("short feature-unit mute write".to_string());
+        return Err(format!(
+            "short USB mute SET_CUR interface={interface_number} unit={feature_unit_id} channel={channel}: {transferred}/{} bytes", data.len()
+        ));
     }
     Ok(())
 }
@@ -3436,13 +3449,13 @@ fn read_feature_unit_volume_range(
         let transferred = handle.read_control(
             request_type, UAC2_REQUEST_GET_RANGE, value, index,
             &mut count_bytes, Duration::from_secs(1),
-        ).map_err(|e| format!("feature-unit volume RANGE count failed: {e}"))?;
+        ).map_err(|e| format!("USB volume RANGE count interface={interface_number} unit={feature_unit_id} channel={channel}: {e}"))?;
         if transferred != count_bytes.len() {
-            return Err("short USB volume RANGE count".to_string());
+            return Err(format!("short USB volume RANGE count interface={interface_number} unit={feature_unit_id} channel={channel}: {transferred}/2 bytes"));
         }
         let count = u16::from_le_bytes(count_bytes) as usize;
         if !(1..=64).contains(&count) {
-            return Err("invalid USB volume RANGE count".to_string());
+            return Err(format!("invalid USB volume RANGE count interface={interface_number} unit={feature_unit_id} channel={channel}: {count}"));
         }
         let mut data = [0u8; 386];
         let expected = 2 + count * 6;
@@ -3450,9 +3463,9 @@ fn read_feature_unit_volume_range(
             request_type, UAC2_REQUEST_GET_RANGE, value, index,
             &mut data[..expected],
             Duration::from_secs(1),
-        ).map_err(|e| format!("feature-unit volume RANGE failed: {e}"))?;
+        ).map_err(|e| format!("USB volume RANGE interface={interface_number} unit={feature_unit_id} channel={channel}: {e}"))?;
         if transferred != expected {
-            return Err("short USB volume RANGE response".to_string());
+            return Err(format!("short USB volume RANGE interface={interface_number} unit={feature_unit_id} channel={channel}: {transferred}/{expected} bytes"));
         }
         return parse_uac2_volume_ranges(&data[..transferred]);
     }
@@ -3605,34 +3618,24 @@ fn refresh_android_usb_hardware_volume_snapshot_with_handle(
 
     let mut last_err = None;
     for attempt in 0..GET_CUR_RETRIES {
-        let read = control.volume_channels.iter().map(|&channel| read_feature_unit_i16_control(
-            handle, control.interface_number, control.feature_unit_id, channel,
-            control.protocol.current_request(), UAC2_FEATURE_UNIT_VOLUME_CONTROL,
-        )).collect::<Result<Vec<_>, _>>().and_then(|values| {
-            let raw = values[0];
-            if values.iter().any(|value| *value != raw)
-                || !control.ranges.iter().any(|range| raw >= range.min && raw <= range.max) {
-                return Err("USB volume readback is out of range or channels disagree".to_string());
-            }
-            Ok(raw)
-        });
+        let read = read_hardware_volume_snapshot(
+            &control.volume_channels,
+            &control.ranges,
+            |channel| read_feature_unit_i16_control(
+                handle, control.interface_number, control.feature_unit_id, channel,
+                control.protocol.current_request(), UAC2_FEATURE_UNIT_VOLUME_CONTROL,
+            ),
+            || control.mute_channel.map(|channel| read_feature_unit_bool_control(
+                handle, control.interface_number, control.feature_unit_id, channel,
+                control.protocol, UAC2_FEATURE_UNIT_MUTE_CONTROL,
+            )).transpose(),
+        );
         match read {
-            Ok(raw) => {
-                let normalized = normalize_volume(raw, &control.ranges);
-                let muted = control
-                    .mute_channel
-                    .map(|channel| {
-                        read_feature_unit_bool_control(
-                            handle,
-                            control.interface_number,
-                            control.feature_unit_id,
-                            channel,
-                            control.protocol,
-                            UAC2_FEATURE_UNIT_MUTE_CONTROL,
-                        )
-                    })
-                    .transpose()?;
-                return Ok((normalized, muted));
+            Ok(snapshot) => {
+                if let Some(error) = snapshot.mute_error {
+                    log_warn!("[USB] Hardware volume remains available; optional mute unavailable: {error}");
+                }
+                return Ok((snapshot.volume, snapshot.muted));
             }
             Err(e) => {
                 dev_eprintln!("[VolFlow] GET_CUR attempt {} failed: {e}", attempt + 1);
@@ -3802,10 +3805,12 @@ pub fn android_direct_set_hardware_mute(muted: bool) -> Result<(), String> {
     let snapshot_result =
         refresh_android_usb_hardware_volume_snapshot_with_handle(&claimed_handle.handle, &control);
     let (normalized, snapshot_muted) = snapshot_result?;
+    // Publish the observed state even when mute readback fails or disagrees.
+    // Healthy volume must remain usable, and an unknown mute must not stay cached.
+    publish_hardware_volume_snapshot(state.hardware_volume_generation, normalized, snapshot_muted)?;
     if snapshot_muted != Some(muted) {
         return Err("USB mute write did not match readback".to_string());
     }
-    publish_hardware_volume_snapshot(state.hardware_volume_generation, normalized, snapshot_muted)?;
     Ok(())
 }
 
@@ -4246,12 +4251,15 @@ fn create_android_usb_backend_inner(
     set_hardware_volume_control(hardware_volume_control.clone());
     if let Some(control) = hardware_volume_control.as_ref() {
         log_info!(
-            "[USB] Hardware volume control found: feature_unit={}, interface={}, min={}, max={}, res={}",
+            "[USB] Hardware volume control found: feature_unit={}, interface={}, min={}, max={}, res={}, protocol={:?}, channels={:?}, mute_channel={:?}",
             control.feature_unit_id,
             control.interface_number,
             control.min_volume_raw,
             control.max_volume_raw,
-            control.resolution_raw
+            control.resolution_raw,
+            control.protocol,
+            control.volume_channels,
+            control.mute_channel
         );
         match refresh_android_usb_hardware_volume_snapshot_with_handle(
             &claimed_handle.handle,
