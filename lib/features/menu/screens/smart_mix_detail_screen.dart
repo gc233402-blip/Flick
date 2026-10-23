@@ -310,6 +310,7 @@ class _SmartMixDetailScreenState extends ConsumerState<SmartMixDetailScreen>
                         expanded: prefs.detailHeaderArtExpanded,
                         centeredTitle: prefs.detailHeaderCenteredTitle,
                         artBuilder: _buildArtLayer,
+                        artColor: _mixColor,
                         title: widget.title,
                         subtitle: widget.description,
                         subtitleMaxLines: 2,

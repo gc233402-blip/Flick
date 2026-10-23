@@ -615,6 +615,7 @@ class _ArtistDetailScreenState extends ConsumerState<ArtistDetailScreen>
                         expanded: prefs.detailHeaderArtExpanded,
                         centeredTitle: prefs.detailHeaderCenteredTitle,
                         artBuilder: _buildArtLayer,
+                        artColor: _artistColor,
                         title: widget.artistName,
                         subtitle:
                             l10n.albumsSongs(_albumGroups.length, widget.songs.length),
