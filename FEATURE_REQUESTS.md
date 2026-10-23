@@ -109,5 +109,6 @@ name, track count, artist, and (newly added) **Year**.
 
 - [x] **Tidal integration** — Tidal streaming service support (reverse-engineered web/OAuth2 path: user signs in with their own account; HiFi lossless FLAC/ALAC through the bit-perfect engine; HiRes/MQA/Atmos gated by Tidal and surfaced as an error).
 - [X] **Local Media Server** — stream music from NAS / network shares. Shipped as Network Sources (`docs/NETWORK_SOURCES_PLAN.md`): Subsonic (Navidrome/Airsonic/gonic/etc.), WebDAV (Nextcloud/ownCloud/Synology/generic), Jellyfin, and UPnP/DLNA media-server browse/play, all through the existing Rust engine (bit-perfect/DSD/gapless preserved). SMB is a loud-failing placeholder recommending the WebDAV workaround.
+- [ ] **Discord Rich Presence** — show “Listening to Flick” with the current track, artist/album, playback timer, and Flick logo on Discord, including the mobile app. Feasible through Discord Social SDK 1.10+ unauthenticated Android presence when the Discord app is installed and signed in; no OAuth or account linking required. Needs Discord Developer Portal approval for a music app, the proprietary native `discord_partner_sdk.aar` (not committable to the repo), a thin Flutter/JNI bridge, and opt-in privacy handling. Local album art cannot be used; use a static Flick asset. **Status: still thinking about it.**
 
 ---
