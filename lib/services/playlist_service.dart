@@ -586,9 +586,7 @@ class PlaylistService {
 
   Future<PlaylistImportResult?> importM3uPlaylist() async {
     if (!Platform.isAndroid) {
-      throw UnsupportedError(
-        'Playlist import is currently supported on Android only.',
-      );
+      throw UnsupportedError(l10n.playlistImportAndroidOnly);
     }
 
     if (_importInProgress) return null;
@@ -612,7 +610,7 @@ class PlaylistService {
       );
       devLog('[PlaylistService] Content length: ${content?.length ?? 0}');
       if (content == null || content.trim().isEmpty) {
-        throw const FormatException('Selected playlist file is empty');
+        throw FormatException(l10n.selectedPlaylistFileIsEmpty);
       }
 
       final displayName = await _storageChannel.invokeMethod<String>(
@@ -744,15 +742,13 @@ class PlaylistService {
     required bool utf8,
   }) async {
     if (!Platform.isAndroid) {
-      throw UnsupportedError(
-        'Playlist export is currently supported on Android only.',
-      );
+      throw UnsupportedError(l10n.playlistExportAndroidOnly);
     }
 
     await _ensureLoaded();
     final playlist = await getPlaylist(playlistId);
     if (playlist == null) {
-      throw StateError('Playlist not found');
+      throw StateError(l10n.playlistNotFound);
     }
 
     final extension = utf8 ? 'm3u8' : 'm3u';
@@ -773,7 +769,7 @@ class PlaylistService {
       {'uri': documentUri, 'content': content},
     );
     if (success != true) {
-      throw const FileSystemException('Failed to write playlist file');
+      throw FileSystemException(l10n.failedToWritePlaylistFile);
     }
 
     return PlaylistExportResult(
@@ -1195,7 +1191,7 @@ class PlaylistService {
         {'uri': sourcePath},
       );
       if (content == null) {
-        throw const FormatException('Selected playlist file is empty');
+        throw FormatException(l10n.selectedPlaylistFileIsEmpty);
       }
       return content;
     }
